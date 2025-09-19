@@ -139,6 +139,22 @@
 </div>
 {{/show_course_header}}
 
+{{#show_course_header}}
+{{#secondarymoremenu}}
+<div class="secondary-navigation edw-tabs-navigation d-print-none">
+    {{> core/moremenu}}
+</div>
+{{/secondarymoremenu}}
+{{/show_course_header}}
+
+{{#overflow}}
+<div class="container-fluid tertiary-navigation">
+    <div class="navitem">
+        {{> core/url_select}}
+    </div>
+</div>
+{{/overflow}}
+
 <div id="page-content" class="pb-4 d-print-block">
     <div id="region-main-box">
         {{#hasregionmainsettingsmenu}}
@@ -154,13 +170,6 @@
             {{#headercontent}}
                 {{> core/activity_header }}
             {{/headercontent}}
-            {{#overflow}}
-                <div class="container-fluid tertiary-navigation">
-                    <div class="navitem">
-                        {{> core/url_select}}
-                    </div>
-                </div>
-            {{/overflow}}
 
             {{#custom_course_cards}}
             <!-- Custom Course Sections as Cards -->

@@ -841,6 +841,16 @@
     padding-top: 2rem;
 }
 
+// Add margin above navigation tabs when they appear after our custom header
+.course-header-banner + .secondary-navigation {
+    margin-top: 2rem;
+}
+
+// Add margin above navigation tabs when they appear after our custom header (alternative selector)
+.course-header-banner ~ .secondary-navigation {
+    margin-top: 2rem;
+}
+
 // ========================================
 // BEAUTIFUL COURSE HEADER STYLES
 // ========================================

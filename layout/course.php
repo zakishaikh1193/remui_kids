@@ -33,6 +33,9 @@ if(!apply_latest_user_pref()){
 // Include parent theme's common layout setup
 require_once($CFG->dirroot . '/theme/remui/layout/common.php');
 
+// Set show_course_header flag for common_start template
+$templatecontext['show_course_header'] = false;
+
 if (isset($templatecontext['focusdata']['enabled']) && $templatecontext['focusdata']['enabled']) {
     list(
         $templatecontext['focusdata']['sections'],
@@ -72,6 +75,10 @@ if ($isediting) {
     $templatecontext['current_section'] = $section;
     $templatecontext['section_activities'] = theme_remui_kids_get_section_activities($COURSE, $section);
     $templatecontext['course_url'] = new moodle_url('/course/view.php', ['id' => $COURSE->id]);
+    
+    // Add course header data for section view
+    $templatecontext['course_header_data'] = theme_remui_kids_get_course_header_data($COURSE);
+    $templatecontext['show_course_header'] = true;
     
     // Must be called before rendering the template
     require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');

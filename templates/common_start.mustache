@@ -153,12 +153,6 @@
             </div>
             
             
-            {{! REMOVED: Course stats section - We're using our custom header instead }}
-            {{! {{#notstudent}} }}
-            {{!     {{#iscoursestatsshow}} }}
-            {{!         {{> theme_remui/course_stats }} }}
-            {{!     {{/iscoursestatsshow}} }}
-            {{! {{/notstudent}} }}
 
             {{#isdashboardstatsshow}}
                 {{> theme_remui/dashboard_stats }}
@@ -168,9 +162,11 @@
                 {{> theme_remui/personalizer_info_dashboard }}
             {{/showpersonlizerinfo}}
             {{#secondarymoremenu}}
+                {{^show_course_header}}
                 <div class="secondary-navigation edw-tabs-navigation d-print-none">
                     {{> core/moremenu}}
                 </div>
+                {{/show_course_header}}
             {{/secondarymoremenu}}
             {{#canaddtopblocks}}
             <section id="region-top-blocks" class="has-blocks" aria-label="region top blocks">
