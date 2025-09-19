@@ -36,7 +36,124 @@
     * custom_course_cards - true if we should show custom course cards
     * course_sections - array of course section data
 }}
-{{> theme_remui/common_start}}
+{{> theme_remui_kids/common_start}}
+
+{{#show_course_header}}
+<!-- Beautiful Course Header - Positioned above navigation tabs -->
+<div class="course-header-banner">
+    <div class="course-header-background" style="background-image: url('{{{course_header_data.courseimage}}}');">
+        <div class="course-header-overlay">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="course-header-content">
+                            <!-- Course Category Tag -->
+                            <div class="course-category-tag">
+                                <span class="category-badge">{{{course_header_data.categoryname}}}</span>
+                            </div>
+                            
+                            <!-- Course Title -->
+                            <h1 class="course-header-title">{{{course_header_data.course.fullname}}}</h1>
+                            
+                            <!-- Course Description -->
+                            {{#course_header_data.course.summary}}
+                            <p class="course-header-description">{{{course_header_data.course.summary}}}</p>
+                            {{/course_header_data.course.summary}}
+                            
+                            <!-- Course Statistics Row -->
+                            <div class="course-stats-row">
+                                <div class="stat-item">
+                                    <i class="fa fa-users stat-icon" aria-hidden="true"></i>
+                                    <span class="stat-number">{{{course_header_data.enrolledstudentscount}}}</span>
+                                    <span class="stat-label">Enrolled Students</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-chalkboard-teacher stat-icon" aria-hidden="true"></i>
+                                    <span class="stat-number">{{{course_header_data.teacherscount}}}</span>
+                                    <span class="stat-label">Teachers</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-calendar-alt stat-icon" aria-hidden="true"></i>
+                                    <span class="stat-number">{{{course_header_data.duration}}}</span>
+                                    <span class="stat-label">Duration!</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-layer-group stat-icon" aria-hidden="true"></i>
+                                    <span class="stat-number">{{{course_header_data.sectionscount}}}</span>
+                                    <span class="stat-label">Sections</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-book stat-icon" aria-hidden="true"></i>
+                                    <span class="stat-number">{{{course_header_data.lessonscount}}}</span>
+                                    <span class="stat-label">Lessons</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Course Dates -->
+                            <div class="course-dates">
+                                <div class="date-item">
+                                    <i class="fa fa-play-circle" aria-hidden="true"></i>
+                                    <span class="date-label">Start Date:</span>
+                                    <span class="date-value">{{{course_header_data.startdate}}}</span>
+                                </div>
+                                <div class="date-item">
+                                    <i class="fa fa-flag-checkered" aria-hidden="true"></i>
+                                    <span class="date-label">End Date:</span>
+                                    <span class="date-value">{{{course_header_data.enddate}}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="course-header-actions">
+                            <!-- Teachers List -->
+                            {{#course_header_data.teachers}}
+                            <div class="teacher-item">
+                                <img src="{{{profileimageurl}}}" alt="{{{fullname}}}" class="teacher-avatar">
+                                <div class="teacher-info">
+                                    <span class="teacher-name">{{{fullname}}}</span>
+                                    <span class="teacher-role">Teacher</span>
+                                </div>
+                            </div>
+                            {{/course_header_data.teachers}}
+                            
+                            <!-- Enroll Button -->
+                            <div class="enroll-action">
+                                <a href="{{{course_header_data.courseurl}}}" class="btn-enroll">
+                                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                    Enroll Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Wave Bottom -->
+    <div class="course-header-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+        </svg>
+    </div>
+</div>
+{{/show_course_header}}
+
+{{#show_course_header}}
+{{#secondarymoremenu}}
+<div class="secondary-navigation edw-tabs-navigation d-print-none">
+    {{> core/moremenu}}
+</div>
+{{/secondarymoremenu}}
+{{/show_course_header}}
+
+{{#overflow}}
+<div class="container-fluid tertiary-navigation">
+    <div class="navitem">
+        {{> core/url_select}}
+    </div>
+</div>
+{{/overflow}}
 
 <div id="page-content" class="pb-4 d-print-block">
     <div id="region-main-box">
@@ -49,17 +166,10 @@
             {{#hasregionmainsettingsmenu}}
                 <div class="region_main_settings_menu_proxy"></div>
             {{/hasregionmainsettingsmenu}}
-            {{{ output.course_content_header }}}
+            
             {{#headercontent}}
                 {{> core/activity_header }}
             {{/headercontent}}
-            {{#overflow}}
-                <div class="container-fluid tertiary-navigation">
-                    <div class="navitem">
-                        {{> core/url_select}}
-                    </div>
-                </div>
-            {{/overflow}}
 
             {{#custom_course_cards}}
             <!-- Custom Course Sections as Cards -->

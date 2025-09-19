@@ -33,6 +33,9 @@ if(!apply_latest_user_pref()){
 // Include parent theme's common layout setup
 require_once($CFG->dirroot . '/theme/remui/layout/common.php');
 
+// Set show_course_header flag for common_start template
+$templatecontext['show_course_header'] = false;
+
 if (isset($templatecontext['focusdata']['enabled']) && $templatecontext['focusdata']['enabled']) {
     list(
         $templatecontext['focusdata']['sections'],
@@ -41,9 +44,8 @@ if (isset($templatecontext['focusdata']['enabled']) && $templatecontext['focusda
 }
 
 $coursecontext = context_course::instance($COURSE->id);
-if (!is_guest($coursecontext, $USER) && \theme_remui\toolbox::get_setting('enablecoursestats')) {
-    $templatecontext['iscoursestatsshow'] = true;
-}
+// Disable old course stats - we're using our custom header instead
+$templatecontext['iscoursestatsshow'] = false;
 
 $completion = new \completion_info($COURSE);
 $templatecontext['completion'] = $completion->is_enabled();
@@ -74,6 +76,10 @@ if ($isediting) {
     $templatecontext['section_activities'] = theme_remui_kids_get_section_activities($COURSE, $section);
     $templatecontext['course_url'] = new moodle_url('/course/view.php', ['id' => $COURSE->id]);
     
+    // Add course header data for section view
+    $templatecontext['course_header_data'] = theme_remui_kids_get_course_header_data($COURSE);
+    $templatecontext['show_course_header'] = true;
+    
     // Must be called before rendering the template
     require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
     
@@ -82,6 +88,14 @@ if ($isediting) {
     // Use our custom course cards for students (course overview)
     $templatecontext['custom_course_cards'] = true;
     $templatecontext['course_sections'] = theme_remui_kids_get_course_sections_data($COURSE);
+    
+    // Add course header data for the beautiful header
+    $templatecontext['course_header_data'] = theme_remui_kids_get_course_header_data($COURSE);
+    $templatecontext['show_course_header'] = true;
+    
+    // Force disable any old header elements
+    $templatecontext['iscoursestatsshow'] = false;
+    $templatecontext['notstudent'] = false; // This might be causing issues
     
     // Must be called before rendering the template
     require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');

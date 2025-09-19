@@ -326,3 +326,149 @@ function theme_remui_kids_get_activity_image($modname) {
     
     return $activity_images[$modname] ?? $activity_images['page']; // Default to page image
 }
+
+/**
+ * Get comprehensive course header data for the beautiful course header
+ *
+ * @param object $course The course object
+ * @return array Array of course header data
+ */
+function theme_remui_kids_get_course_header_data($course) {
+    global $CFG, $DB, $USER;
+    
+    require_once($CFG->dirroot . '/course/lib.php');
+    require_once($CFG->dirroot . '/enrol/locallib.php');
+    
+    $coursecontext = context_course::instance($course->id);
+    
+    // Get course image
+    $courseimage = theme_remui_kids_get_course_image($course);
+    
+    // Get enrolled students count
+    $enrolledstudents = get_enrolled_users($coursecontext, 'moodle/course:view', 0, 'u.id', null, 0, 0, true);
+    $enrolledstudentscount = count($enrolledstudents);
+    
+    // Get teachers/instructors
+    $teachers = get_enrolled_users($coursecontext, 'moodle/course:view', 0, 'u.id, u.firstname, u.lastname, u.email', null, 0, 0, true);
+    $teacherroles = ['teacher', 'editingteacher', 'manager'];
+    $teacherslist = [];
+    
+    foreach ($teachers as $user) {
+        $userroles = get_user_roles($coursecontext, $user->id);
+        foreach ($userroles as $role) {
+            if (in_array($role->shortname, $teacherroles)) {
+                $teacherslist[] = [
+                    'id' => $user->id,
+                    'fullname' => fullname($user),
+                    'firstname' => $user->firstname,
+                    'lastname' => $user->lastname,
+                    'email' => $user->email,
+                    'profileimageurl' => new moodle_url('/user/pix.php/' . $user->id . '/f1.jpg')
+                ];
+                break; // Only add once per user
+            }
+        }
+    }
+    
+    // Get course start and end dates
+    $startdate = $course->startdate ? date('M d, Y', $course->startdate) : 'No Start Date';
+    $enddate = $course->enddate ? date('M d, Y', $course->enddate) : 'No End Date';
+    
+    // Calculate duration
+    $duration = '';
+    if ($course->startdate && $course->enddate) {
+        $start = new DateTime();
+        $start->setTimestamp($course->startdate);
+        $end = new DateTime();
+        $end->setTimestamp($course->enddate);
+        $interval = $start->diff($end);
+        
+        if ($interval->days > 0) {
+            $weeks = floor($interval->days / 7);
+            $days = $interval->days % 7;
+            if ($weeks > 0) {
+                $duration = $weeks . ' Week' . ($weeks > 1 ? 's' : '');
+                if ($days > 0) {
+                    $duration .= ' ' . $days . ' Day' . ($days > 1 ? 's' : '');
+                }
+            } else {
+                $duration = $days . ' Day' . ($days > 1 ? 's' : '');
+            }
+        }
+    }
+    
+    // Get sections count
+    $modinfo = get_fast_modinfo($course);
+    $sections = $modinfo->get_section_info_all();
+    $sectionscount = 0;
+    $lessonscount = 0;
+    
+    foreach ($sections as $section) {
+        if ($section->section > 0) { // Skip general section
+            $sectionscount++;
+            if (isset($modinfo->sections[$section->section])) {
+                $lessonscount += count($modinfo->sections[$section->section]);
+            }
+        }
+    }
+    
+    // Get course category name
+    $category = $DB->get_record('course_categories', ['id' => $course->category]);
+    $categoryname = $category ? $category->name : 'General';
+    
+    return [
+        'course' => $course,
+        'courseimage' => $courseimage,
+        'enrolledstudentscount' => $enrolledstudentscount,
+        'teachers' => $teacherslist,
+        'teacherscount' => count($teacherslist),
+        'startdate' => $startdate,
+        'enddate' => $enddate,
+        'duration' => $duration,
+        'sectionscount' => $sectionscount,
+        'lessonscount' => $lessonscount,
+        'categoryname' => $categoryname,
+        'courseurl' => new moodle_url('/course/view.php', ['id' => $course->id])
+    ];
+}
+
+/**
+ * Get course image URL
+ *
+ * @param object $course The course object
+ * @return string Image URL
+ */
+function theme_remui_kids_get_course_image($course) {
+    global $CFG;
+    
+    // Try to get course image from course files
+    $fs = get_file_storage();
+    $context = context_course::instance($course->id);
+    
+    $files = $fs->get_area_files($context->id, 'course', 'overviewfiles', 0, 'timemodified DESC', false);
+    
+    if (!empty($files)) {
+        $file = reset($files);
+        return moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        )->out();
+    }
+    
+    // Default course images based on category or course name
+    $default_images = [
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=400&fit=crop&crop=center',
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=400&fit=crop&crop=center',
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&h=400&fit=crop&crop=center',
+        'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=1200&h=400&fit=crop&crop=center',
+        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&h=400&fit=crop&crop=center',
+    ];
+    
+    // Use course ID to consistently select the same image for the same course
+    $index = $course->id % count($default_images);
+    return $default_images[$index];
+}
