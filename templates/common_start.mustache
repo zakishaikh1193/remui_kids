@@ -11,14 +11,16 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
-    Edwiser RemUI
-    @package theme_remui
-    @copyright (c) 2023 WisdmLabs (https://wisdmlabs.com/)
+    Edwiser RemUI Kids
+    @package theme_remui_kids
+    @copyright (c) 2025 Kodeit
     @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
 }}
 {{!
-    @template theme_remui/common_start
+    @template theme_remui_kids/common_start
+
+    Custom common_start template that removes old course headers and stats
 }}
 
 {{> theme_remui/head }}
@@ -149,13 +151,14 @@
                     </div>
                 {{/hasblocks}}
             </div>
-            {{{ output.full_header }}}
-
-            {{#notstudent}}
-                {{#iscoursestatsshow}}
-                    {{> theme_remui/course_stats }}
-                {{/iscoursestatsshow}}
-            {{/notstudent}}
+            
+            
+            {{! REMOVED: Course stats section - We're using our custom header instead }}
+            {{! {{#notstudent}} }}
+            {{!     {{#iscoursestatsshow}} }}
+            {{!         {{> theme_remui/course_stats }} }}
+            {{!     {{/iscoursestatsshow}} }}
+            {{! {{/notstudent}} }}
 
             {{#isdashboardstatsshow}}
                 {{> theme_remui/dashboard_stats }}
