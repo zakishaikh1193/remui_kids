@@ -344,60 +344,78 @@ function theme_remui_kids_get_course_header_data($course) {
     // Get course image
     $courseimage = theme_remui_kids_get_course_image($course);
     
-    // Get enrolled students count
-    $enrolledstudents = get_enrolled_users($coursecontext, 'moodle/course:view', 0, 'u.id', null, 0, 0, true);
-    $enrolledstudentscount = count($enrolledstudents);
+    // Get enrolled students count (users with 'student' role)
+    $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+    $enrolledstudentscount = 0;
+    if ($studentrole) {
+        $enrolledstudentscount = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT u.id) 
+             FROM {user} u 
+             JOIN {role_assignments} ra ON u.id = ra.userid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid = ? AND u.deleted = 0",
+            [CONTEXT_COURSE, $course->id, $studentrole->id]
+        );
+    }
     
-    // Get teachers/instructors
-    $teachers = get_enrolled_users($coursecontext, 'moodle/course:view', 0, 'u.id, u.firstname, u.lastname, u.email', null, 0, 0, true);
-    $teacherroles = ['teacher', 'editingteacher', 'manager'];
+    // Get teachers count (users with 'teacher' or 'editingteacher' role)
+    $teacherroles = $DB->get_records_list('role', 'shortname', ['teacher', 'editingteacher']);
+    $teacherscount = 0;
     $teacherslist = [];
     
-    foreach ($teachers as $user) {
-        $userroles = get_user_roles($coursecontext, $user->id);
-        foreach ($userroles as $role) {
-            if (in_array($role->shortname, $teacherroles)) {
-                $teacherslist[] = [
-                    'id' => $user->id,
-                    'fullname' => fullname($user),
-                    'firstname' => $user->firstname,
-                    'lastname' => $user->lastname,
-                    'email' => $user->email,
-                    'profileimageurl' => new moodle_url('/user/pix.php/' . $user->id . '/f1.jpg')
-                ];
-                break; // Only add once per user
-            }
+    if (!empty($teacherroles)) {
+        $teacherroleids = array_keys($teacherroles);
+        $teacherscount = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT u.id) 
+             FROM {user} u 
+             JOIN {role_assignments} ra ON u.id = ra.userid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid IN (" . implode(',', $teacherroleids) . ") AND u.deleted = 0",
+            [CONTEXT_COURSE, $course->id]
+        );
+        
+        // Get teacher details
+        $teachers = $DB->get_records_sql(
+            "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email 
+             FROM {user} u 
+             JOIN {role_assignments} ra ON u.id = ra.userid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid IN (" . implode(',', $teacherroleids) . ") AND u.deleted = 0 
+             LIMIT 3",
+            [CONTEXT_COURSE, $course->id]
+        );
+        
+        foreach ($teachers as $user) {
+            $teacherslist[] = [
+                'id' => $user->id,
+                'fullname' => fullname($user),
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'email' => $user->email,
+                'profileimageurl' => new moodle_url('/user/pix.php/' . $user->id . '/f1.jpg')
+            ];
         }
     }
     
     // Get course start and end dates
-    $startdate = $course->startdate ? date('M d, Y', $course->startdate) : 'No Start Date';
-    $enddate = $course->enddate ? date('M d, Y', $course->enddate) : 'No End Date';
+    $startdate = $course->startdate ? date('d/m/Y', $course->startdate) : 'No Start Date';
+    $enddate = $course->enddate ? date('d/m/Y', $course->enddate) : 'No End Date';
     
-    // Calculate duration
+    // Calculate duration in weeks
     $duration = '';
     if ($course->startdate && $course->enddate) {
-        $start = new DateTime();
-        $start->setTimestamp($course->startdate);
-        $end = new DateTime();
-        $end->setTimestamp($course->enddate);
-        $interval = $start->diff($end);
-        
-        if ($interval->days > 0) {
-            $weeks = floor($interval->days / 7);
-            $days = $interval->days % 7;
-            if ($weeks > 0) {
-                $duration = $weeks . ' Week' . ($weeks > 1 ? 's' : '');
-                if ($days > 0) {
-                    $duration .= ' ' . $days . ' Day' . ($days > 1 ? 's' : '');
-                }
-            } else {
-                $duration = $days . ' Day' . ($days > 1 ? 's' : '');
-            }
+        $days = ($course->enddate - $course->startdate) / (60 * 60 * 24);
+        $weeks = round($days / 7);
+        if ($weeks > 0) {
+            $duration = $weeks . ' Week' . ($weeks > 1 ? 's' : '');
+        } else {
+            $duration = '1 Week'; // Default to 1 week if less than 7 days
         }
+    } else {
+        $duration = '10 Weeks'; // Default duration
     }
     
-    // Get sections count
+    // Get sections count (excluding general section)
     $modinfo = get_fast_modinfo($course);
     $sections = $modinfo->get_section_info_all();
     $sectionscount = 0;
@@ -421,7 +439,7 @@ function theme_remui_kids_get_course_header_data($course) {
         'courseimage' => $courseimage,
         'enrolledstudentscount' => $enrolledstudentscount,
         'teachers' => $teacherslist,
-        'teacherscount' => count($teacherslist),
+        'teacherscount' => $teacherscount,
         'startdate' => $startdate,
         'enddate' => $enddate,
         'duration' => $duration,
