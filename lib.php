@@ -782,7 +782,7 @@ function theme_remui_kids_get_elementary_courses($userid) {
                 'enddate' => $enddate,
                 'courseimage' => $courseimage,
                 'categoryname' => $course->categoryname ?: 'General',
-                'courseurl' => new moodle_url('/course/view.php', ['id' => $course->id]),
+                'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out(),
                 'progress' => $progress,
                 'progress_percentage' => round($progress),
                 'duration' => $duration,
@@ -1065,4 +1065,367 @@ function theme_remui_kids_get_activity_playful_data($modname, $status) {
     $data['icon'] = $icons[$modname] ?? 'fa-star';
     
     return $data;
+}
+
+/**
+ * Get course sections for modal preview
+ *
+ * @param int $courseid Course ID
+ * @return array Array of course sections with activities
+ */
+function theme_remui_kids_get_course_sections_for_modal($courseid) {
+    global $DB, $USER;
+    
+    try {
+        // Get course object
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        
+        // Get course modules info
+        $modinfo = get_fast_modinfo($course);
+        $sections = $modinfo->get_section_info_all();
+        
+        // Get completion info
+        $completion = new completion_info($course);
+        
+        $sectionsdata = [];
+        
+        foreach ($sections as $section) {
+            // Skip section 0 (general section)
+            if ($section->section == 0) {
+                continue;
+            }
+            
+            // Get section name
+            $sectionname = $section->name ?: "Section " . $section->section;
+            
+            // Get activities in this section
+            $activities = [];
+            $totalactivities = 0;
+            $completedactivities = 0;
+            
+            if (isset($modinfo->sections[$section->section])) {
+                foreach ($modinfo->sections[$section->section] as $cmid) {
+                    $module = $modinfo->cms[$cmid];
+                    
+                    if (!$module->uservisible) {
+                        continue;
+                    }
+                    
+                    $totalactivities++;
+                    
+                    // Check completion status
+                    $iscompleted = false;
+                    if ($completion->is_enabled() && $module->completion != COMPLETION_TRACKING_NONE) {
+                        $completiondata = $completion->get_data($module, true, $USER->id);
+                        if ($completiondata->completionstate == COMPLETION_COMPLETE || 
+                            $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $iscompleted = true;
+                            $completedactivities++;
+                        }
+                    }
+                    
+                    $activities[] = [
+                        'id' => $module->id,
+                        'name' => $module->name,
+                        'modname' => $module->modname,
+                        'url' => (new moodle_url('/mod/' . $module->modname . '/view.php', ['id' => $module->id]))->out(),
+                        'iscompleted' => $iscompleted,
+                        'icon' => '/theme/image.php/remui_kids/' . $module->modname . '/1/icon'
+                    ];
+                }
+            }
+            
+            // Calculate progress percentage
+            $progress = 0;
+            if ($totalactivities > 0) {
+                $progress = round(($completedactivities / $totalactivities) * 100);
+            }
+            
+            // Get section summary (first 150 characters)
+            $summary = '';
+            if ($section->summary) {
+                $summary = strip_tags($section->summary);
+                $summary = strlen($summary) > 150 ? substr($summary, 0, 150) . '...' : $summary;
+            }
+            
+            $sectionsdata[] = [
+                'id' => $section->id,
+                'section' => $section->section,
+                'name' => $sectionname,
+                'summary' => $summary,
+                'total_activities' => $totalactivities,
+                'completed_activities' => $completedactivities,
+                'progress' => $progress,
+                'activities' => $activities,
+                'url' => (new moodle_url('/course/view.php', ['id' => $courseid, 'section' => $section->section]))->out()
+            ];
+        }
+        
+        return [
+            'course' => [
+                'id' => $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname
+            ],
+            'sections' => $sectionsdata
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'course' => ['id' => $courseid, 'fullname' => 'Unknown Course', 'shortname' => ''],
+            'sections' => []
+        ];
+    }
+}
+
+/**
+ * Get calendar week data with events for the next 7 days using Moodle's Calendar API
+ *
+ * @param int $userid User ID
+ * @return array Calendar week data with events
+ */
+function theme_remui_kids_get_calendar_week_data($userid) {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $calendarweek = [];
+    $today = time();
+    $starttime = mktime(0, 0, 0, date('n', $today), date('j', $today), date('Y', $today));
+    $endtime = $starttime + (7 * 86400); // Next 7 days
+    
+    // Get user's enrolled courses
+    $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    $courseids = array_keys($courses);
+    
+    // Get calendar events using Moodle's built-in function
+    $events = calendar_get_events(
+        $starttime,
+        $endtime,
+        $userid, // User events
+        false,   // No group events
+        $courseids, // Course events
+        true,    // With duration
+        true     // Ignore hidden
+    );
+    
+    // Get next 7 days
+    for ($i = 0; $i < 7; $i++) {
+        $date = $starttime + ($i * 86400);
+        $dayname = date('D', $date);
+        $daynumber = date('j', $date);
+        $datekey = date('Y-m-d', $date);
+        
+        // Check if there are events on this date
+        $dayevents = [];
+        foreach ($events as $event) {
+            $eventdate = date('Y-m-d', $event->timestart);
+            if ($eventdate === $datekey) {
+                $dayevents[] = $event;
+            }
+        }
+        
+        $calendarweek[] = [
+            'date' => $datekey,
+            'day_name' => $dayname,
+            'day_number' => $daynumber,
+            'has_events' => !empty($dayevents),
+            'events' => $dayevents
+        ];
+    }
+    
+    return $calendarweek;
+}
+
+/**
+ * Get upcoming events for the next 7 days using Moodle's Calendar API
+ *
+ * @param int $userid User ID
+ * @return array Upcoming events data
+ */
+function theme_remui_kids_get_upcoming_events($userid) {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $upcomingevents = [];
+    $today = time();
+    $starttime = mktime(0, 0, 0, date('n', $today), date('j', $today), date('Y', $today));
+    $endtime = $starttime + (7 * 86400); // Next 7 days
+    
+    // Get user's enrolled courses
+    $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    $courseids = array_keys($courses);
+    
+    // Get calendar events using Moodle's built-in function
+    $events = calendar_get_events(
+        $starttime,
+        $endtime,
+        $userid, // User events
+        false,   // No group events
+        $courseids, // Course events
+        true,    // With duration
+        true     // Ignore hidden
+    );
+    
+    // Process events and format them
+    foreach ($events as $event) {
+        // Skip events that are not assignments, quizzes, or lessons
+        if (!in_array($event->modulename, ['assign', 'quiz', 'lesson'])) {
+            continue;
+        }
+        
+        // Get course name
+        $coursename = '';
+        if ($event->courseid && isset($courses[$event->courseid])) {
+            $coursename = $courses[$event->courseid]->fullname;
+        }
+        
+        // Determine event type and icon
+        $eventtype = $event->modulename;
+        $eventicon = 'fa-star'; // Default icon
+        
+        switch ($event->modulename) {
+            case 'assign':
+                $eventicon = 'fa-file-text';
+                break;
+            case 'quiz':
+                $eventicon = 'fa-question-circle';
+                break;
+            case 'lesson':
+                $eventicon = 'fa-graduation-cap';
+                break;
+        }
+        
+        // Create event URL
+        $eventurl = '';
+        if ($event->modulename && $event->instance) {
+            $eventurl = (new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $event->instance]))->out();
+        }
+        
+        $upcomingevents[] = [
+            'event_title' => $event->name,
+            'event_time' => date('g:i A', $event->timestart),
+            'event_day' => date('j', $event->timestart),
+            'event_month' => date('M', $event->timestart),
+            'course_name' => $coursename,
+            'event_type' => $eventtype,
+            'event_icon' => $eventicon,
+            'event_date' => $event->timestart,
+            'event_url' => $eventurl,
+            'event_description' => $event->description ?? ''
+        ];
+    }
+    
+    // Sort all events by date
+    usort($upcomingevents, function($a, $b) {
+        return $a['event_date'] - $b['event_date'];
+    });
+    
+    // Return only the first 5 events
+    return array_slice($upcomingevents, 0, 5);
+}
+
+
+/**
+ * Get learning progress statistics
+ *
+ * @param int $userid User ID
+ * @return array Learning progress data
+ */
+function theme_remui_kids_get_learning_progress_stats($userid) {
+    global $DB;
+    
+    $today = time();
+    $weekstart = $today - (date('w', $today) * 86400);
+    $weekend = $weekstart + (7 * 86400);
+    
+    // Get lessons completed this week
+    $lessonscompleted = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)
+         AND cmc.timemodified >= ?
+         AND cmc.timemodified <= ?",
+        [$userid, $weekstart, $weekend]
+    );
+    
+    // Get study time (estimated based on completed activities)
+    $studytime = $lessonscompleted * 30; // Assume 30 minutes per lesson
+    $studytimehours = round($studytime / 60, 1);
+    
+    // Get best quiz score
+    $bestscoresql = "
+        SELECT MAX(gg.finalgrade / gg.rawgrademax * 100) as bestscore
+        FROM {grade_grades} gg
+        JOIN {grade_items} gi ON gg.itemid = gi.id
+        JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+        JOIN {modules} m ON cm.module = m.id
+        WHERE gg.userid = ? 
+        AND m.name = 'quiz'
+        AND gg.finalgrade IS NOT NULL
+        AND gg.rawgrademax > 0";
+    
+    $bestscore = $DB->get_field_sql($bestscoresql, [$userid]) ?: 0;
+    
+    // Calculate goal progress (based on weekly target)
+    $weeklytarget = 5; // Target 5 lessons per week
+    $goalprogress = min(100, round(($lessonscompleted / $weeklytarget) * 100));
+    
+    return [
+        'lessons_this_week' => $lessonscompleted,
+        'study_time' => $studytimehours . 'h',
+        'best_score' => round($bestscore),
+        'goal_progress' => $goalprogress
+    ];
+}
+
+/**
+ * Get achievements data
+ *
+ * @param int $userid User ID
+ * @return array Achievements data
+ */
+function theme_remui_kids_get_achievements_data($userid) {
+    global $DB;
+    
+    // Get study streak (consecutive days with activity)
+    $streak = $DB->get_field_sql(
+        "SELECT COUNT(DISTINCT DATE(FROM_UNIXTIME(timemodified))) as streak
+         FROM {course_modules_completion}
+         WHERE userid = ? 
+         AND completionstate IN (1, 2)
+         AND timemodified >= ?",
+        [$userid, time() - (30 * 86400)] // Last 30 days
+    ) ?: 0;
+    
+    // Get total points (based on completed activities)
+    $points = $DB->get_field_sql(
+        "SELECT COUNT(*) * 10
+         FROM {course_modules_completion}
+         WHERE userid = ? 
+         AND completionstate IN (1, 2)",
+        [$userid]
+    ) ?: 0;
+    
+    // Get coins (bonus for high scores)
+    $coins = $DB->get_field_sql(
+        "SELECT COUNT(*) * 5
+         FROM {grade_grades} gg
+         JOIN {grade_items} gi ON gg.itemid = gi.id
+         WHERE gg.userid = ? 
+         AND gg.finalgrade / gg.rawgrademax >= 0.8
+         AND gg.rawgrademax > 0",
+        [$userid]
+    ) ?: 0;
+    
+    return [
+        'streaks' => $streak,
+        'best_streak' => $streak,
+        'goal_streak' => 7, // Goal of 7 day streak
+        'points' => $points,
+        'coins' => $coins
+    ];
 }

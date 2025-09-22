@@ -74,6 +74,7 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $templatecontext['user_cohort_id'] = $usercohortid;
     $templatecontext['student_name'] = $USER->firstname;
     $templatecontext['hello_message'] = "Hello " . $USER->firstname . "!";
+    $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
     
     // Set individual dashboard type flags for Mustache template
     $templatecontext['elementary'] = ($dashboardtype === 'elementary');
@@ -111,15 +112,34 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['total_courses_count'] = count($courses);
         $templatecontext['show_view_all_button'] = count($courses) > 3;
         
-        // Add active sections data
+        // Add course sections data for modal preview
+        $coursesectionsdata = [];
+        foreach ($courses as $course) {
+            $sectionsdata = theme_remui_kids_get_course_sections_for_modal($course['id']);
+            $coursesectionsdata[$course['id']] = $sectionsdata;
+            // Debug: Log the data for each course
+            error_log("Course {$course['id']} ({$course['fullname']}) sections data: " . print_r($sectionsdata, true));
+        }
+        $templatecontext['middle_courses_sections'] = json_encode($coursesectionsdata);
+        // Debug: Log the final JSON data
+        error_log("Final courses sections JSON: " . $templatecontext['middle_courses_sections']);
+        
+        // Add active sections data (limit to 3 for Current Lessons section)
         $activesections = theme_remui_kids_get_elementary_active_sections($USER->id);
-        $templatecontext['middle_active_sections'] = $activesections;
+        $templatecontext['middle_active_sections'] = array_slice($activesections, 0, 3); // Show only first 3 sections
         $templatecontext['has_middle_active_sections'] = !empty($activesections);
         
-        // Add active lessons data
+        // Add active lessons data (limit to 3 like elementary dashboard)
         $activelessons = theme_remui_kids_get_elementary_active_lessons($USER->id);
-        $templatecontext['middle_active_lessons'] = $activelessons;
+        $templatecontext['middle_active_lessons'] = array_slice($activelessons, 0, 3); // Show only first 3 lessons
         $templatecontext['has_middle_active_lessons'] = !empty($activelessons);
+        
+        // Add calendar and sidebar data
+        $templatecontext['calendar_week'] = theme_remui_kids_get_calendar_week_data($USER->id);
+        $templatecontext['upcoming_events'] = theme_remui_kids_get_upcoming_events($USER->id);
+        $templatecontext['learning_stats'] = theme_remui_kids_get_learning_progress_stats($USER->id);
+        $templatecontext['achievements'] = theme_remui_kids_get_achievements_data($USER->id);
+        $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     }
 
     // Add cohort-specific data
