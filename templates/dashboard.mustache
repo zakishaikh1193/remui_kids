@@ -241,195 +241,300 @@
     
     {{#middle}}
         <div class="middle-dashboard">
-            <!-- Custom Dashboard Header -->
-            <div class="custom-dashboard-header">
-                <div class="dashboard-greeting">
-                    <h1>{{hello_message}}</h1>
-                    <p>Welcome to your Grade 4-7 learning space!</p>
-                </div>
-                <div class="dashboard-badge">
-                    <i class="fa fa-star"></i>
-                </div>
-            </div>
-            
-            <!-- Statistics Cards -->
+            <!-- Top Statistics Bar -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="elementary-stats-container">
-                        <div class="elementary-stat-card">
-                            <div class="stat-icon-container">
+                    <div class="middle-stats-container">
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Active Courses</div>
+                                <div class="stat-number">{{middle_stats.total_courses}}</div>
+                                <div class="stat-subtext">2 in progress</div>
+                                <div class="stat-trend">+12% this week</div>
+                            </div>
+                            <div class="stat-icon-container blue">
                                 <i class="fa fa-book"></i>
                             </div>
-                            <div class="stat-number">{{middle_stats.total_courses}}</div>
-                            <div class="stat-label">Courses</div>
                         </div>
-                        <div class="elementary-stat-card">
-                            <div class="stat-icon-container">
-                                <i class="fa fa-check-circle"></i>
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Lessons Completed</div>
+                                <div class="stat-number">{{middle_stats.lessons_completed}}</div>
+                                <div class="stat-subtext">this month</div>
+                                <div class="stat-trend">+8% this week</div>
                             </div>
-                            <div class="stat-number">{{middle_stats.lessons_completed}}</div>
-                            <div class="stat-label">Lessons Done</div>
+                            <div class="stat-icon-container green">
+                                <i class="fa fa-bullseye"></i>
+                            </div>
                         </div>
-                        <div class="elementary-stat-card">
-                            <div class="stat-icon-container">
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Study Time</div>
+                                <div class="stat-number">24h</div>
+                                <div class="stat-subtext">this week</div>
+                                <div class="stat-trend">+5% this week</div>
+                            </div>
+                            <div class="stat-icon-container purple">
+                                <i class="fa fa-clock-o"></i>
+                            </div>
+                        </div>
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Achievements</div>
+                                <div class="stat-number">12</div>
+                                <div class="stat-subtext">total earned</div>
+                                <div class="stat-trend">+3% this week</div>
+                            </div>
+                            <div class="stat-icon-container orange">
                                 <i class="fa fa-trophy"></i>
                             </div>
-                            <div class="stat-number">{{middle_stats.activities_completed}}</div>
-                            <div class="stat-label">Activities Done</div>
-                        </div>
-                        <div class="elementary-stat-card">
-                            <div class="stat-icon-container">
-                                <i class="fa fa-chart-line"></i>
-                            </div>
-                            <div class="stat-number">{{middle_stats.overall_progress}}%</div>
-                            <div class="stat-label">Overall Progress</div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- My Courses Section -->
-            {{#has_middle_courses}}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h3 class="courses-section-title">
-                        <i class="fa fa-book"></i> My Courses
-                    </h3>
-                    <div class="elementary-courses-container">
-                        {{#middle_courses}}
-                        <div class="elementary-course-card">
-                            <div class="course-image-container">
-                                {{#courseimage}}
-                                <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
-                                {{/courseimage}}
-                                {{^courseimage}}
-                                <div class="course-image-placeholder">
-                                    <i class="fa fa-book"></i>
-                                </div>
-                                {{/courseimage}}
-                                <div class="course-level-badge">{{categoryname}}</div>
-                            </div>
-                            
-                            <div class="course-content">
-                                <h4 class="course-title">{{fullname}}</h4>
-                                <p class="course-summary">{{summary}}</p>
-                                
-                                <!-- Progress Bar -->
-                                <div class="course-progress-section">
-                                    <div class="progress-bar-container">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
-                                        </div>
-                                        <span class="progress-percentage">{{progress_percentage}}%</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Course Stats -->
-                                <div class="course-stats">
-                                    <div class="course-stat-item">
-                                        <i class="fa fa-list"></i>
-                                        <span>{{total_sections}} lessons</span>
-                                    </div>
-                                    <div class="course-stat-item">
-                                        <i class="fa fa-clock-o"></i>
-                                        <span>{{duration}}</span>
-                                    </div>
-                                </div>
-                                
-                                <a href="{{courseurl}}" class="course-button">
-                                    <i class="fa fa-play"></i> Continue Learning
-                                </a>
-                            </div>
+            <!-- Main Content Area -->
+            <div class="row">
+                <!-- Left Content Area -->
+                <div class="col-lg-8">
+                    <!-- My Courses Section -->
+                    {{#has_middle_courses}}
+                    <div class="middle-courses-section">
+                        <div class="section-header">
+                            <h3 class="section-title">My Courses</h3>
+                            <a href="/my/courses.php" class="view-all-link">View All ></a>
                         </div>
-                        {{/middle_courses}}
+                        <div class="course-carousel-container">
+                            <button class="carousel-btn prev-btn" onclick="changeCourse(-1)">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <div class="course-carousel">
+                                {{#middle_courses}}
+                                <div class="middle-course-card" data-course-index="{{@index}}">
+                                    <div class="course-image-container">
+                                        {{#courseimage}}
+                                        <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
+                                        {{/courseimage}}
+                                        {{^courseimage}}
+                                        <div class="course-image-placeholder">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        {{/courseimage}}
+                                        <div class="course-level-badge">Beginner</div>
+                                    </div>
+                                    
+                                    <div class="course-content">
+                                        <h4 class="course-title">{{fullname}}</h4>
+                                        <p class="course-summary">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
+                                        
+                                        <!-- Progress Bar -->
+                                        <div class="course-progress-section">
+                                            <div class="progress-label">Progress {{progress_percentage}}%</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Course Stats -->
+                                        <div class="course-stats">
+                                            <div class="course-stat-item">
+                                                <i class="fa fa-book"></i>
+                                                <span>{{total_sections}}/{{total_sections}} lessons</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="course-status">not started</div>
+                                        
+                                        <a href="{{courseurl}}" class="course-button">
+                                            <i class="fa fa-play"></i> Continue Learning
+                                        </a>
+                                    </div>
+                                </div>
+                                {{/middle_courses}}
+                            </div>
+                            <button class="carousel-btn next-btn" onclick="changeCourse(1)">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="course-indicators">
+                            {{#middle_courses}}
+                            <span class="indicator" data-course-index="{{@index}}" onclick="goToCourse({{@index}})"></span>
+                            {{/middle_courses}}
+                        </div>
                     </div>
+                    {{/has_middle_courses}}
                     
-                    {{#show_view_all_button}}
-                    <div class="text-center mt-3">
-                        <a href="/my/courses.php" class="view-all-courses-btn">
-                            <i class="fa fa-th"></i> View All Courses ({{total_courses_count}})
-                        </a>
+                    <!-- Current Lessons Section -->
+                    {{#has_middle_active_lessons}}
+                    <div class="current-lessons-section">
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fa fa-clock-o"></i> Current Lessons
+                            </h3>
+                            <p class="section-subtitle">Continue your learning journey</p>
+                            <a href="#" class="view-all-link">View All ></a>
+                        </div>
+                        <div class="current-lessons-container">
+                            {{#middle_active_lessons}}
+                            <div class="current-lesson-card">
+                                <div class="lesson-image">
+                                    <div class="lesson-placeholder">
+                                        <i class="fa fa-chalkboard"></i>
+                                    </div>
+                                </div>
+                                <div class="lesson-content">
+                                    <h5 class="lesson-title">{{name}}</h5>
+                                    <p class="lesson-course">{{coursename}}</p>
+                                </div>
+                            </div>
+                            {{/middle_active_lessons}}
+                        </div>
                     </div>
-                    {{/show_view_all_button}}
+                    {{/has_middle_active_lessons}}
                 </div>
-            </div>
-            {{/has_middle_courses}}
-            
-            <!-- Active Sections Section -->
-            {{#has_middle_active_sections}}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h3 class="sections-section-title">
-                        <i class="fa fa-list-alt"></i> Active Sections
-                    </h3>
-                    <div class="elementary-sections-container">
-                        {{#middle_active_sections}}
-                        <div class="elementary-section-card">
-                            <div class="section-content">
-                                <div class="section-header">
-                                    <h4 class="section-title">{{name}}</h4>
-                                    <span class="section-course">{{coursename}}</span>
+                
+                <!-- Right Sidebar -->
+                <div class="col-lg-4">
+                    <div class="middle-sidebar">
+                        <!-- Quick Stats -->
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">Quick Stats</h4>
+                            <div class="quick-stats-list">
+                                <div class="quick-stat-item">
+                                    <i class="fa fa-book"></i>
+                                    <span>Courses Enrolled {{middle_stats.total_courses}}</span>
                                 </div>
-                                
-                                {{#summary}}
-                                <p class="section-summary">{{summary}}</p>
-                                {{/summary}}
-                                
-                                <!-- Progress Bar -->
-                                <div class="section-progress-section">
-                                    <div class="progress-bar-container">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
-                                        </div>
-                                        <span class="progress-percentage">{{progress_percentage}}%</span>
-                                    </div>
+                                <div class="quick-stat-item">
+                                    <i class="fa fa-check-circle"></i>
+                                    <span>Lessons Completed {{middle_stats.lessons_completed}}</span>
                                 </div>
-                                
-                                <!-- Section Stats -->
-                                <div class="section-stats">
-                                    <div class="section-stat-item">
-                                        <i class="fa fa-check-circle" style="color: #27ae60;"></i>
-                                        <span>{{completed_activities}}/{{total_activities}} activities</span>
-                                    </div>
+                                <div class="quick-stat-item">
+                                    <i class="fa fa-tasks"></i>
+                                    <span>Pending Activities {{middle_stats.activities_completed}}</span>
                                 </div>
-                                
-                                <a href="{{courseurl}}" class="section-button">
-                                    <i class="fa fa-play"></i> Continue Section
-                                </a>
                             </div>
                         </div>
-                        {{/middle_active_sections}}
-                    </div>
-                </div>
-            </div>
-            {{/has_middle_active_sections}}
-            
-            <!-- Active Lessons Section -->
-            {{#has_middle_active_lessons}}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h3 class="lessons-section-title">
-                        <i class="fa fa-gamepad"></i> Active Lessons
-                    </h3>
-                    <div class="elementary-lessons-container">
-                        {{#middle_active_lessons}}
-                        <a href="{{url}}" class="elementary-lesson-card" data-status="{{status}}">
-                            <div class="lesson-icon-container" style="background-color: {{color}};">
-                                <i class="fa {{icon}}"></i>
+                        
+                        <!-- Achievements -->
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">Achievements</h4>
+                            <div class="achievements-content">
+                                <div class="achievement-goal">Best: 5 Goal: 7</div>
+                                <div class="achievements-grid">
+                                    <div class="achievement-item">
+                                        <i class="fa fa-fire"></i>
+                                        <span>5 Streaks</span>
+                                    </div>
+                                    <div class="achievement-item">
+                                        <i class="fa fa-star"></i>
+                                        <span>850 Points</span>
+                                    </div>
+                                    <div class="achievement-item">
+                                        <i class="fa fa-coins"></i>
+                                        <span>1250 Coins</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="lesson-name">{{name}}</div>
-                            <div class="lesson-course">{{coursename}}</div>
-                            {{#description}}
-                            <div class="lesson-description">{{description}}</div>
-                            {{/description}}
-                        </a>
-                        {{/middle_active_lessons}}
+                        </div>
+                        
+                        <!-- Your Schedule -->
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">
+                                <i class="fa fa-clock-o"></i> Your Schedule
+                                <a href="#" class="view-full-link">View Full Calendar ></a>
+                            </h4>
+                            <p class="schedule-subtitle">Next 7 Days</p>
+                            <div class="calendar-week">
+                                <div class="calendar-day">
+                                    <div class="day-name">MON</div>
+                                    <div class="day-number">22</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-name">TUE</div>
+                                    <div class="day-number">23</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-name">WED</div>
+                                    <div class="day-number">24</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-name">THU</div>
+                                    <div class="day-number">25</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-name">FRI</div>
+                                    <div class="day-number">26</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-name">SAT</div>
+                                    <div class="day-number">27</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            {{/has_middle_active_lessons}}
-            
         </div>
+    {{/middle}}
+    
+    {{#middle}}
+    <script>
+    let currentCourseIndex = 0;
+    const courses = document.querySelectorAll('.middle-course-card');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    function showCourse(index) {
+        // Hide all courses
+        courses.forEach(course => {
+            course.style.display = 'none';
+        });
+        
+        // Show current course
+        if (courses[index]) {
+            courses[index].style.display = 'block';
+        }
+        
+        // Update indicators
+        indicators.forEach((indicator, i) => {
+            indicator.classList.toggle('active', i === index);
+        });
+        
+        // Navigation buttons are always enabled for circular navigation
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        
+        if (prevBtn) prevBtn.style.opacity = '1';
+        if (nextBtn) nextBtn.style.opacity = '1';
+    }
+    
+    function changeCourse(direction) {
+        if (courses.length === 0) return;
+        
+        if (direction === 1) {
+            // Move to next course (circular)
+            currentCourseIndex = (currentCourseIndex + 1) % courses.length;
+        } else {
+            // Move to previous course (circular)
+            currentCourseIndex = (currentCourseIndex - 1 + courses.length) % courses.length;
+        }
+        
+        showCourse(currentCourseIndex);
+    }
+    
+    function goToCourse(index) {
+        if (index >= 0 && index < courses.length) {
+            currentCourseIndex = index;
+            showCourse(currentCourseIndex);
+        }
+    }
+    
+    // Initialize carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        if (courses.length > 0) {
+            showCourse(0);
+        }
+    });
+    </script>
     {{/middle}}
     
     {{#highschool}}
