@@ -1,0 +1,491 @@
+{{!
+    Custom Dashboard Template for remui_kids theme
+    
+    This template provides different dashboard layouts based on user cohorts:
+    - Elementary (Grades 1-3)
+    - Middle School (Grades 4-7) 
+    - High School (Grades 8-12)
+    - Default (fallback)
+}}
+
+{{> theme_remui_kids/common_start}}
+
+{{#custom_dashboard}}
+<!-- Custom Dashboard Header -->
+<div class="custom-dashboard-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="dashboard-greeting mb-2">
+                    {{hello_message}}
+                </h1>
+                <p class="dashboard-subtitle mb-0">
+                    {{#user_cohort_name}}
+                        Welcome to your {{user_cohort_name}} learning space!
+                    {{/user_cohort_name}}
+                    {{^user_cohort_name}}
+                        Welcome to your learning space!
+                    {{/user_cohort_name}}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="dashboard-badge">
+                    <i class="fa fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cohort-specific content -->
+{{#dashboard_type}}
+    {{#elementary}}
+        <div class="elementary-dashboard">
+            <!-- Grade 1-3 Statistics Cards -->
+            {{#elementary_stats}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="elementary-stats-container">
+                        <!-- Total Courses Card -->
+                        <div class="elementary-stat-card courses-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-book stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{total_courses}}</div>
+                                <div class="stat-label">Courses</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lessons Completed Card -->
+                        <div class="elementary-stat-card lessons-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-check-circle stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{lessons_completed}}</div>
+                                <div class="stat-label">Lessons Done</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Activities Completed Card -->
+                        <div class="elementary-stat-card activities-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-trophy stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{activities_completed}}</div>
+                                <div class="stat-label">Activities Done</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Overall Progress Card -->
+                        <div class="elementary-stat-card progress-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-chart-line stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{overall_progress}}%</div>
+                                <div class="stat-label">Overall Progress</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/elementary_stats}}
+
+            <!-- My Courses Section -->
+            {{#has_elementary_courses}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="courses-section-title">
+                        <i class="fa fa-book"></i> My Courses
+                    </h3>
+                    <div class="elementary-courses-container">
+                        {{#elementary_courses}}
+                        <div class="elementary-course-card">
+                            <div class="course-image-container">
+                                {{#courseimage}}
+                                <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
+                                {{/courseimage}}
+                                {{^courseimage}}
+                                <div class="course-image-placeholder">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                {{/courseimage}}
+                                <div class="course-level-badge">{{categoryname}}</div>
+                            </div>
+                            <div class="course-content">
+                                <h4 class="course-title">{{fullname}}</h4>
+                                <p class="course-summary">{{summary}}</p>
+                                
+                                <!-- Progress Bar -->
+                                <div class="course-progress-section">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Course Stats -->
+                                <div class="course-stats">
+                                    <div class="course-stat-item">
+                                        <i class="fa fa-book" style="color: black;"></i>
+                                        <span>{{completed_sections}}/{{total_sections}} lessons</span>
+                                    </div>
+                                    <div class="course-stat-item">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>{{duration}}</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{courseurl}}" class="course-button">
+                                    <i class="fa fa-play"></i> Continue Learning
+                                </a>
+                            </div>
+                        </div>
+                        {{/elementary_courses}}
+                    </div>
+                    
+                    <!-- View All Courses Button -->
+                    {{#show_view_all_button}}
+                    <div class="text-center mt-3">
+                        <a href="/my/courses.php" class="btn btn-outline-primary view-all-courses-btn">
+                            <i class="fa fa-th-large"></i> View All Courses ({{total_courses_count}})
+                        </a>
+                    </div>
+                    {{/show_view_all_button}}
+                </div>
+            </div>
+            {{/has_elementary_courses}}
+            
+            <!-- Active Sections Section -->
+            {{#has_elementary_active_sections}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="sections-section-title">
+                        <i class="fa fa-list-alt"></i> Active Sections
+                    </h3>
+                    <div class="elementary-sections-container">
+                        {{#elementary_active_sections}}
+                        <div class="elementary-section-card">
+                            <div class="section-content">
+                                <div class="section-header">
+                                    <h4 class="section-title">{{name}}</h4>
+                                    <span class="section-course">{{coursename}}</span>
+                                </div>
+                                
+                                {{#summary}}
+                                <p class="section-summary">{{summary}}</p>
+                                {{/summary}}
+                                
+                                <!-- Progress Bar -->
+                                <div class="section-progress-section">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section Stats -->
+                                <div class="section-stats">
+                                    <div class="section-stat-item">
+                                        <i class="fa fa-check-circle" style="color: #27ae60;"></i>
+                                        <span>{{completed_activities}}/{{total_activities}} activities</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{courseurl}}" class="section-button">
+                                    <i class="fa fa-play"></i> Continue Section
+                                </a>
+                            </div>
+                        </div>
+                        {{/elementary_active_sections}}
+                    </div>
+                </div>
+            </div>
+            {{/has_elementary_active_sections}}
+            
+            <!-- Active Lessons Section -->
+            {{#has_elementary_active_lessons}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="lessons-section-title">
+                        <i class="fa fa-gamepad"></i> Active Lessons
+                    </h3>
+                    <div class="elementary-lessons-container">
+                        {{#elementary_active_lessons}}
+                        <a href="{{url}}" class="elementary-lesson-card" data-status="{{status}}">
+                            <div class="lesson-icon-container" style="background-color: {{color}};">
+                                <i class="fa {{icon}}"></i>
+                            </div>
+                            <div class="lesson-name">{{name}}</div>
+                            <div class="lesson-course">{{coursename}}</div>
+                            {{#description}}
+                            <div class="lesson-description">{{description}}</div>
+                            {{/description}}
+                        </a>
+                        {{/elementary_active_lessons}}
+                    </div>
+                </div>
+            </div>
+            {{/has_elementary_active_lessons}}
+            
+        </div>
+    {{/elementary}}
+    
+    {{#middle}}
+        <div class="middle-dashboard">
+            <!-- Custom Dashboard Header -->
+            <div class="custom-dashboard-header">
+                <div class="dashboard-greeting">
+                    <h1>{{hello_message}}</h1>
+                    <p>Welcome to your Grade 4-7 learning space!</p>
+                </div>
+                <div class="dashboard-badge">
+                    <i class="fa fa-star"></i>
+                </div>
+            </div>
+            
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="elementary-stats-container">
+                        <div class="elementary-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="stat-number">{{middle_stats.total_courses}}</div>
+                            <div class="stat-label">Courses</div>
+                        </div>
+                        <div class="elementary-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-check-circle"></i>
+                            </div>
+                            <div class="stat-number">{{middle_stats.lessons_completed}}</div>
+                            <div class="stat-label">Lessons Done</div>
+                        </div>
+                        <div class="elementary-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-trophy"></i>
+                            </div>
+                            <div class="stat-number">{{middle_stats.activities_completed}}</div>
+                            <div class="stat-label">Activities Done</div>
+                        </div>
+                        <div class="elementary-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-chart-line"></i>
+                            </div>
+                            <div class="stat-number">{{middle_stats.overall_progress}}%</div>
+                            <div class="stat-label">Overall Progress</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Courses Section -->
+            {{#has_middle_courses}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="courses-section-title">
+                        <i class="fa fa-book"></i> My Courses
+                    </h3>
+                    <div class="elementary-courses-container">
+                        {{#middle_courses}}
+                        <div class="elementary-course-card">
+                            <div class="course-image-container">
+                                {{#courseimage}}
+                                <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
+                                {{/courseimage}}
+                                {{^courseimage}}
+                                <div class="course-image-placeholder">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                {{/courseimage}}
+                                <div class="course-level-badge">{{categoryname}}</div>
+                            </div>
+                            
+                            <div class="course-content">
+                                <h4 class="course-title">{{fullname}}</h4>
+                                <p class="course-summary">{{summary}}</p>
+                                
+                                <!-- Progress Bar -->
+                                <div class="course-progress-section">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Course Stats -->
+                                <div class="course-stats">
+                                    <div class="course-stat-item">
+                                        <i class="fa fa-list"></i>
+                                        <span>{{total_sections}} lessons</span>
+                                    </div>
+                                    <div class="course-stat-item">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>{{duration}}</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{courseurl}}" class="course-button">
+                                    <i class="fa fa-play"></i> Continue Learning
+                                </a>
+                            </div>
+                        </div>
+                        {{/middle_courses}}
+                    </div>
+                    
+                    {{#show_view_all_button}}
+                    <div class="text-center mt-3">
+                        <a href="/my/courses.php" class="view-all-courses-btn">
+                            <i class="fa fa-th"></i> View All Courses ({{total_courses_count}})
+                        </a>
+                    </div>
+                    {{/show_view_all_button}}
+                </div>
+            </div>
+            {{/has_middle_courses}}
+            
+            <!-- Active Sections Section -->
+            {{#has_middle_active_sections}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="sections-section-title">
+                        <i class="fa fa-list-alt"></i> Active Sections
+                    </h3>
+                    <div class="elementary-sections-container">
+                        {{#middle_active_sections}}
+                        <div class="elementary-section-card">
+                            <div class="section-content">
+                                <div class="section-header">
+                                    <h4 class="section-title">{{name}}</h4>
+                                    <span class="section-course">{{coursename}}</span>
+                                </div>
+                                
+                                {{#summary}}
+                                <p class="section-summary">{{summary}}</p>
+                                {{/summary}}
+                                
+                                <!-- Progress Bar -->
+                                <div class="section-progress-section">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section Stats -->
+                                <div class="section-stats">
+                                    <div class="section-stat-item">
+                                        <i class="fa fa-check-circle" style="color: #27ae60;"></i>
+                                        <span>{{completed_activities}}/{{total_activities}} activities</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{courseurl}}" class="section-button">
+                                    <i class="fa fa-play"></i> Continue Section
+                                </a>
+                            </div>
+                        </div>
+                        {{/middle_active_sections}}
+                    </div>
+                </div>
+            </div>
+            {{/has_middle_active_sections}}
+            
+            <!-- Active Lessons Section -->
+            {{#has_middle_active_lessons}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="lessons-section-title">
+                        <i class="fa fa-gamepad"></i> Active Lessons
+                    </h3>
+                    <div class="elementary-lessons-container">
+                        {{#middle_active_lessons}}
+                        <a href="{{url}}" class="elementary-lesson-card" data-status="{{status}}">
+                            <div class="lesson-icon-container" style="background-color: {{color}};">
+                                <i class="fa {{icon}}"></i>
+                            </div>
+                            <div class="lesson-name">{{name}}</div>
+                            <div class="lesson-course">{{coursename}}</div>
+                            {{#description}}
+                            <div class="lesson-description">{{description}}</div>
+                            {{/description}}
+                        </a>
+                        {{/middle_active_lessons}}
+                    </div>
+                </div>
+            </div>
+            {{/has_middle_active_lessons}}
+            
+        </div>
+    {{/middle}}
+    
+    {{#highschool}}
+        <div class="highschool-dashboard">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fa fa-trophy"></i> High School Dashboard</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>This is an advanced dashboard for high school students (Grades 8-12).</p>
+                            <p>Features will include:</p>
+                            <ul>
+                                <li>Comprehensive academic tracking</li>
+                                <li>College preparation tools</li>
+                                <li>Advanced analytics and reporting</li>
+                                <li>Career planning resources</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/highschool}}
+    
+    {{#default}}
+        <div class="default-dashboard">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-secondary">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fa fa-home"></i> Default Dashboard</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>This is the default dashboard for users not assigned to specific grade cohorts.</p>
+                            <p>You can customize this dashboard or assign users to appropriate grade cohorts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/default}}
+{{/dashboard_type}}
+
+{{/custom_dashboard}}
+
+<!-- Regular Dashboard Content -->
+<div class="dashboard-content">
+    <div id="region-main-box" class="d-print-block">
+        <section id="region-main" class="d-print-block" aria-label="{{#str}}content{{/str}}">
+            <div class="rui-course-content">
+                {{{ output.main_content }}}
+            </div>
+        </section>
+    </div>
+</div>
+
+{{> theme_remui/common_end}}
