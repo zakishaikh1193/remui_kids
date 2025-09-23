@@ -1,0 +1,1065 @@
+{{!
+    Custom Dashboard Template for remui_kids theme
+    
+    This template provides different dashboard layouts based on user cohorts:
+    - Elementary (Grades 1-3)
+    - Middle School (Grades 4-7) 
+    - High School (Grades 8-12)
+    - Default (fallback)
+}}
+
+{{> theme_remui_kids/common_start}}
+
+{{#custom_dashboard}}
+<!-- Custom Dashboard Header -->
+<div class="custom-dashboard-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="dashboard-greeting mb-2">
+                    {{hello_message}}
+                </h1>
+                <p class="dashboard-subtitle mb-0">
+                    {{#user_cohort_name}}
+                        Welcome to your {{user_cohort_name}} learning space!
+                    {{/user_cohort_name}}
+                    {{^user_cohort_name}}
+                        Welcome to your learning space!
+                    {{/user_cohort_name}}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="dashboard-badge">
+                    <i class="fa fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cohort-specific content -->
+{{#dashboard_type}}
+    {{#elementary}}
+        <div class="elementary-dashboard">
+            <!-- Grade 1-3 Statistics Cards -->
+            {{#elementary_stats}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="elementary-stats-container">
+                        <!-- Total Courses Card -->
+                        <div class="elementary-stat-card courses-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-book stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{total_courses}}</div>
+                                <div class="stat-label">Courses</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lessons Completed Card -->
+                        <div class="elementary-stat-card lessons-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-check-circle stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{lessons_completed}}</div>
+                                <div class="stat-label">Lessons Done</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Activities Completed Card -->
+                        <div class="elementary-stat-card activities-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-trophy stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{activities_completed}}</div>
+                                <div class="stat-label">Activities Done</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Overall Progress Card -->
+                        <div class="elementary-stat-card progress-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-chart-line stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{overall_progress}}%</div>
+                                <div class="stat-label">Overall Progress</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/elementary_stats}}
+
+            <!-- My Courses Section -->
+            {{#has_elementary_courses}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="courses-section-title">
+                        <i class="fa fa-book"></i> My Courses
+                    </h3>
+                    <div class="elementary-courses-container">
+                        {{#elementary_courses}}
+                        <div class="elementary-course-card">
+                            <div class="course-image-container">
+                                {{#courseimage}}
+                                <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
+                                {{/courseimage}}
+                                {{^courseimage}}
+                                <div class="course-image-placeholder">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                {{/courseimage}}
+                                <div class="course-level-badge">{{categoryname}}</div>
+                            </div>
+                            <div class="course-content">
+                                <h4 class="course-title">{{fullname}}</h4>
+                                <p class="course-summary">{{summary}}</p>
+                                
+                                <!-- Progress Bar -->
+                                <div class="course-progress-section">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Course Stats -->
+                                <div class="course-stats">
+                                    <div class="course-stat-item">
+                                        <i class="fa fa-book" style="color: black;"></i>
+                                        <span>{{completed_sections}}/{{total_sections}} lessons</span>
+                                    </div>
+                                    <div class="course-stat-item">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>{{duration}}</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{courseurl}}" class="course-button">
+                                    <i class="fa fa-play"></i> Continue Learning
+                                </a>
+                            </div>
+                        </div>
+                        {{/elementary_courses}}
+                    </div>
+                    
+                    <!-- View All Courses Button -->
+                    {{#show_view_all_button}}
+                    <div class="text-center mt-3">
+                        <a href="{{{mycoursesurl}}}" class="btn btn-outline-primary view-all-courses-btn">
+                            <i class="fa fa-th-large"></i> View All Courses ({{total_courses_count}})
+                        </a>
+                    </div>
+                    {{/show_view_all_button}}
+                </div>
+            </div>
+            {{/has_elementary_courses}}
+            
+            <!-- Active Sections Section -->
+            {{#has_elementary_active_sections}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="sections-section-title">
+                        <i class="fa fa-list-alt"></i> Active Sections
+                    </h3>
+                    <div class="elementary-sections-container">
+                        {{#elementary_active_sections}}
+                        <div class="elementary-section-card">
+                            <div class="section-content">
+                                <div class="section-header">
+                                    <h4 class="section-title">{{name}}</h4>
+                                    <span class="section-course">{{coursename}}</span>
+                                </div>
+                                
+                                {{#summary}}
+                                <p class="section-summary">{{summary}}</p>
+                                {{/summary}}
+                                
+                                <!-- Progress Bar -->
+                                <div class="section-progress-section">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section Stats -->
+                                <div class="section-stats">
+                                    <div class="section-stat-item">
+                                        <i class="fa fa-check-circle" style="color: #27ae60;"></i>
+                                        <span>{{completed_activities}}/{{total_activities}} activities</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{courseurl}}" class="section-button">
+                                    <i class="fa fa-play"></i> Continue Section
+                                </a>
+                            </div>
+                        </div>
+                        {{/elementary_active_sections}}
+                    </div>
+                </div>
+            </div>
+            {{/has_elementary_active_sections}}
+            
+            <!-- Active Lessons Section -->
+            {{#has_elementary_active_lessons}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="lessons-section-title">
+                        <i class="fa fa-gamepad"></i> Active Lessons
+                    </h3>
+                    <div class="elementary-lessons-container">
+                        {{#elementary_active_lessons}}
+                        <a href="{{url}}" class="elementary-lesson-card" data-status="{{status}}">
+                            <div class="lesson-icon-container" style="background-color: {{color}};">
+                                <i class="fa {{icon}}"></i>
+                            </div>
+                            <div class="lesson-name">{{name}}</div>
+                            <div class="lesson-course">{{coursename}}</div>
+                            {{#description}}
+                            <div class="lesson-description">{{description}}</div>
+                            {{/description}}
+                        </a>
+                        {{/elementary_active_lessons}}
+                    </div>
+                </div>
+            </div>
+            {{/has_elementary_active_lessons}}
+            
+        </div>
+    {{/elementary}}
+    
+    {{#middle}}
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span class="nav-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tachometer"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span class="nav-text">My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-star"></i>
+                            <span class="nav-text">My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span class="nav-text">Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span class="nav-text">Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span class="nav-text">Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span class="nav-text">Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fa fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{{fullname}}}</div>
+                        <div class="user-role">Student</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="middle-dashboard">
+            <!-- Top Statistics Bar -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="middle-stats-container">
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Active Courses</div>
+                                <div class="stat-number">{{middle_stats.total_courses}}</div>
+                                <div class="stat-subtext">2 in progress</div>
+                                <div class="stat-trend">+12% this week</div>
+                            </div>
+                            <div class="stat-icon-container blue">
+                                <i class="fa fa-book"></i>
+                            </div>
+                        </div>
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Lessons Completed</div>
+                                <div class="stat-number">{{middle_stats.lessons_completed}}</div>
+                                <div class="stat-subtext">this month</div>
+                                <div class="stat-trend">+8% this week</div>
+                            </div>
+                            <div class="stat-icon-container green">
+                                <i class="fa fa-bullseye"></i>
+                            </div>
+                        </div>
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Study Time</div>
+                                <div class="stat-number">24h</div>
+                                <div class="stat-subtext">this week</div>
+                                <div class="stat-trend">+5% this week</div>
+                            </div>
+                            <div class="stat-icon-container purple">
+                                <i class="fa fa-clock-o"></i>
+                            </div>
+                        </div>
+                        <div class="middle-stat-card">
+                            <div class="stat-content">
+                                <div class="stat-title">Achievements</div>
+                                <div class="stat-number">12</div>
+                                <div class="stat-subtext">total earned</div>
+                                <div class="stat-trend">+3% this week</div>
+                            </div>
+                            <div class="stat-icon-container orange">
+                                <i class="fa fa-trophy"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="row">
+                <!-- Left Content Area -->
+                <div class="col-lg-9">
+                    <!-- Current Courses Section -->
+                    {{#has_middle_courses}}
+                    <div class="middle-courses-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Current Courses</h3>
+                            <a href="{{{mycoursesurl}}}" class="view-all-link">View All ></a>
+                        </div>
+                        <div class="courses-static-grid">
+                            {{#middle_courses}}
+                            <div class="middle-course-card">
+                                <div class="course-image-container">
+                                    {{#courseimage}}
+                                    <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
+                                    {{/courseimage}}
+                                    {{^courseimage}}
+                                    <div class="course-image-placeholder">
+                                        <i class="fa fa-book"></i>
+                                    </div>
+                                    {{/courseimage}}
+                                    <div class="course-level-badge">Beginner</div>
+                                </div>
+                                
+                                <div class="course-content">
+                                    <h4 class="course-title">{{fullname}}</h4>
+                                    <p class="course-summary">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
+                                    
+                                    <!-- Progress Bar -->
+                                    <div class="course-progress-section">
+                                        <div class="progress-label">Progress {{progress_percentage}}%</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Course Stats -->
+                                    <div class="course-stats">
+                                        <div class="course-stat-item">
+                                            <span>{{total_sections}}/{{total_sections}} lessons</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="course-status">not started</div>
+                                    
+                                    <div class="course-buttons">
+                                        <button type="button" class="course-button secondary preview-btn" data-course="{{fullname}}" data-courseid="{{id}}">
+                                            <i class="fa fa-eye"></i> Preview
+                                        </button>
+                                        <a href="{{courseurl}}" class="course-button primary">
+                                            <i class="fa fa-play"></i> Continue Learning
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/middle_courses}}
+                        </div>
+                        
+                        <!-- My Courses Button -->
+                        <div class="my-courses-button-container">
+                            
+                        </div>
+                    </div>
+                    {{/has_middle_courses}}
+                    
+                    <!-- Current Lessons Section (Active Sections) -->
+                    {{#has_middle_active_sections}}
+                    <div class="current-lessons-section">
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fa fa-list-alt"></i> Current Lessons
+                            </h3>
+                            <p class="section-subtitle">Continue your learning journey</p>
+                            <a href="#" class="view-all-link">View All ></a>
+                        </div>
+                        <div class="elementary-sections-container">
+                            {{#middle_active_sections}}
+                            <div class="elementary-section-card">
+                                <div class="section-content">
+                                    <div class="section-header">
+                                        <h4 class="section-title">{{name}}</h4>
+                                        <span class="section-course">{{coursename}}</span>
+                                    </div>
+                                    
+                                    {{#summary}}
+                                    <p class="section-summary">{{summary}}</p>
+                                    {{/summary}}
+                                    
+                                    <!-- Progress Bar -->
+                                    <div class="section-progress-section">
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                            </div>
+                                            <span class="progress-percentage">{{progress_percentage}}%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Stats -->
+                                    <div class="section-stats">
+                                        <div class="section-stat-item">
+                                            <i class="fa fa-check-circle" style="color: #27ae60;"></i>
+                                            <span>{{completed_activities}}/{{total_activities}} activities</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <a href="{{courseurl}}" class="section-button">
+                                        <i class="fa fa-play"></i> Continue Section
+                                    </a>
+                                </div>
+                            </div>
+                            {{/middle_active_sections}}
+                        </div>
+                    </div>
+                    {{/has_middle_active_sections}}
+                    
+                    <!-- My Achievements Section -->
+                    <div class="achievements-section">
+                        <div class="achievements-header">
+                            <div class="header-content">
+                                <h3 class="achievements-title">
+                                    <i class="fa fa-trophy"></i> My Achievements
+                                </h3>
+                                <p class="achievements-subtitle">Track your learning milestones</p>
+                            </div>
+                            <a href="#" class="view-all-achievements">
+                                <span>View All Achievements</span>
+                                <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="achievements-container">
+                            <div class="achievement-card earned">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Course Explorer</h4>
+                                    <p class="achievement-description">Enrolled in 3 courses</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-card earned">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-tasks"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Activity Master</h4>
+                                    <p class="achievement-description">Completed 12 activities</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-card earned">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Assignment Hero</h4>
+                                    <p class="achievement-description">Submitted 5 assignments</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-graduation-cap"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Course Graduate</h4>
+                                    <p class="achievement-description">Complete 1 full course</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-lock"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-comments"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Forum Contributor</h4>
+                                    <p class="achievement-description">Post 10 forum messages</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-lock"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-certificate"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Certification Seeker</h4>
+                                    <p class="achievement-description">Earn 1 certificate</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-lock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Sidebar -->
+                <div class="col-lg-3">
+                    <div class="middle-sidebar">
+                        <!-- My Schedule -->
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">
+                                <i class="fa fa-calendar"></i> My Schedule
+                                <a href="{{{calendarurl}}}" class="view-full-link">View Full Calendar ></a>
+                            </h4>
+                            <p class="schedule-subtitle">Next 7 Days</p>
+                            <div class="calendar-week">
+                                {{#calendar_week}}
+                                <div class="calendar-day {{#has_events}}has-events{{/has_events}}" data-date="{{date}}">
+                                    <div class="day-name">{{day_name}}</div>
+                                    <div class="day-number">{{day_number}}</div>
+                                    {{#has_events}}
+                                    <div class="event-indicator">
+                                        <div class="event-dot"></div>
+                                    </div>
+                                    {{/has_events}}
+                                </div>
+                                {{/calendar_week}}
+                            </div>
+                            
+                            <!-- Upcoming Events List -->
+                            <div class="upcoming-events">
+                                {{#upcoming_events}}
+                                <a href="{{event_url}}" class="event-item" target="_blank">
+                                    <div class="event-date">
+                                        <span class="event-day">{{event_day}}</span>
+                                        <span class="event-month">{{event_month}}</span>
+                                    </div>
+                                    <div class="event-details">
+                                        <div class="event-title">{{event_title}}</div>
+                                        <div class="event-time">{{event_time}}</div>
+                                        <div class="event-course">{{course_name}}</div>
+                                    </div>
+                                    <div class="event-type {{event_type}}">
+                                        <i class="fa {{event_icon}}"></i>
+                                    </div>
+                                </a>
+                                {{/upcoming_events}}
+                                {{^upcoming_events}}
+                                <div class="no-events">
+                                    <i class="fa fa-calendar-o"></i>
+                                    <p>No upcoming events in the next 7 days</p>
+                                </div>
+                                {{/upcoming_events}}
+                            </div>
+                        </div>
+                        
+                        <!-- Learning Progress -->
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">Learning Progress</h4>
+                            <div class="quick-stats-list">
+                                <div class="quick-stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-book"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Active Courses</span>
+                                        <span class="stat-value">3</span>
+                                    </div>
+                                </div>
+                                <div class="quick-stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-tasks"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Completed Activities</span>
+                                        <span class="stat-value">12</span>
+                                    </div>
+                                </div>
+                                <div class="quick-stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-calendar-check-o"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Assignments Due</span>
+                                        <span class="stat-value">2</span>
+                                    </div>
+                                </div>
+                                <div class="quick-stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-percent"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Overall Progress</span>
+                                        <span class="stat-value">68%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Achievements -->
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">Achievements</h4>
+                            <div class="achievements-content">
+                                <div class="achievement-summary">
+                                    <div class="achievement-badge-small earned">
+                                        <i class="fa fa-book"></i>
+                                        <span>3</span>
+                                        <label>Courses</label>
+                                    </div>
+                                    <div class="achievement-badge-small earned">
+                                        <i class="fa fa-tasks"></i>
+                                        <span>12</span>
+                                        <label>Activities</label>
+                                    </div>
+                                    <div class="achievement-badge-small earned">
+                                        <i class="fa fa-calendar-check-o"></i>
+                                        <span>5</span>
+                                        <label>Assignments</label>
+                                    </div>
+                                </div>
+                                <div class="achievement-progress">
+                                    <div class="progress-item">
+                                        <span class="progress-label">Course Completion</span>
+                                        <div class="progress-bar-small">
+                                            <div class="progress-fill-small" style="width: 68%"></div>
+                                        </div>
+                                        <span class="progress-value">68%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/middle}}
+    
+    
+    {{#highschool}}
+        <div class="highschool-dashboard">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fa fa-trophy"></i> High School Dashboard</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>This is an advanced dashboard for high school students (Grades 8-12).</p>
+                            <p>Features will include:</p>
+                            <ul>
+                                <li>Comprehensive academic tracking</li>
+                                <li>College preparation tools</li>
+                                <li>Advanced analytics and reporting</li>
+                                <li>Career planning resources</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/highschool}}
+    
+    {{#default}}
+        <div class="default-dashboard">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-secondary">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fa fa-home"></i> Default Dashboard</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>This is the default dashboard for users not assigned to specific grade cohorts.</p>
+                            <p>You can customize this dashboard or assign users to appropriate grade cohorts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/default}}
+{{/dashboard_type}}
+
+{{/custom_dashboard}}
+
+<!-- Regular Dashboard Content -->
+<div class="dashboard-content">
+    <div id="region-main-box" class="d-print-block">
+        <section id="region-main" class="d-print-block" aria-label="{{#str}}content{{/str}}">
+            <div class="rui-course-content">
+                {{{ output.main_content }}}
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Course Preview Modal -->
+<div id="coursePreviewModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="coursePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="coursePreviewModalLabel">
+                    <i class="fa fa-eye"></i> Course Preview
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-content">
+                    <div class="preview-header text-center mb-4">
+                        <div class="preview-icon">
+                            <i class="fa fa-book fa-3x text-primary mb-2"></i>
+                        </div>
+                        <h3 class="preview-title">Course Preview</h3>
+                        <p class="course-name-display mb-3"></p>
+                    </div>
+                    
+                    <div class="sections-container">
+                        <h5 class="sections-title">
+                            <i class="fa fa-list"></i> Course Sections
+                        </h5>
+                        <div class="sections-list" id="sectionsList">
+                            <div class="loading-sections">
+                                <i class="fa fa-spinner fa-spin"></i> Loading sections...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Close
+                </button>
+                <button type="button" class="btn btn-primary start-course-btn">
+                    <i class="fa fa-play"></i> Start Course
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{#js}}
+require(['jquery'], function($) {
+    $(document).ready(function() {
+        // Store course sections data from PHP
+        var coursesSectionsData = {};
+        try {
+            coursesSectionsData = JSON.parse('{{{middle_courses_sections}}}');
+            console.log('Course sections data loaded:', coursesSectionsData);
+        } catch (e) {
+            console.error('Error parsing course sections data:', e);
+            console.log('Raw data:', '{{{middle_courses_sections}}}');
+        }
+        
+        // Handle Preview button clicks
+        $('.preview-btn').on('click', function(e) {
+            e.preventDefault();
+            console.log('Preview button clicked');
+            
+            // Get course data from attributes
+            var courseName = $(this).data('course');
+            var courseId = $(this).data('courseid');
+            
+            console.log('Course name:', courseName, 'Course ID:', courseId);
+            
+            // Update modal content
+            $('.course-name-display').text(courseName);
+            
+            // Show loading state
+            $('#sectionsList').html('<div class="loading-sections"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>');
+            
+            // Show the modal
+            console.log('Attempting to show modal');
+            $('#coursePreviewModal').modal('show');
+            
+            // Display course sections
+            displayCourseSections(courseId);
+        });
+        
+        // Test if modal exists
+        console.log('Modal element exists:', $('#coursePreviewModal').length > 0);
+        console.log('Preview buttons found:', $('.preview-btn').length);
+        
+        // Test modal functionality
+        if ($('#coursePreviewModal').length > 0) {
+            console.log('Modal HTML:', $('#coursePreviewModal')[0].outerHTML.substring(0, 200) + '...');
+        }
+        
+        // Add a simple test to show modal
+        setTimeout(function() {
+            console.log('Testing modal show after 2 seconds...');
+            // Uncomment the line below to test modal functionality
+            // $('#coursePreviewModal').modal('show');
+        }, 2000);
+        
+        // Function to display course sections with tree view
+        function displayCourseSections(courseId) {
+            console.log('Displaying sections for course ID:', courseId);
+            console.log('Available course data:', coursesSectionsData);
+            
+            var sectionsData = coursesSectionsData[courseId];
+            console.log('Sections data for course:', sectionsData);
+            
+            if (!sectionsData || !sectionsData.sections || sectionsData.sections.length === 0) {
+                console.log('No sections data available');
+                $('#sectionsList').html('<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>');
+                return;
+            }
+            
+            var sectionsHtml = '';
+            
+            sectionsData.sections.forEach(function(section, index) {
+                var progressBar = '';
+                if (section.total_activities > 0) {
+                    var progressPercent = section.progress;
+                    progressBar = '<div class="section-progress"><div class="progress-bar"><div class="progress-fill" style="width: ' + progressPercent + '%"></div></div><span class="progress-text">' + section.completed_activities + '/' + section.total_activities + ' activities</span></div>';
+                }
+                
+                // Activities list (initially hidden)
+                var activitiesList = '';
+                if (section.activities && section.activities.length > 0) {
+                    activitiesList = '<div class="section-activities collapsed" id="activities-' + index + '">';
+                    activitiesList += '<div class="activities-header"><span class="activities-count">' + section.activities.length + ' activities</span></div>';
+                    activitiesList += '<ul class="activities-list">';
+                    
+                    section.activities.forEach(function(activity) {
+                        var statusIcon = activity.iscompleted ? 'fa-check-circle' : 'fa-circle-o';
+                        var activityType = activity.modname || 'activity';
+                        var activityIcon = getActivityIcon(activity.modname);
+                        var buttonText = activity.iscompleted ? 'Review' : 'Start';
+                        var buttonClass = activity.iscompleted ? 'review-btn' : 'start-btn';
+                        
+                        activitiesList += '<li class="activity-item">' +
+                            '<div class="activity-icon">' + activityIcon + '</div>' +
+                            '<div class="activity-content">' +
+                                '<div class="activity-name">' + activity.name + '</div>' +
+                                '<div class="activity-meta">' + activityType + '</div>' +
+                            '</div>' +
+                            '<div class="activity-actions">' +
+                                '<div class="activity-status ' + (activity.iscompleted ? 'completed' : 'pending') + '">' +
+                                    '<i class="fa ' + statusIcon + '"></i>' +
+                                '</div>' +
+                                '<a href="' + activity.url + '" class="activity-start-btn ' + buttonClass + '" target="_blank">' +
+                                    '<i class="fa fa-play"></i> ' + buttonText +
+                                '</a>' +
+                            '</div>' +
+                        '</li>';
+                    });
+                    
+                    activitiesList += '</ul></div>';
+                }
+                
+                sectionsHtml += '<div class="section-item" data-section-index="' + index + '">' +
+                    '<div class="section-header clickable" onclick="toggleSection(' + index + ')">' +
+                        '<div class="section-left">' +
+                            '<i class="fa fa-chevron-right section-toggle-icon" id="toggle-' + index + '"></i>' +
+                            '<div class="section-info">' +
+                                '<h6 class="section-name">' + section.name + '</h6>' +
+                                '<div class="section-meta">' + section.total_activities + ' activities</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="section-right">' +
+                            '<a href="' + section.url + '" class="section-start-btn" target="_blank">' +
+                                '<i class="fa fa-play"></i> Start Section' +
+                            '</a>' +
+                        '</div>' +
+                    '</div>' +
+                    progressBar +
+                    activitiesList +
+                '</div>';
+            });
+            
+            $('#sectionsList').html(sectionsHtml);
+        }
+        
+        // Function to toggle section expansion
+        window.toggleSection = function(index) {
+            var activitiesDiv = $('#activities-' + index);
+            var toggleIcon = $('#toggle-' + index);
+            
+            if (activitiesDiv.hasClass('collapsed')) {
+                // Expand
+                activitiesDiv.removeClass('collapsed').addClass('expanded');
+                toggleIcon.removeClass('fa-chevron-right').addClass('fa-chevron-down');
+            } else {
+                // Collapse
+                activitiesDiv.removeClass('expanded').addClass('collapsed');
+                toggleIcon.removeClass('fa-chevron-down').addClass('fa-chevron-right');
+            }
+        }
+        
+        // Function to get activity icon based on module type
+        function getActivityIcon(modname) {
+            var icons = {
+                'quiz': '<i class="fa fa-question-circle"></i>',
+                'assign': '<i class="fa fa-file-text"></i>',
+                'page': '<i class="fa fa-file"></i>',
+                'lesson': '<i class="fa fa-graduation-cap"></i>',
+                'forum': '<i class="fa fa-comments"></i>',
+                'scorm': '<i class="fa fa-laptop"></i>',
+                'book': '<i class="fa fa-book"></i>',
+                'url': '<i class="fa fa-external-link"></i>',
+                'video': '<i class="fa fa-play-circle"></i>',
+                'resource': '<i class="fa fa-file"></i>'
+            };
+            return icons[modname] || '<i class="fa fa-star"></i>';
+        }
+        
+        // Handle Start Course button in modal
+        $('.start-course-btn').on('click', function() {
+            // Close modal
+            $('#coursePreviewModal').modal('hide');
+            
+            // Find the corresponding Continue Learning button and click it
+            var courseName = $('.course-name-display').text();
+            
+            // Find the course card with matching name and click its Continue Learning button
+            $('.middle-course-card').each(function() {
+                var cardCourseName = $(this).find('.course-title').text().trim();
+                if (cardCourseName === courseName) {
+                    $(this).find('.course-button.primary').click();
+                    return false; // Break the loop
+                }
+            });
+        });
+    });
+    
+    // Student Sidebar Functionality
+    $(document).ready(function() {
+        // Add body class for content shifting
+        $('body').addClass('has-student-sidebar');
+        
+        // Handle sidebar navigation clicks
+        $('.student-sidebar .nav-link').on('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            $('.student-sidebar .nav-link').removeClass('active');
+            
+            // Add active class to clicked link
+            $(this).addClass('active');
+            
+            // Get the link text to determine action
+            var linkText = $(this).find('.nav-text').text().trim();
+            
+            // Get the current base URL
+            var baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+            if (baseUrl.endsWith('/')) {
+                baseUrl = baseUrl.slice(0, -1);
+            }
+            
+            // Handle different navigation items
+            switch(linkText) {
+                case 'Home':
+                    // Already on home/dashboard
+                    break;
+                case 'Dashboard':
+                    window.location.href = baseUrl + '/';
+                    break;
+                case 'My Courses':
+                    window.location.href = baseUrl + '/courses.php';
+                    break;
+                case 'My Grades':
+                    window.location.href = baseUrl + '/grade/report/user/index.php';
+                    break;
+                case 'Assignments':
+                    window.location.href = baseUrl + '/mod/assign/index.php';
+                    break;
+                case 'Messages':
+                    window.location.href = baseUrl + '/message/index.php';
+                    break;
+                case 'Code Editor':
+                    // Open code editor in new tab
+                    window.open(baseUrl + '/mod/codeeditor/view.php', '_blank');
+                    break;
+                case 'Scratch Emulator':
+                    // Open scratch emulator in new tab
+                    window.open(baseUrl + '/mod/scratch/view.php', '_blank');
+                    break;
+                default:
+                    console.log('Navigation to:', linkText);
+            }
+        });
+        
+        // Mobile sidebar toggle (if needed)
+        $('.student-sidebar-toggle').on('click', function() {
+            $('.student-sidebar').toggleClass('show');
+        });
+    });
+});
+{{/js}}
+
+{{> theme_remui/common_end}}

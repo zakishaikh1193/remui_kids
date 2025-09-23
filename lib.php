@@ -344,60 +344,78 @@ function theme_remui_kids_get_course_header_data($course) {
     // Get course image
     $courseimage = theme_remui_kids_get_course_image($course);
     
-    // Get enrolled students count
-    $enrolledstudents = get_enrolled_users($coursecontext, 'moodle/course:view', 0, 'u.id', null, 0, 0, true);
-    $enrolledstudentscount = count($enrolledstudents);
+    // Get enrolled students count (users with 'student' role)
+    $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+    $enrolledstudentscount = 0;
+    if ($studentrole) {
+        $enrolledstudentscount = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT u.id) 
+             FROM {user} u 
+             JOIN {role_assignments} ra ON u.id = ra.userid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid = ? AND u.deleted = 0",
+            [CONTEXT_COURSE, $course->id, $studentrole->id]
+        );
+    }
     
-    // Get teachers/instructors
-    $teachers = get_enrolled_users($coursecontext, 'moodle/course:view', 0, 'u.id, u.firstname, u.lastname, u.email', null, 0, 0, true);
-    $teacherroles = ['teacher', 'editingteacher', 'manager'];
+    // Get teachers count (users with 'teacher' or 'editingteacher' role)
+    $teacherroles = $DB->get_records_list('role', 'shortname', ['teacher', 'editingteacher']);
+    $teacherscount = 0;
     $teacherslist = [];
     
-    foreach ($teachers as $user) {
-        $userroles = get_user_roles($coursecontext, $user->id);
-        foreach ($userroles as $role) {
-            if (in_array($role->shortname, $teacherroles)) {
-                $teacherslist[] = [
-                    'id' => $user->id,
-                    'fullname' => fullname($user),
-                    'firstname' => $user->firstname,
-                    'lastname' => $user->lastname,
-                    'email' => $user->email,
-                    'profileimageurl' => new moodle_url('/user/pix.php/' . $user->id . '/f1.jpg')
-                ];
-                break; // Only add once per user
-            }
+    if (!empty($teacherroles)) {
+        $teacherroleids = array_keys($teacherroles);
+        $teacherscount = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT u.id) 
+             FROM {user} u 
+             JOIN {role_assignments} ra ON u.id = ra.userid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid IN (" . implode(',', $teacherroleids) . ") AND u.deleted = 0",
+            [CONTEXT_COURSE, $course->id]
+        );
+        
+        // Get teacher details
+        $teachers = $DB->get_records_sql(
+            "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email 
+             FROM {user} u 
+             JOIN {role_assignments} ra ON u.id = ra.userid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid IN (" . implode(',', $teacherroleids) . ") AND u.deleted = 0 
+             LIMIT 3",
+            [CONTEXT_COURSE, $course->id]
+        );
+        
+        foreach ($teachers as $user) {
+            $teacherslist[] = [
+                'id' => $user->id,
+                'fullname' => fullname($user),
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'email' => $user->email,
+                'profileimageurl' => new moodle_url('/user/pix.php/' . $user->id . '/f1.jpg')
+            ];
         }
     }
     
     // Get course start and end dates
-    $startdate = $course->startdate ? date('M d, Y', $course->startdate) : 'No Start Date';
-    $enddate = $course->enddate ? date('M d, Y', $course->enddate) : 'No End Date';
+    $startdate = $course->startdate ? date('d/m/Y', $course->startdate) : 'No Start Date';
+    $enddate = $course->enddate ? date('d/m/Y', $course->enddate) : 'No End Date';
     
-    // Calculate duration
+    // Calculate duration in weeks
     $duration = '';
     if ($course->startdate && $course->enddate) {
-        $start = new DateTime();
-        $start->setTimestamp($course->startdate);
-        $end = new DateTime();
-        $end->setTimestamp($course->enddate);
-        $interval = $start->diff($end);
-        
-        if ($interval->days > 0) {
-            $weeks = floor($interval->days / 7);
-            $days = $interval->days % 7;
-            if ($weeks > 0) {
-                $duration = $weeks . ' Week' . ($weeks > 1 ? 's' : '');
-                if ($days > 0) {
-                    $duration .= ' ' . $days . ' Day' . ($days > 1 ? 's' : '');
-                }
-            } else {
-                $duration = $days . ' Day' . ($days > 1 ? 's' : '');
-            }
+        $days = ($course->enddate - $course->startdate) / (60 * 60 * 24);
+        $weeks = round($days / 7);
+        if ($weeks > 0) {
+            $duration = $weeks . ' Week' . ($weeks > 1 ? 's' : '');
+        } else {
+            $duration = '1 Week'; // Default to 1 week if less than 7 days
         }
+    } else {
+        $duration = '10 Weeks'; // Default duration
     }
     
-    // Get sections count
+    // Get sections count (excluding general section)
     $modinfo = get_fast_modinfo($course);
     $sections = $modinfo->get_section_info_all();
     $sectionscount = 0;
@@ -421,7 +439,7 @@ function theme_remui_kids_get_course_header_data($course) {
         'courseimage' => $courseimage,
         'enrolledstudentscount' => $enrolledstudentscount,
         'teachers' => $teacherslist,
-        'teacherscount' => count($teacherslist),
+        'teacherscount' => $teacherscount,
         'startdate' => $startdate,
         'enddate' => $enddate,
         'duration' => $duration,
@@ -453,7 +471,7 @@ function theme_remui_kids_get_course_image($course) {
             $file->get_contextid(),
             $file->get_component(),
             $file->get_filearea(),
-            $file->get_itemid(),
+            null, // Changed from $file->get_itemid() to null to remove extra /0/ in URL
             $file->get_filepath(),
             $file->get_filename()
         )->out();
@@ -471,4 +489,943 @@ function theme_remui_kids_get_course_image($course) {
     // Use course ID to consistently select the same image for the same course
     $index = $course->id % count($default_images);
     return $default_images[$index];
+}
+
+/**
+ * Get user's cohort information for dashboard customization
+ *
+ * @param int $userid User ID
+ * @return array Array containing cohort information
+ */
+function theme_remui_kids_get_user_cohort_info($userid) {
+    global $DB;
+    
+    $usercohorts = $DB->get_records_sql(
+        "SELECT c.name, c.id, c.description
+         FROM {cohort} c 
+         JOIN {cohort_members} cm ON c.id = cm.cohortid 
+         WHERE cm.userid = ?",
+        [$userid]
+    );
+    
+    $cohortinfo = [
+        'cohorts' => $usercohorts,
+        'primary_cohort' => null,
+        'grade_level' => 'default'
+    ];
+    
+    if (!empty($usercohorts)) {
+        // Get the first cohort as primary
+        $cohortinfo['primary_cohort'] = reset($usercohorts);
+        
+        // Determine grade level based on cohort name
+        $cohortname = strtolower($cohortinfo['primary_cohort']->name);
+        
+        if (preg_match('/grade\s*[1-3]/i', $cohortname)) {
+            $cohortinfo['grade_level'] = 'elementary';
+        } elseif (preg_match('/grade\s*[4-7]/i', $cohortname)) {
+            $cohortinfo['grade_level'] = 'middle';
+        } elseif (preg_match('/grade\s*[8-9]|grade\s*1[0-2]/i', $cohortname)) {
+            $cohortinfo['grade_level'] = 'highschool';
+        }
+    }
+    
+    return $cohortinfo;
+}
+
+/**
+ * Check if current page is dashboard
+ *
+ * @return bool True if current page is dashboard
+ */
+function theme_remui_kids_is_dashboard_page() {
+    global $PAGE;
+    
+    // Check if we're on the dashboard page
+    $pagetype = $PAGE->pagetype;
+    $url = $PAGE->url;
+    
+    // Dashboard pages typically have these patterns
+    $dashboardpatterns = [
+        'my-index',
+        'my-dashboard',
+        'user-dashboard'
+    ];
+    
+    // Check pagetype
+    foreach ($dashboardpatterns as $pattern) {
+        if (strpos($pagetype, $pattern) !== false) {
+            return true;
+        }
+    }
+    
+    // Check URL path
+    if ($url && strpos($url->get_path(), '/my/') !== false) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Get Grade 1-3 specific dashboard statistics
+ *
+ * @param int $userid User ID
+ * @return array Array containing Grade 1-3 dashboard statistics
+ */
+function theme_remui_kids_get_elementary_dashboard_stats($userid) {
+    global $DB;
+    
+    try {
+        // Get total courses enrolled
+        $totalcourses = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id) 
+             FROM {course} c 
+             JOIN {enrol} e ON c.id = e.courseid 
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid 
+             WHERE ue.userid = ? AND c.visible = 1 AND c.id > 1",
+            [$userid]
+        );
+        
+        // Get lessons completed (activities completed)
+        $lessonscompleted = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cmc.coursemoduleid) 
+             FROM {course_modules_completion} cmc 
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id 
+             JOIN {course} c ON cm.course = c.id 
+             WHERE cmc.userid = ? AND cmc.completionstate > 0 AND c.visible = 1 AND c.id > 1",
+            [$userid]
+        );
+        
+        // Get activities completed (all completion records)
+        $activitiescompleted = $DB->count_records_sql(
+            "SELECT COUNT(*) 
+             FROM {course_modules_completion} cmc 
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id 
+             JOIN {course} c ON cm.course = c.id 
+             WHERE cmc.userid = ? AND cmc.completionstate > 0 AND c.visible = 1 AND c.id > 1",
+            [$userid]
+        );
+        
+        // Calculate overall progress percentage
+        $totalactivities = $DB->count_records_sql(
+            "SELECT COUNT(*) 
+             FROM {course_modules} cm 
+             JOIN {course} c ON cm.course = c.id 
+             WHERE c.visible = 1 AND c.id > 1 AND cm.completion > 0",
+            []
+        );
+        
+        $overallprogress = 0;
+        if ($totalactivities > 0) {
+            $overallprogress = round(($activitiescompleted / $totalactivities) * 100);
+        }
+        
+        return [
+            'total_courses' => $totalcourses,
+            'lessons_completed' => $lessonscompleted,
+            'activities_completed' => $activitiescompleted,
+            'overall_progress' => $overallprogress,
+            'total_activities' => $totalactivities
+        ];
+    } catch (Exception $e) {
+        // Return default values if there's an error
+        return [
+            'total_courses' => 0,
+            'lessons_completed' => 0,
+            'activities_completed' => 0,
+            'overall_progress' => 0,
+            'total_activities' => 0
+        ];
+    }
+}
+
+/**
+ * Get assigned courses for Grade 1-3 students
+ *
+ * @param int $userid User ID
+ * @return array Array containing assigned courses
+ */
+function theme_remui_kids_get_elementary_courses($userid) {
+    global $DB;
+    
+    try {
+        // First, let's check if user has any enrollments at all
+        $enrollments = $DB->get_records_sql(
+            "SELECT COUNT(*) as count FROM {user_enrolments} WHERE userid = ?",
+            [$userid]
+        );
+        
+        $courses = $DB->get_records_sql(
+            "SELECT DISTINCT c.id, c.fullname, c.shortname, c.summary, c.startdate, c.enddate,
+                    c.category, cat.name as categoryname
+             FROM {course} c 
+             JOIN {enrol} e ON c.id = e.courseid 
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid 
+             LEFT JOIN {course_categories} cat ON c.category = cat.id
+             WHERE ue.userid = ? AND c.visible = 1 AND c.id > 1
+             ORDER BY c.timecreated DESC",
+            [$userid]
+        );
+        
+        $formattedcourses = [];
+        foreach ($courses as $course) {
+            // Get course image from files table
+            $courseimage = '';
+            $coursecontext = context_course::instance($course->id);
+            
+            // Get course overview files (course images)
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($coursecontext->id, 'course', 'overviewfiles', 0, 'timemodified DESC', false);
+            
+            if (!empty($files)) {
+                $file = reset($files); // Get the first (most recent) file
+                $courseimage = moodle_url::make_pluginfile_url(
+                    $coursecontext->id,
+                    'course',
+                    'overviewfiles',
+                    null,
+                    '/',
+                    $file->get_filename()
+                )->out();
+            } else {
+                // Fallback to default course images from Unsplash
+                $defaultimages = [
+                    'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop',
+                    'https://images.unsplash.com/photo-1523240798036-942441c8ece9?w=400&h=200&fit=crop'
+                ];
+                $courseimage = $defaultimages[array_rand($defaultimages)];
+            }
+            
+            // Calculate course progress
+            $progress = 0;
+            $totalactivities = 0;
+            $completedactivities = 0;
+            
+            // Get course completion data using correct API
+            try {
+                $completion = new completion_info($course);
+                if ($completion->is_enabled()) {
+                    // Get all activities with completion tracking
+                    $modules = $completion->get_activities();
+                    $totalactivities = count($modules);
+                    
+                    // Count completed activities
+                    foreach ($modules as $module) {
+                        $data = $completion->get_data($module, true, $userid);
+                        if ($data->completionstate == COMPLETION_COMPLETE || 
+                            $data->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $completedactivities++;
+                        }
+                    }
+                    
+                    // Calculate progress percentage
+                    if ($totalactivities > 0) {
+                        $progress = ($completedactivities / $totalactivities) * 100;
+                    }
+                }
+            } catch (Exception $e) {
+                // If completion is not available, use default values
+                $progress = 0;
+                $totalactivities = 0;
+                $completedactivities = 0;
+            }
+            
+            // Calculate duration in weeks
+            $duration = '';
+            if ($course->startdate && $course->enddate) {
+                $start = new DateTime();
+                $start->setTimestamp($course->startdate);
+                $end = new DateTime();
+                $end->setTimestamp($course->enddate);
+                $diff = $start->diff($end);
+                $weeks = ceil($diff->days / 7);
+                $duration = $weeks . ' week' . ($weeks > 1 ? 's' : '');
+            } else {
+                $duration = 'Ongoing';
+            }
+            
+            // Use the same data from completion API for lessons count
+            $totalsections = $totalactivities;
+            $completedsections = $completedactivities;
+            
+            // Fallback: if completion is not enabled, get basic course module count
+            if ($totalsections == 0) {
+                $coursemodules = $DB->get_records('course_modules', [
+                    'course' => $course->id, 
+                    'visible' => 1,
+                    'deletioninprogress' => 0
+                ]);
+                $totalsections = count($coursemodules);
+                $completedsections = 0; // Can't determine completion without completion tracking
+            }
+            
+            // Format dates
+            $startdate = '';
+            $enddate = '';
+            if ($course->startdate) {
+                $startdate = date('M d, Y', $course->startdate);
+            }
+            if ($course->enddate) {
+                $enddate = date('M d, Y', $course->enddate);
+            }
+            
+            $formattedcourses[] = [
+                'id' => $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname,
+                'summary' => $course->summary,
+                'startdate' => $startdate,
+                'enddate' => $enddate,
+                'courseimage' => $courseimage,
+                'categoryname' => $course->categoryname ?: 'General',
+                'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out(),
+                'progress' => $progress,
+                'progress_percentage' => round($progress),
+                'duration' => $duration,
+                'total_sections' => $totalsections,
+                'completed_sections' => $completedsections,
+                'remaining_sections' => $totalsections - $completedsections
+            ];
+        }
+        
+        return $formattedcourses;
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get active sections (sections with activities) for elementary students
+ * @param int $userid User ID
+ * @return array Array of sections with activities data (for debugging, shows all sections with activities)
+ */
+function theme_remui_kids_get_elementary_active_sections($userid) {
+    global $DB;
+    
+    try {
+        // Get user's enrolled courses
+        $courses = $DB->get_records_sql(
+            "SELECT DISTINCT c.id, c.fullname, c.shortname
+             FROM {course} c 
+             JOIN {enrol} e ON c.id = e.courseid 
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid 
+             WHERE ue.userid = ? AND c.visible = 1 AND c.id > 1
+             ORDER BY c.fullname ASC",
+            [$userid]
+        );
+        
+        
+        $activesections = [];
+        
+        foreach ($courses as $course) {
+            // Get course sections
+            $modinfo = get_fast_modinfo($course->id);
+            $sections = $modinfo->get_section_info_all();
+            
+            foreach ($sections as $section) {
+                // Skip section 0 (general section) and hidden sections
+                if ($section->section == 0 || !$section->visible) {
+                    continue;
+                }
+                
+                // Get section name and limit to 7 words
+                $sectionname = $section->name ?: "Section " . $section->section;
+                $words = explode(' ', $sectionname);
+                if (count($words) > 7) {
+                    $sectionname = implode(' ', array_slice($words, 0, 7)) . '...';
+                }
+                
+                // Get activities in this section
+                $modules = [];
+                if (isset($modinfo->sections[$section->section])) {
+                    foreach ($modinfo->sections[$section->section] as $cmid) {
+                        $modules[] = $modinfo->cms[$cmid];
+                    }
+                }
+                
+                if (empty($modules)) {
+                    continue; // Skip sections with no activities
+                }
+                
+                // Calculate progress for this section
+                $totalactivities = count($modules);
+                $completedactivities = 0;
+                
+                // Check completion for each activity
+                $completion = new completion_info($course);
+                if ($completion->is_enabled()) {
+                    foreach ($modules as $module) {
+                        if ($module->completion != COMPLETION_TRACKING_NONE) {
+                            $data = $completion->get_data($module, true, $userid);
+                            if ($data->completionstate == COMPLETION_COMPLETE || 
+                                $data->completionstate == COMPLETION_COMPLETE_PASS) {
+                                $completedactivities++;
+                            }
+                        }
+                    }
+                }
+                
+                
+                // Include sections with any activities (for debugging, we'll show all sections with activities)
+                if ($totalactivities > 0) {
+                    $progress = ($completedactivities / $totalactivities) * 100;
+                    
+                    // Get section summary (first 100 characters)
+                    $summary = '';
+                    if ($section->summary) {
+                        $summary = strip_tags($section->summary);
+                        $summary = strlen($summary) > 100 ? substr($summary, 0, 100) . '...' : $summary;
+                    }
+                    
+                    $activesections[] = [
+                        'id' => $section->id,
+                        'section' => $section->section,
+                        'name' => $sectionname,
+                        'summary' => $summary,
+                        'courseid' => $course->id,
+                        'coursename' => $course->fullname,
+                        'courseurl' => new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]),
+                        'total_activities' => $totalactivities,
+                        'completed_activities' => $completedactivities,
+                        'progress' => $progress,
+                        'progress_percentage' => round($progress)
+                    ];
+                }
+            }
+        }
+        
+        // Sort by progress percentage (highest first)
+        usort($activesections, function($a, $b) {
+            return $b['progress'] <=> $a['progress'];
+        });
+        
+        // Limit to top 3 sections
+        return array_slice($activesections, 0, 3);
+        
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get real active lessons/activities for elementary students from Moodle
+ * @param int $userid User ID
+ * @return array Array of real activities with completion data
+ */
+function theme_remui_kids_get_elementary_active_lessons($userid) {
+    global $DB;
+    
+    try {
+        // Get user's enrolled courses
+        $courses = $DB->get_records_sql(
+            "SELECT DISTINCT c.id, c.fullname, c.shortname
+             FROM {course} c 
+             JOIN {enrol} e ON c.id = e.courseid 
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid 
+             WHERE ue.userid = ? AND c.visible = 1 AND c.id > 1
+             ORDER BY c.fullname ASC",
+            [$userid]
+        );
+        
+        $activities = [];
+        
+        foreach ($courses as $course) {
+            $modinfo = get_fast_modinfo($course->id);
+            $completion = new completion_info($course);
+            
+            // Get all course modules (activities) from all sections
+            foreach ($modinfo->sections as $sectionnum => $sectionmodules) {
+                if ($sectionnum == 0) {
+                    continue; // Skip general section
+                }
+                
+                foreach ($sectionmodules as $cmid) {
+                    $module = $modinfo->cms[$cmid];
+                    
+                    if (!$module->uservisible) {
+                        continue;
+                    }
+                    
+                    $status = 'future'; // Default status
+                    $completiondata = null;
+                    
+                    // Get completion data if available
+                    if ($completion->is_enabled()) {
+                        $completiondata = $completion->get_data($module, true, $userid);
+                        
+                        // Determine activity status
+                        if ($completiondata->completionstate == COMPLETION_COMPLETE || 
+                            $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $status = 'completed';
+                        } elseif ($completiondata->timestarted > 0) {
+                            $status = 'active';
+                        }
+                    }
+                    
+                    // Get activity icon and color based on status
+                    $activitydata = theme_remui_kids_get_activity_playful_data($module->modname, $status);
+                    
+                    // Get activity description (first 100 characters)
+                    $description = '';
+                    if ($module->content) {
+                        $description = strip_tags($module->content);
+                        $description = strlen($description) > 100 ? substr($description, 0, 100) . '...' : $description;
+                    }
+                    
+                    // Get section name for context
+                    $section = $modinfo->get_section_info($sectionnum);
+                    $sectionname = $section->name ?: "Section " . $sectionnum;
+                    
+                    $activities[] = [
+                        'id' => $module->id,
+                        'name' => $module->name,
+                        'modname' => $module->modname,
+                        'status' => $status,
+                        'courseid' => $course->id,
+                        'coursename' => $course->fullname,
+                        'sectionname' => $sectionname,
+                        'sectionnum' => $sectionnum,
+                        'url' => $module->url,
+                        'icon' => $activitydata['icon'],
+                        'color' => $activitydata['color'],
+                        'description' => $description,
+                        'completion_state' => $completiondata ? $completiondata->completionstate : null,
+                        'timestarted' => $completiondata ? $completiondata->timestarted : 0,
+                        'timecompleted' => $completiondata ? $completiondata->timecompleted : 0,
+                        'available' => $module->available,
+                        'availablefrom' => $module->availablefrom,
+                        'availableuntil' => $module->availableuntil
+                    ];
+                }
+            }
+        }
+        
+        // Sort activities: completed first, then active, then future
+        usort($activities, function($a, $b) {
+            $order = ['completed' => 1, 'active' => 2, 'future' => 3];
+            $statusOrder = $order[$a['status']] <=> $order[$b['status']];
+            
+            // If same status, sort by course name, then by section number
+            if ($statusOrder == 0) {
+                $courseOrder = strcmp($a['coursename'], $b['coursename']);
+                if ($courseOrder == 0) {
+                    return $a['sectionnum'] <=> $b['sectionnum'];
+                }
+                return $courseOrder;
+            }
+            
+            return $statusOrder;
+        });
+        
+        // Limit to 8 activities for the display
+        return array_slice($activities, 0, 8);
+        
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+
+/**
+ * Get playful activity data (icon and color) based on module type and status
+ * @param string $modname Module name
+ * @param string $status Activity status (completed, active, future)
+ * @return array Array with icon and color
+ */
+function theme_remui_kids_get_activity_playful_data($modname, $status) {
+    $data = [
+        'icon' => 'fa-star',
+        'color' => '#4CAF50' // Default green
+    ];
+    
+    // Define colors based on status
+    $colors = [
+        'completed' => '#4CAF50', // Green
+        'active' => '#2196F3',    // Blue
+        'future' => '#9E9E9E'     // Gray
+    ];
+    
+    // Define icons based on module type
+    $icons = [
+        'quiz' => 'fa-star',
+        'assign' => 'fa-play',
+        'page' => 'fa-book',
+        'lesson' => 'fa-graduation-cap',
+        'forum' => 'fa-comments',
+        'scorm' => 'fa-laptop',
+        'book' => 'fa-book-open',
+        'url' => 'fa-external-link'
+    ];
+    
+    $data['color'] = $colors[$status] ?? $colors['future'];
+    $data['icon'] = $icons[$modname] ?? 'fa-star';
+    
+    return $data;
+}
+
+/**
+ * Get course sections for modal preview
+ *
+ * @param int $courseid Course ID
+ * @return array Array of course sections with activities
+ */
+function theme_remui_kids_get_course_sections_for_modal($courseid) {
+    global $DB, $USER;
+    
+    try {
+        // Get course object
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        
+        // Get course modules info
+        $modinfo = get_fast_modinfo($course);
+        $sections = $modinfo->get_section_info_all();
+        
+        // Get completion info
+        $completion = new completion_info($course);
+        
+        $sectionsdata = [];
+        
+        foreach ($sections as $section) {
+            // Skip section 0 (general section)
+            if ($section->section == 0) {
+                continue;
+            }
+            
+            // Get section name
+            $sectionname = $section->name ?: "Section " . $section->section;
+            
+            // Get activities in this section
+            $activities = [];
+            $totalactivities = 0;
+            $completedactivities = 0;
+            
+            if (isset($modinfo->sections[$section->section])) {
+                foreach ($modinfo->sections[$section->section] as $cmid) {
+                    $module = $modinfo->cms[$cmid];
+                    
+                    if (!$module->uservisible) {
+                        continue;
+                    }
+                    
+                    $totalactivities++;
+                    
+                    // Check completion status
+                    $iscompleted = false;
+                    if ($completion->is_enabled() && $module->completion != COMPLETION_TRACKING_NONE) {
+                        $completiondata = $completion->get_data($module, true, $USER->id);
+                        if ($completiondata->completionstate == COMPLETION_COMPLETE || 
+                            $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $iscompleted = true;
+                            $completedactivities++;
+                        }
+                    }
+                    
+                    $activities[] = [
+                        'id' => $module->id,
+                        'name' => $module->name,
+                        'modname' => $module->modname,
+                        'url' => (new moodle_url('/mod/' . $module->modname . '/view.php', ['id' => $module->id]))->out(),
+                        'iscompleted' => $iscompleted,
+                        'icon' => '/theme/image.php/remui_kids/' . $module->modname . '/1/icon'
+                    ];
+                }
+            }
+            
+            // Calculate progress percentage
+            $progress = 0;
+            if ($totalactivities > 0) {
+                $progress = round(($completedactivities / $totalactivities) * 100);
+            }
+            
+            // Get section summary (first 150 characters)
+            $summary = '';
+            if ($section->summary) {
+                $summary = strip_tags($section->summary);
+                $summary = strlen($summary) > 150 ? substr($summary, 0, 150) . '...' : $summary;
+            }
+            
+            $sectionsdata[] = [
+                'id' => $section->id,
+                'section' => $section->section,
+                'name' => $sectionname,
+                'summary' => $summary,
+                'total_activities' => $totalactivities,
+                'completed_activities' => $completedactivities,
+                'progress' => $progress,
+                'activities' => $activities,
+                'url' => (new moodle_url('/course/view.php', ['id' => $courseid, 'section' => $section->section]))->out()
+            ];
+        }
+        
+        return [
+            'course' => [
+                'id' => $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname
+            ],
+            'sections' => $sectionsdata
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'course' => ['id' => $courseid, 'fullname' => 'Unknown Course', 'shortname' => ''],
+            'sections' => []
+        ];
+    }
+}
+
+/**
+ * Get calendar week data with events for the next 7 days using Moodle's Calendar API
+ *
+ * @param int $userid User ID
+ * @return array Calendar week data with events
+ */
+function theme_remui_kids_get_calendar_week_data($userid) {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $calendarweek = [];
+    $today = time();
+    $starttime = mktime(0, 0, 0, date('n', $today), date('j', $today), date('Y', $today));
+    $endtime = $starttime + (7 * 86400); // Next 7 days
+    
+    // Get user's enrolled courses
+    $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    $courseids = array_keys($courses);
+    
+    // Get calendar events using Moodle's built-in function
+    $events = calendar_get_events(
+        $starttime,
+        $endtime,
+        $userid, // User events
+        false,   // No group events
+        $courseids, // Course events
+        true,    // With duration
+        true     // Ignore hidden
+    );
+    
+    // Get next 7 days
+    for ($i = 0; $i < 7; $i++) {
+        $date = $starttime + ($i * 86400);
+        $dayname = date('D', $date);
+        $daynumber = date('j', $date);
+        $datekey = date('Y-m-d', $date);
+        
+        // Check if there are events on this date
+        $dayevents = [];
+        foreach ($events as $event) {
+            $eventdate = date('Y-m-d', $event->timestart);
+            if ($eventdate === $datekey) {
+                $dayevents[] = $event;
+            }
+        }
+        
+        $calendarweek[] = [
+            'date' => $datekey,
+            'day_name' => $dayname,
+            'day_number' => $daynumber,
+            'has_events' => !empty($dayevents),
+            'events' => $dayevents
+        ];
+    }
+    
+    return $calendarweek;
+}
+
+/**
+ * Get upcoming events for the next 7 days using Moodle's Calendar API
+ *
+ * @param int $userid User ID
+ * @return array Upcoming events data
+ */
+function theme_remui_kids_get_upcoming_events($userid) {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $upcomingevents = [];
+    $today = time();
+    $starttime = mktime(0, 0, 0, date('n', $today), date('j', $today), date('Y', $today));
+    $endtime = $starttime + (7 * 86400); // Next 7 days
+    
+    // Get user's enrolled courses
+    $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    $courseids = array_keys($courses);
+    
+    // Get calendar events using Moodle's built-in function
+    $events = calendar_get_events(
+        $starttime,
+        $endtime,
+        $userid, // User events
+        false,   // No group events
+        $courseids, // Course events
+        true,    // With duration
+        true     // Ignore hidden
+    );
+    
+    // Process events and format them
+    foreach ($events as $event) {
+        // Skip events that are not assignments, quizzes, or lessons
+        if (!in_array($event->modulename, ['assign', 'quiz', 'lesson'])) {
+            continue;
+        }
+        
+        // Get course name
+        $coursename = '';
+        if ($event->courseid && isset($courses[$event->courseid])) {
+            $coursename = $courses[$event->courseid]->fullname;
+        }
+        
+        // Determine event type and icon
+        $eventtype = $event->modulename;
+        $eventicon = 'fa-star'; // Default icon
+        
+        switch ($event->modulename) {
+            case 'assign':
+                $eventicon = 'fa-file-text';
+                break;
+            case 'quiz':
+                $eventicon = 'fa-question-circle';
+                break;
+            case 'lesson':
+                $eventicon = 'fa-graduation-cap';
+                break;
+        }
+        
+        // Create event URL
+        $eventurl = '';
+        if ($event->modulename && $event->instance) {
+            $eventurl = (new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $event->instance]))->out();
+        }
+        
+        $upcomingevents[] = [
+            'event_title' => $event->name,
+            'event_time' => date('g:i A', $event->timestart),
+            'event_day' => date('j', $event->timestart),
+            'event_month' => date('M', $event->timestart),
+            'course_name' => $coursename,
+            'event_type' => $eventtype,
+            'event_icon' => $eventicon,
+            'event_date' => $event->timestart,
+            'event_url' => $eventurl,
+            'event_description' => $event->description ?? ''
+        ];
+    }
+    
+    // Sort all events by date
+    usort($upcomingevents, function($a, $b) {
+        return $a['event_date'] - $b['event_date'];
+    });
+    
+    // Return only the first 5 events
+    return array_slice($upcomingevents, 0, 5);
+}
+
+
+/**
+ * Get learning progress statistics
+ *
+ * @param int $userid User ID
+ * @return array Learning progress data
+ */
+function theme_remui_kids_get_learning_progress_stats($userid) {
+    global $DB;
+    
+    $today = time();
+    $weekstart = $today - (date('w', $today) * 86400);
+    $weekend = $weekstart + (7 * 86400);
+    
+    // Get lessons completed this week
+    $lessonscompleted = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)
+         AND cmc.timemodified >= ?
+         AND cmc.timemodified <= ?",
+        [$userid, $weekstart, $weekend]
+    );
+    
+    // Get study time (estimated based on completed activities)
+    $studytime = $lessonscompleted * 30; // Assume 30 minutes per lesson
+    $studytimehours = round($studytime / 60, 1);
+    
+    // Get best quiz score
+    $bestscoresql = "
+        SELECT MAX(gg.finalgrade / gg.rawgrademax * 100) as bestscore
+        FROM {grade_grades} gg
+        JOIN {grade_items} gi ON gg.itemid = gi.id
+        JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+        JOIN {modules} m ON cm.module = m.id
+        WHERE gg.userid = ? 
+        AND m.name = 'quiz'
+        AND gg.finalgrade IS NOT NULL
+        AND gg.rawgrademax > 0";
+    
+    $bestscore = $DB->get_field_sql($bestscoresql, [$userid]) ?: 0;
+    
+    // Calculate goal progress (based on weekly target)
+    $weeklytarget = 5; // Target 5 lessons per week
+    $goalprogress = min(100, round(($lessonscompleted / $weeklytarget) * 100));
+    
+    return [
+        'lessons_this_week' => $lessonscompleted,
+        'study_time' => $studytimehours . 'h',
+        'best_score' => round($bestscore),
+        'goal_progress' => $goalprogress
+    ];
+}
+
+/**
+ * Get achievements data
+ *
+ * @param int $userid User ID
+ * @return array Achievements data
+ */
+function theme_remui_kids_get_achievements_data($userid) {
+    global $DB;
+    
+    // Get study streak (consecutive days with activity)
+    $streak = $DB->get_field_sql(
+        "SELECT COUNT(DISTINCT DATE(FROM_UNIXTIME(timemodified))) as streak
+         FROM {course_modules_completion}
+         WHERE userid = ? 
+         AND completionstate IN (1, 2)
+         AND timemodified >= ?",
+        [$userid, time() - (30 * 86400)] // Last 30 days
+    ) ?: 0;
+    
+    // Get total points (based on completed activities)
+    $points = $DB->get_field_sql(
+        "SELECT COUNT(*) * 10
+         FROM {course_modules_completion}
+         WHERE userid = ? 
+         AND completionstate IN (1, 2)",
+        [$userid]
+    ) ?: 0;
+    
+    // Get coins (bonus for high scores)
+    $coins = $DB->get_field_sql(
+        "SELECT COUNT(*) * 5
+         FROM {grade_grades} gg
+         JOIN {grade_items} gi ON gg.itemid = gi.id
+         WHERE gg.userid = ? 
+         AND gg.finalgrade / gg.rawgrademax >= 0.8
+         AND gg.rawgrademax > 0",
+        [$userid]
+    ) ?: 0;
+    
+    return [
+        'streaks' => $streak,
+        'best_streak' => $streak,
+        'goal_streak' => 7, // Goal of 7 day streak
+        'points' => $points,
+        'coins' => $coins
+    ];
 }
