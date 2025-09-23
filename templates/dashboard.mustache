@@ -240,6 +240,74 @@
     {{/elementary}}
     
     {{#middle}}
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span class="nav-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tachometer"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span class="nav-text">My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-star"></i>
+                            <span class="nav-text">My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span class="nav-text">Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span class="nav-text">Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span class="nav-text">Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span class="nav-text">Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fa fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{{fullname}}}</div>
+                        <div class="user-role">Student</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="middle-dashboard">
             <!-- Top Statistics Bar -->
             <div class="row mb-4">
@@ -926,6 +994,69 @@ require(['jquery'], function($) {
                     return false; // Break the loop
                 }
             });
+        });
+    });
+    
+    // Student Sidebar Functionality
+    $(document).ready(function() {
+        // Add body class for content shifting
+        $('body').addClass('has-student-sidebar');
+        
+        // Handle sidebar navigation clicks
+        $('.student-sidebar .nav-link').on('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            $('.student-sidebar .nav-link').removeClass('active');
+            
+            // Add active class to clicked link
+            $(this).addClass('active');
+            
+            // Get the link text to determine action
+            var linkText = $(this).find('.nav-text').text().trim();
+            
+            // Get the current base URL
+            var baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+            if (baseUrl.endsWith('/')) {
+                baseUrl = baseUrl.slice(0, -1);
+            }
+            
+            // Handle different navigation items
+            switch(linkText) {
+                case 'Home':
+                    // Already on home/dashboard
+                    break;
+                case 'Dashboard':
+                    window.location.href = baseUrl + '/';
+                    break;
+                case 'My Courses':
+                    window.location.href = baseUrl + '/courses.php';
+                    break;
+                case 'My Grades':
+                    window.location.href = baseUrl + '/grade/report/user/index.php';
+                    break;
+                case 'Assignments':
+                    window.location.href = baseUrl + '/mod/assign/index.php';
+                    break;
+                case 'Messages':
+                    window.location.href = baseUrl + '/message/index.php';
+                    break;
+                case 'Code Editor':
+                    // Open code editor in new tab
+                    window.open(baseUrl + '/mod/codeeditor/view.php', '_blank');
+                    break;
+                case 'Scratch Emulator':
+                    // Open scratch emulator in new tab
+                    window.open(baseUrl + '/mod/scratch/view.php', '_blank');
+                    break;
+                default:
+                    console.log('Navigation to:', linkText);
+            }
+        });
+        
+        // Mobile sidebar toggle (if needed)
+        $('.student-sidebar-toggle').on('click', function() {
+            $('.student-sidebar').toggleClass('show');
         });
     });
 });
