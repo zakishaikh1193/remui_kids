@@ -413,65 +413,95 @@
                     
                     <!-- My Achievements Section -->
                     <div class="achievements-section">
-                        <div class="section-header">
-                            <h3 class="section-title">
-                                <i class="fa fa-trophy"></i> My Achievements
-                            </h3>
-                            <p class="section-subtitle">Track your learning progress</p>
+                        <div class="achievements-header">
+                            <div class="header-content">
+                                <h3 class="achievements-title">
+                                    <i class="fa fa-trophy"></i> My Achievements
+                                </h3>
+                                <p class="achievements-subtitle">Track your learning milestones</p>
+                            </div>
+                            <a href="#" class="view-all-achievements">
+                                <span>View All Achievements</span>
+                                <i class="fa fa-arrow-right"></i>
+                            </a>
                         </div>
-                        <div class="achievements-grid">
-                            <div class="achievement-badge earned">
-                                <div class="badge-icon">
-                                    <i class="fa fa-fire"></i>
+                        
+                        <div class="achievements-container">
+                            <div class="achievement-card earned">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-book"></i>
                                 </div>
-                                <div class="badge-info">
-                                    <h5>Study Streak</h5>
-                                    <p>5 days in a row!</p>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Course Explorer</h4>
+                                    <p class="achievement-description">Enrolled in 3 courses</p>
                                 </div>
-                            </div>
-                            <div class="achievement-badge earned">
-                                <div class="badge-icon">
-                                    <i class="fa fa-star"></i>
-                                </div>
-                                <div class="badge-info">
-                                    <h5>Quick Learner</h5>
-                                    <p>Completed 3 lessons</p>
+                                <div class="achievement-status">
+                                    <i class="fa fa-check-circle"></i>
                                 </div>
                             </div>
-                            <div class="achievement-badge earned">
-                                <div class="badge-icon">
-                                    <i class="fa fa-clock-o"></i>
+                            
+                            <div class="achievement-card earned">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-tasks"></i>
                                 </div>
-                                <div class="badge-info">
-                                    <h5>Time Master</h5>
-                                    <p>2 hours this week</p>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Activity Master</h4>
+                                    <p class="achievement-description">Completed 12 activities</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-check-circle"></i>
                                 </div>
                             </div>
-                            <div class="achievement-badge locked">
-                                <div class="badge-icon">
+                            
+                            <div class="achievement-card earned">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                </div>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Assignment Hero</h4>
+                                    <p class="achievement-description">Submitted 5 assignments</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
                                     <i class="fa fa-graduation-cap"></i>
                                 </div>
-                                <div class="badge-info">
-                                    <h5>Course Master</h5>
-                                    <p>Complete 1 course</p>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Course Graduate</h4>
+                                    <p class="achievement-description">Complete 1 full course</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-lock"></i>
                                 </div>
                             </div>
-                            <div class="achievement-badge locked">
-                                <div class="badge-icon">
-                                    <i class="fa fa-medal"></i>
+                            
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-comments"></i>
                                 </div>
-                                <div class="badge-info">
-                                    <h5>Perfect Score</h5>
-                                    <p>Get 100% on quiz</p>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Forum Contributor</h4>
+                                    <p class="achievement-description">Post 10 forum messages</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-lock"></i>
                                 </div>
                             </div>
-                            <div class="achievement-badge locked">
-                                <div class="badge-icon">
-                                    <i class="fa fa-rocket"></i>
+                            
+                            <div class="achievement-card locked">
+                                <div class="achievement-icon">
+                                    <i class="fa fa-certificate"></i>
                                 </div>
-                                <div class="badge-info">
-                                    <h5>Speed Demon</h5>
-                                    <p>Complete 5 activities</p>
+                                <div class="achievement-content">
+                                    <h4 class="achievement-title">Certification Seeker</h4>
+                                    <p class="achievement-description">Earn 1 certificate</p>
+                                </div>
+                                <div class="achievement-status">
+                                    <i class="fa fa-lock"></i>
                                 </div>
                             </div>
                         </div>
@@ -481,10 +511,10 @@
                 <!-- Right Sidebar -->
                 <div class="col-lg-3">
                     <div class="middle-sidebar">
-                        <!-- Your Schedule -->
+                        <!-- My Schedule -->
                         <div class="sidebar-section">
                             <h4 class="sidebar-title">
-                                <i class="fa fa-calendar"></i> Your Schedule
+                                <i class="fa fa-calendar"></i> My Schedule
                                 <a href="{{{calendarurl}}}" class="view-full-link">View Full Calendar ></a>
                             </h4>
                             <p class="schedule-subtitle">Next 7 Days</p>
@@ -529,44 +559,44 @@
                             </div>
                         </div>
                         
-                        <!-- Quick Stats -->
+                        <!-- Learning Progress -->
                         <div class="sidebar-section">
                             <h4 class="sidebar-title">Learning Progress</h4>
                             <div class="quick-stats-list">
                                 <div class="quick-stat-item">
                                     <div class="stat-icon">
+                                        <i class="fa fa-book"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Active Courses</span>
+                                        <span class="stat-value">3</span>
+                                    </div>
+                                </div>
+                                <div class="quick-stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-tasks"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <span class="stat-label">Completed Activities</span>
+                                        <span class="stat-value">12</span>
+                                    </div>
+                                </div>
+                                <div class="quick-stat-item">
+                                    <div class="stat-icon">
                                         <i class="fa fa-calendar-check-o"></i>
                                     </div>
                                     <div class="stat-details">
-                                        <span class="stat-label">This Week</span>
-                                        <span class="stat-value">{{learning_stats.lessons_this_week}}</span>
+                                        <span class="stat-label">Assignments Due</span>
+                                        <span class="stat-value">2</span>
                                     </div>
                                 </div>
                                 <div class="quick-stat-item">
                                     <div class="stat-icon">
-                                        <i class="fa fa-clock-o"></i>
+                                        <i class="fa fa-percent"></i>
                                     </div>
                                     <div class="stat-details">
-                                        <span class="stat-label">Study Time</span>
-                                        <span class="stat-value">{{learning_stats.study_time}}</span>
-                                    </div>
-                                </div>
-                                <div class="quick-stat-item">
-                                    <div class="stat-icon">
-                                        <i class="fa fa-trophy"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <span class="stat-label">Best Score</span>
-                                        <span class="stat-value">{{learning_stats.best_score}}%</span>
-                                    </div>
-                                </div>
-                                <div class="quick-stat-item">
-                                    <div class="stat-icon">
-                                        <i class="fa fa-target"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <span class="stat-label">Goal Progress</span>
-                                        <span class="stat-value">{{learning_stats.goal_progress}}%</span>
+                                        <span class="stat-label">Overall Progress</span>
+                                        <span class="stat-value">68%</span>
                                     </div>
                                 </div>
                             </div>
@@ -576,19 +606,30 @@
                         <div class="sidebar-section">
                             <h4 class="sidebar-title">Achievements</h4>
                             <div class="achievements-content">
-                                <div class="achievement-goal">Best: {{achievements.best_streak}} Goal: {{achievements.goal_streak}}</div>
-                                <div class="achievements-grid">
-                                    <div class="achievement-item">
-                                        <i class="fa fa-fire"></i>
-                                        <span>{{achievements.streaks}} Streaks</span>
+                                <div class="achievement-summary">
+                                    <div class="achievement-badge-small earned">
+                                        <i class="fa fa-book"></i>
+                                        <span>3</span>
+                                        <label>Courses</label>
                                     </div>
-                                    <div class="achievement-item">
-                                        <i class="fa fa-star"></i>
-                                        <span>{{achievements.points}} Points</span>
+                                    <div class="achievement-badge-small earned">
+                                        <i class="fa fa-tasks"></i>
+                                        <span>12</span>
+                                        <label>Activities</label>
                                     </div>
-                                    <div class="achievement-item">
-                                        <i class="fa fa-coins"></i>
-                                        <span>{{achievements.coins}} Coins</span>
+                                    <div class="achievement-badge-small earned">
+                                        <i class="fa fa-calendar-check-o"></i>
+                                        <span>5</span>
+                                        <label>Assignments</label>
+                                    </div>
+                                </div>
+                                <div class="achievement-progress">
+                                    <div class="progress-item">
+                                        <span class="progress-label">Course Completion</span>
+                                        <div class="progress-bar-small">
+                                            <div class="progress-fill-small" style="width: 68%"></div>
+                                        </div>
+                                        <span class="progress-value">68%</span>
                                     </div>
                                 </div>
                             </div>
