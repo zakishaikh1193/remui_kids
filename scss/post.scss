@@ -1042,30 +1042,156 @@
 // CUSTOM DASHBOARD STYLES
 // ========================================
 
+// Override page and container padding for custom dashboard
+body:has(.custom_dashboard),
+body.custom-dashboard-page,
+body.custom-dashboard-page.has-student-sidebar {
+    #page {
+        padding: 0 !important;
+        margin-left: 280px !important; // Shift content to the right of sidebar
+        transition: margin-left 0.1s ease;
+    }
+    
+    .main-content,
+    .page-content,
+    .content-area,
+    .region-main,
+    .region-main-box,
+    .region-main-content,
+    .region-main-wrapper {
+        padding: 0 !important;
+        margin-left: 280px !important; // Shift content to the right of sidebar
+        background: transparent !important;
+        transition: margin-left 0.1s ease;
+    }
+    
+    .container,
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+    }
+    
+    // Remove any wrapper padding
+    .wrapper,
+    .page-wrapper,
+    .content-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    // Remove body background that might be showing through
+    background: transparent !important;
+    
+    // Mobile responsiveness
+    @media (max-width: 768px) {
+        #page,
+        .main-content,
+        .page-content,
+        .content-area,
+        .region-main,
+        .region-main-box,
+        .region-main-content,
+        .region-main-wrapper {
+            margin-left: 0 !important;
+        }
+    }
+}
+
+.custom_dashboard{
+    background-color: #ffffff;
+    padding: 0 1rem 1rem 1rem; // Remove top padding to stick header to top
+    margin: 0;
+    width: 100%;
+    min-height: calc(100vh - 60px); // Full height minus navbar
+    overflow-x: hidden;
+    
+    // Remove any default container padding
+    .container,
+    .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+        margin: 0;
+    }
+    
+    // Ensure rows and columns use full width
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .col-12,
+    .col-lg-3,
+    .col-md-6,
+    .col-md-8,
+    .col-md-4 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    // Responsive adjustments
+    @media (max-width: 768px) {
+        padding: 0 0.5rem 0.5rem 0.5rem; // Remove top padding on mobile too
+        
+        .col-12,
+        .col-lg-3,
+        .col-md-6,
+        .col-md-8,
+        .col-md-4 {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        padding: 0 1.5rem 1.5rem 1.5rem; // Remove top padding on large screens too
+        
+        .col-12,
+        .col-lg-3,
+        .col-md-6,
+        .col-md-8,
+        .col-md-4 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+    }
+}
+
 .custom-dashboard-header {
-    background: linear-gradient(135deg, #9C8CD1 0%, #43B7BF 50%, #2D99CF 100%);
-    color: #ffffff;
-    padding: 2rem;
-    margin: -15px -15px 2rem -15px;
+    background: linear-gradient(135deg, #E8B4F0 0%, #B8E6E6 50%, #C7D2FE 100%);
+    color: #4A5568;
+    padding: 2rem 1rem;
+    margin: -1rem 10px 1rem 10px; // Add 10px breathing space on each side
     border-radius: 0 0 1.5rem 1.5rem;
-    box-shadow: 0 6px 25px rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
+    position: relative;
+    
+    @media (max-width: 768px) {
+        padding: 1rem 0.5rem;
+        margin: -0.5rem 8px 1rem 8px; // Slightly less space on mobile
+    }
+    
+    @media (min-width: 1200px) {
+        padding: 2rem 1.5rem;
+        margin: -1.5rem 12px 1rem 12px; // Slightly more space on large screens
+    }
     
     .dashboard-greeting {
         font-size: 2.4rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
-        color: #ffffff;
+        color: #2D3748;
         text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
     }
     
     .dashboard-subtitle {
         font-size: 1.2rem;
-        color: rgb(228, 228, 228);
+        color: #4A5568;
         font-weight: 500;
     }
     
     .dashboard-badge {
-        background: linear-gradient(135deg, #d6b2f7, #b8d4ff);
+        background: linear-gradient(135deg, #F7E7FF, #E0F2FE);
         border-radius: 50%;
         width: 80px;
         height: 80px;
@@ -1073,13 +1199,19 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto;
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-        border: 4px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 15px rgba(139, 69, 19, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        
+        &:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(139, 69, 19, 0.2);
+        }
         
         i {
-            color: white;
+            color: #6B46C1;
             font-size: 2.2rem;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
         }
     }
     
@@ -1127,16 +1259,16 @@
         
         .elementary-stat-card {
             background: white;
-            border-radius: 1.25rem;
-            padding: 1.75rem 1.5rem;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
-            gap: 1.25rem;
-            min-width: 220px;
+            gap: 1.75rem;
+            min-width: 280px;
             flex: 1;
-            max-width: 280px;
-            height: 120px;
+            max-width: 350px;
+            height: 160px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -1147,17 +1279,17 @@
             }
             
             .stat-icon-container {
-                width: 60px;
-                height: 60px;
+                width: 80px;
+                height: 80px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 flex-shrink: 0;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
                 
                 .stat-icon {
-                    font-size: 1.25rem;
+                    font-size: 1.75rem;
                     color: #2c3e50;
                 }
             }
@@ -1166,15 +1298,15 @@
                 flex: 1;
                 
                 .stat-number {
-                    font-size: 1.8rem;
-                    font-weight: 600;
+                    font-size: 2.4rem;
+                    font-weight: 700;
                     color: #2c3e50;
                     line-height: 1;
-                    margin-bottom: 0.25rem;
+                    margin-bottom: 0.5rem;
                 }
                 
                 .stat-label {
-                    font-size: 0.9rem;
+                    font-size: 1.1rem;
                     color: #7f8c8d;
                     font-weight: 400;
                 }
@@ -1220,25 +1352,26 @@
             
             .elementary-stat-card {
                 width: 100%;
-                max-width: 320px;
-                height: 100px;
+                max-width: 400px;
+                height: 140px;
+                padding: 2rem 1.5rem;
                 
                 .stat-icon-container {
-                    width: 50px;
-                    height: 50px;
+                    width: 70px;
+                    height: 70px;
                     
                     .stat-icon {
-                        font-size: 1.1rem;
+                        font-size: 1.5rem;
                     }
                 }
                 
                 .stat-content {
                     .stat-number {
-                        font-size: 1.6rem;
+                        font-size: 2rem;
                     }
                     
                     .stat-label {
-                        font-size: 0.85rem;
+                        font-size: 1rem;
                     }
                 }
             }
@@ -1246,9 +1379,29 @@
         
         @media (min-width: 769px) and (max-width: 1024px) {
             .elementary-stat-card {
-                min-width: 200px;
-                max-width: 240px;
-                height: 110px;
+                min-width: 250px;
+                max-width: 300px;
+                height: 150px;
+                padding: 2.25rem 1.75rem;
+                
+                .stat-icon-container {
+                    width: 75px;
+                    height: 75px;
+                    
+                    .stat-icon {
+                        font-size: 1.6rem;
+                    }
+                }
+                
+                .stat-content {
+                    .stat-number {
+                        font-size: 2.2rem;
+                    }
+                    
+                    .stat-label {
+                        font-size: 1.05rem;
+                    }
+                }
             }
         }
     }
@@ -1506,18 +1659,19 @@
 .sections-section-title {
     font-size: 1.8rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: #4A5568;
     margin-bottom: 1.5rem;
     text-align: center;
-    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-    color: white;
+    background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 50%, #E2E8F0 100%);
+    color: #4A5568;
     padding: 1rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(52, 73, 94, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
+    border: 1px solid rgba(226, 232, 240, 0.8);
     
     i {
-        color: rgb(255, 255, 255);
+        color: #718096;
         margin-right: 0.5rem;
     }
 }
@@ -1698,18 +1852,19 @@
 .lessons-section-title {
     font-size: 1.8rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: #4A5568;
     margin-bottom: 1.5rem;
     text-align: center;
-    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-    color: white;
+    background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 50%, #E2E8F0 100%);
+    color: #4A5568;
     padding: 1rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(52, 73, 94, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
+    border: 1px solid rgba(226, 232, 240, 0.8);
     
     i {
-        color: rgb(255, 255, 255);
+        color: #718096;
         margin-right: 0.5rem;
     }
 }
@@ -3782,13 +3937,13 @@
                         color: #333333;
                         
                         i {
-                            color: #4ECDC4;
+                            color: #7dc1f8;
                         }
                     }
                     
                     &.active {
-                        background: #f0f8f7;
-                        color: #2c3e50;
+                        background: linear-gradient(90deg, #7dc1f8b4 0%,#ffffffb4 70% , #ffffffb4 100%);
+                        color: #333333;
                         
                         &::before {
                             content: '';
@@ -3797,12 +3952,12 @@
                             top: 0;
                             bottom: 0;
                             width: 3px;
-                            background: #4ECDC4;
+                            background: #5e7af8;
                             border-radius: 0 2px 2px 0;
                         }
                         
                         i {
-                            color: #4ECDC4;
+                            color: #333333;
                         }
                     }
                 }
@@ -3852,14 +4007,14 @@
 body.has-student-sidebar {
     #page {
         margin-left: 280px;
-        transition: margin-left 0.3s ease;
+        transition: margin-left 0.1s ease;
     }
     
     .main-content,
     .page-content,
     .content-area {
         margin-left: 280px;
-        transition: margin-left 0.3s ease;
+        transition: margin-left 0.1s ease;
     }
     
     // Ensure top navbar stays on top

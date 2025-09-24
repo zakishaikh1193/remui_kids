@@ -11,6 +11,9 @@
 {{> theme_remui_kids/common_start}}
 
 {{#custom_dashboard}}
+
+<div class="custom_dashboard">
+
 <!-- Custom Dashboard Header -->
 <div class="custom-dashboard-header">
     <div class="container-fluid">
@@ -41,6 +44,69 @@
 <!-- Cohort-specific content -->
 {{#dashboard_type}}
     {{#elementary}}
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span>Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span>Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{student_name}}</div>
+                        <div class="user-role">Elementary Student</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="elementary-dashboard">
             <!-- Grade 1-3 Statistics Cards -->
             {{#elementary_stats}}
@@ -99,7 +165,7 @@
             {{#has_elementary_courses}}
             <div class="row mb-4">
                 <div class="col-12">
-                    <h3 class="courses-section-title">
+                    <h3 class="sections-section-title">
                         <i class="fa fa-book"></i> My Courses
                     </h3>
                     <div class="elementary-courses-container">
@@ -162,12 +228,12 @@
             </div>
             {{/has_elementary_courses}}
             
-            <!-- Active Sections Section -->
+            <!-- Active Lessons Section -->
             {{#has_elementary_active_sections}}
             <div class="row mb-4">
                 <div class="col-12">
                     <h3 class="sections-section-title">
-                        <i class="fa fa-list-alt"></i> Active Sections
+                        <i class="fa fa-list-alt"></i> Active Lessons
                     </h3>
                     <div class="elementary-sections-container">
                         {{#elementary_active_sections}}
@@ -211,12 +277,12 @@
             </div>
             {{/has_elementary_active_sections}}
             
-            <!-- Active Lessons Section -->
+            <!-- Active Activities Section -->
             {{#has_elementary_active_lessons}}
             <div class="row mb-4">
                 <div class="col-12">
                     <h3 class="lessons-section-title">
-                        <i class="fa fa-gamepad"></i> Active Lessons
+                        <i class="fa fa-gamepad"></i> Active Activities
                     </h3>
                     <div class="elementary-lessons-container">
                         {{#elementary_active_lessons}}
@@ -247,13 +313,7 @@
                     <li class="nav-item">
                         <a href="#" class="nav-link active">
                             <i class="fa fa-home"></i>
-                            <span class="nav-text">Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fa fa-tachometer"></i>
-                            <span class="nav-text">Dashboard</span>
+                            <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -710,26 +770,219 @@
     
     
     {{#highschool}}
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span>Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span>Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{student_name}}</div>
+                        <div class="user-role">High School Student</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="highschool-dashboard">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card border-success">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="fa fa-trophy"></i> High School Dashboard</h5>
+            <!-- Grade 8-12 Statistics Cards -->
+            {{#highschool_stats}}
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card courses-card">
+                        <div class="stats-icon">
+                            <i class="fa fa-graduation-cap"></i>
                         </div>
-                        <div class="card-body">
-                            <p>This is an advanced dashboard for high school students (Grades 8-12).</p>
-                            <p>Features will include:</p>
-                            <ul>
-                                <li>Comprehensive academic tracking</li>
-                                <li>College preparation tools</li>
-                                <li>Advanced analytics and reporting</li>
-                                <li>Career planning resources</li>
-                            </ul>
+                        <div class="stats-content">
+                            <h3 class="stats-number">{{courses}}</h3>
+                            <p class="stats-label">Courses</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card lessons-card">
+                        <div class="stats-icon">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                        <div class="stats-content">
+                            <h3 class="stats-number">{{lessons}}</h3>
+                            <p class="stats-label">Lessons Done</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card activities-card">
+                        <div class="stats-icon">
+                            <i class="fa fa-trophy"></i>
+                        </div>
+                        <div class="stats-content">
+                            <h3 class="stats-number">{{activities}}</h3>
+                            <p class="stats-label">Activities Done</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card progress-card">
+                        <div class="stats-icon">
+                            <i class="fa fa-chart-line"></i>
+                        </div>
+                        <div class="stats-content">
+                            <h3 class="stats-number">{{progress}}%</h3>
+                            <p class="stats-label">Overall Progress</p>
                         </div>
                     </div>
                 </div>
             </div>
+            {{/highschool_stats}}
+            
+            <!-- My Courses Section -->
+            {{#has_highschool_courses}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fa fa-book"></i> My Courses
+                        </h3>
+                        {{#show_view_all_button}}
+                        <a href="{{{mycoursesurl}}}" class="view-all-btn">
+                            <i class="fa fa-arrow-right"></i> View All
+                        </a>
+                        {{/show_view_all_button}}
+                    </div>
+                    
+                    <div class="courses-grid">
+                        {{#highschool_courses}}
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h4 class="course-title">{{fullname}}</h4>
+                                <div class="course-progress">
+                                    <div class="progress-circle" data-progress="{{progress}}">
+                                        <span class="progress-text">{{progress}}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-content">
+                                <p class="course-description">{{summary}}</p>
+                                <div class="course-meta">
+                                    <span class="course-shortname">{{shortname}}</span>
+                                </div>
+                            </div>
+                            <div class="course-actions">
+                                <a href="{{courseurl}}" class="btn btn-primary">
+                                    <i class="fa fa-play"></i> Continue Course
+                                </a>
+                            </div>
+                        </div>
+                        {{/highschool_courses}}
+                    </div>
+                </div>
+            </div>
+            {{/has_highschool_courses}}
+            
+            <!-- Active Sections Section -->
+            {{#has_highschool_active_sections}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="section-title">
+                        <i class="fa fa-list-alt"></i> Active Sections
+                    </h3>
+                    <div class="sections-container">
+                        {{#highschool_active_sections}}
+                        <div class="section-card">
+                            <div class="section-header">
+                                <h4 class="section-title">{{name}}</h4>
+                                <span class="section-course">{{coursename}}</span>
+                            </div>
+                            <div class="section-content">
+                                <p class="section-description">{{summary}}</p>
+                            </div>
+                            <div class="section-actions">
+                                <a href="{{url}}" class="section-button">
+                                    <i class="fa fa-play"></i> Start Section
+                                </a>
+                            </div>
+                        </div>
+                        {{/highschool_active_sections}}
+                    </div>
+                </div>
+            </div>
+            {{/has_highschool_active_sections}}
+            
+            <!-- Active Lessons Section -->
+            {{#has_highschool_active_lessons}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="section-title">
+                        <i class="fa fa-tasks"></i> Active Lessons
+                    </h3>
+                    <div class="lessons-container">
+                        {{#highschool_active_lessons}}
+                        <div class="lesson-card">
+                            <div class="lesson-header">
+                                <h4 class="lesson-title">{{modulename}}</h4>
+                                <span class="lesson-course">{{coursename}}</span>
+                            </div>
+                            <div class="lesson-actions">
+                                <a href="{{url}}" class="lesson-button">
+                                    <i class="fa fa-play"></i> Start Activity
+                                </a>
+                            </div>
+                        </div>
+                        {{/highschool_active_lessons}}
+                    </div>
+                </div>
+            </div>
+            {{/has_highschool_active_lessons}}
+            
         </div>
     {{/highschool}}
     
@@ -751,6 +1004,8 @@
         </div>
     {{/default}}
 {{/dashboard_type}}
+
+</div>
 
 {{/custom_dashboard}}
 
