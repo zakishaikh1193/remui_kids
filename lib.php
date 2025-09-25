@@ -1066,3 +1066,254 @@ function theme_remui_kids_get_activity_playful_data($modname, $status) {
     
     return $data;
 }
+
+/**
+ * Get admin dashboard statistics
+ *
+ * @return array Array containing admin dashboard statistics
+ */
+function theme_remui_kids_get_admin_dashboard_stats() {
+    global $DB;
+    
+    try {
+        // Get total schools (organizations)
+        $totalschools = $DB->count_records('course_categories', ['visible' => 1]);
+        
+        // Get total courses
+        $totalcourses = $DB->count_records('course', ['visible' => 1]);
+        
+        // Get total students
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $totalstudents = 0;
+        if ($studentrole) {
+            $totalstudents = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {context} ctx ON ra.contextid = ctx.id 
+                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
+                [CONTEXT_SYSTEM, $studentrole->id]
+            );
+        }
+        
+        // Get average course rating (mock data for now)
+        $avgcourserating = 0; // Will be implemented when rating system is available
+        
+        return [
+            'total_schools' => $totalschools,
+            'total_courses' => $totalcourses,
+            'total_students' => $totalstudents,
+            'avg_course_rating' => $avgcourserating
+        ];
+    } catch (Exception $e) {
+        return [
+            'total_schools' => 0,
+            'total_courses' => 0,
+            'total_students' => 0,
+            'avg_course_rating' => 0
+        ];
+    }
+}
+
+/**
+ * Get admin user statistics
+ *
+ * @return array Array containing user statistics
+ */
+function theme_remui_kids_get_admin_user_stats() {
+    global $DB;
+    
+    try {
+        // Get total users
+        $totalusers = $DB->count_records('user', ['deleted' => 0]);
+        
+        // Get teachers count
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
+        $teachers = 0;
+        if ($teacherrole) {
+            $teachers = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {context} ctx ON ra.contextid = ctx.id 
+                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
+                [CONTEXT_SYSTEM, $teacherrole->id]
+            );
+        }
+        
+        // Get students count
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $students = 0;
+        if ($studentrole) {
+            $students = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {context} ctx ON ra.contextid = ctx.id 
+                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
+                [CONTEXT_SYSTEM, $studentrole->id]
+            );
+        }
+        
+        // Get admins count
+        $adminrole = $DB->get_record('role', ['shortname' => 'manager']);
+        $admins = 0;
+        if ($adminrole) {
+            $admins = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {context} ctx ON ra.contextid = ctx.id 
+                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
+                [CONTEXT_SYSTEM, $adminrole->id]
+            );
+        }
+        
+        // Get active users (logged in within last 30 days)
+        $activeusers = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT userid) 
+             FROM {user_lastaccess} 
+             WHERE lastaccess > ?",
+            [time() - (30 * 24 * 60 * 60)]
+        );
+        
+        // Get new users this month
+        $newusers = $DB->count_records_sql(
+            "SELECT COUNT(*) 
+             FROM {user} 
+             WHERE timecreated > ? AND deleted = 0",
+            [strtotime('first day of this month')]
+        );
+        
+        return [
+            'total_users' => $totalusers,
+            'teachers' => $teachers,
+            'students' => $students,
+            'admins' => $admins,
+            'active_users' => $activeusers,
+            'new_this_month' => $newusers
+        ];
+    } catch (Exception $e) {
+        return [
+            'total_users' => 0,
+            'teachers' => 0,
+            'students' => 0,
+            'admins' => 0,
+            'active_users' => 0,
+            'new_this_month' => 0
+        ];
+    }
+}
+
+/**
+ * Get admin course statistics
+ *
+ * @return array Array containing course statistics
+ */
+function theme_remui_kids_get_admin_course_stats() {
+    global $DB;
+    
+    try {
+        // Get total courses
+        $totalcourses = $DB->count_records('course', ['visible' => 1]);
+        
+        // Get completion rate (mock data for now)
+        $completionrate = 0; // Will be implemented when completion tracking is analyzed
+        
+        // Get average rating (mock data for now)
+        $avgrating = 0; // Will be implemented when rating system is available
+        
+        // Get categories count
+        $categories = $DB->count_records('course_categories', ['visible' => 1]);
+        
+        return [
+            'total_courses' => $totalcourses,
+            'completion_rate' => $completionrate,
+            'avg_rating' => $avgrating,
+            'categories' => $categories
+        ];
+    } catch (Exception $e) {
+        return [
+            'total_courses' => 0,
+            'completion_rate' => 0,
+            'avg_rating' => 0,
+            'categories' => 0
+        ];
+    }
+}
+
+/**
+ * Get admin recent activity
+ *
+ * @return array Array containing recent activity data
+ */
+function theme_remui_kids_get_admin_recent_activity() {
+    global $DB;
+    
+    try {
+        $activities = [];
+        
+        // Get recent course creation
+        $recentcourses = $DB->get_records_sql(
+            "SELECT c.id, c.fullname, c.timecreated, u.firstname, u.lastname
+             FROM {course} c
+             LEFT JOIN {user} u ON c.userid = u.id
+             WHERE c.visible = 1
+             ORDER BY c.timecreated DESC
+             LIMIT 5",
+            []
+        );
+        
+        foreach ($recentcourses as $course) {
+            $timeago = time() - $course->timecreated;
+            $timeago = $timeago < 3600 ? round($timeago / 60) . 'm ago' : 
+                      ($timeago < 86400 ? round($timeago / 3600) . 'h ago' : 
+                      round($timeago / 86400) . 'd ago');
+            
+            $activities[] = [
+                'type' => 'course_created',
+                'title' => '"' . $course->fullname . '" course published',
+                'time' => $timeago,
+                'author' => $course->firstname . ' ' . $course->lastname,
+                'icon' => 'fa-book',
+                'color' => 'red'
+            ];
+        }
+        
+        // Get recent user registrations
+        $recentusers = $DB->get_records_sql(
+            "SELECT u.id, u.firstname, u.lastname, u.timecreated
+             FROM {user} u
+             WHERE u.deleted = 0
+             ORDER BY u.timecreated DESC
+             LIMIT 3",
+            []
+        );
+        
+        foreach ($recentusers as $user) {
+            $timeago = time() - $user->timecreated;
+            $timeago = $timeago < 3600 ? round($timeago / 60) . 'm ago' : 
+                      ($timeago < 86400 ? round($timeago / 3600) . 'h ago' : 
+                      round($timeago / 86400) . 'd ago');
+            
+            $activities[] = [
+                'type' => 'user_registered',
+                'title' => 'New user registered: ' . $user->firstname . ' ' . $user->lastname,
+                'time' => $timeago,
+                'author' => '',
+                'icon' => 'fa-user',
+                'color' => 'blue'
+            ];
+        }
+        
+        // Sort by time and limit to 5 most recent
+        usort($activities, function($a, $b) {
+            return strcmp($a['time'], $b['time']);
+        });
+        
+        return array_slice($activities, 0, 5);
+        
+    } catch (Exception $e) {
+        return [];
+    }
+}
