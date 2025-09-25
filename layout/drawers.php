@@ -53,17 +53,17 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $dashboardtype = 'default'; // Default dashboard
 
     if (!empty($usercohortname)) {
-        // Check for Grade 1-3 (Elementary)
-        if (preg_match('/grade\s*[1-3]/i', $usercohortname)) {
-            $dashboardtype = 'elementary';
+        // Check for Grade 8-12 (High School) - Check this first to avoid conflicts
+        if (preg_match('/grade\s*(?:1[0-2]|[8-9])/i', $usercohortname)) {
+            $dashboardtype = 'highschool';
         }
         // Check for Grade 4-7 (Middle)
         elseif (preg_match('/grade\s*[4-7]/i', $usercohortname)) {
             $dashboardtype = 'middle';
         }
-        // Check for Grade 8-12 (High School)
-        elseif (preg_match('/grade\s*[8-9]|grade\s*1[0-2]/i', $usercohortname)) {
-            $dashboardtype = 'highschool';
+        // Check for Grade 1-3 (Elementary) - Check this last
+        elseif (preg_match('/grade\s*[1-3]/i', $usercohortname)) {
+            $dashboardtype = 'elementary';
         }
     }
 
@@ -75,6 +75,9 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $templatecontext['student_name'] = $USER->firstname;
     $templatecontext['hello_message'] = "Hello " . $USER->firstname . "!";
     $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
+    
+    // Add custom body class for dashboard styling
+    $templatecontext['bodyattributes'] = 'class="custom-dashboard-page has-student-sidebar"';
     
     // Set individual dashboard type flags for Mustache template
     $templatecontext['elementary'] = ($dashboardtype === 'elementary');
@@ -133,6 +136,41 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $activelessons = theme_remui_kids_get_elementary_active_lessons($USER->id);
         $templatecontext['middle_active_lessons'] = array_slice($activelessons, 0, 3); // Show only first 3 lessons
         $templatecontext['has_middle_active_lessons'] = !empty($activelessons);
+        
+        // Add calendar and sidebar data
+        $templatecontext['calendar_week'] = theme_remui_kids_get_calendar_week_data($USER->id);
+        $templatecontext['upcoming_events'] = theme_remui_kids_get_upcoming_events($USER->id);
+        $templatecontext['learning_stats'] = theme_remui_kids_get_learning_progress_stats($USER->id);
+        $templatecontext['achievements'] = theme_remui_kids_get_achievements_data($USER->id);
+        $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
+    }
+    
+    // Add Grade 8-12 specific statistics and courses for high school students
+    if ($dashboardtype === 'highschool') {
+        $templatecontext['highschool_stats'] = theme_remui_kids_get_highschool_dashboard_stats($USER->id);
+        $courses = theme_remui_kids_get_highschool_courses($USER->id);
+        $templatecontext['highschool_courses'] = array_slice($courses, 0, 3); // Show only first 3 courses
+        $templatecontext['has_highschool_courses'] = !empty($courses);
+        $templatecontext['total_courses_count'] = count($courses);
+        $templatecontext['show_view_all_button'] = count($courses) > 3;
+        
+        // Add course sections data for modal preview
+        $coursesectionsdata = [];
+        foreach ($courses as $course) {
+            $sectionsdata = theme_remui_kids_get_course_sections_for_modal($course['id']);
+            $coursesectionsdata[$course['id']] = $sectionsdata;
+        }
+        $templatecontext['highschool_courses_sections'] = json_encode($coursesectionsdata);
+        
+        // Add active sections data (limit to 3 for Current Lessons section)
+        $activesections = theme_remui_kids_get_highschool_active_sections($USER->id);
+        $templatecontext['highschool_active_sections'] = array_slice($activesections, 0, 3);
+        $templatecontext['has_highschool_active_sections'] = !empty($activesections);
+        
+        // Add active lessons data (limit to 3)
+        $activelessons = theme_remui_kids_get_highschool_active_lessons($USER->id);
+        $templatecontext['highschool_active_lessons'] = array_slice($activelessons, 0, 3);
+        $templatecontext['has_highschool_active_lessons'] = !empty($activelessons);
         
         // Add calendar and sidebar data
         $templatecontext['calendar_week'] = theme_remui_kids_get_calendar_week_data($USER->id);

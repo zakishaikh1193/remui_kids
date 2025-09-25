@@ -1429,3 +1429,204 @@ function theme_remui_kids_get_achievements_data($userid) {
         'coins' => $coins
     ];
 }
+
+/**
+ * Get high school dashboard statistics (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Dashboard statistics
+ */
+function theme_remui_kids_get_highschool_dashboard_stats($userid) {
+    global $DB;
+    
+    // Get enrolled courses count
+    $courses = $DB->get_field_sql(
+        "SELECT COUNT(DISTINCT c.id)
+         FROM {course} c
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND c.visible = 1
+         AND c.id > 1",
+        [$userid]
+    ) ?: 0;
+    
+    // Get completed lessons count
+    $lessons = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)
+         AND cm.module IN (SELECT id FROM {modules} WHERE name IN ('lesson', 'page', 'book'))",
+        [$userid]
+    ) ?: 0;
+    
+    // Get completed activities count
+    $activities = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)",
+        [$userid]
+    ) ?: 0;
+    
+    // Calculate overall progress percentage
+    $total_activities = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules} cm
+         JOIN {enrol} e ON cm.course = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND cm.completion > 0",
+        [$userid]
+    ) ?: 1;
+    
+    $progress = $total_activities > 0 ? round(($activities / $total_activities) * 100) : 0;
+    
+    return [
+        'courses' => $courses,
+        'lessons' => $lessons,
+        'activities' => $activities,
+        'progress' => $progress
+    ];
+}
+
+/**
+ * Get high school courses (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Course data
+ */
+function theme_remui_kids_get_highschool_courses($userid) {
+    global $DB;
+    
+    $courses = $DB->get_records_sql(
+        "SELECT c.id, c.fullname, c.shortname, c.summary, c.startdate, c.enddate
+         FROM {course} c
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND c.visible = 1
+         AND c.id > 1
+         ORDER BY c.startdate DESC, c.fullname ASC",
+        [$userid]
+    );
+    
+    $coursedata = [];
+    foreach ($courses as $course) {
+        // Get course progress
+        $total_activities = $DB->get_field_sql(
+            "SELECT COUNT(*)
+             FROM {course_modules} cm
+             WHERE cm.course = ? 
+             AND cm.completion > 0",
+            [$course->id]
+        ) ?: 1;
+        
+        $completed_activities = $DB->get_field_sql(
+            "SELECT COUNT(*)
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             WHERE cmc.userid = ? 
+             AND cm.course = ?
+             AND cmc.completionstate IN (1, 2)",
+            [$userid, $course->id]
+        ) ?: 0;
+        
+        $progress = $total_activities > 0 ? round(($completed_activities / $total_activities) * 100) : 0;
+        
+        $coursedata[] = [
+            'id' => $course->id,
+            'fullname' => $course->fullname,
+            'shortname' => $course->shortname,
+            'summary' => $course->summary,
+            'startdate' => $course->startdate,
+            'enddate' => $course->enddate,
+            'progress' => $progress,
+            'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out()
+        ];
+    }
+    
+    return $coursedata;
+}
+
+/**
+ * Get high school active sections (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Active sections data
+ */
+function theme_remui_kids_get_highschool_active_sections($userid) {
+    global $DB;
+    
+    $sections = $DB->get_records_sql(
+        "SELECT cs.id, cs.section, cs.name, cs.summary, c.id as courseid, c.fullname as coursename
+         FROM {course_sections} cs
+         JOIN {course} c ON cs.course = c.id
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND cs.section > 0
+         AND c.visible = 1
+         AND c.id > 1
+         ORDER BY c.startdate DESC, cs.section ASC
+         LIMIT 10",
+        [$userid]
+    );
+    
+    $sectionsdata = [];
+    foreach ($sections as $section) {
+        $sectionsdata[] = [
+            'id' => $section->id,
+            'section' => $section->section,
+            'name' => $section->name ?: "Section {$section->section}",
+            'summary' => $section->summary,
+            'courseid' => $section->courseid,
+            'coursename' => $section->coursename,
+            'url' => (new moodle_url('/course/view.php', ['id' => $section->courseid, 'section' => $section->section]))->out()
+        ];
+    }
+    
+    return $sectionsdata;
+}
+
+/**
+ * Get high school active lessons (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Active lessons data
+ */
+function theme_remui_kids_get_highschool_active_lessons($userid) {
+    global $DB;
+    
+    $lessons = $DB->get_records_sql(
+        "SELECT cm.id, cm.instance, m.name as modulename, c.id as courseid, c.fullname as coursename
+         FROM {course_modules} cm
+         JOIN {modules} m ON cm.module = m.id
+         JOIN {course} c ON cm.course = c.id
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND m.name IN ('lesson', 'page', 'book', 'assign', 'quiz')
+         AND c.visible = 1
+         AND c.id > 1
+         ORDER BY c.startdate DESC, cm.id ASC
+         LIMIT 10",
+        [$userid]
+    );
+    
+    $lessonsdata = [];
+    foreach ($lessons as $lesson) {
+        $lessonsdata[] = [
+            'id' => $lesson->id,
+            'instance' => $lesson->instance,
+            'modulename' => $lesson->modulename,
+            'courseid' => $lesson->courseid,
+            'coursename' => $lesson->coursename,
+            'url' => (new moodle_url('/mod/' . $lesson->modulename . '/view.php', ['id' => $lesson->id]))->out()
+        ];
+    }
+    
+    return $lessonsdata;
+}

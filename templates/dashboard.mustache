@@ -11,6 +11,9 @@
 {{> theme_remui_kids/common_start}}
 
 {{#custom_dashboard}}
+
+<div class="custom_dashboard">
+
 <!-- Custom Dashboard Header -->
 <div class="custom-dashboard-header">
     <div class="container-fluid">
@@ -41,6 +44,69 @@
 <!-- Cohort-specific content -->
 {{#dashboard_type}}
     {{#elementary}}
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span>Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span>Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{student_name}}</div>
+                        <div class="user-role">Elementary Student</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="elementary-dashboard">
             <!-- Grade 1-3 Statistics Cards -->
             {{#elementary_stats}}
@@ -99,7 +165,7 @@
             {{#has_elementary_courses}}
             <div class="row mb-4">
                 <div class="col-12">
-                    <h3 class="courses-section-title">
+                    <h3 class="sections-section-title">
                         <i class="fa fa-book"></i> My Courses
                     </h3>
                     <div class="elementary-courses-container">
@@ -162,12 +228,12 @@
             </div>
             {{/has_elementary_courses}}
             
-            <!-- Active Sections Section -->
+            <!-- Active Lessons Section -->
             {{#has_elementary_active_sections}}
             <div class="row mb-4">
                 <div class="col-12">
                     <h3 class="sections-section-title">
-                        <i class="fa fa-list-alt"></i> Active Sections
+                        <i class="fa fa-list-alt"></i> Active Lessons
                     </h3>
                     <div class="elementary-sections-container">
                         {{#elementary_active_sections}}
@@ -211,12 +277,12 @@
             </div>
             {{/has_elementary_active_sections}}
             
-            <!-- Active Lessons Section -->
+            <!-- Active Activities Section -->
             {{#has_elementary_active_lessons}}
             <div class="row mb-4">
                 <div class="col-12">
                     <h3 class="lessons-section-title">
-                        <i class="fa fa-gamepad"></i> Active Lessons
+                        <i class="fa fa-gamepad"></i> Active Activities
                     </h3>
                     <div class="elementary-lessons-container">
                         {{#elementary_active_lessons}}
@@ -247,13 +313,7 @@
                     <li class="nav-item">
                         <a href="#" class="nav-link active">
                             <i class="fa fa-home"></i>
-                            <span class="nav-text">Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fa fa-tachometer"></i>
-                            <span class="nav-text">Dashboard</span>
+                            <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -456,18 +516,18 @@
                                         <div class="progress-bar-container">
                                             <div class="progress-bar">
                                                 <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
-                                            </div>
+                                </div>
                                             <span class="progress-percentage">{{progress_percentage}}%</span>
-                                        </div>
-                                    </div>
+                                </div>
+                            </div>
                                     
                                     <!-- Section Stats -->
                                     <div class="section-stats">
                                         <div class="section-stat-item">
                                             <i class="fa fa-check-circle" style="color: #27ae60;"></i>
                                             <span>{{completed_activities}}/{{total_activities}} activities</span>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
                                     
                                     <a href="{{courseurl}}" class="section-button">
                                         <i class="fa fa-play"></i> Continue Section
@@ -484,15 +544,15 @@
                         <div class="achievements-header">
                             <div class="header-content">
                                 <h3 class="achievements-title">
-                                    <i class="fa fa-trophy"></i> My Achievements
-                                </h3>
+                                <i class="fa fa-trophy"></i> My Achievements
+                            </h3>
                                 <p class="achievements-subtitle">Track your learning milestones</p>
-                            </div>
+                        </div>
                             <a href="#" class="view-all-achievements">
                                 <span>View All Achievements</span>
                                 <i class="fa fa-arrow-right"></i>
                             </a>
-                        </div>
+                                </div>
                         
                         <div class="achievements-container">
                             <div class="achievement-card earned">
@@ -502,16 +562,16 @@
                                 <div class="achievement-content">
                                     <h4 class="achievement-title">Course Explorer</h4>
                                     <p class="achievement-description">Enrolled in 3 courses</p>
-                                </div>
+                            </div>
                                 <div class="achievement-status">
                                     <i class="fa fa-check-circle"></i>
                                 </div>
-                            </div>
+                                </div>
                             
                             <div class="achievement-card earned">
                                 <div class="achievement-icon">
                                     <i class="fa fa-tasks"></i>
-                                </div>
+                            </div>
                                 <div class="achievement-content">
                                     <h4 class="achievement-title">Activity Master</h4>
                                     <p class="achievement-description">Completed 12 activities</p>
@@ -544,8 +604,8 @@
                                 </div>
                                 <div class="achievement-status">
                                     <i class="fa fa-lock"></i>
-                                </div>
                             </div>
+                                </div>
                             
                             <div class="achievement-card locked">
                                 <div class="achievement-icon">
@@ -554,16 +614,16 @@
                                 <div class="achievement-content">
                                     <h4 class="achievement-title">Forum Contributor</h4>
                                     <p class="achievement-description">Post 10 forum messages</p>
-                                </div>
+                            </div>
                                 <div class="achievement-status">
                                     <i class="fa fa-lock"></i>
                                 </div>
-                            </div>
+                                </div>
                             
                             <div class="achievement-card locked">
                                 <div class="achievement-icon">
                                     <i class="fa fa-certificate"></i>
-                                </div>
+                            </div>
                                 <div class="achievement-content">
                                     <h4 class="achievement-title">Certification Seeker</h4>
                                     <p class="achievement-description">Earn 1 certificate</p>
@@ -696,9 +756,9 @@
                                         <span class="progress-label">Course Completion</span>
                                         <div class="progress-bar-small">
                                             <div class="progress-fill-small" style="width: 68%"></div>
-                                        </div>
+                            </div>
                                         <span class="progress-value">68%</span>
-                                    </div>
+                        </div>
                                 </div>
                             </div>
                         </div>
@@ -710,27 +770,982 @@
     
     
     {{#highschool}}
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span>Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span>Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fa fa-user"></i>
+                                </div>
+                    <div class="user-details">
+                        <div class="user-name">{{student_name}}</div>
+                        
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+
         <div class="highschool-dashboard">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card border-success">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="fa fa-trophy"></i> High School Dashboard</h5>
+
+            <!-- Main Analytics Dashboard -->
+            <div class="analytics-dashboard">
+                <!-- Performance Overview -->
+                <div class="performance-overview">
+                    <div class="overview-header">
+                        <h2><i class="fa fa-chart-line"></i> Performance Overview</h2>
+                        <div class="time-selector">
+                            <button class="time-btn active" data-period="week">This Week</button>
+                            <button class="time-btn" data-period="month">This Month</button>
+                            <button class="time-btn" data-period="semester">This Semester</button>
+                </div>
+            </div>
+                    
+                    <div class="performance-metrics">
+                        {{#highschool_stats}}
+                        <div class="metric-card courses-metric">
+                            <div class="metric-icon">
+                                <i class="fa fa-graduation-cap"></i>
+        </div>
+                            <div class="metric-info">
+                                <div class="metric-value">{{courses}}</div>
+                                <div class="metric-label">Active Courses</div>
+                                <div class="metric-change positive">+2 this semester</div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <p>This is an advanced dashboard for high school students (Grades 8-12).</p>
-                            <p>Features will include:</p>
-                            <ul>
-                                <li>Comprehensive academic tracking</li>
-                                <li>College preparation tools</li>
-                                <li>Advanced analytics and reporting</li>
-                                <li>Career planning resources</li>
-                            </ul>
+                        
+                        <div class="metric-card lessons-metric">
+                            <div class="metric-icon">
+                                <i class="fa fa-book-open"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value">{{lessons}}</div>
+                                <div class="metric-label">Lessons Completed</div>
+                                <div class="metric-change positive">+15 this week</div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card activities-metric">
+                            <div class="metric-icon">
+                                <i class="fa fa-tasks"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value">{{activities}}</div>
+                                <div class="metric-label">Activities Done</div>
+                                <div class="metric-change positive">+8 this week</div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card progress-metric">
+                            <div class="metric-icon">
+                                <i class="fa fa-trophy"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-value">{{progress}}%</div>
+                                <div class="metric-label">Overall Progress</div>
+                                <div class="metric-change positive">+5% this month</div>
+                            </div>
+                        </div>
+                        {{/highschool_stats}}
+                    </div>
+                </div>
+            
+                <!-- Charts and Analytics -->
+                <div class="charts-analytics">
+                    <div class="chart-row">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3><i class="fa fa-line-chart"></i> Learning Progress Trend</h3>
+                                <div class="chart-legend">
+                                    <span class="legend-item">
+                                        <span class="legend-color" style="background: #FF6B6B;"></span>
+                                        Progress
+                                    </span>
+                                    <span class="legend-item">
+                                        <span class="legend-color" style="background: #4ECDC4;"></span>
+                                        Goals
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="progressChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3><i class="fa fa-pie-chart"></i> Subject Performance</h3>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="subjectChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Course Management -->
+                <div class="course-management">
+                    <div class="section-header">
+                        <h2><i class="fa fa-graduation-cap"></i> My Courses</h2>
+                        <div class="course-filters">
+                            <select class="filter-select">
+                                <option>All Courses</option>
+                                <option>In Progress</option>
+                                <option>Completed</option>
+                                <option>Upcoming</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="courses-grid">
+                        {{#highschool_courses}}
+                        <div class="course-card">
+                            <div class="course-header">
+                                <div class="course-badge">Active</div>
+                                <div class="course-progress-circle">
+                                    <svg class="progress-ring" width="60" height="60">
+                                        <circle class="progress-ring-circle" stroke="#E2E8F0" stroke-width="4" fill="transparent" r="26" cx="30" cy="30"/>
+                                        <circle class="progress-ring-circle progress-ring-fill" stroke="#FF6B6B" stroke-width="4" fill="transparent" r="26" cx="30" cy="30" style="stroke-dasharray: {{progress}} 100;"/>
+                                    </svg>
+                                    <span class="progress-text">{{progress}}%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="course-content">
+                                <h3 class="course-title">{{fullname}}</h3>
+                                <p class="course-code">{{shortname}}</p>
+                                <p class="course-description">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
+                                
+                                <div class="course-metrics">
+                                    <div class="metric">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>24h remaining</span>
+                                    </div>
+                                    <div class="metric">
+                                        <i class="fa fa-tasks"></i>
+                                        <span>3 assignments</span>
+                                    </div>
+                                    <div class="metric">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>Due: Dec 15</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="course-actions">
+                                <button class="action-btn preview-btn" data-course="{{fullname}}" data-courseid="{{id}}">
+                                    <i class="fa fa-eye"></i> Preview
+                                </button>
+                                <a href="{{courseurl}}" class="action-btn primary">
+                                    <i class="fa fa-play"></i> Continue
+                                </a>
+                            </div>
+                        </div>
+                        {{/highschool_courses}}
+                    </div>
+                </div>
+            
+            <!-- Active Sections Section -->
+                <!-- Learning Insights -->
+                <div class="learning-insights">
+                    <div class="insights-grid">
+                        <div class="insight-card achievements">
+                            <div class="insight-header">
+                                <h3><i class="fa fa-trophy"></i> Recent Achievements</h3>
+                            </div>
+                            <div class="insight-content">
+                                <div class="achievement-item earned">
+                                    <div class="achievement-icon">
+                                        <i class="fa fa-star"></i>
+                                    </div>
+                                    <div class="achievement-details">
+                                        <h4>Perfect Week</h4>
+                                        <p>Completed all assignments on time</p>
+                                        <span class="achievement-date">2 days ago</span>
+                                    </div>
+                                </div>
+                                <div class="achievement-item earned">
+                                    <div class="achievement-icon">
+                                        <i class="fa fa-fire"></i>
+                                    </div>
+                                    <div class="achievement-details">
+                                        <h4>Study Streak</h4>
+                                        <p>12 days of consistent study</p>
+                                        <span class="achievement-date">1 week ago</span>
+                                    </div>
+                                </div>
+                                <div class="achievement-item locked">
+                                    <div class="achievement-icon">
+                                        <i class="fa fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="achievement-details">
+                                        <h4>Honor Roll</h4>
+                                        <p>Maintain 3.5+ GPA for semester</p>
+                                        <span class="achievement-progress">75% complete</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card deadlines">
+                            <div class="insight-header">
+                                <h3><i class="fa fa-calendar-check-o"></i> Upcoming Deadlines</h3>
+                                </div>
+                            <div class="insight-content">
+                                <div class="deadline-item urgent">
+                                    <div class="deadline-icon">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                </div>
+                                    <div class="deadline-details">
+                                        <h4>Calculus Final Exam</h4>
+                                        <p>Advanced Mathematics</p>
+                                        <span class="deadline-time">Due in 2 days</span>
+                                </div>
+                                    <button class="deadline-action">Study</button>
+                                </div>
+                                <div class="deadline-item">
+                                    <div class="deadline-icon">
+                                        <i class="fa fa-file-text-o"></i>
+                                </div>
+                                    <div class="deadline-details">
+                                        <h4>Research Paper</h4>
+                                        <p>English Literature</p>
+                                        <span class="deadline-time">Due in 5 days</span>
+                                </div>
+                                    <button class="deadline-action">Continue</button>
+                            </div>
+                                <div class="deadline-item">
+                                    <div class="deadline-icon">
+                                        <i class="fa fa-flask"></i>
+                        </div>
+                                    <div class="deadline-details">
+                                        <h4>Lab Report</h4>
+                                        <p>Chemistry</p>
+                                        <span class="deadline-time">Due in 7 days</span>
+                    </div>
+                                    <button class="deadline-action">Start</button>
+                </div>
+            </div>
+        </div>
+                        
+                        <div class="insight-card study-stats">
+                            <div class="insight-header">
+                                <h3><i class="fa fa-lightbulb-o"></i> Study Insights</h3>
+                            </div>
+                            <div class="insight-content">
+                                <div class="study-stat">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <h4>Peak Study Time</h4>
+                                        <p>You're most productive between 2-4 PM</p>
+                                    </div>
+                                </div>
+                                <div class="study-stat">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-book"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <h4>Strongest Subject</h4>
+                                        <p>Mathematics - 95% average</p>
+                                    </div>
+                                </div>
+                                <div class="study-stat">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-target"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <h4>Goal Progress</h4>
+                                        <p>On track to complete 5 courses this semester</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Learning Analytics Section -->
+            <div class="learning-analytics mb-4">
+            <div class="row">
+                    <div class="col-lg-6">
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-chart-line"></i> Learning Progress
+                                </h3>
+                                <div class="time-filter">
+                                    <select class="form-select">
+                                        <option>Last 7 Days</option>
+                                        <option>Last 30 Days</option>
+                                        <option>This Semester</option>
+                                        <option>All Time</option>
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="card-body">
+                                <div class="progress-chart-container">
+                                    <canvas id="learningProgressChart" width="400" height="200"></canvas>
+                        </div>
+                                <div class="chart-stats">
+                                    <div class="chart-stat-item">
+                                        <span class="stat-label">Average Score</span>
+                                        <span class="stat-value">87%</span>
+                    </div>
+                                    <div class="chart-stat-item">
+                                        <span class="stat-label">Study Time</span>
+                                        <span class="stat-value">24h</span>
+                </div>
+                                    <div class="chart-stat-item">
+                                        <span class="stat-label">Completion Rate</span>
+                                        <span class="stat-value">92%</span>
+            </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-calendar-check-o"></i> Upcoming Deadlines
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="deadlines-list">
+                                    <div class="deadline-item urgent">
+                                        <div class="deadline-icon">
+                                            <i class="fa fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="deadline-content">
+                                            <h4>Calculus Final Exam</h4>
+                                            <p>Advanced Mathematics</p>
+                                            <span class="deadline-time">Due in 2 days</span>
+                                        </div>
+                                        <div class="deadline-action">
+                                            <button class="btn btn-sm btn-outline-primary">Study</button>
+                                        </div>
+                                    </div>
+                                    <div class="deadline-item">
+                                        <div class="deadline-icon">
+                                            <i class="fa fa-file-text-o"></i>
+                                        </div>
+                                        <div class="deadline-content">
+                                            <h4>Research Paper</h4>
+                                            <p>English Literature</p>
+                                            <span class="deadline-time">Due in 5 days</span>
+                                        </div>
+                                        <div class="deadline-action">
+                                            <button class="btn btn-sm btn-outline-primary">Continue</button>
+                                        </div>
+                                    </div>
+                                    <div class="deadline-item">
+                                        <div class="deadline-icon">
+                                            <i class="fa fa-flask"></i>
+                                        </div>
+                                        <div class="deadline-content">
+                                            <h4>Lab Report</h4>
+                                            <p>Chemistry</p>
+                                            <span class="deadline-time">Due in 7 days</span>
+                                        </div>
+                                        <div class="deadline-action">
+                                            <button class="btn btn-sm btn-outline-primary">Start</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Insights -->
+            <div class="performance-insights mb-4">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="insight-card">
+                            <div class="card-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-trophy"></i> Recent Achievements
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="achievements-list">
+                                    <div class="achievement-item earned">
+                                        <div class="achievement-icon">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="achievement-content">
+                                            <h4>Perfect Week</h4>
+                                            <p>Completed all assignments on time</p>
+                                            <span class="achievement-date">2 days ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="achievement-item earned">
+                                        <div class="achievement-icon">
+                                            <i class="fa fa-fire"></i>
+                                        </div>
+                                        <div class="achievement-content">
+                                            <h4>Study Streak</h4>
+                                            <p>12 days of consistent study</p>
+                                            <span class="achievement-date">1 week ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="achievement-item locked">
+                                        <div class="achievement-icon">
+                                            <i class="fa fa-graduation-cap"></i>
+                                        </div>
+                                        <div class="achievement-content">
+                                            <h4>Honor Roll</h4>
+                                            <p>Maintain 3.5+ GPA for semester</p>
+                                            <span class="achievement-progress">75% complete</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="insight-card">
+                            <div class="card-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-lightbulb-o"></i> Study Insights
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="insights-list">
+                                    <div class="insight-item">
+                                        <div class="insight-icon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        <div class="insight-content">
+                                            <h4>Peak Study Time</h4>
+                                            <p>You're most productive between 2-4 PM</p>
+                                        </div>
+                                    </div>
+                                    <div class="insight-item">
+                                        <div class="insight-icon">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        <div class="insight-content">
+                                            <h4>Strongest Subject</h4>
+                                            <p>Mathematics - 95% average</p>
+                                        </div>
+                                    </div>
+                                    <div class="insight-item">
+                                        <div class="insight-icon">
+                                            <i class="fa fa-target"></i>
+                                        </div>
+                                        <div class="insight-content">
+                                            <h4>Goal Progress</h4>
+                                            <p>On track to complete 5 courses this semester</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="insight-card">
+                            <div class="card-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-bar-chart"></i> Subject Performance
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="subject-performance">
+                                    <div class="subject-item">
+                                        <div class="subject-info">
+                                            <span class="subject-name">Mathematics</span>
+                                            <span class="subject-grade">A+</span>
+                                        </div>
+                                        <div class="subject-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 95%"></div>
+                                            </div>
+                                            <span class="progress-text">95%</span>
+                                        </div>
+                                    </div>
+                                    <div class="subject-item">
+                                        <div class="subject-info">
+                                            <span class="subject-name">Science</span>
+                                            <span class="subject-grade">A</span>
+                                        </div>
+                                        <div class="subject-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 88%"></div>
+                                            </div>
+                                            <span class="progress-text">88%</span>
+                                        </div>
+                                    </div>
+                                    <div class="subject-item">
+                                        <div class="subject-info">
+                                            <span class="subject-name">English</span>
+                                            <span class="subject-grade">B+</span>
+                                        </div>
+                                        <div class="subject-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 82%"></div>
+                                            </div>
+                                            <span class="progress-text">82%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
+    {{/highschool}}
+    
+    <!-- High School Dashboard JavaScript -->
+    {{#highschool}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all components
+        initializeProgressRings();
+        initializeInteractiveElements();
+        initializeCharts();
+        initializeAnalytics();
+        initializeAnimations();
+    });
+    
+    function initializeProgressRings() {
+        const progressRings = document.querySelectorAll('.progress-ring-fill');
+        progressRings.forEach(ring => {
+            const progress = ring.closest('.course-progress-circle').querySelector('.progress-text').textContent;
+            const percentage = parseInt(progress.replace('%', ''));
+            const circumference = 2 * Math.PI * 26; // radius = 26
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            ring.style.strokeDasharray = circumference;
+            ring.style.strokeDashoffset = offset;
+        });
+    }
+    
+    function initializeInteractiveElements() {
+        // Time selector buttons
+        const timeBtns = document.querySelectorAll('.time-btn');
+        timeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                timeBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const period = this.dataset.period;
+                updateAnalyticsData(period);
+            });
+        });
+        
+        // Course filter
+        const courseFilter = document.querySelector('.filter-select');
+        if (courseFilter) {
+            courseFilter.addEventListener('change', function() {
+                console.log('Course filter changed to:', this.value);
+                filterCourses(this.value);
+            });
+        }
+        
+        // Course preview buttons
+        const previewBtns = document.querySelectorAll('.preview-btn');
+        previewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const courseName = this.dataset.course;
+                const courseId = this.dataset.courseid;
+                console.log('Preview course:', courseName, courseId);
+                
+                // Add visual feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                showCoursePreview(courseId);
+            });
+        });
+        
+        // Deadline action buttons
+        const deadlineActions = document.querySelectorAll('.deadline-action button');
+        deadlineActions.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                console.log('Deadline action:', action);
+                
+                // Add visual feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                handleDeadlineAction(action, this);
+            });
+        });
+    }
+    
+    function initializeCharts() {
+        // Progress Chart
+        const progressCtx = document.getElementById('progressChart');
+        if (progressCtx) {
+            createProgressChart(progressCtx);
+        }
+        
+        // Subject Chart
+        const subjectCtx = document.getElementById('subjectChart');
+        if (subjectCtx) {
+            createSubjectChart(subjectCtx);
+        }
+    }
+    
+    function createProgressChart(canvas) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Set background
+        ctx.fillStyle = '#F8FAFC';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw animated progress line
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = 60;
+        
+        // Draw progress line
+        ctx.strokeStyle = '#FF6B6B';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        
+        // Animate the line drawing
+        const progress = 75; // 75% progress
+        const endAngle = (progress / 100) * 2 * Math.PI - Math.PI / 2;
+        
+        ctx.arc(centerX, centerY, radius, -Math.PI / 2, endAngle);
+        ctx.stroke();
+        
+        // Draw goal line
+        ctx.strokeStyle = '#4ECDC4';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, -Math.PI / 2, 2 * Math.PI - Math.PI / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Add text
+        ctx.fillStyle = '#2D3748';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Learning Progress', centerX, centerY - 20);
+        
+        ctx.fillStyle = '#718096';
+        ctx.font = '14px Arial';
+        ctx.fillText('75% Complete', centerX, centerY + 10);
+    }
+    
+    function createSubjectChart(canvas) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Set background
+        ctx.fillStyle = '#F8FAFC';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw pie chart
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = 80;
+        
+        const data = [
+            { label: 'Math', value: 35, color: '#FF6B6B' },
+            { label: 'Science', value: 25, color: '#4ECDC4' },
+            { label: 'English', value: 20, color: '#45B7D1' },
+            { label: 'History', value: 20, color: '#96CEB4' }
+        ];
+        
+        let currentAngle = -Math.PI / 2;
+        
+        data.forEach(item => {
+            const sliceAngle = (item.value / 100) * 2 * Math.PI;
+            
+            ctx.fillStyle = item.color;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+            ctx.closePath();
+            ctx.fill();
+            
+            currentAngle += sliceAngle;
+        });
+        
+        // Add center text
+        ctx.fillStyle = '#2D3748';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Subject', centerX, centerY - 5);
+        ctx.fillText('Performance', centerX, centerY + 15);
+    }
+    
+    function initializeAnalytics() {
+        // Simulate real-time data updates
+        updateAnalyticsData('week');
+        
+        // Update analytics every 30 seconds
+        setInterval(() => {
+            const activeBtn = document.querySelector('.time-btn.active');
+            if (activeBtn) {
+                updateAnalyticsData(activeBtn.dataset.period);
+            }
+        }, 30000);
+    }
+    
+    function updateAnalyticsData(period) {
+        console.log('Updating analytics for period:', period);
+        
+        // Simulate data fetching based on period
+        const mockData = {
+            'week': {
+                courses: 5,
+                lessons: 23,
+                activities: 18,
+                progress: 78
+            },
+            'month': {
+                courses: 5,
+                lessons: 89,
+                activities: 67,
+                progress: 82
+            },
+            'semester': {
+                courses: 6,
+                lessons: 234,
+                activities: 189,
+                progress: 85
+            }
+        };
+        
+        const data = mockData[period] || mockData['week'];
+        
+        // Update metric cards with animation
+        const metricCards = document.querySelectorAll('.metric-card');
+        metricCards.forEach((card, index) => {
+            const valueElement = card.querySelector('.metric-value');
+            const currentValue = parseInt(valueElement.textContent);
+            const targetValue = Object.values(data)[index];
+            
+            animateValue(valueElement, currentValue, targetValue, 1000);
+        });
+        
+        // Update charts
+        const progressCtx = document.getElementById('progressChart');
+        if (progressCtx) {
+            createProgressChart(progressCtx);
+        }
+    }
+    
+    function animateValue(element, start, end, duration) {
+        const startTime = performance.now();
+        
+        function updateValue(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const current = Math.round(start + (end - start) * progress);
+            element.textContent = current + (element.textContent.includes('%') ? '%' : '');
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateValue);
+            }
+        }
+        
+        requestAnimationFrame(updateValue);
+    }
+    
+    function initializeAnimations() {
+        // Add entrance animations
+        const cards = document.querySelectorAll('.metric-card, .course-card, .insight-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
+    
+    function filterCourses(filter) {
+        const courseCards = document.querySelectorAll('.course-card');
+        
+        courseCards.forEach(card => {
+            const courseTitle = card.querySelector('.course-title').textContent.toLowerCase();
+            let shouldShow = true;
+            
+            switch(filter) {
+                case 'In Progress':
+                    shouldShow = courseTitle.includes('math') || courseTitle.includes('science');
+                    break;
+                case 'Completed':
+                    shouldShow = courseTitle.includes('english') || courseTitle.includes('history');
+                    break;
+                case 'Upcoming':
+                    shouldShow = courseTitle.includes('art') || courseTitle.includes('music');
+                    break;
+            }
+            
+            card.style.display = shouldShow ? 'block' : 'none';
+        });
+    }
+    
+    function showCoursePreview(courseId) {
+        console.log('Opening course preview for ID:', courseId);
+        
+        // Create a simple modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        `;
+        
+        modal.innerHTML = `
+            <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
+                <h3>Course Preview</h3>
+                <p>Course ID: ${courseId}</p>
+                <p>This would show a detailed course preview with syllabus, requirements, and more.</p>
+                <button onclick="this.closest('div').parentElement.remove()" style="background: #FF6B6B; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; margin-top: 1rem;">Close</button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+    
+    function handleDeadlineAction(action, button) {
+        const deadlineItem = button.closest('.deadline-item');
+        const deadlineTitle = deadlineItem.querySelector('h4').textContent;
+        
+        console.log(`Handling ${action} for ${deadlineTitle}`);
+        
+        // Add visual feedback
+        deadlineItem.style.background = '#C6F6D5';
+        setTimeout(() => {
+            deadlineItem.style.background = '';
+        }, 2000);
+        
+        // Show success message
+        const originalText = button.textContent;
+        button.textContent = 'Done!';
+        button.style.background = '#38A169';
+        button.style.color = 'white';
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '';
+            button.style.color = '';
+        }, 2000);
+    }
+    
+    // Add smooth scrolling for better UX
+    function smoothScrollTo(element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+    
+    // Add keyboard navigation support
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case '1':
+                    e.preventDefault();
+                    const welcomeSection = document.querySelector('.highschool-welcome-header');
+                    if (welcomeSection) smoothScrollTo(welcomeSection);
+                    break;
+                case '2':
+                    e.preventDefault();
+                    const coursesSection = document.querySelector('.course-management');
+                    if (coursesSection) smoothScrollTo(coursesSection);
+                    break;
+                case '3':
+                    e.preventDefault();
+                    const insightsSection = document.querySelector('.learning-insights');
+                    if (insightsSection) smoothScrollTo(insightsSection);
+                    break;
+            }
+        }
+    });
+    </script>
     {{/highschool}}
     
     {{#default}}
@@ -751,6 +1766,8 @@
         </div>
     {{/default}}
 {{/dashboard_type}}
+
+</div>
 
 {{/custom_dashboard}}
 
