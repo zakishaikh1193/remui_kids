@@ -195,6 +195,7 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     // Add Grade 8-12 specific statistics and courses for high school students
     if ($dashboardtype === 'highschool') {
         $templatecontext['highschool_stats'] = theme_remui_kids_get_highschool_dashboard_stats($USER->id);
+        $templatecontext['highschool_metrics'] = theme_remui_kids_get_highschool_dashboard_metrics($USER->id);
         $courses = theme_remui_kids_get_highschool_courses($USER->id);
         $templatecontext['highschool_courses'] = array_slice($courses, 0, 3); // Show only first 3 courses
         $templatecontext['has_highschool_courses'] = !empty($courses);

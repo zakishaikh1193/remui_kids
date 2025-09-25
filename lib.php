@@ -1882,3 +1882,154 @@ function theme_remui_kids_get_highschool_active_lessons($userid) {
     
     return $lessonsdata;
 }
+
+/**
+ * Get high school dashboard metrics (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Dashboard metrics data
+ */
+function theme_remui_kids_get_highschool_dashboard_metrics($userid) {
+    global $DB;
+    
+    try {
+        // Get enrolled courses count
+        $enrolled_courses = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id)
+             FROM {course} c
+             JOIN {enrol} e ON c.id = e.courseid
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid
+             WHERE ue.userid = ? 
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        // Get completed assignments count
+        $completed_assignments = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cmc.coursemoduleid)
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE cmc.userid = ? 
+             AND cmc.completionstate IN (1, 2)
+             AND m.name = 'assign'
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        // Get pending assignments count (assignments not completed)
+        $total_assignments = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cm.id)
+             FROM {course_modules} cm
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             JOIN {enrol} e ON c.id = e.courseid
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid
+             WHERE ue.userid = ? 
+             AND m.name = 'assign'
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        $pending_assignments = $total_assignments - $completed_assignments;
+        
+        // Get average grade from all graded activities
+        $average_grade = $DB->get_field_sql(
+            "SELECT AVG(gg.finalgrade / gg.rawgrademax * 100)
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gg.itemid = gi.id
+             JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE gg.userid = ? 
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        // Calculate trends (comparing with previous quarter)
+        $current_quarter_start = strtotime('first day of this month');
+        $previous_quarter_start = strtotime('first day of -3 months');
+        
+        // Enrolled courses trend
+        $previous_courses = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id)
+             FROM {course} c
+             JOIN {enrol} e ON c.id = e.courseid
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid
+             WHERE ue.userid = ? 
+             AND c.visible = 1
+             AND c.id > 1
+             AND ue.timecreated < ?",
+            [$userid, $previous_quarter_start]
+        ) ?: 0;
+        
+        $courses_trend = $previous_courses > 0 ? round((($enrolled_courses - $previous_courses) / $previous_courses) * 100) : 0;
+        
+        // Completed assignments trend
+        $previous_completed = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cmc.coursemoduleid)
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE cmc.userid = ? 
+             AND cmc.completionstate IN (1, 2)
+             AND m.name = 'assign'
+             AND c.visible = 1
+             AND c.id > 1
+             AND cmc.timemodified < ?",
+            [$userid, $previous_quarter_start]
+        ) ?: 0;
+        
+        $assignments_trend = $previous_completed > 0 ? round((($completed_assignments - $previous_completed) / $previous_completed) * 100) : 0;
+        
+        // Average grade trend
+        $previous_grade = $DB->get_field_sql(
+            "SELECT AVG(gg.finalgrade / gg.rawgrademax * 100)
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gg.itemid = gi.id
+             JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE gg.userid = ? 
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND c.visible = 1
+             AND c.id > 1
+             AND gg.timemodified < ?",
+            [$userid, $previous_quarter_start]
+        ) ?: 0;
+        
+        $grade_trend = $previous_grade > 0 ? round($average_grade - $previous_grade) : 0;
+        
+        return [
+            'enrolled_courses' => $enrolled_courses,
+            'completed_assignments' => $completed_assignments,
+            'pending_assignments' => $pending_assignments,
+            'average_grade' => round($average_grade),
+            'courses_trend' => $courses_trend,
+            'assignments_trend' => $assignments_trend,
+            'grade_trend' => $grade_trend,
+            'pending_due_soon' => $pending_assignments > 0 // Simple logic for "Due soon"
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'enrolled_courses' => 0,
+            'completed_assignments' => 0,
+            'pending_assignments' => 0,
+            'average_grade' => 0,
+            'courses_trend' => 0,
+            'assignments_trend' => 0,
+            'grade_trend' => 0,
+            'pending_due_soon' => false
+        ];
+    }
+}
