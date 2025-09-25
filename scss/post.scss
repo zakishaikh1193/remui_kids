@@ -1050,7 +1050,7 @@
 .analytics-dashboard {
     .performance-overview {
         border-radius: 2rem;
-        padding: 2rem;
+    padding: 2rem;
         margin-bottom: 2rem;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         
@@ -5246,6 +5246,50 @@ body.custom-dashboard-page.has-student-sidebar {
                     color: #888888;
                     font-size: 0.8rem;
                     font-weight: 500;
+                }
+            }
+        }
+        
+        .sidebar-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            
+            .action-btn {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                text-decoration: none;
+                font-size: 0.8rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                
+                &.profile-btn {
+                    background: #E2E8F0;
+                    color: #4A5568;
+                    
+                    &:hover {
+                        background: #CBD5E0;
+                        color: #2D3748;
+                    }
+                }
+                
+                &.logout-btn {
+                    background: #FED7D7;
+                    color: #C53030;
+                    
+                    &:hover {
+                        background: #FEB2B2;
+                        color: #9C1C1C;
+                    }
+                }
+                
+                i {
+                    font-size: 0.9rem;
                 }
             }
         }
