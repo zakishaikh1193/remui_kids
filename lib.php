@@ -1316,12 +1316,15 @@ function theme_remui_kids_get_admin_recent_activity() {
     } catch (Exception $e) {
         return [];
     }
+}
 
+/**
  * Get course sections for modal preview
  *
  * @param int $courseid Course ID
- * @return array Array of course sections with activities
+ * @return array Array containing course sections data
  */
+
 function theme_remui_kids_get_course_sections_for_modal($courseid) {
     global $DB, $USER;
     

@@ -96,9 +96,35 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $templatecontext['student_name'] = $USER->firstname;
     $templatecontext['hello_message'] = "Hello " . $USER->firstname . "!";
     $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
+    $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
+    $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
+    $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
+    $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
+    $templatecontext['codeeditorurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 1]))->out(); // Adjust ID as needed
+    $templatecontext['scratchurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 2]))->out(); // Adjust ID as needed
+    $templatecontext['logouturl'] = (new moodle_url('/login/logout.php', ['sesskey' => sesskey()]))->out();
+    $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', ['id' => $USER->id]))->out();
     
     // Add custom body class for dashboard styling
     $templatecontext['bodyattributes'] = 'class="custom-dashboard-page has-student-sidebar"';
+    
+    // Ensure parent theme navigation context is properly set up
+    $templatecontext['navlayout'] = \theme_remui\toolbox::get_setting('header-primary-layout-desktop');
+    $templatecontext['applylatestuserpref'] = apply_latest_user_pref();
+    
+    // Set up drawer preferences for parent theme navigation
+    user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
+    user_preference_allow_ajax_update('drawer-open-index', PARAM_BOOL);
+    user_preference_allow_ajax_update('drawer-open-block', PARAM_BOOL);
+    
+    $navdraweropen = (get_user_preferences('drawer-open-nav', true) == true);
+    $templatecontext['navdraweropen'] = $navdraweropen;
+    
+    // Add parent theme navigation context
+    $templatecontext['applylatestdrawerjs'] = (get_moodle_release_version_branch() > '402');
+    
+    // Ensure parent theme navigation JavaScript is loaded
+    $PAGE->requires->data_for_js('applylatestuserpref', $templatecontext['applylatestuserpref']);
     
     // Set individual dashboard type flags for Mustache template
     $templatecontext['elementary'] = ($dashboardtype === 'elementary');
