@@ -26,11 +26,32 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG, $PAGE, $COURSE, $USER, $DB, $OUTPUT;
 
-require_once($CFG->dirroot . '/theme/remui/layout/common.php');
+require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
 // Check if this is a dashboard page and use our custom dashboard
 if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
-    // Get user's cohort information
+    // Check if user is admin first
+    $isadmin = is_siteadmin($USER) || has_capability('moodle/site:config', context_system::instance(), $USER);
+    
+    if ($isadmin) {
+        // Show admin dashboard
+        $templatecontext['custom_dashboard'] = true;
+        $templatecontext['dashboard_type'] = 'admin';
+        $templatecontext['admin_dashboard'] = true;
+        $templatecontext['admin_stats'] = theme_remui_kids_get_admin_dashboard_stats();
+        $templatecontext['admin_user_stats'] = theme_remui_kids_get_admin_user_stats();
+        $templatecontext['admin_course_stats'] = theme_remui_kids_get_admin_course_stats();
+        $templatecontext['admin_recent_activity'] = theme_remui_kids_get_admin_recent_activity();
+        
+        // Must be called before rendering the template.
+        require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
+        
+        // Render our custom admin dashboard template
+        echo $OUTPUT->render_from_template('theme_remui_kids/admin_dashboard', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Get user's cohort information for non-admin users
     $usercohorts = $DB->get_records_sql(
         "SELECT c.name, c.id 
          FROM {cohort} c 

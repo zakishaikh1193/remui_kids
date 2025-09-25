@@ -31,7 +31,7 @@ if(!apply_latest_user_pref()){
 }
 
 // Include parent theme's common layout setup
-require_once($CFG->dirroot . '/theme/remui/layout/common.php');
+require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
 // Set show_course_header flag for common_start template
 $templatecontext['show_course_header'] = false;

@@ -463,18 +463,17 @@
                                     <div class="course-stats">
                                         <div class="course-stat-item">
                                             <span>{{total_sections}}/{{total_sections}} lessons</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="course-status">not started</div>
-                                    
-                                    <div class="course-buttons">
-                                        <button type="button" class="course-button secondary preview-btn" data-course="{{fullname}}" data-courseid="{{id}}">
-                                            <i class="fa fa-eye"></i> Preview
-                                        </button>
-                                        <a href="{{courseurl}}" class="course-button primary">
-                                            <i class="fa fa-play"></i> Continue Learning
-                                        </a>
+                                        </div>                    
+                                            <div class="course-status">not started</div>
+                                            
+                                            <div class="course-buttons">
+                                                <a href="{{courseurl}}" class="course-button primary">
+                                                    <i class="fa fa-play"></i> Continue Learning
+                                                </a>
+                                                <button class="course-button secondary preview-btn" onclick="openPreviewModal({{id}}, '{{fullname}}')">
+                                                    <i class="fa fa-eye"></i> Preview
+                                                </button>
+                                            </div>
                                     </div>
                                 </div>
                             </div>
@@ -1072,7 +1071,22 @@
                     </div>
                                     <button class="deadline-action">Start</button>
                 </div>
+                </div>
             </div>
+            
+            <!-- Course Preview Modal -->
+            <div id="coursePreviewModal" class="preview-modal">
+                <div class="modal-overlay" onclick="closePreviewModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="modalCourseTitle">Course Preview</h3>
+                        <button class="modal-close" onclick="closePreviewModal()">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="course-sections-list" id="courseSectionsList">
+                            <!-- Sections will be loaded here -->
         </div>
                         
                         <div class="insight-card study-stats">
@@ -1347,9 +1361,7 @@
                     </div>
                 </div>
             </div>
-            
-        </div>
-    {{/highschool}}
+        {{/middle}}
     
     <!-- High School Dashboard JavaScript -->
     {{#highschool}}
@@ -1618,9 +1630,79 @@
                 requestAnimationFrame(updateValue);
             }
         }
+    });
+    
+    // Modal functionality
+    function openPreviewModal(courseId, courseName) {
+        const modal = document.getElementById('coursePreviewModal');
+        const modalTitle = document.getElementById('modalCourseTitle');
+        const sectionsList = document.getElementById('courseSectionsList');
         
-        requestAnimationFrame(updateValue);
+        // Set modal title
+        modalTitle.textContent = courseName + ' - Course Sections';
+        
+        // Show loading state
+        sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+        
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Load course sections via AJAX
+        loadCourseSections(courseId, sectionsList);
     }
+    
+    function closePreviewModal() {
+        const modal = document.getElementById('coursePreviewModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    function loadCourseSections(courseId, container) {
+        // Create a simple AJAX request to load sections
+        // For now, we'll simulate the data structure
+        const sections = [
+            { id: 1, name: 'Introduction to Digital Learning', description: 'Welcome to the course and overview of digital tools', activities: 3 },
+            { id: 2, name: 'Basic Computer Skills', description: 'Learning fundamental computer operations', activities: 5 },
+            { id: 3, name: 'Digital Safety and Security', description: 'Understanding online safety and privacy', activities: 4 },
+            { id: 4, name: 'Creative Digital Projects', description: 'Hands-on projects using digital tools', activities: 6 },
+            { id: 5, name: 'Assessment and Review', description: 'Final assessment and course review', activities: 2 }
+        ];
+        
+        // Clear loading state
+        container.innerHTML = '';
+        
+        // Add sections to the modal
+        sections.forEach(section => {
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'section-item';
+            sectionElement.innerHTML = `
+                <div class="section-header">
+                    <h4 class="section-name">${section.name}</h4>
+                    <span class="section-activities">${section.activities} activities</span>
+                </div>
+                <p class="section-description">${section.description}</p>
+            `;
+            container.appendChild(sectionElement);
+        });
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('coursePreviewModal');
+        if (e.target === modal) {
+            closePreviewModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+        }
+    });
+    </script>
+    {{/middle}}
     
     function initializeAnimations() {
         // Add entrance animations
