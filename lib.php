@@ -1884,11 +1884,254 @@ function theme_remui_kids_get_highschool_active_lessons($userid) {
 }
 
 /**
- * Get high school dashboard metrics (Grades 8-12)
+ * Get admin sidebar data with URLs and active states
  *
- * @param int $userid User ID
- * @return array Dashboard metrics data
+ * @param string $current_page Current page identifier
+ * @return array Array containing sidebar navigation data
  */
+function theme_remui_kids_get_admin_sidebar_data($current_page = 'dashboard') {
+    global $CFG;
+    
+    // Base URLs
+    $base_url = $CFG->wwwroot;
+    
+    // Define all sidebar URLs
+    $urls = [
+        'dashboard_url' => $base_url . '/my/'
+    ];
+    
+    // Define active states based on current page
+    $active_states = [
+        'dashboard_active' => ($current_page === 'dashboard')
+    ];
+    
+    // Merge URLs and active states
+    return array_merge($urls, $active_states);
+}
+
+/**
+ * Check if current page is an admin page
+ *
+ * @return bool True if current page is an admin page
+ */
+function theme_remui_kids_is_admin_page() {
+    global $PAGE, $CFG;
+    
+    // Get current URL path
+    $current_url = $PAGE->url->get_path();
+    $current_pagetype = $PAGE->pagetype;
+    
+    // Admin page patterns
+    $admin_patterns = [
+        '/admin/',
+        '/local/edwiserreports/',
+        '/course/index.php',
+        '/user/index.php',
+        '/admin/user.php',
+        '/admin/search.php',
+        '/admin/settings.php',
+        '/admin/tool/',
+        '/admin/pluginfile.php',
+        '/admin/upgradesettings.php',
+        '/admin/plugins.php',
+        '/admin/roles/',
+        '/admin/capabilities/',
+        '/admin/cohort/',
+        '/admin/competency/',
+        '/admin/analytics/',
+        '/admin/backup/',
+        '/admin/restore/',
+        '/admin/webservice/',
+        '/admin/registration/',
+        '/admin/notification/',
+        '/admin/upgrade.php',
+        '/admin/index.php'
+    ];
+    
+    // Check if current URL matches admin patterns
+    foreach ($admin_patterns as $pattern) {
+        if (strpos($current_url, $pattern) !== false) {
+            return true;
+        }
+    }
+    
+    // Check pagetype for admin pages
+    $admin_pagetypes = [
+        'admin-',
+        'course-index',
+        'user-index',
+        'admin-user',
+        'admin-search',
+        'admin-settings',
+        'admin-tool-',
+        'admin-roles-',
+        'admin-capabilities-',
+        'admin-cohort-',
+        'admin-competency-',
+        'admin-analytics-',
+        'admin-backup-',
+        'admin-restore-',
+        'admin-webservice-',
+        'admin-registration-',
+        'admin-notification-',
+        'admin-upgrade',
+        'admin-plugins'
+    ];
+    
+    foreach ($admin_pagetypes as $pagetype) {
+        if (strpos($current_pagetype, $pagetype) !== false) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Check if current page is the home page
+ *
+ * @return bool True if current page is the home page
+ */
+function theme_remui_kids_is_home_page() {
+    global $PAGE, $CFG;
+    
+    $current_url = $PAGE->url->get_path();
+    $current_pagetype = $PAGE->pagetype;
+    
+    // Home page patterns
+    $home_patterns = [
+        '/my/',
+        '/',
+        '/index.php',
+        '/course/view.php',
+        '/user/profile.php',
+        '/user/view.php'
+    ];
+    
+    // Check if current URL matches home patterns
+    foreach ($home_patterns as $pattern) {
+        // Use exact match for root patterns, substring match for others
+        if ($pattern === '/' || $pattern === '/index.php') {
+            if ($current_url === $pattern || $current_url === $CFG->wwwroot . $pattern) {
+                return true;
+            }
+        } else {
+            if ($current_url === $pattern || $current_url === $CFG->wwwroot . $pattern || strpos($current_url, $pattern) !== false) {
+                return true;
+            }
+        }
+    }
+    
+    // Check pagetype for home page
+    if (strpos($current_pagetype, 'my-index') !== false || 
+        strpos($current_pagetype, 'site-index') !== false) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Get admin sidebar data for template rendering
+ *
+ * @return array Array containing admin sidebar data
+ */
+function theme_remui_kids_get_admin_sidebar_template_data() {
+    global $PAGE, $CFG;
+    
+    try {
+        // Check if we should show admin sidebar
+        $show_admin_sidebar = theme_remui_kids_is_admin_page() && !theme_remui_kids_is_home_page();
+        
+        if (!$show_admin_sidebar) {
+            return ['show_admin_sidebar' => false];
+        }
+        
+        // Get current page identifier for active state
+        $current_url = $PAGE->url->get_path();
+        $current_page = 'dashboard'; // default
+        
+        // Determine current page based on URL
+        if (strpos($current_url, '/admin/search.php') !== false) {
+            $current_page = 'site_admin';
+        } elseif (strpos($current_url, '/local/edwiserreports/') !== false) {
+            $current_page = 'analytics';
+        } elseif (strpos($current_url, '/course/index.php') !== false) {
+            $current_page = 'courses_programs';
+        } elseif (strpos($current_url, '/user/index.php') !== false || strpos($current_url, '/admin/user.php') !== false) {
+            $current_page = 'user_management';
+        } elseif (strpos($current_url, '/admin/settings.php') !== false) {
+            $current_page = 'system_settings';
+        } elseif (strpos($current_url, '/admin/tool/') !== false) {
+            $current_page = 'system_settings';
+        } elseif (strpos($current_url, '/admin/roles/') !== false) {
+            $current_page = 'user_management';
+        } elseif (strpos($current_url, '/admin/cohort/') !== false) {
+            $current_page = 'cohort_navigation';
+        }
+        
+        // Get sidebar data
+        $sidebar_data = theme_remui_kids_get_admin_sidebar_data($current_page);
+        
+        return array_merge([
+            'show_admin_sidebar' => true
+        ], $sidebar_data);
+        
+    } catch (Exception $e) {
+        // Fallback: return minimal data to prevent crashes
+        debugging('Admin sidebar template data error: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        return ['show_admin_sidebar' => false];
+    }
+}
+
+/**
+ * Test function to debug admin sidebar visibility
+ * This can be called from any page to check if admin sidebar should show
+ */
+function theme_remui_kids_debug_admin_sidebar() {
+    global $PAGE, $CFG;
+    
+    $is_admin = theme_remui_kids_is_admin_page();
+    $is_home = theme_remui_kids_is_home_page();
+    $should_show = $is_admin && !$is_home;
+    
+    $debug_info = [
+        'current_url' => $PAGE->url->get_path(),
+        'current_pagetype' => $PAGE->pagetype,
+        'is_admin_page' => $is_admin,
+        'is_home_page' => $is_home,
+        'should_show_sidebar' => $should_show
+    ];
+    
+    return $debug_info;
+}
+
+/**
+ * Add admin sidebar test button to admin pages
+ * This can be used to test if the sidebar is working
+ */
+function theme_remui_kids_add_admin_sidebar_test() {
+    global $PAGE;
+    
+    // Only add test button on admin pages
+    if (theme_remui_kids_is_admin_page() && !theme_remui_kids_is_home_page()) {
+        $debug_info = theme_remui_kids_debug_admin_sidebar();
+        
+        $test_html = '<div style="position: fixed; top: 10px; right: 10px; background: #007bff; color: white; padding: 10px; border-radius: 5px; z-index: 9999; font-size: 12px;">
+            <strong>Admin Sidebar Test</strong><br>
+            URL: ' . htmlspecialchars($debug_info['current_url']) . '<br>
+            Page Type: ' . htmlspecialchars($debug_info['current_pagetype']) . '<br>
+            Is Admin: ' . ($debug_info['is_admin_page'] ? 'Yes' : 'No') . '<br>
+            Is Home: ' . ($debug_info['is_home_page'] ? 'Yes' : 'No') . '<br>
+            Show Sidebar: ' . ($debug_info['should_show_sidebar'] ? 'Yes' : 'No') . '
+        </div>';
+        
+        return $test_html;
+    }
+    
+    return '';
+}
+
 function theme_remui_kids_get_highschool_dashboard_metrics($userid) {
     global $DB;
     
@@ -2033,3 +2276,4 @@ function theme_remui_kids_get_highschool_dashboard_metrics($userid) {
         ];
     }
 }
+

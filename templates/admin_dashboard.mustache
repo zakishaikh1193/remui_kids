@@ -36,147 +36,7 @@
     </div>
 </div>
 
-<!-- Admin Sidebar Navigation -->
-<div class="admin-sidebar">
-    <div class="sidebar-content">
-        <!-- DASHBOARD Section -->
-        <div class="sidebar-section">
-            <h3 class="sidebar-category">DASHBOARD</h3>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item active">
-                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/my/" class="sidebar-link">
-                        <i class="fa fa-th-large sidebar-icon"></i>
-                        <span class="sidebar-text">Admin Dashboard</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/admin/search.php" class="sidebar-link">
-                        <i class="fa fa-cog sidebar-icon"></i>
-                        <span class="sidebar-text">Site Administration</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-users sidebar-icon"></i>
-                        <span class="sidebar-text">Community</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-graduation-cap sidebar-icon"></i>
-                        <span class="sidebar-text">Enrollments</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- TEACHERS Section -->
-        <div class="sidebar-section">
-            <h3 class="sidebar-category">TEACHERS</h3>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-users sidebar-icon"></i>
-                        <span class="sidebar-text">Teachers</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-medal sidebar-icon"></i>
-                        <span class="sidebar-text">Master Trainers</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- COURSES & PROGRAMS Section -->
-        <div class="sidebar-section">
-            <h3 class="sidebar-category">COURSES & PROGRAMS</h3>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-book sidebar-icon"></i>
-                        <span class="sidebar-text">Courses & Programs</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-graduation-cap sidebar-icon"></i>
-                        <span class="sidebar-text">Certifications</span>
-                    </a>
-                </li>
-                <li class="sidebar-item active">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-clipboard-list sidebar-icon"></i>
-                        <span class="sidebar-text">Assessments</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-school sidebar-icon"></i>
-                        <span class="sidebar-text">Schools</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- INSIGHTS Section -->
-        <div class="sidebar-section">
-            <h3 class="sidebar-category">INSIGHTS</h3>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item">
-                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/local/edwiserreports/index.php" class="sidebar-link">
-                        <i class="fa fa-chart-bar sidebar-icon"></i>
-                        <span class="sidebar-text">Analytics</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-chart-line sidebar-icon"></i>
-                        <span class="sidebar-text">Predictive Models</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-file-alt sidebar-icon"></i>
-                        <span class="sidebar-text">Reports</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-map sidebar-icon"></i>
-                        <span class="sidebar-text">Competencies Map</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- SETTINGS Section -->
-        <div class="sidebar-section">
-            <h3 class="sidebar-category">SETTINGS</h3>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-cog sidebar-icon"></i>
-                        <span class="sidebar-text">System Settings</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-user-friends sidebar-icon"></i>
-                        <span class="sidebar-text">User Management</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="fa fa-users-cog sidebar-icon"></i>
-                        <span class="sidebar-text">Cohort Navigation</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>
+{{> theme_remui_kids/admin_sidebar}}
 
 <!-- Main Content Area with Sidebar -->
 <div class="admin-main-content">
@@ -297,24 +157,23 @@
     </div>
 </div>
 
-<!-- Course Statistics Section -->
+<!-- Side by Side Layout: Course Statistics and Recent Activity -->
+<div class="admin-stats-activity-container">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Column: Course Statistics -->
+            <div class="col-md-6">
 <div class="admin-course-stats-section">
     <div class="stats-section-container">
         <div class="section-header">
             <h3 class="section-title">Course Statistics</h3>
-            <div class="live-indicator">
-                <span class="live-dot"></span>
                 
             </div>
-        </div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="course-stats-container">
+                        <div class="course-stats-grid">
                     {{#admin_course_stats}}
                     <div class="course-stat-card total-courses">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-book stat-icon"></i>
+                            <div class="stat-icon-square blue">
+                                <i class="fa fa-book"></i>
                         </div>
                         <div class="stat-content">
                             <div class="stat-number">{{total_courses}}</div>
@@ -323,8 +182,8 @@
                     </div>
                     
                     <div class="course-stat-card completion-rate">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-bullseye stat-icon"></i>
+                            <div class="stat-icon-square green">
+                                <i class="fa fa-bullseye"></i>
                         </div>
                         <div class="stat-content">
                             <div class="stat-number">{{completion_rate}}%</div>
@@ -333,8 +192,8 @@
                     </div>
                     
                     <div class="course-stat-card avg-rating">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-star stat-icon"></i>
+                            <div class="stat-icon-square yellow">
+                                <i class="fa fa-star"></i>
                         </div>
                         <div class="stat-content">
                             <div class="stat-number">{{avg_rating}}/5</div>
@@ -343,8 +202,8 @@
                     </div>
                     
                     <div class="course-stat-card categories">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-building stat-icon"></i>
+                            <div class="stat-icon-square purple">
+                                <i class="fa fa-building"></i>
                         </div>
                         <div class="stat-content">
                             <div class="stat-number">{{categories}}</div>
@@ -352,105 +211,758 @@
                         </div>
                     </div>
                     {{/admin_course_stats}}
-                    </div>
-                </div>
-            </div>
         </div>
         
         <!-- Course Categories Section -->
         <div class="course-categories-section">
-            <h4 class="subsection-title">Course Categories</h4>
+                            <h4 class="categories-title">Course Categories</h4>
             <div class="categories-list">
                 {{#course_categories}}
                 <div class="category-item">
-                    <div class="category-info">
+                                    <div class="category-left">
                         <div class="category-name">{{name}}</div>
-                        <div class="category-stats">
-                            <span class="enrollments">{{enrollments}} enrollments</span>
-                            <span class="courses">{{courses}} courses</span>
-                            <span class="completion">{{completion}}% completion</span>
+                                        <div class="category-enrollments">{{enrollments}} enrollments</div>
                         </div>
+                                    <div class="category-right">
+                                        <div class="category-courses">{{courses}} courses</div>
+                                        <div class="category-completion">{{completion}}% completion</div>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: {{completion}}%"></div>
                     </div>
                 </div>
                 {{/course_categories}}
+                                {{^course_categories}}
+                                <div class="category-item">
+                                    <div class="category-left">
+                                        <div class="category-name">Saudi International School</div>
+                                        <div class="category-enrollments">0 enrollments</div>
+                                    </div>
+                                    <div class="category-right">
+                                        <div class="category-courses">0 courses</div>
+                                        <div class="category-completion">0% completion</div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="category-item">
+                                    <div class="category-left">
+                                        <div class="category-name">Grade 1 Courses</div>
+                                        <div class="category-enrollments">0 enrollments</div>
+                                    </div>
+                                    <div class="category-right">
+                                        <div class="category-courses">0 courses</div>
+                                        <div class="category-completion">0% completion</div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="category-item">
+                                    <div class="category-left">
+                                        <div class="category-name">G1-G3 Courses</div>
+                                        <div class="category-enrollments">0 enrollments</div>
+                                    </div>
+                                    <div class="category-right">
+                                        <div class="category-courses">0 courses</div>
+                                        <div class="category-completion">0% completion</div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="category-item">
+                                    <div class="category-left">
+                                        <div class="category-name">Template Blueprints</div>
+                                        <div class="category-enrollments">0 enrollments</div>
+                                    </div>
+                                    <div class="category-right">
+                                        <div class="category-courses">0 courses</div>
+                                        <div class="category-completion">0% completion</div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                {{/course_categories}}
             </div>
         </div>
         
-        <!-- Top Performing Courses Section -->
-        <div class="top-courses-section">
-            <h4 class="subsection-title">Top Performing Courses</h4>
-            <div class="top-courses-list">
-                {{#top_courses}}
-                <div class="course-item">
-                    <div class="course-icon">
-                        <i class="fa fa-book"></i>
-                    </div>
-                    <div class="course-info">
-                        <div class="course-name">{{name}}</div>
-                        <div class="course-stats">{{enrollments}} enrollments • {{rating}}/5 rating</div>
                     </div>
                 </div>
-                {{/top_courses}}
-                {{^top_courses}}
-                <div class="no-courses">
-                    <p>No top performing courses to display</p>
+            </div>
+            
+            <!-- Right Column: Recent Activity -->
+            <div class="col-md-6">
+                <div class="admin-recent-activity-section">
+                    <div class="stats-section-container">
+                        <div class="recent-activity-container">
+                            <h3 class="activity-section-title">Recent Activity</h3>
+                        {{#admin_recent_activity}}
+                        <div class="activity-item">
+                            <div class="activity-icon {{color}}">
+                                <i class="fa {{icon}}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">{{title}}</div>
+                                <div class="activity-description">{{description}}</div>
+                                <div class="activity-meta">
+                                    <span class="activity-time">
+                                        <i class="fa fa-clock-o"></i>
+                                        {{time}}
+                                    </span>
+                                    {{#author}}
+                                    <span class="activity-author">
+                                        <span class="author-dot"></span>
+                                        {{author}}
+                                    </span>
+                                    {{/author}}
+                                </div>
+                            </div>
+                        </div>
+                        {{/admin_recent_activity}}
+                        
+                        {{^admin_recent_activity}}
+                        <!-- Default Activity Items Matching Image -->
+                        <div class="activity-item">
+                            <div class="activity-icon purple">
+                                <i class="fa fa-building"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">New School Added</div>
+                                <div class="activity-description">Al-Huda-Global-School joined the platform</div>
+                                <div class="activity-meta">
+                                    <span class="activity-time">
+                                        <i class="fa fa-clock-o"></i>
+                                        23h ago
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon green">
+                                <i class="fa fa-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Course Completion</div>
+                                <div class="activity-description">8 teachers completed "Advanced Teaching Methods"</div>
+                                <div class="activity-meta">
+                                    <span class="activity-time">
+                                        <i class="fa fa-clock-o"></i>
+                                        Yesterday
+                                    </span>
+                                    <span class="activity-author">
+                                        <span class="author-dot"></span>
+                                        za ki
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon orange">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">New Course Created</div>
+                                <div class="activity-description">"Digital Learning Fundamentals" course published</div>
+                                <div class="activity-meta">
+                                    <span class="activity-time">
+                                        <i class="fa fa-clock-o"></i>
+                                        Yesterday
+                                    </span>
+                                    <span class="activity-author">
+                                        <span class="author-dot"></span>
+                                        shak zaki
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon orange">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">New Course Created</div>
+                                <div class="activity-description">"Digital Learning Fundamentals" course published</div>
+                                <div class="activity-meta">
+                                    <span class="activity-time">
+                                        <i class="fa fa-clock-o"></i>
+                                        9/21/2025
+                                    </span>
+                                    <span class="activity-author">
+                                        <span class="author-dot"></span>
+                                        za ki
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon green">
+                                <i class="fa fa-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Course Completion</div>
+                                <div class="activity-description">10 teachers completed "Advanced Teaching Methods"</div>
+                                <div class="activity-meta">
+                                    <span class="activity-time">
+                                        <i class="fa fa-clock-o"></i>
+                                        9/20/2025
+                                    </span>
+                                    <span class="activity-author">
+                                        <span class="author-dot"></span>
+                                        Fatima ki
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {{/admin_recent_activity}}
+                        </div>
+                    </div>
                 </div>
-                {{/top_courses}}
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Activity Section -->
-<div class="admin-recent-activity-section">
-    <div class="stats-section-container">
+<!-- Student Enrollments Section -->
+<div class="admin-student-enrollments-section">
+    <div class="container-fluid">
+        <div class="student-enrollments-container">
         <div class="section-header">
-            <h3 class="section-title">Recent Activity</h3>
+                <h3 class="section-title">Student Enrollments</h3>
+                <p class="section-subtitle">Real-time enrollment data from Moodle API</p>
             <div class="live-indicator">
                 <span class="live-dot purple"></span>
-                
+                    <span class="live-text">Live Data</span>
+                </div>
             </div>
-        </div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="recent-activity-container">
-                    {{#admin_recent_activity}}
-                    <div class="activity-item">
-                        <div class="activity-icon {{color}}">
-                            <i class="fa {{icon}}"></i>
+            
+            <div class="recent-enrollments-section">
+                <div class="subsection-header">
+                    <h4 class="subsection-title">Recent Student Enrollments</h4>
+                    <span class="subsection-note">Based on real API data</span>
+                </div>
+                
+                <div class="enrollments-list">
+                    {{#student_enrollments}}
+                    <div class="enrollment-item">
+                        <div class="user-info">
+                            <div class="user-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">{{name}}</div>
+                                <div class="user-role">Role: {{role}}</div>
+                                {{#activity_level}}
+                                <div class="activity-level">
+                                    <div class="activity-bar">
+                                        <div class="activity-fill" style="width: {{percentage}}%"></div>
+                                    </div>
+                                    <span class="activity-score">{{level}}/5</span>
+                                </div>
+                                {{/activity_level}}
+                            </div>
                         </div>
-                        <div class="activity-content">
-                            <div class="activity-title">{{title}}</div>
-                            {{#author}}
-                            <div class="activity-author">by {{author}}</div>
-                            {{/author}}
+                        <div class="enrollment-status">
+                            <div class="status-indicator">
+                                <span class="status-dot {{status_class}}"></span>
+                                <span class="status-text">{{status}}</span>
+                            </div>
+                            <div class="user-stats">{{logins}} logins • {{courses}} courses</div>
                         </div>
-                        <div class="activity-time">{{time}}</div>
                     </div>
-                    {{/admin_recent_activity}}
+                    {{/student_enrollments}}
                     
-                    {{^admin_recent_activity}}
-                    <div class="no-activity">
-                        <i class="fa fa-info-circle"></i>
-                        <p>No recent activity to display</p>
+                    {{^student_enrollments}}
+                    <!-- Default Student Enrollments Matching Image -->
+                    <div class="enrollment-item">
+                        <div class="user-info">
+                            <div class="user-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Guest user</div>
+                                <div class="user-role">Role: student</div>
+                            </div>
+                        </div>
+                        <div class="enrollment-status">
+                            <div class="status-indicator">
+                                <span class="status-dot inactive"></span>
+                                <span class="status-text">Inactive</span>
+                            </div>
+                            <div class="user-stats">0 logins • 0 courses</div>
+                        </div>
                     </div>
-                    {{/admin_recent_activity}}
+                    
+                    <div class="enrollment-item">
+                        <div class="user-info">
+                            <div class="user-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Kodeit Admin</div>
+                                <div class="user-role">Role: school_admin</div>
+                                <div class="activity-level">
+                                    <div class="activity-bar">
+                                        <div class="activity-fill" style="width: 80%"></div>
+                                    </div>
+                                    <span class="activity-score">1/5</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="enrollment-status">
+                            <div class="status-indicator">
+                                <span class="status-dot active"></span>
+                                <span class="status-text">Active</span>
+                            </div>
+                            <div class="user-stats">29 logins • 0 courses</div>
+                        </div>
                     </div>
+                    
+                    <div class="enrollment-item">
+                        <div class="user-info">
+                            <div class="user-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">alhuda admin</div>
+                                <div class="user-role">Role: school_admin</div>
+                            </div>
+                        </div>
+                        <div class="enrollment-status">
+                            <div class="status-indicator">
+                                <span class="status-dot inactive"></span>
+                                <span class="status-text">Inactive</span>
+                            </div>
+                            <div class="user-stats">0 logins • 0 courses</div>
+                        </div>
+                    </div>
+                    
+                    <div class="enrollment-item">
+                        <div class="user-info">
+                            <div class="user-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">James Walker</div>
+                                <div class="user-role">Role: student</div>
+                            </div>
+                        </div>
+                        <div class="enrollment-status">
+                            <div class="status-indicator">
+                                <span class="status-dot inactive"></span>
+                                <span class="status-text">Inactive</span>
+                            </div>
+                            <div class="user-stats">0 logins • 0 courses</div>
+                        </div>
+                    </div>
+                    
+                    <div class="enrollment-item">
+                        <div class="user-info">
+                            <div class="user-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Sophia Turner</div>
+                                <div class="user-role">Role: student</div>
+                            </div>
+                        </div>
+                        <div class="enrollment-status">
+                            <div class="status-indicator">
+                                <span class="status-dot inactive"></span>
+                                <span class="status-text">Inactive</span>
+                            </div>
+                            <div class="user-stats">0 logins • 0 courses</div>
+                        </div>
+                    </div>
+                    {{/student_enrollments}}
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Floating Action Button -->
-<div class="admin-fab">
-    <button class="fab-button" onclick="openAdminChat()">
-        <i class="fa fa-robot"></i>
-    </button>
+<!-- Student Activities Section -->
+<div class="admin-student-activities-section">
+        <div class="container-fluid">
+        <div class="student-activities-container">
+            <div class="section-header">
+                <h3 class="section-title">Student Activities (Last 30 Days)</h3>
+                <p class="section-subtitle">Detailed student activity tracking and engagement metrics</p>
+                <div class="live-indicator">
+                    <span class="live-dot blue"></span>
+                    <span class="live-text">Live Activity Data</span>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="activities-summary-cards">
+                <div class="summary-card total-students">
+                    <div class="card-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">76</div>
+                        <div class="card-label">Total Students</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card active-students">
+                    <div class="card-icon">
+                        <i class="fa fa-user-check"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">6</div>
+                        <div class="card-label">Active Students</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card avg-activity">
+                    <div class="card-icon">
+                        <i class="fa fa-chart-line"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">0</div>
+                        <div class="card-label">Avg Activity Level</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- All Student Activities Section -->
+            <div class="all-activities-section">
+                <div class="subsection-header">
+                    <h4 class="subsection-title">All Student Activities (Last 30 Days)</h4>
+                    <button class="realtime-data-btn">Real-time data</button>
+                </div>
+                
+                <div class="activities-scrollable-list">
+                    {{#student_activities}}
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="header-item">
+                                <i class="fa fa-calendar"></i>
+                                <span>Last active: {{last_active}}</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-eye"></i>
+                                <span>Engagement: {{engagement}}</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-book"></i>
+                                <span>Courses: {{courses}}</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-clock"></i>
+                                <span>Logins: {{logins}}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="student-details">
+                            <div class="student-info">
+                                <div class="student-icon">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                                <div class="student-content">
+                                    <div class="student-name">{{name}}</div>
+                                    <div class="student-stats">
+                                        <span class="stat-item">
+                                            <i class="fa fa-clock"></i>
+                                            {{logins}} logins
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-book"></i>
+                                            {{courses}} courses
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-bullseye"></i>
+                                            Level {{level}}/5
+                                        </span>
+                                    </div>
+                                    <div class="activity-level-section">
+                                        <div class="activity-level-label">Activity Level</div>
+                                        <div class="activity-level-bar">
+                                            <div class="activity-level-fill" style="width: {{activity_percentage}}%"></div>
+                                        </div>
+                                        <div class="activity-level-score">{{level}}/5</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-status">
+                                <div class="status-indicator">
+                                    <span class="status-dot {{status_class}}"></span>
+                                    <span class="status-text">{{status}}</span>
+                                </div>
+                                <div class="last-seen">{{last_seen}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/student_activities}}
+                    
+                    {{^student_activities}}
+                    <!-- Default Student Activities Matching Image -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="header-item">
+                                <i class="fa fa-calendar"></i>
+                                <span>Last active: Recently</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-eye"></i>
+                                <span>Engagement: Low</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-book"></i>
+                                <span>Courses: 0</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-clock"></i>
+                                <span>Logins: 0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="student-details">
+                            <div class="student-info">
+                                <div class="student-icon">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                                <div class="student-content">
+                                    <div class="student-name">James Walker</div>
+                                    <div class="student-stats">
+                                        <span class="stat-item">
+                                            <i class="fa fa-clock"></i>
+                                            0 logins
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-book"></i>
+                                            0 courses
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-bullseye"></i>
+                                            Level 0/5
+                                        </span>
+                                    </div>
+                                    <div class="activity-level-section">
+                                        <div class="activity-level-label">Activity Level</div>
+                                        <div class="activity-level-bar">
+                                            <div class="activity-level-fill" style="width: 0%"></div>
+                                        </div>
+                                        <div class="activity-level-score">0/5</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-status">
+                                <div class="status-indicator">
+                                    <span class="status-dot inactive"></span>
+                                    <span class="status-text">Inactive</span>
+                                </div>
+                                <div class="last-seen">Last seen recently</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="header-item">
+                                <i class="fa fa-calendar"></i>
+                                <span>Last active: Recently</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-eye"></i>
+                                <span>Engagement: Low</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-book"></i>
+                                <span>Courses: 0</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-clock"></i>
+                                <span>Logins: 0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="student-details">
+                            <div class="student-info">
+                                <div class="student-icon">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                                <div class="student-content">
+                                    <div class="student-name">Sophia Turner</div>
+                                    <div class="student-stats">
+                                        <span class="stat-item">
+                                            <i class="fa fa-clock"></i>
+                                            0 logins
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-book"></i>
+                                            0 courses
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-bullseye"></i>
+                                            Level 0/5
+                                        </span>
+                                    </div>
+                                    <div class="activity-level-section">
+                                        <div class="activity-level-label">Activity Level</div>
+                                        <div class="activity-level-bar">
+                                            <div class="activity-level-fill" style="width: 0%"></div>
+                                        </div>
+                                        <div class="activity-level-score">0/5</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-status">
+                                <div class="status-indicator">
+                                    <span class="status-dot inactive"></span>
+                                    <span class="status-text">Inactive</span>
+                                </div>
+                                <div class="last-seen">Last seen recently</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional sample cards for scrolling demonstration -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="header-item">
+                                <i class="fa fa-calendar"></i>
+                                <span>Last active: Recently</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-eye"></i>
+                                <span>Engagement: Low</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-book"></i>
+                                <span>Courses: 0</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-clock"></i>
+                                <span>Logins: 0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="student-details">
+                            <div class="student-info">
+                                <div class="student-icon">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                                <div class="student-content">
+                                    <div class="student-name">Alex Johnson</div>
+                                    <div class="student-stats">
+                                        <span class="stat-item">
+                                            <i class="fa fa-clock"></i>
+                                            0 logins
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-book"></i>
+                                            0 courses
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-bullseye"></i>
+                                            Level 0/5
+                                        </span>
+                                    </div>
+                                    <div class="activity-level-section">
+                                        <div class="activity-level-label">Activity Level</div>
+                                        <div class="activity-level-bar">
+                                            <div class="activity-level-fill" style="width: 0%"></div>
+                                        </div>
+                                        <div class="activity-level-score">0/5</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-status">
+                                <div class="status-indicator">
+                                    <span class="status-dot inactive"></span>
+                                    <span class="status-text">Inactive</span>
+                                </div>
+                                <div class="last-seen">Last seen recently</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <div class="header-item">
+                                <i class="fa fa-calendar"></i>
+                                <span>Last active: Recently</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-eye"></i>
+                                <span>Engagement: Low</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-book"></i>
+                                <span>Courses: 0</span>
+                            </div>
+                            <div class="header-item">
+                                <i class="fa fa-clock"></i>
+                                <span>Logins: 0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="student-details">
+                            <div class="student-info">
+                                <div class="student-icon">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                                <div class="student-content">
+                                    <div class="student-name">Emma Davis</div>
+                                    <div class="student-stats">
+                                        <span class="stat-item">
+                                            <i class="fa fa-clock"></i>
+                                            0 logins
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-book"></i>
+                                            0 courses
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fa fa-bullseye"></i>
+                                            Level 0/5
+                                        </span>
+                                    </div>
+                                    <div class="activity-level-section">
+                                        <div class="activity-level-label">Activity Level</div>
+                                        <div class="activity-level-bar">
+                                            <div class="activity-level-fill" style="width: 0%"></div>
+                                        </div>
+                                        <div class="activity-level-score">0/5</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-status">
+                                <div class="status-indicator">
+                                    <span class="status-dot inactive"></span>
+                                    <span class="status-text">Inactive</span>
+                                </div>
+                                <div class="last-seen">Last seen recently</div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/student_activities}}
+                </div>
+            </div>
+            
+            <!-- Bottom Summary Bar -->
+            <div class="bottom-summary-bar">
+                <div class="summary-stats">
+                    <span class="summary-stat">6 Active Students</span>
+                    <span class="summary-stat">0 Avg Activity Level</span>
+                    <span class="summary-stat">0 Total Course Access</span>
+                    <span class="summary-stat">78 Total Logins</span>
+                </div>
+                <div class="floating-action-btn">
+                    <i class="fa fa-plus"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 </div> <!-- End admin-main-content -->
@@ -471,11 +983,6 @@
 {{> theme_remui/common_end}}
 
 <script>
-function openAdminChat() {
-    // Placeholder for admin chat functionality
-    alert('Admin chat feature coming soon!');
-}
-
 function toggleSidebar() {
     const sidebar = document.querySelector('.admin-sidebar');
     sidebar.classList.toggle('sidebar-open');
