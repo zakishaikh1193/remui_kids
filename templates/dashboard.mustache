@@ -865,64 +865,227 @@
         <div class="highschool-dashboard">
 
             <!-- Main Analytics Dashboard -->
-            <div class="analytics-dashboard">
-                <!-- Performance Overview -->
-                <div class="performance-overview">
-                    <div class="overview-header">
-                        <h2><i class="fa fa-chart-line"></i> Performance Overview</h2>
-                        <div class="time-selector">
-                            <button class="time-btn active" data-period="week">This Week</button>
-                            <button class="time-btn" data-period="month">This Month</button>
-                            <button class="time-btn" data-period="semester">This Semester</button>
-                </div>
-            </div>
+            <div class="analytics-dashboard highschool-dashboard">
+                 <!-- Dashboard Metrics -->
+                 <div class="dashboard-metrics">
+                     {{#highschool_metrics}}
+                     <div class="metric-card enrolled-courses">
+                         <div class="metric-icon">
+                             <i class="fa fa-book"></i>
+                         </div>
+                         <div class="metric-content">
+                             <div class="metric-title">Enrolled Courses</div>
+                             <div class="metric-value">{{enrolled_courses}}</div>
+                             <div class="metric-trend {{#courses_trend}}positive{{/courses_trend}}{{^courses_trend}}neutral{{/courses_trend}}">
+                                 {{#courses_trend}}<i class="fa fa-arrow-up"></i> +{{courses_trend}}%{{/courses_trend}}
+                                 {{^courses_trend}}<i class="fa fa-minus"></i> 0%{{/courses_trend}}
+                                 vs last quarter
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <div class="metric-card completed-assignments">
+                         <div class="metric-icon">
+                             <i class="fa fa-check-circle"></i>
+                         </div>
+                         <div class="metric-content">
+                             <div class="metric-title">Completed Assignments</div>
+                             <div class="metric-value">{{completed_assignments}}</div>
+                             <div class="metric-trend {{#assignments_trend}}positive{{/assignments_trend}}{{^assignments_trend}}neutral{{/assignments_trend}}">
+                                 {{#assignments_trend}}<i class="fa fa-arrow-up"></i> +{{assignments_trend}}%{{/assignments_trend}}
+                                 {{^assignments_trend}}<i class="fa fa-minus"></i> 0%{{/assignments_trend}}
+                                 vs last quarter
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <div class="metric-card pending-assignments">
+                         <div class="metric-icon">
+                             <i class="fa fa-clock"></i>
+                         </div>
+                         <div class="metric-content">
+                             <div class="metric-title">Pending Assignments</div>
+                             <div class="metric-value">{{pending_assignments}}</div>
+                             <div class="metric-trend {{#pending_due_soon}}urgent{{/pending_due_soon}}{{^pending_due_soon}}neutral{{/pending_due_soon}}">
+                                 {{#pending_due_soon}}Due soon{{/pending_due_soon}}
+                                 {{^pending_due_soon}}All caught up{{/pending_due_soon}}
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <div class="metric-card average-grade">
+                         <div class="metric-icon">
+                             <i class="fa fa-trophy"></i>
+                         </div>
+                         <div class="metric-content">
+                             <div class="metric-title">Average Grade</div>
+                             <div class="metric-value">{{average_grade}}%</div>
+                             <div class="metric-trend {{#grade_trend}}positive{{/grade_trend}}{{^grade_trend}}neutral{{/grade_trend}}">
+                                 {{#grade_trend}}<i class="fa fa-arrow-up"></i> +{{grade_trend}}%{{/grade_trend}}
+                                 {{^grade_trend}}<i class="fa fa-minus"></i> 0%{{/grade_trend}}
+                                 vs last quarter
+                             </div>
+                         </div>
+                     </div>
+                     {{/highschool_metrics}}
+                 </div>
+            
+                <!-- Main Content Area -->
+                <div class="row">
+                    <!-- Left Content Area -->
+                    <div class="col-lg-9">
+                        <!-- Current Courses Section -->
+                        {{#has_highschool_courses}}
+                        <div class="middle-courses-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Current Courses</h3>
+                                <a href="{{{mycoursesurl}}}" class="view-all-link">View All ></a>
+                            </div>
+                            <div class="courses-static-grid">
+                                {{#highschool_courses}}
+                                <div class="middle-course-card">
+                                    <div class="course-image-container">
+                                        {{#courseimage}}
+                                        <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
+                                        {{/courseimage}}
+                                        {{^courseimage}}
+                                        <div class="course-image-placeholder">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        {{/courseimage}}
+                                        <div class="course-level-badge">Beginner</div>
+                                    </div>
+                                    
+                                    <div class="course-content">
+                                        <h4 class="course-title">{{fullname}}</h4>
+                                        <p class="course-summary">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
+                                        
+                                        <!-- Progress Bar -->
+                                        <div class="course-progress-section">
+                                            <div class="progress-label">Progress {{progress}}%</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: {{progress}}%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Course Stats -->
+                                        <div class="course-stats">
+                                            <div class="course-stat-item">
+                                                <span>{{total_sections}}/{{total_sections}} lessons</span>
+                                            </div>
+                                        <div class="course-status">not started</div>
+                                        
+                                        <div class="course-buttons">
+                                            <a href="{{courseurl}}" class="course-button primary">
+                                                <i class="fa fa-play"></i> Continue Learning
+                                            </a>
+                                                    <button class="course-button secondary preview-btn" data-course="{{fullname}}" data-courseid="{{id}}">
+                                                        <i class="fa fa-eye"></i> Preview
+                                                    </button>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{/highschool_courses}}
+                            </div>
+                        </div>
+                        {{/has_highschool_courses}}
+                    </div>
                     
-                    <div class="performance-metrics">
-                        {{#highschool_stats}}
-                        <div class="metric-card courses-metric">
-                            <div class="metric-icon">
-                                <i class="fa fa-graduation-cap"></i>
-        </div>
-                            <div class="metric-info">
-                                <div class="metric-value">{{courses}}</div>
-                                <div class="metric-label">Active Courses</div>
-                                <div class="metric-change positive">+2 this semester</div>
+                    <!-- Right Sidebar -->
+                    <div class="col-lg-3">
+                        <div class="middle-sidebar">
+                            <!-- My Schedule -->
+                            <div class="sidebar-section">
+                                <h4 class="sidebar-title">
+                                    <i class="fa fa-calendar"></i> My Schedule
+                                    <a href="{{{calendarurl}}}" class="view-full-link">View Full Calendar ></a>
+                                </h4>
+                                <p class="schedule-subtitle">Next 7 Days</p>
+                                <div class="calendar-week">
+                                    {{#calendar_week}}
+                                    <div class="calendar-day {{#has_events}}has-events{{/has_events}}" data-date="{{date}}">
+                                        <div class="day-name">{{day_name}}</div>
+                                        <div class="day-number">{{day_number}}</div>
+                                        {{#has_events}}
+                                        <div class="event-indicator">
+                                            <div class="event-dot"></div>
+                                        </div>
+                                        {{/has_events}}
+                                    </div>
+                                    {{/calendar_week}}
+                                </div>
+                                
+                                <!-- Upcoming Events List -->
+                                <div class="upcoming-events">
+                                    {{#upcoming_events}}
+                                    <a href="{{event_url}}" class="event-item" target="_blank">
+                                        <div class="event-date">
+                                            <span class="event-day">{{event_day}}</span>
+                                            <span class="event-month">{{event_month}}</span>
+                                        </div>
+                                        <div class="event-details">
+                                            <div class="event-title">{{event_title}}</div>
+                                            <div class="event-time">{{event_time}}</div>
+                                            <div class="event-course">{{course_name}}</div>
+                                        </div>
+                                        <div class="event-type {{event_type}}">
+                                            <i class="fa {{event_icon}}"></i>
+                                        </div>
+                                    </a>
+                                    {{/upcoming_events}}
+                                    {{^upcoming_events}}
+                                    <div class="no-events">
+                                        <i class="fa fa-calendar-o"></i>
+                                        <p>No upcoming events in the next 7 days</p>
+                                    </div>
+                                    {{/upcoming_events}}
+                                </div>
+                            </div>
+                            
+                            <!-- Learning Progress -->
+                            <div class="sidebar-section">
+                                <h4 class="sidebar-title">Learning Progress</h4>
+                                <div class="quick-stats-list">
+                                    <div class="quick-stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        <div class="stat-details">
+                                            <span class="stat-label">Active Courses</span>
+                                            <span class="stat-value">{{#highschool_stats}}{{courses}}{{/highschool_stats}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="quick-stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-tasks"></i>
+                                        </div>
+                                        <div class="stat-details">
+                                            <span class="stat-label">Completed Activities</span>
+                                            <span class="stat-value">{{#highschool_stats}}{{activities}}{{/highschool_stats}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="quick-stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-calendar-check-o"></i>
+                                        </div>
+                                        <div class="stat-details">
+                                            <span class="stat-label">Assignments Due</span>
+                                            <span class="stat-value">{{#highschool_metrics}}{{pending_assignments}}{{/highschool_metrics}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="quick-stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-percent"></i>
+                                        </div>
+                                        <div class="stat-details">
+                                            <span class="stat-label">Overall Progress</span>
+                                            <span class="stat-value">{{#highschool_stats}}{{progress}}%{{/highschool_stats}}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="metric-card lessons-metric">
-                            <div class="metric-icon">
-                                <i class="fa fa-book-open"></i>
-                            </div>
-                            <div class="metric-info">
-                                <div class="metric-value">{{lessons}}</div>
-                                <div class="metric-label">Lessons Completed</div>
-                                <div class="metric-change positive">+15 this week</div>
-                            </div>
-                        </div>
-                        
-                        <div class="metric-card activities-metric">
-                            <div class="metric-icon">
-                                <i class="fa fa-tasks"></i>
-                            </div>
-                            <div class="metric-info">
-                                <div class="metric-value">{{activities}}</div>
-                                <div class="metric-label">Activities Done</div>
-                                <div class="metric-change positive">+8 this week</div>
-                            </div>
-                        </div>
-                        
-                        <div class="metric-card progress-metric">
-                            <div class="metric-icon">
-                                <i class="fa fa-trophy"></i>
-                            </div>
-                            <div class="metric-info">
-                                <div class="metric-value">{{progress}}%</div>
-                                <div class="metric-label">Overall Progress</div>
-                                <div class="metric-change positive">+5% this month</div>
-                            </div>
-                        </div>
-                        {{/highschool_stats}}
                     </div>
                 </div>
             
@@ -1105,7 +1268,7 @@
         </div>
             
             <!-- Course Preview Modal -->
-            <div id="coursePreviewModal" class="preview-modal">
+            <div id="highschoolCoursePreviewModal" class="preview-modal">
                 <div class="modal-overlay" onclick="closePreviewModal()"></div>
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1117,7 +1280,7 @@
                     <div class="modal-body">
                         <div class="course-sections-list" id="courseSectionsList">
                             <!-- Sections will be loaded here -->
-        </div>
+                        </div>
                         
                         <div class="insight-card study-stats">
                             <div class="insight-header">
@@ -1661,64 +1824,13 @@
         }
     };
     
-    // Modal functionality
-    function openPreviewModal(courseId, courseName) {
-        const modal = document.getElementById('coursePreviewModal');
-        const modalTitle = document.getElementById('modalCourseTitle');
-        const sectionsList = document.getElementById('courseSectionsList');
-        
-        // Set modal title
-        modalTitle.textContent = courseName + ' - Course Sections';
-        
-        // Show loading state
-        sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
-        
-        // Show modal
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
-        // Load course sections via AJAX
-        loadCourseSections(courseId, sectionsList);
-    }
+    // Modal functionality - moved to jQuery require block below
     
-    function closePreviewModal() {
-        const modal = document.getElementById('coursePreviewModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-    
-    function loadCourseSections(courseId, container) {
-        // Create a simple AJAX request to load sections
-        // For now, we'll simulate the data structure
-        const sections = [
-            { id: 1, name: 'Introduction to Digital Learning', description: 'Welcome to the course and overview of digital tools', activities: 3 },
-            { id: 2, name: 'Basic Computer Skills', description: 'Learning fundamental computer operations', activities: 5 },
-            { id: 3, name: 'Digital Safety and Security', description: 'Understanding online safety and privacy', activities: 4 },
-            { id: 4, name: 'Creative Digital Projects', description: 'Hands-on projects using digital tools', activities: 6 },
-            { id: 5, name: 'Assessment and Review', description: 'Final assessment and course review', activities: 2 }
-        ];
-        
-        // Clear loading state
-        container.innerHTML = '';
-        
-        // Add sections to the modal
-        sections.forEach(section => {
-            const sectionElement = document.createElement('div');
-            sectionElement.className = 'section-item';
-            sectionElement.innerHTML = `
-                <div class="section-header">
-                    <h4 class="section-name">${section.name}</h4>
-                    <span class="section-activities">${section.activities} activities</span>
-                </div>
-                <p class="section-description">${section.description}</p>
-            `;
-            container.appendChild(sectionElement);
-        });
-    }
+    // Modal functionality - moved to jQuery require block below
     
     // Close modal when clicking outside
     document.addEventListener('click', function(e) {
-        const modal = document.getElementById('coursePreviewModal');
+        const modal = document.getElementById('highschoolCoursePreviewModal');
         if (e.target === modal) {
             closePreviewModal();
         }
@@ -1891,11 +2003,11 @@
 </div>
 
 <!-- Course Preview Modal -->
-<div id="coursePreviewModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="coursePreviewModalLabel" aria-hidden="true">
+<div id="middleCoursePreviewModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="middleCoursePreviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="coursePreviewModalLabel">
+                <h5 class="modal-title" id="middleCoursePreviewModalLabel">
                     <i class="fa fa-eye"></i> Course Preview
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -1937,28 +2049,223 @@
 </div>
 
 <script>
+
+// Global functions that need to be accessible from onclick attributes
+function openPreviewModal(courseId, courseName) {
+    console.log('Global openPreviewModal called with:', courseId, courseName);
+    
+    const modal = document.getElementById('highschoolCoursePreviewModal');
+    const modalTitle = document.getElementById('modalCourseTitle');
+    const sectionsList = document.getElementById('courseSectionsList');
+    
+    if (!modal || !modalTitle || !sectionsList) {
+        console.error('Modal elements not found');
+        return;
+    }
+    
+    // Set modal title
+    modalTitle.textContent = courseName + ' - Course Sections';
+    
+    // Show loading state
+    sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+    
+    // Show modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Load course sections
+    loadCourseSections(courseId, sectionsList);
+}
+
+function closePreviewModal() {
+    const modal = document.getElementById('highschoolCoursePreviewModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function loadCourseSections(courseId, container) {
+    console.log('loadCourseSections called with courseId:', courseId);
+    
+    // Get course sections data from PHP
+    var coursesSectionsData = {};
+    try {
+        var rawData = '{{{highschool_courses_sections}}}';
+        console.log('Raw highschool_courses_sections data:', rawData);
+        // Clean the JSON data by removing problematic characters
+        rawData = rawData.replace(/&amp;/g, '&');
+        rawData = rawData.replace(/&lt;/g, '<');
+        rawData = rawData.replace(/&gt;/g, '>');
+        rawData = rawData.replace(/&quot;/g, '"');
+        rawData = rawData.replace(/&#x27;/g, "'");
+        coursesSectionsData = JSON.parse(rawData);
+        console.log('High school course sections data loaded:', coursesSectionsData);
+        console.log('Available course IDs:', Object.keys(coursesSectionsData));
+    } catch (e) {
+        console.error('Error parsing high school course sections data:', e);
+        console.log('Raw data:', '{{{highschool_courses_sections}}}');
+    }
+    
+    // Clear loading state
+    if (container) {
+        container.innerHTML = '';
+    }
+    
+    // Try both string and number keys
+    var sectionsData = coursesSectionsData[courseId] || coursesSectionsData[String(courseId)] || coursesSectionsData[Number(courseId)];
+    console.log('Sections data for course:', sectionsData);
+    console.log('CourseId type:', typeof courseId, 'Value:', courseId);
+    
+    if (!sectionsData || !sectionsData.sections || sectionsData.sections.length === 0) {
+        console.log('No sections data available for course ID:', courseId);
+        console.log('Available course IDs in data:', Object.keys(coursesSectionsData));
+        if (container) {
+            container.innerHTML = '<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>';
+        }
+        return;
+    }
+    
+    var sectionsHtml = '';
+    
+    // Add sections to the modal with tree view
+    sectionsData.sections.forEach(function(section, index) {
+        var progressBar = '';
+        if (section.total_activities > 0) {
+            var progressPercent = section.progress;
+            progressBar = '<div class="section-progress"><div class="progress-bar"><div class="progress-fill" style="width: ' + progressPercent + '%"></div></div><span class="progress-text">' + section.completed_activities + '/' + section.total_activities + ' activities</span></div>';
+        }
+        
+        // Activities list (initially hidden)
+        var activitiesList = '';
+        if (section.activities && section.activities.length > 0) {
+            activitiesList = '<div class="section-activities collapsed" id="highschool-activities-' + index + '">';
+            activitiesList += '<div class="activities-header"><span class="activities-count">' + section.activities.length + ' activities</span></div>';
+            activitiesList += '<ul class="activities-list">';
+            
+            section.activities.forEach(function(activity) {
+                var statusIcon = activity.iscompleted ? 'fa-check-circle' : 'fa-circle-o';
+                var activityType = activity.modname || 'activity';
+                var activityIcon = getActivityIcon(activityType);
+                
+                activitiesList += '<li class="activity-item ' + (activity.iscompleted ? 'completed' : 'pending') + '">';
+                activitiesList += '<div class="activity-icon"><i class="fa ' + activityIcon + '"></i></div>';
+                activitiesList += '<div class="activity-details">';
+                activitiesList += '<div class="activity-name">' + activity.name + '</div>';
+                activitiesList += '<div class="activity-type">' + activityType.charAt(0).toUpperCase() + activityType.slice(1) + '</div>';
+                activitiesList += '</div>';
+                activitiesList += '<div class="activity-status"><i class="fa ' + statusIcon + '"></i></div>';
+                activitiesList += '</li>';
+            });
+            
+            activitiesList += '</ul></div>';
+        }
+        
+        sectionsHtml += '<div class="section-item">';
+        sectionsHtml += '<div class="section-header" onclick="toggleActivities(\'highschool-activities-' + index + '\')">';
+        sectionsHtml += '<div class="section-info">';
+        sectionsHtml += '<h4 class="section-name">' + section.name + '</h4>';
+        sectionsHtml += '<p class="section-description">' + (section.summary || 'No description available') + '</p>';
+        sectionsHtml += '</div>';
+        sectionsHtml += '<div class="section-meta">';
+        sectionsHtml += '<span class="section-activities-count">' + section.total_activities + ' activities</span>';
+        if (section.activities && section.activities.length > 0) {
+            sectionsHtml += '<i class="fa fa-chevron-down toggle-icon"></i>';
+        }
+        sectionsHtml += '</div>';
+        sectionsHtml += '</div>';
+        sectionsHtml += progressBar;
+        sectionsHtml += activitiesList;
+        sectionsHtml += '</div>';
+    });
+    
+    if (container) {
+        container.innerHTML = sectionsHtml;
+    }
+}
+
+function getActivityIcon(activityType) {
+    var icons = {
+        'assign': 'fa-file-text-o',
+        'quiz': 'fa-question-circle',
+        'lesson': 'fa-book',
+        'forum': 'fa-comments',
+        'resource': 'fa-file-o',
+        'url': 'fa-external-link',
+        'page': 'fa-file-text',
+        'folder': 'fa-folder',
+        'label': 'fa-tag'
+    };
+    return icons[activityType] || 'fa-circle';
+}
+
+function toggleActivities(activitiesId) {
+    var activitiesDiv = document.getElementById(activitiesId);
+    if (activitiesDiv) {
+        var toggleIcon = activitiesDiv.previousElementSibling.querySelector('.toggle-icon');
+        
+        if (activitiesDiv.classList.contains('collapsed')) {
+            activitiesDiv.classList.remove('collapsed');
+            activitiesDiv.classList.add('expanded');
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-chevron-down');
+                toggleIcon.classList.add('fa-chevron-up');
+            }
+        } else {
+            activitiesDiv.classList.remove('expanded');
+            activitiesDiv.classList.add('collapsed');
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-chevron-up');
+                toggleIcon.classList.add('fa-chevron-down');
+            }
+        }
+    }
+}
+
 require(['jquery'], function($) {
     $(document).ready(function() {
         // Store course sections data from PHP
         var coursesSectionsData = {};
         try {
-            coursesSectionsData = JSON.parse('{{{middle_courses_sections}}}');
+            var rawData = '{{{middle_courses_sections}}}';
+            // Clean the JSON data by removing problematic characters
+            rawData = rawData.replace(/&amp;/g, '&');
+            rawData = rawData.replace(/&lt;/g, '<');
+            rawData = rawData.replace(/&gt;/g, '>');
+            rawData = rawData.replace(/&quot;/g, '"');
+            rawData = rawData.replace(/&#x27;/g, "'");
+            coursesSectionsData = JSON.parse(rawData);
             console.log('Course sections data loaded:', coursesSectionsData);
         } catch (e) {
             console.error('Error parsing course sections data:', e);
             console.log('Raw data:', '{{{middle_courses_sections}}}');
         }
         
-        // Handle Preview button clicks
-        $('.preview-btn').on('click', function(e) {
+        // Handle Preview button clicks for high school dashboard
+        $('.highschool-dashboard .preview-btn').on('click', function(e) {
             e.preventDefault();
-            console.log('Preview button clicked');
+            console.log('High school preview button clicked');
             
             // Get course data from attributes
             var courseName = $(this).data('course');
             var courseId = $(this).data('courseid');
             
-            console.log('Course name:', courseName, 'Course ID:', courseId);
+            console.log('High school course name:', courseName, 'Course ID:', courseId);
+            
+            // Call the modal function
+            openPreviewModal(courseId, courseName);
+        });
+        
+        // Handle Preview button clicks for middle school dashboard
+        $('.middle-dashboard .preview-btn').on('click', function(e) {
+            e.preventDefault();
+            console.log('Middle school preview button clicked');
+            
+            // Get course data from attributes
+            var courseName = $(this).data('course');
+            var courseId = $(this).data('courseid');
+            
+            console.log('Middle school course name:', courseName, 'Course ID:', courseId);
             
             // Update modal content
             $('.course-name-display').text(courseName);
@@ -1968,26 +2275,26 @@ require(['jquery'], function($) {
             
             // Show the modal
             console.log('Attempting to show modal');
-            $('#coursePreviewModal').modal('show');
+            $('#middleCoursePreviewModal').modal('show');
             
             // Display course sections
             displayCourseSections(courseId);
         });
         
         // Test if modal exists
-        console.log('Modal element exists:', $('#coursePreviewModal').length > 0);
+        console.log('Modal element exists:', $('#middleCoursePreviewModal').length > 0);
         console.log('Preview buttons found:', $('.preview-btn').length);
         
         // Test modal functionality
-        if ($('#coursePreviewModal').length > 0) {
-            console.log('Modal HTML:', $('#coursePreviewModal')[0].outerHTML.substring(0, 200) + '...');
+        if ($('#middleCoursePreviewModal').length > 0) {
+            console.log('Modal HTML:', $('#middleCoursePreviewModal')[0].outerHTML.substring(0, 200) + '...');
         }
         
         // Add a simple test to show modal
         setTimeout(function() {
             console.log('Testing modal show after 2 seconds...');
             // Uncomment the line below to test modal functionality
-            // $('#coursePreviewModal').modal('show');
+            // $('#middleCoursePreviewModal').modal('show');
         }, 2000);
         
         // Function to display course sections with tree view
@@ -2106,7 +2413,7 @@ require(['jquery'], function($) {
         // Handle Start Course button in modal
         $('.start-course-btn').on('click', function() {
             // Close modal
-            $('#coursePreviewModal').modal('hide');
+            $('#middleCoursePreviewModal').modal('hide');
             
             // Find the corresponding Continue Learning button and click it
             var courseName = $('.course-name-display').text();
@@ -2184,6 +2491,6 @@ require(['jquery'], function($) {
             $('.student-sidebar').toggleClass('show');
         });
     });
+});
     </script>
-
 {{> theme_remui/common_end}}
