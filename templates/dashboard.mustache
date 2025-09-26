@@ -654,10 +654,10 @@
 
         // Show loading state
         refreshIcon.classList.add('fa-spin');
-        console.log('Fetching data from: {{config.wwwroot}}/test_ajax.php'); // Debug log
+        console.log('Fetching data from: {{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php'); // Debug log
 
         // Fetch real-time data
-        fetch('{{config.wwwroot}}/test_ajax.php')
+        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status);
@@ -764,10 +764,10 @@
 
         // Show loading state
         refreshIcon.classList.add('fa-spin');
-        console.log('Fetching data from: {{config.wwwroot}}/test_ajax.php'); // Debug log
+        console.log('Fetching data from: {{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php'); // Debug log
 
         // Fetch real-time data
-        fetch('{{config.wwwroot}}/test_ajax.php')
+        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status);
@@ -810,7 +810,7 @@
     // Debug function to test AJAX endpoint
     function testAjaxEndpoint() {
         console.log('Testing AJAX endpoint...');
-        fetch('{{config.wwwroot}}/test_ajax.php')
+        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
             .then(response => {
                 console.log('Response status:', response.status);
                 return response.text();

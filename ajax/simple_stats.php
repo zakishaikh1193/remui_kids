@@ -11,7 +11,7 @@ ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
 try {
-    require_once('../../../../config.php');
+    require_once('../../../config.php');
     
     // Check if user is logged in and has admin privileges
     require_login();

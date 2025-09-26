@@ -62,7 +62,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/admin/enrollments.php" class="sidebar-link">
+                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/enrollments.php" class="sidebar-link">
                         <i class="fa fa-graduation-cap sidebar-icon"></i>
                         <span class="sidebar-text">Enrollments</span>
                     </a>
@@ -75,7 +75,7 @@
             <h3 class="sidebar-category">TEACHERS</h3>
             <ul class="sidebar-menu">
                 <li class="sidebar-item">
-                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/admin/teachers_list.php" class="sidebar-link">
+                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/teachers_list.php" class="sidebar-link">
                         <i class="fa fa-users sidebar-icon"></i>
                         <span class="sidebar-text">Teachers</span>
                     </a>
@@ -94,7 +94,7 @@
             <h3 class="sidebar-category">COURSES & PROGRAMS</h3>
             <ul class="sidebar-menu">
                 <li class="sidebar-item">
-                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/admin/courses.php" class="sidebar-link">
+                    <a href="http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/courses.php" class="sidebar-link">
                         <i class="fa fa-book sidebar-icon"></i>
                         <span class="sidebar-text">Courses & Programs</span>
                     </a>
@@ -534,7 +534,7 @@ function refreshSchoolCount() {
     refreshIcon.classList.add('fa-spin');
     
     // Fetch real-time data
-    fetch('{{config.wwwroot}}/test_ajax.php')
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
@@ -581,7 +581,7 @@ function refreshCourseCountAdmin() {
     refreshIcon.classList.add('fa-spin');
     
     // Fetch real-time data
-    fetch('{{config.wwwroot}}/test_ajax.php')
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
@@ -681,7 +681,7 @@ function refreshStudentCountAdmin() {
     refreshIcon.classList.add('fa-spin');
     
     // Fetch real-time data
-    fetch('{{config.wwwroot}}/test_ajax.php')
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
@@ -726,7 +726,7 @@ function refreshAllStats() {
     refreshIcon.classList.add('fa-spin');
     
     // Fetch real-time data
-    fetch('{{config.wwwroot}}/test_ajax.php')
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
         .then(response => {
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);

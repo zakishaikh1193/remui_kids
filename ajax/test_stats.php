@@ -11,7 +11,7 @@ ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
 try {
-    require_once('../../../../config.php');
+    require_once('../../../config.php');
     
     // Simple test response
     echo json_encode([
@@ -29,5 +29,6 @@ try {
     ]);
 }
 ?>
+
 
 

@@ -13,7 +13,7 @@ header('Content-Type: application/json');
 try {
     echo json_encode(['step' => '1', 'message' => 'Starting debug...']);
     
-    require_once('../../../../config.php');
+    require_once('../../../config.php');
     echo json_encode(['step' => '2', 'message' => 'Config loaded']);
     
     // Check if user is logged in
@@ -68,5 +68,6 @@ try {
     ]);
 }
 ?>
+
 
 
