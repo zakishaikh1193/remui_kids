@@ -1280,7 +1280,7 @@
                     <div class="modal-body">
                         <div class="course-sections-list" id="courseSectionsList">
                             <!-- Sections will be loaded here -->
-        </div>
+                        </div>
                         
                         <div class="insight-card study-stats">
                             <div class="insight-header">
@@ -1824,161 +1824,9 @@
         }
     };
     
-    // Modal functionality
-    function openPreviewModal(courseId, courseName) {
-        const modal = document.getElementById('highschoolCoursePreviewModal');
-        const modalTitle = document.getElementById('modalCourseTitle');
-        const sectionsList = document.getElementById('courseSectionsList');
-        
-        // Set modal title
-        modalTitle.textContent = courseName + ' - Course Sections';
-        
-        // Show loading state
-        sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
-        
-        // Show modal
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
-        // Load course sections via AJAX
-        loadCourseSections(courseId, sectionsList);
-    }
+    // Modal functionality - moved to jQuery require block below
     
-    // Handle Preview button clicks for high school dashboard
-    $(document).ready(function() {
-        $('.preview-btn').on('click', function(e) {
-            e.preventDefault();
-            console.log('High school preview button clicked');
-            
-            // Get course data from attributes
-            var courseName = $(this).data('course');
-            var courseId = $(this).data('courseid');
-            
-            console.log('High school course name:', courseName, 'Course ID:', courseId);
-            
-            // Call the modal function
-            openPreviewModal(courseId, courseName);
-        });
-    });
-    
-    function closePreviewModal() {
-        const modal = document.getElementById('highschoolCoursePreviewModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-    
-    function loadCourseSections(courseId, container) {
-        // Get course sections data from PHP
-        var coursesSectionsData = {};
-        try {
-            coursesSectionsData = JSON.parse('{{{highschool_courses_sections}}}');
-            console.log('High school course sections data loaded:', coursesSectionsData);
-        } catch (e) {
-            console.error('Error parsing high school course sections data:', e);
-            console.log('Raw data:', '{{{highschool_courses_sections}}}');
-        }
-        
-        // Clear loading state
-        container.innerHTML = '';
-        
-        var sectionsData = coursesSectionsData[courseId];
-        console.log('Sections data for course:', sectionsData);
-        
-        if (!sectionsData || !sectionsData.sections || sectionsData.sections.length === 0) {
-            console.log('No sections data available');
-            container.innerHTML = '<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>';
-            return;
-        }
-        
-        var sectionsHtml = '';
-        
-        // Add sections to the modal with tree view
-        sectionsData.sections.forEach(function(section, index) {
-            var progressBar = '';
-            if (section.total_activities > 0) {
-                var progressPercent = section.progress;
-                progressBar = '<div class="section-progress"><div class="progress-bar"><div class="progress-fill" style="width: ' + progressPercent + '%"></div></div><span class="progress-text">' + section.completed_activities + '/' + section.total_activities + ' activities</span></div>';
-            }
-            
-            // Activities list (initially hidden)
-            var activitiesList = '';
-            if (section.activities && section.activities.length > 0) {
-                activitiesList = '<div class="section-activities collapsed" id="highschool-activities-' + index + '">';
-                activitiesList += '<div class="activities-header"><span class="activities-count">' + section.activities.length + ' activities</span></div>';
-                activitiesList += '<ul class="activities-list">';
-                
-                section.activities.forEach(function(activity) {
-                    var statusIcon = activity.iscompleted ? 'fa-check-circle' : 'fa-circle-o';
-                    var activityType = activity.modname || 'activity';
-                    var activityIcon = getActivityIcon(activityType);
-                    
-                    activitiesList += '<li class="activity-item ' + (activity.iscompleted ? 'completed' : 'pending') + '">';
-                    activitiesList += '<div class="activity-icon"><i class="fa ' + activityIcon + '"></i></div>';
-                    activitiesList += '<div class="activity-details">';
-                    activitiesList += '<div class="activity-name">' + activity.name + '</div>';
-                    activitiesList += '<div class="activity-type">' + activityType.charAt(0).toUpperCase() + activityType.slice(1) + '</div>';
-                    activitiesList += '</div>';
-                    activitiesList += '<div class="activity-status"><i class="fa ' + statusIcon + '"></i></div>';
-                    activitiesList += '</li>';
-                });
-                
-                activitiesList += '</ul></div>';
-            }
-            
-            sectionsHtml += '<div class="section-item">';
-            sectionsHtml += '<div class="section-header" onclick="toggleActivities(\'highschool-activities-' + index + '\')">';
-            sectionsHtml += '<div class="section-info">';
-            sectionsHtml += '<h4 class="section-name">' + section.name + '</h4>';
-            sectionsHtml += '<p class="section-description">' + (section.summary || 'No description available') + '</p>';
-            sectionsHtml += '</div>';
-            sectionsHtml += '<div class="section-meta">';
-            sectionsHtml += '<span class="section-activities-count">' + section.total_activities + ' activities</span>';
-            if (section.activities && section.activities.length > 0) {
-                sectionsHtml += '<i class="fa fa-chevron-down toggle-icon"></i>';
-            }
-            sectionsHtml += '</div>';
-            sectionsHtml += '</div>';
-            sectionsHtml += progressBar;
-            sectionsHtml += activitiesList;
-            sectionsHtml += '</div>';
-        });
-        
-        container.innerHTML = sectionsHtml;
-    }
-    
-    // Helper function to get activity icons
-    function getActivityIcon(activityType) {
-        var icons = {
-            'assign': 'fa-file-text-o',
-            'quiz': 'fa-question-circle',
-            'lesson': 'fa-book',
-            'forum': 'fa-comments',
-            'resource': 'fa-file-o',
-            'url': 'fa-external-link',
-            'page': 'fa-file-text',
-            'folder': 'fa-folder',
-            'label': 'fa-tag'
-        };
-        return icons[activityType] || 'fa-circle';
-    }
-    
-    // Function to toggle activities visibility
-    function toggleActivities(activitiesId) {
-        var activitiesDiv = document.getElementById(activitiesId);
-        var toggleIcon = activitiesDiv.previousElementSibling.querySelector('.toggle-icon');
-        
-        if (activitiesDiv.classList.contains('collapsed')) {
-            activitiesDiv.classList.remove('collapsed');
-            activitiesDiv.classList.add('expanded');
-            toggleIcon.classList.remove('fa-chevron-down');
-            toggleIcon.classList.add('fa-chevron-up');
-        } else {
-            activitiesDiv.classList.remove('expanded');
-            activitiesDiv.classList.add('collapsed');
-            toggleIcon.classList.remove('fa-chevron-up');
-            toggleIcon.classList.add('fa-chevron-down');
-        }
-    }
+    // Modal functionality - moved to jQuery require block below
     
     // Close modal when clicking outside
     document.addEventListener('click', function(e) {
@@ -2201,28 +2049,222 @@
 </div>
 
 <script>
+// Global functions that need to be accessible from onclick attributes
+function openPreviewModal(courseId, courseName) {
+    console.log('Global openPreviewModal called with:', courseId, courseName);
+    
+    const modal = document.getElementById('highschoolCoursePreviewModal');
+    const modalTitle = document.getElementById('modalCourseTitle');
+    const sectionsList = document.getElementById('courseSectionsList');
+    
+    if (!modal || !modalTitle || !sectionsList) {
+        console.error('Modal elements not found');
+        return;
+    }
+    
+    // Set modal title
+    modalTitle.textContent = courseName + ' - Course Sections';
+    
+    // Show loading state
+    sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+    
+    // Show modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Load course sections
+    loadCourseSections(courseId, sectionsList);
+}
+
+function closePreviewModal() {
+    const modal = document.getElementById('highschoolCoursePreviewModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function loadCourseSections(courseId, container) {
+    console.log('loadCourseSections called with courseId:', courseId);
+    
+    // Get course sections data from PHP
+    var coursesSectionsData = {};
+    try {
+        var rawData = '{{{highschool_courses_sections}}}';
+        console.log('Raw highschool_courses_sections data:', rawData);
+        // Clean the JSON data by removing problematic characters
+        rawData = rawData.replace(/&amp;/g, '&');
+        rawData = rawData.replace(/&lt;/g, '<');
+        rawData = rawData.replace(/&gt;/g, '>');
+        rawData = rawData.replace(/&quot;/g, '"');
+        rawData = rawData.replace(/&#x27;/g, "'");
+        coursesSectionsData = JSON.parse(rawData);
+        console.log('High school course sections data loaded:', coursesSectionsData);
+        console.log('Available course IDs:', Object.keys(coursesSectionsData));
+    } catch (e) {
+        console.error('Error parsing high school course sections data:', e);
+        console.log('Raw data:', '{{{highschool_courses_sections}}}');
+    }
+    
+    // Clear loading state
+    if (container) {
+        container.innerHTML = '';
+    }
+    
+    // Try both string and number keys
+    var sectionsData = coursesSectionsData[courseId] || coursesSectionsData[String(courseId)] || coursesSectionsData[Number(courseId)];
+    console.log('Sections data for course:', sectionsData);
+    console.log('CourseId type:', typeof courseId, 'Value:', courseId);
+    
+    if (!sectionsData || !sectionsData.sections || sectionsData.sections.length === 0) {
+        console.log('No sections data available for course ID:', courseId);
+        console.log('Available course IDs in data:', Object.keys(coursesSectionsData));
+        if (container) {
+            container.innerHTML = '<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>';
+        }
+        return;
+    }
+    
+    var sectionsHtml = '';
+    
+    // Add sections to the modal with tree view
+    sectionsData.sections.forEach(function(section, index) {
+        var progressBar = '';
+        if (section.total_activities > 0) {
+            var progressPercent = section.progress;
+            progressBar = '<div class="section-progress"><div class="progress-bar"><div class="progress-fill" style="width: ' + progressPercent + '%"></div></div><span class="progress-text">' + section.completed_activities + '/' + section.total_activities + ' activities</span></div>';
+        }
+        
+        // Activities list (initially hidden)
+        var activitiesList = '';
+        if (section.activities && section.activities.length > 0) {
+            activitiesList = '<div class="section-activities collapsed" id="highschool-activities-' + index + '">';
+            activitiesList += '<div class="activities-header"><span class="activities-count">' + section.activities.length + ' activities</span></div>';
+            activitiesList += '<ul class="activities-list">';
+            
+            section.activities.forEach(function(activity) {
+                var statusIcon = activity.iscompleted ? 'fa-check-circle' : 'fa-circle-o';
+                var activityType = activity.modname || 'activity';
+                var activityIcon = getActivityIcon(activityType);
+                
+                activitiesList += '<li class="activity-item ' + (activity.iscompleted ? 'completed' : 'pending') + '">';
+                activitiesList += '<div class="activity-icon"><i class="fa ' + activityIcon + '"></i></div>';
+                activitiesList += '<div class="activity-details">';
+                activitiesList += '<div class="activity-name">' + activity.name + '</div>';
+                activitiesList += '<div class="activity-type">' + activityType.charAt(0).toUpperCase() + activityType.slice(1) + '</div>';
+                activitiesList += '</div>';
+                activitiesList += '<div class="activity-status"><i class="fa ' + statusIcon + '"></i></div>';
+                activitiesList += '</li>';
+            });
+            
+            activitiesList += '</ul></div>';
+        }
+        
+        sectionsHtml += '<div class="section-item">';
+        sectionsHtml += '<div class="section-header" onclick="toggleActivities(\'highschool-activities-' + index + '\')">';
+        sectionsHtml += '<div class="section-info">';
+        sectionsHtml += '<h4 class="section-name">' + section.name + '</h4>';
+        sectionsHtml += '<p class="section-description">' + (section.summary || 'No description available') + '</p>';
+        sectionsHtml += '</div>';
+        sectionsHtml += '<div class="section-meta">';
+        sectionsHtml += '<span class="section-activities-count">' + section.total_activities + ' activities</span>';
+        if (section.activities && section.activities.length > 0) {
+            sectionsHtml += '<i class="fa fa-chevron-down toggle-icon"></i>';
+        }
+        sectionsHtml += '</div>';
+        sectionsHtml += '</div>';
+        sectionsHtml += progressBar;
+        sectionsHtml += activitiesList;
+        sectionsHtml += '</div>';
+    });
+    
+    if (container) {
+        container.innerHTML = sectionsHtml;
+    }
+}
+
+function getActivityIcon(activityType) {
+    var icons = {
+        'assign': 'fa-file-text-o',
+        'quiz': 'fa-question-circle',
+        'lesson': 'fa-book',
+        'forum': 'fa-comments',
+        'resource': 'fa-file-o',
+        'url': 'fa-external-link',
+        'page': 'fa-file-text',
+        'folder': 'fa-folder',
+        'label': 'fa-tag'
+    };
+    return icons[activityType] || 'fa-circle';
+}
+
+function toggleActivities(activitiesId) {
+    var activitiesDiv = document.getElementById(activitiesId);
+    if (activitiesDiv) {
+        var toggleIcon = activitiesDiv.previousElementSibling.querySelector('.toggle-icon');
+        
+        if (activitiesDiv.classList.contains('collapsed')) {
+            activitiesDiv.classList.remove('collapsed');
+            activitiesDiv.classList.add('expanded');
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-chevron-down');
+                toggleIcon.classList.add('fa-chevron-up');
+            }
+        } else {
+            activitiesDiv.classList.remove('expanded');
+            activitiesDiv.classList.add('collapsed');
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-chevron-up');
+                toggleIcon.classList.add('fa-chevron-down');
+            }
+        }
+    }
+}
+
 require(['jquery'], function($) {
     $(document).ready(function() {
         // Store course sections data from PHP
         var coursesSectionsData = {};
         try {
-            coursesSectionsData = JSON.parse('{{{middle_courses_sections}}}');
+            var rawData = '{{{middle_courses_sections}}}';
+            // Clean the JSON data by removing problematic characters
+            rawData = rawData.replace(/&amp;/g, '&');
+            rawData = rawData.replace(/&lt;/g, '<');
+            rawData = rawData.replace(/&gt;/g, '>');
+            rawData = rawData.replace(/&quot;/g, '"');
+            rawData = rawData.replace(/&#x27;/g, "'");
+            coursesSectionsData = JSON.parse(rawData);
             console.log('Course sections data loaded:', coursesSectionsData);
         } catch (e) {
             console.error('Error parsing course sections data:', e);
             console.log('Raw data:', '{{{middle_courses_sections}}}');
         }
         
-        // Handle Preview button clicks
-        $('.preview-btn').on('click', function(e) {
+        // Handle Preview button clicks for high school dashboard
+        $('.highschool-dashboard .preview-btn').on('click', function(e) {
             e.preventDefault();
-            console.log('Preview button clicked');
+            console.log('High school preview button clicked');
             
             // Get course data from attributes
             var courseName = $(this).data('course');
             var courseId = $(this).data('courseid');
             
-            console.log('Course name:', courseName, 'Course ID:', courseId);
+            console.log('High school course name:', courseName, 'Course ID:', courseId);
+            
+            // Call the modal function
+            openPreviewModal(courseId, courseName);
+        });
+        
+        // Handle Preview button clicks for middle school dashboard
+        $('.middle-dashboard .preview-btn').on('click', function(e) {
+            e.preventDefault();
+            console.log('Middle school preview button clicked');
+            
+            // Get course data from attributes
+            var courseName = $(this).data('course');
+            var courseId = $(this).data('courseid');
+            
+            console.log('Middle school course name:', courseName, 'Course ID:', courseId);
             
             // Update modal content
             $('.course-name-display').text(courseName);
@@ -2448,6 +2490,6 @@ require(['jquery'], function($) {
             $('.student-sidebar').toggleClass('show');
         });
     });
+});
     </script>
-
 {{> theme_remui/common_end}}
