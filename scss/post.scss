@@ -1202,6 +1202,233 @@
     }
 }
 
+    // Weekly Activity Section
+    .weekly-activity-section {
+        background: white;
+        border-radius: 2rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            
+            .section-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #2D3748;
+                margin: 0;
+                
+                i {
+                    color: #4ECDC4;
+                    margin-right: 0.5rem;
+                }
+            }
+            
+            .chart-info {
+                .info-text {
+                    font-size: 0.9rem;
+                    color: #6B7280;
+                    background: #F3F4F6;
+                    padding: 0.5rem 1rem;
+                    border-radius: 1rem;
+                    border: 1px solid #E5E7EB;
+                }
+            }
+        }
+        
+        .chart-container {
+            background: #F8FAFC;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 2px solid #E2E8F0;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            
+            canvas {
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }
+
+    // Active Sections Section
+    .active-sections {
+        background: white;
+        border-radius: 2rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            
+            .section-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #2D3748;
+                margin: 0;
+                
+                i {
+                    color: #4ECDC4;
+                    margin-right: 0.5rem;
+                }
+            }
+            
+            .section-info {
+                .info-text {
+                    font-size: 0.9rem;
+                    color: #6B7280;
+                    background: #F3F4F6;
+                    padding: 0.5rem 1rem;
+                    border-radius: 1rem;
+                    border: 1px solid #E5E7EB;
+                }
+            }
+        }
+        
+        .sections-list {
+            .section-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem 0;
+                border-bottom: 1px solid #F1F3F4;
+                
+                &:last-child {
+                    border-bottom: none;
+                }
+                
+                &.section-link {
+                    text-decoration: none;
+                    color: inherit;
+                    transition: all 0.3s ease;
+                    border-radius: 0.5rem;
+                    margin: 0 -0.5rem;
+                    padding: 1.5rem 0.5rem;
+                    
+                    &:hover {
+                        background: rgba(78, 205, 196, 0.05);
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(78, 205, 196, 0.15);
+                        
+                        .section-name {
+                            color: #4ECDC4;
+                        }
+                        
+                        .progress-fill {
+                            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+                        }
+                    }
+                    
+                    &:active {
+                        transform: translateY(0);
+                    }
+                }
+                
+                .section-info {
+                    flex: 1;
+                    margin-right: 2rem;
+                    
+                    .section-name {
+                        font-size: 1.3rem;
+                        font-weight: 700;
+                        color: #2D3748;
+                        margin: 0 0 0.5rem 0;
+                        line-height: 1.2;
+                    }
+                    
+                    .course-name {
+                        font-size: 0.9rem;
+                        color: #6B7280;
+                        font-weight: 500;
+                        margin: 0;
+                    }
+                }
+                
+                .section-progress {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    min-width: 450px;
+                    
+                    .progress-bar {
+                        flex: 1;
+                        height: 16px;
+                        background: #E5E7EB;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        position: relative;
+                        
+                        .progress-fill {
+                            height: 100%;
+                            border-radius: 8px;
+                            transition: width 0.3s ease;
+                            position: relative;
+                            width: 40%;
+                            
+                            &::after {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                                animation: shimmer 2s infinite;
+                            }
+                        }
+                    }
+                    
+                    .progress-text {
+                        font-size: 1rem;
+                        font-weight: 700;
+                        color: #2D3748;
+                        min-width: 50px;
+                        text-align: right;
+                    }
+                }
+            }
+            
+            .no-sections {
+                text-align: center;
+                padding: 3rem 2rem;
+                color: #6B7280;
+                
+                i {
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    display: block;
+                    color: #D1D5DB;
+                }
+                
+                p {
+                    font-size: 1rem;
+                    margin: 0;
+                    line-height: 1.5;
+                }
+            }
+        }
+    }
+    
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
     // Charts Analytics
     .charts-analytics {
         background: white;
