@@ -996,13 +996,13 @@
                     <div class="col-lg-3">
                         <div class="middle-sidebar">
                             <!-- My Schedule -->
-                            <div class="sidebar-section">
-                                <h4 class="sidebar-title">
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">
                                     <i class="fa fa-calendar"></i> My Schedule
                                     <a href="{{{calendarurl}}}" class="view-full-link">View Full Calendar ></a>
-                                </h4>
-                                <p class="schedule-subtitle">Next 7 Days</p>
-                                <div class="calendar-week">
+                            </h4>
+                            <p class="schedule-subtitle">Next 7 Days</p>
+                            <div class="calendar-week">
                                     {{#calendar_week}}
                                     <div class="calendar-day {{#has_events}}has-events{{/has_events}}" data-date="{{date}}">
                                         <div class="day-name">{{day_name}}</div>
@@ -1010,9 +1010,9 @@
                                         {{#has_events}}
                                         <div class="event-indicator">
                                             <div class="event-dot"></div>
-                                        </div>
+                                </div>
                                         {{/has_events}}
-                                    </div>
+                                </div>
                                     {{/calendar_week}}
                                 </div>
                                 
@@ -1023,25 +1023,25 @@
                                         <div class="event-date">
                                             <span class="event-day">{{event_day}}</span>
                                             <span class="event-month">{{event_month}}</span>
-                                        </div>
+                                </div>
                                         <div class="event-details">
                                             <div class="event-title">{{event_title}}</div>
                                             <div class="event-time">{{event_time}}</div>
                                             <div class="event-course">{{course_name}}</div>
-                                        </div>
+                                </div>
                                         <div class="event-type {{event_type}}">
                                             <i class="fa {{event_icon}}"></i>
-                                        </div>
+                                </div>
                                     </a>
                                     {{/upcoming_events}}
                                     {{^upcoming_events}}
                                     <div class="no-events">
                                         <i class="fa fa-calendar-o"></i>
                                         <p>No upcoming events in the next 7 days</p>
-                                    </div>
-                                    {{/upcoming_events}}
-                                </div>
                             </div>
+                                    {{/upcoming_events}}
+                        </div>
+                    </div>
                             
                             <!-- Learning Progress -->
                             <div class="sidebar-section">
@@ -1050,12 +1050,12 @@
                                     <div class="quick-stat-item">
                                         <div class="stat-icon">
                                             <i class="fa fa-book"></i>
-                                        </div>
+                </div>
                                         <div class="stat-details">
                                             <span class="stat-label">Active Courses</span>
                                             <span class="stat-value">{{#highschool_stats}}{{courses}}{{/highschool_stats}}</span>
-                                        </div>
-                                    </div>
+            </div>
+        </div>
                                     <div class="quick-stat-item">
                                         <div class="stat-icon">
                                             <i class="fa fa-tasks"></i>
