@@ -195,6 +195,7 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     // Add Grade 8-12 specific statistics and courses for high school students
     if ($dashboardtype === 'highschool') {
         $templatecontext['highschool_stats'] = theme_remui_kids_get_highschool_dashboard_stats($USER->id);
+        $templatecontext['highschool_metrics'] = theme_remui_kids_get_highschool_dashboard_metrics($USER->id);
         $courses = theme_remui_kids_get_highschool_courses($USER->id);
         $templatecontext['highschool_courses'] = array_slice($courses, 0, 3); // Show only first 3 courses
         $templatecontext['has_highschool_courses'] = !empty($courses);
@@ -206,8 +207,12 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         foreach ($courses as $course) {
             $sectionsdata = theme_remui_kids_get_course_sections_for_modal($course['id']);
             $coursesectionsdata[$course['id']] = $sectionsdata;
+            // Debug: Log the data for each course
+            error_log("High school course {$course['id']} ({$course['fullname']}) sections data: " . print_r($sectionsdata, true));
         }
         $templatecontext['highschool_courses_sections'] = json_encode($coursesectionsdata);
+        // Debug: Log the final JSON data
+        error_log("Final high school courses sections JSON: " . $templatecontext['highschool_courses_sections']);
         
         // Add active sections data (limit to 3 for Current Lessons section)
         $activesections = theme_remui_kids_get_highschool_active_sections($USER->id);

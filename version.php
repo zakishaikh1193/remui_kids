@@ -22,13 +22,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+ defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025011700;
-$plugin->requires  = 2022041200;
-$plugin->release   = '1.0.0';
-$plugin->component = 'theme_remui_kids';
-$plugin->dependencies = array(
-    'theme_remui' => 2025072400,
-);
+ $plugin->version   = 2025012600;    // updated to a higher version
+ $plugin->requires  = 2022041200;    // Moodle version required
+ $plugin->release   = '1.1.0';       // updated release version
+ $plugin->component = 'theme_remui_kids';
+ $plugin->dependencies = array(
+     'theme_remui' => 2025072400,    // parent theme required version
+ );
 
