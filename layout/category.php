@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once("{$CFG->dirroot}/theme/remui/layout/common.php");
+require_once("{$CFG->dirroot}/theme/remui_kids/layout/common.php");
 
 use theme_remui\utility;
 

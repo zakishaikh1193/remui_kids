@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $USER, $DB, $OUTPUT, $CFG, $SITE;
 
-require_once($CFG->dirroot . '/theme/remui/layout/common.php');
+require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
 require_once($CFG->libdir . "/badgeslib.php");
 

@@ -782,7 +782,7 @@ function theme_remui_kids_get_elementary_courses($userid) {
                 'enddate' => $enddate,
                 'courseimage' => $courseimage,
                 'categoryname' => $course->categoryname ?: 'General',
-                'courseurl' => new moodle_url('/course/view.php', ['id' => $course->id]),
+                'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out(),
                 'progress' => $progress,
                 'progress_percentage' => round($progress),
                 'duration' => $duration,
@@ -1103,12 +1103,13 @@ function theme_remui_kids_get_admin_dashboard_stats() {
         $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
         $totalstudents = 0;
         if ($traineerole) {
+
             $totalstudents = $DB->count_records_sql(
                 "SELECT COUNT(DISTINCT u.id) 
                  FROM {user} u 
                  JOIN {role_assignments} ra ON u.id = ra.userid 
                  JOIN {role} r ON ra.roleid = r.id 
-                 WHERE r.shortname = 'trainee' AND u.deleted = 0 AND u.suspended = 0"
+                 WHERE r.shortname = 'trainee'||'student' AND u.deleted = 0 AND u.suspended = 0"
             );
         }
         
@@ -1160,7 +1161,7 @@ function theme_remui_kids_get_admin_user_stats() {
         }
         
         // Get students count - using trainee role for consistency with enrollment system
-        $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
+        $traineerole = $DB->get_record('role', ['shortname' => 'trainee'||'student']);
         $students = 0;
         if ($traineerole) {
             $students = $DB->count_records_sql(
@@ -1168,7 +1169,8 @@ function theme_remui_kids_get_admin_user_stats() {
                  FROM {user} u 
                  JOIN {role_assignments} ra ON u.id = ra.userid 
                  JOIN {role} r ON ra.roleid = r.id 
-                 WHERE r.shortname = 'trainee' AND u.deleted = 0"
+                 WHERE r.shortname = 'trainee' || 'student' AND u.deleted = 0"
+
             );
         }
         
@@ -1192,6 +1194,7 @@ function theme_remui_kids_get_admin_user_stats() {
              JOIN {user_lastaccess} ul ON u.id = ul.userid 
              WHERE u.deleted = 0 AND ul.timeaccess > ?",
             [time() - (30 * 24 * 60 * 60)] // Last 30 days
+
         );
         
         // Get new users this month
@@ -1336,5 +1339,964 @@ function theme_remui_kids_get_admin_recent_activity() {
         
     } catch (Exception $e) {
         return [];
+    }
+}
+
+/**
+ * Get course sections for modal preview
+ *
+ * @param int $courseid Course ID
+ * @return array Array containing course sections data
+ */
+
+function theme_remui_kids_get_course_sections_for_modal($courseid) {
+    global $DB, $USER;
+    
+    try {
+        // Get course object
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        
+        // Get course modules info
+        $modinfo = get_fast_modinfo($course);
+        $sections = $modinfo->get_section_info_all();
+        
+        // Get completion info
+        $completion = new completion_info($course);
+        
+        $sectionsdata = [];
+        
+        foreach ($sections as $section) {
+            // Skip section 0 (general section)
+            if ($section->section == 0) {
+                continue;
+            }
+            
+            // Get section name
+            $sectionname = $section->name ?: "Section " . $section->section;
+            
+            // Get activities in this section
+            $activities = [];
+            $totalactivities = 0;
+            $completedactivities = 0;
+            
+            if (isset($modinfo->sections[$section->section])) {
+                foreach ($modinfo->sections[$section->section] as $cmid) {
+                    $module = $modinfo->cms[$cmid];
+                    
+                    if (!$module->uservisible) {
+                        continue;
+                    }
+                    
+                    $totalactivities++;
+                    
+                    // Check completion status
+                    $iscompleted = false;
+                    if ($completion->is_enabled() && $module->completion != COMPLETION_TRACKING_NONE) {
+                        $completiondata = $completion->get_data($module, true, $USER->id);
+                        if ($completiondata->completionstate == COMPLETION_COMPLETE || 
+                            $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $iscompleted = true;
+                            $completedactivities++;
+                        }
+                    }
+                    
+                    $activities[] = [
+                        'id' => $module->id,
+                        'name' => $module->name,
+                        'modname' => $module->modname,
+                        'url' => (new moodle_url('/mod/' . $module->modname . '/view.php', ['id' => $module->id]))->out(),
+                        'iscompleted' => $iscompleted,
+                        'icon' => '/theme/image.php/remui_kids/' . $module->modname . '/1/icon'
+                    ];
+                }
+            }
+            
+            // Calculate progress percentage
+            $progress = 0;
+            if ($totalactivities > 0) {
+                $progress = round(($completedactivities / $totalactivities) * 100);
+            }
+            
+            // Get section summary (first 150 characters)
+            $summary = '';
+            if ($section->summary) {
+                $summary = strip_tags($section->summary);
+                $summary = strlen($summary) > 150 ? substr($summary, 0, 150) . '...' : $summary;
+            }
+            
+            $sectionsdata[] = [
+                'id' => $section->id,
+                'section' => $section->section,
+                'name' => $sectionname,
+                'summary' => $summary,
+                'total_activities' => $totalactivities,
+                'completed_activities' => $completedactivities,
+                'progress' => $progress,
+                'activities' => $activities,
+                'url' => (new moodle_url('/course/view.php', ['id' => $courseid, 'section' => $section->section]))->out()
+            ];
+        }
+        
+        return [
+            'course' => [
+                'id' => $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname
+            ],
+            'sections' => $sectionsdata
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'course' => ['id' => $courseid, 'fullname' => 'Unknown Course', 'shortname' => ''],
+            'sections' => []
+        ];
+    }
+}
+
+/**
+ * Get calendar week data with events for the next 7 days using Moodle's Calendar API
+ *
+ * @param int $userid User ID
+ * @return array Calendar week data with events
+ */
+function theme_remui_kids_get_calendar_week_data($userid) {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $calendarweek = [];
+    $today = time();
+    $starttime = mktime(0, 0, 0, date('n', $today), date('j', $today), date('Y', $today));
+    $endtime = $starttime + (7 * 86400); // Next 7 days
+    
+    // Get user's enrolled courses
+    $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    $courseids = array_keys($courses);
+    
+    // Get calendar events using Moodle's built-in function
+    $events = calendar_get_events(
+        $starttime,
+        $endtime,
+        $userid, // User events
+        false,   // No group events
+        $courseids, // Course events
+        true,    // With duration
+        true     // Ignore hidden
+    );
+    
+    // Get next 7 days
+    for ($i = 0; $i < 7; $i++) {
+        $date = $starttime + ($i * 86400);
+        $dayname = date('D', $date);
+        $daynumber = date('j', $date);
+        $datekey = date('Y-m-d', $date);
+        
+        // Check if there are events on this date
+        $dayevents = [];
+        foreach ($events as $event) {
+            $eventdate = date('Y-m-d', $event->timestart);
+            if ($eventdate === $datekey) {
+                $dayevents[] = $event;
+            }
+        }
+        
+        $calendarweek[] = [
+            'date' => $datekey,
+            'day_name' => $dayname,
+            'day_number' => $daynumber,
+            'has_events' => !empty($dayevents),
+            'events' => $dayevents
+        ];
+    }
+    
+    return $calendarweek;
+}
+
+/**
+ * Get upcoming events for the next 7 days using Moodle's Calendar API
+ *
+ * @param int $userid User ID
+ * @return array Upcoming events data
+ */
+function theme_remui_kids_get_upcoming_events($userid) {
+    global $DB, $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $upcomingevents = [];
+    $today = time();
+    $starttime = mktime(0, 0, 0, date('n', $today), date('j', $today), date('Y', $today));
+    $endtime = $starttime + (7 * 86400); // Next 7 days
+    
+    // Get user's enrolled courses
+    $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    $courseids = array_keys($courses);
+    
+    // Get calendar events using Moodle's built-in function
+    $events = calendar_get_events(
+        $starttime,
+        $endtime,
+        $userid, // User events
+        false,   // No group events
+        $courseids, // Course events
+        true,    // With duration
+        true     // Ignore hidden
+    );
+    
+    // Process events and format them
+    foreach ($events as $event) {
+        // Skip events that are not assignments, quizzes, or lessons
+        if (!in_array($event->modulename, ['assign', 'quiz', 'lesson'])) {
+            continue;
+        }
+        
+        // Get course name
+        $coursename = '';
+        if ($event->courseid && isset($courses[$event->courseid])) {
+            $coursename = $courses[$event->courseid]->fullname;
+        }
+        
+        // Determine event type and icon
+        $eventtype = $event->modulename;
+        $eventicon = 'fa-star'; // Default icon
+        
+        switch ($event->modulename) {
+            case 'assign':
+                $eventicon = 'fa-file-text';
+                break;
+            case 'quiz':
+                $eventicon = 'fa-question-circle';
+                break;
+            case 'lesson':
+                $eventicon = 'fa-graduation-cap';
+                break;
+        }
+        
+        // Create event URL
+        $eventurl = '';
+        if ($event->modulename && $event->instance) {
+            $eventurl = (new moodle_url('/mod/' . $event->modulename . '/view.php', ['id' => $event->instance]))->out();
+        }
+        
+        $upcomingevents[] = [
+            'event_title' => $event->name,
+            'event_time' => date('g:i A', $event->timestart),
+            'event_day' => date('j', $event->timestart),
+            'event_month' => date('M', $event->timestart),
+            'course_name' => $coursename,
+            'event_type' => $eventtype,
+            'event_icon' => $eventicon,
+            'event_date' => $event->timestart,
+            'event_url' => $eventurl,
+            'event_description' => $event->description ?? ''
+        ];
+    }
+    
+    // Sort all events by date
+    usort($upcomingevents, function($a, $b) {
+        return $a['event_date'] - $b['event_date'];
+    });
+    
+    // Return only the first 5 events
+    return array_slice($upcomingevents, 0, 5);
+}
+
+
+/**
+ * Get learning progress statistics
+ *
+ * @param int $userid User ID
+ * @return array Learning progress data
+ */
+function theme_remui_kids_get_learning_progress_stats($userid) {
+    global $DB;
+    
+    $today = time();
+    $weekstart = $today - (date('w', $today) * 86400);
+    $weekend = $weekstart + (7 * 86400);
+    
+    // Get lessons completed this week
+    $lessonscompleted = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)
+         AND cmc.timemodified >= ?
+         AND cmc.timemodified <= ?",
+        [$userid, $weekstart, $weekend]
+    );
+    
+    // Get study time (estimated based on completed activities)
+    $studytime = $lessonscompleted * 30; // Assume 30 minutes per lesson
+    $studytimehours = round($studytime / 60, 1);
+    
+    // Get best quiz score
+    $bestscoresql = "
+        SELECT MAX(gg.finalgrade / gg.rawgrademax * 100) as bestscore
+        FROM {grade_grades} gg
+        JOIN {grade_items} gi ON gg.itemid = gi.id
+        JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+        JOIN {modules} m ON cm.module = m.id
+        WHERE gg.userid = ? 
+        AND m.name = 'quiz'
+        AND gg.finalgrade IS NOT NULL
+        AND gg.rawgrademax > 0";
+    
+    $bestscore = $DB->get_field_sql($bestscoresql, [$userid]) ?: 0;
+    
+    // Calculate goal progress (based on weekly target)
+    $weeklytarget = 5; // Target 5 lessons per week
+    $goalprogress = min(100, round(($lessonscompleted / $weeklytarget) * 100));
+    
+    return [
+        'lessons_this_week' => $lessonscompleted,
+        'study_time' => $studytimehours . 'h',
+        'best_score' => round($bestscore),
+        'goal_progress' => $goalprogress
+    ];
+}
+
+/**
+ * Get achievements data
+ *
+ * @param int $userid User ID
+ * @return array Achievements data
+ */
+function theme_remui_kids_get_achievements_data($userid) {
+    global $DB;
+    
+    // Get study streak (consecutive days with activity)
+    $streak = $DB->get_field_sql(
+        "SELECT COUNT(DISTINCT DATE(FROM_UNIXTIME(timemodified))) as streak
+         FROM {course_modules_completion}
+         WHERE userid = ? 
+         AND completionstate IN (1, 2)
+         AND timemodified >= ?",
+        [$userid, time() - (30 * 86400)] // Last 30 days
+    ) ?: 0;
+    
+    // Get total points (based on completed activities)
+    $points = $DB->get_field_sql(
+        "SELECT COUNT(*) * 10
+         FROM {course_modules_completion}
+         WHERE userid = ? 
+         AND completionstate IN (1, 2)",
+        [$userid]
+    ) ?: 0;
+    
+    // Get coins (bonus for high scores)
+    $coins = $DB->get_field_sql(
+        "SELECT COUNT(*) * 5
+         FROM {grade_grades} gg
+         JOIN {grade_items} gi ON gg.itemid = gi.id
+         WHERE gg.userid = ? 
+         AND gg.finalgrade / gg.rawgrademax >= 0.8
+         AND gg.rawgrademax > 0",
+        [$userid]
+    ) ?: 0;
+    
+    return [
+        'streaks' => $streak,
+        'best_streak' => $streak,
+        'goal_streak' => 7, // Goal of 7 day streak
+        'points' => $points,
+        'coins' => $coins
+    ];
+}
+
+/**
+ * Get high school dashboard statistics (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Dashboard statistics
+ */
+function theme_remui_kids_get_highschool_dashboard_stats($userid) {
+    global $DB;
+    
+    // Get enrolled courses count
+    $courses = $DB->get_field_sql(
+        "SELECT COUNT(DISTINCT c.id)
+         FROM {course} c
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND c.visible = 1
+         AND c.id > 1",
+        [$userid]
+    ) ?: 0;
+    
+    // Get completed lessons count
+    $lessons = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)
+         AND cm.module IN (SELECT id FROM {modules} WHERE name IN ('lesson', 'page', 'book'))",
+        [$userid]
+    ) ?: 0;
+    
+    // Get completed activities count
+    $activities = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules_completion} cmc
+         WHERE cmc.userid = ? 
+         AND cmc.completionstate IN (1, 2)",
+        [$userid]
+    ) ?: 0;
+    
+    // Calculate overall progress percentage
+    $total_activities = $DB->get_field_sql(
+        "SELECT COUNT(*)
+         FROM {course_modules} cm
+         JOIN {enrol} e ON cm.course = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND cm.completion > 0",
+        [$userid]
+    ) ?: 1;
+    
+    $progress = $total_activities > 0 ? round(($activities / $total_activities) * 100) : 0;
+    
+    return [
+        'courses' => $courses,
+        'lessons' => $lessons,
+        'activities' => $activities,
+        'progress' => $progress
+    ];
+}
+
+/**
+ * Get high school courses (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Course data
+ */
+function theme_remui_kids_get_highschool_courses($userid) {
+    global $DB;
+    
+    $courses = $DB->get_records_sql(
+        "SELECT c.id, c.fullname, c.shortname, c.summary, c.startdate, c.enddate
+         FROM {course} c
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND c.visible = 1
+         AND c.id > 1
+         ORDER BY c.startdate DESC, c.fullname ASC",
+        [$userid]
+    );
+    
+    $coursedata = [];
+    foreach ($courses as $course) {
+        // Get course progress
+        $total_activities = $DB->get_field_sql(
+            "SELECT COUNT(*)
+             FROM {course_modules} cm
+             WHERE cm.course = ? 
+             AND cm.completion > 0",
+            [$course->id]
+        ) ?: 1;
+        
+        $completed_activities = $DB->get_field_sql(
+            "SELECT COUNT(*)
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             WHERE cmc.userid = ? 
+             AND cm.course = ?
+             AND cmc.completionstate IN (1, 2)",
+            [$userid, $course->id]
+        ) ?: 0;
+        
+        $progress = $total_activities > 0 ? round(($completed_activities / $total_activities) * 100) : 0;
+        
+        $coursedata[] = [
+            'id' => $course->id,
+            'fullname' => $course->fullname,
+            'shortname' => $course->shortname,
+            'summary' => $course->summary,
+            'startdate' => $course->startdate,
+            'enddate' => $course->enddate,
+            'progress' => $progress,
+            'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out()
+        ];
+    }
+    
+    return $coursedata;
+}
+
+/**
+ * Get high school active sections (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Active sections data
+ */
+function theme_remui_kids_get_highschool_active_sections($userid) {
+    global $DB;
+    
+    $sections = $DB->get_records_sql(
+        "SELECT cs.id, cs.section, cs.name, cs.summary, c.id as courseid, c.fullname as coursename
+         FROM {course_sections} cs
+         JOIN {course} c ON cs.course = c.id
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND cs.section > 0
+         AND c.visible = 1
+         AND c.id > 1
+         ORDER BY c.startdate DESC, cs.section ASC
+         LIMIT 10",
+        [$userid]
+    );
+    
+    $sectionsdata = [];
+    foreach ($sections as $section) {
+        $sectionsdata[] = [
+            'id' => $section->id,
+            'section' => $section->section,
+            'name' => $section->name ?: "Section {$section->section}",
+            'summary' => $section->summary,
+            'courseid' => $section->courseid,
+            'coursename' => $section->coursename,
+            'url' => (new moodle_url('/course/view.php', ['id' => $section->courseid, 'section' => $section->section]))->out()
+        ];
+    }
+    
+    return $sectionsdata;
+}
+
+/**
+ * Get high school active lessons (Grades 8-12)
+ *
+ * @param int $userid User ID
+ * @return array Active lessons data
+ */
+function theme_remui_kids_get_highschool_active_lessons($userid) {
+    global $DB;
+    
+    $lessons = $DB->get_records_sql(
+        "SELECT cm.id, cm.instance, m.name as modulename, c.id as courseid, c.fullname as coursename
+         FROM {course_modules} cm
+         JOIN {modules} m ON cm.module = m.id
+         JOIN {course} c ON cm.course = c.id
+         JOIN {enrol} e ON c.id = e.courseid
+         JOIN {user_enrolments} ue ON e.id = ue.enrolid
+         WHERE ue.userid = ? 
+         AND m.name IN ('lesson', 'page', 'book', 'assign', 'quiz')
+         AND c.visible = 1
+         AND c.id > 1
+         ORDER BY c.startdate DESC, cm.id ASC
+         LIMIT 10",
+        [$userid]
+    );
+    
+    $lessonsdata = [];
+    foreach ($lessons as $lesson) {
+        $lessonsdata[] = [
+            'id' => $lesson->id,
+            'instance' => $lesson->instance,
+            'modulename' => $lesson->modulename,
+            'courseid' => $lesson->courseid,
+            'coursename' => $lesson->coursename,
+            'url' => (new moodle_url('/mod/' . $lesson->modulename . '/view.php', ['id' => $lesson->id]))->out()
+        ];
+    }
+    
+    return $lessonsdata;
+}
+
+/**
+ * Get admin sidebar data with URLs and active states
+ *
+ * @param string $current_page Current page identifier
+ * @return array Array containing sidebar navigation data
+ */
+function theme_remui_kids_get_admin_sidebar_data($current_page = 'dashboard') {
+    global $CFG;
+    
+    // Base URLs
+    $base_url = $CFG->wwwroot;
+    
+    // Define all sidebar URLs
+    $urls = [
+        'dashboard_url' => $base_url . '/my/'
+    ];
+    
+    // Define active states based on current page
+    $active_states = [
+        'dashboard_active' => ($current_page === 'dashboard')
+    ];
+    
+    // Merge URLs and active states
+    return array_merge($urls, $active_states);
+}
+
+/**
+ * Check if current page is an admin page
+ *
+ * @return bool True if current page is an admin page
+ */
+function theme_remui_kids_is_admin_page() {
+    global $PAGE, $CFG;
+    
+    // Get current URL path
+    $current_url = $PAGE->url->get_path();
+    $current_pagetype = $PAGE->pagetype;
+    
+    // Admin page patterns
+    $admin_patterns = [
+        '/admin/',
+        '/local/edwiserreports/',
+        '/course/index.php',
+        '/user/index.php',
+        '/admin/user.php',
+        '/admin/search.php',
+        '/admin/settings.php',
+        '/admin/tool/',
+        '/admin/pluginfile.php',
+        '/admin/upgradesettings.php',
+        '/admin/plugins.php',
+        '/admin/roles/',
+        '/admin/capabilities/',
+        '/admin/cohort/',
+        '/admin/competency/',
+        '/admin/analytics/',
+        '/admin/backup/',
+        '/admin/restore/',
+        '/admin/webservice/',
+        '/admin/registration/',
+        '/admin/notification/',
+        '/admin/upgrade.php',
+        '/admin/index.php'
+    ];
+    
+    // Check if current URL matches admin patterns
+    foreach ($admin_patterns as $pattern) {
+        if (strpos($current_url, $pattern) !== false) {
+            return true;
+        }
+    }
+    
+    // Check pagetype for admin pages
+    $admin_pagetypes = [
+        'admin-',
+        'course-index',
+        'user-index',
+        'admin-user',
+        'admin-search',
+        'admin-settings',
+        'admin-tool-',
+        'admin-roles-',
+        'admin-capabilities-',
+        'admin-cohort-',
+        'admin-competency-',
+        'admin-analytics-',
+        'admin-backup-',
+        'admin-restore-',
+        'admin-webservice-',
+        'admin-registration-',
+        'admin-notification-',
+        'admin-upgrade',
+        'admin-plugins'
+    ];
+    
+    foreach ($admin_pagetypes as $pagetype) {
+        if (strpos($current_pagetype, $pagetype) !== false) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Check if current page is the home page
+ *
+ * @return bool True if current page is the home page
+ */
+function theme_remui_kids_is_home_page() {
+    global $PAGE, $CFG;
+    
+    $current_url = $PAGE->url->get_path();
+    $current_pagetype = $PAGE->pagetype;
+    
+    // Home page patterns
+    $home_patterns = [
+        '/my/',
+        '/',
+        '/index.php',
+        '/course/view.php',
+        '/user/profile.php',
+        '/user/view.php'
+    ];
+    
+    // Check if current URL matches home patterns
+    foreach ($home_patterns as $pattern) {
+        // Use exact match for root patterns, substring match for others
+        if ($pattern === '/' || $pattern === '/index.php') {
+            if ($current_url === $pattern || $current_url === $CFG->wwwroot . $pattern) {
+                return true;
+            }
+        } else {
+            if ($current_url === $pattern || $current_url === $CFG->wwwroot . $pattern || strpos($current_url, $pattern) !== false) {
+                return true;
+            }
+        }
+    }
+    
+    // Check pagetype for home page
+    if (strpos($current_pagetype, 'my-index') !== false || 
+        strpos($current_pagetype, 'site-index') !== false) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Get admin sidebar data for template rendering
+ *
+ * @return array Array containing admin sidebar data
+ */
+function theme_remui_kids_get_admin_sidebar_template_data() {
+    global $PAGE, $CFG;
+    
+    try {
+        // Check if we should show admin sidebar
+        $show_admin_sidebar = theme_remui_kids_is_admin_page() && !theme_remui_kids_is_home_page();
+        
+        if (!$show_admin_sidebar) {
+            return ['show_admin_sidebar' => false];
+        }
+        
+        // Get current page identifier for active state
+        $current_url = $PAGE->url->get_path();
+        $current_page = 'dashboard'; // default
+        
+        // Determine current page based on URL
+        if (strpos($current_url, '/admin/search.php') !== false) {
+            $current_page = 'site_admin';
+        } elseif (strpos($current_url, '/local/edwiserreports/') !== false) {
+            $current_page = 'analytics';
+        } elseif (strpos($current_url, '/course/index.php') !== false) {
+            $current_page = 'courses_programs';
+        } elseif (strpos($current_url, '/user/index.php') !== false || strpos($current_url, '/admin/user.php') !== false) {
+            $current_page = 'user_management';
+        } elseif (strpos($current_url, '/admin/settings.php') !== false) {
+            $current_page = 'system_settings';
+        } elseif (strpos($current_url, '/admin/tool/') !== false) {
+            $current_page = 'system_settings';
+        } elseif (strpos($current_url, '/admin/roles/') !== false) {
+            $current_page = 'user_management';
+        } elseif (strpos($current_url, '/admin/cohort/') !== false) {
+            $current_page = 'cohort_navigation';
+        }
+        
+        // Get sidebar data
+        $sidebar_data = theme_remui_kids_get_admin_sidebar_data($current_page);
+        
+        return array_merge([
+            'show_admin_sidebar' => true
+        ], $sidebar_data);
+        
+    } catch (Exception $e) {
+        // Fallback: return minimal data to prevent crashes
+        debugging('Admin sidebar template data error: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        return ['show_admin_sidebar' => false];
+    }
+}
+
+/**
+ * Test function to debug admin sidebar visibility
+ * This can be called from any page to check if admin sidebar should show
+ */
+function theme_remui_kids_debug_admin_sidebar() {
+    global $PAGE, $CFG;
+    
+    $is_admin = theme_remui_kids_is_admin_page();
+    $is_home = theme_remui_kids_is_home_page();
+    $should_show = $is_admin && !$is_home;
+    
+    $debug_info = [
+        'current_url' => $PAGE->url->get_path(),
+        'current_pagetype' => $PAGE->pagetype,
+        'is_admin_page' => $is_admin,
+        'is_home_page' => $is_home,
+        'should_show_sidebar' => $should_show
+    ];
+    
+    return $debug_info;
+}
+
+/**
+ * Add admin sidebar test button to admin pages
+ * This can be used to test if the sidebar is working
+ */
+function theme_remui_kids_add_admin_sidebar_test() {
+    global $PAGE;
+    
+    // Only add test button on admin pages
+    if (theme_remui_kids_is_admin_page() && !theme_remui_kids_is_home_page()) {
+        $debug_info = theme_remui_kids_debug_admin_sidebar();
+        
+        $test_html = '<div style="position: fixed; top: 10px; right: 10px; background: #007bff; color: white; padding: 10px; border-radius: 5px; z-index: 9999; font-size: 12px;">
+            <strong>Admin Sidebar Test</strong><br>
+            URL: ' . htmlspecialchars($debug_info['current_url']) . '<br>
+            Page Type: ' . htmlspecialchars($debug_info['current_pagetype']) . '<br>
+            Is Admin: ' . ($debug_info['is_admin_page'] ? 'Yes' : 'No') . '<br>
+            Is Home: ' . ($debug_info['is_home_page'] ? 'Yes' : 'No') . '<br>
+            Show Sidebar: ' . ($debug_info['should_show_sidebar'] ? 'Yes' : 'No') . '
+        </div>';
+        
+        return $test_html;
+    }
+    
+    return '';
+}
+
+function theme_remui_kids_get_highschool_dashboard_metrics($userid) {
+    global $DB;
+    
+    try {
+        // Get enrolled courses count
+        $enrolled_courses = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id)
+             FROM {course} c
+             JOIN {enrol} e ON c.id = e.courseid
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid
+             WHERE ue.userid = ? 
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        // Get completed assignments count
+        $completed_assignments = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cmc.coursemoduleid)
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE cmc.userid = ? 
+             AND cmc.completionstate IN (1, 2)
+             AND m.name = 'assign'
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        // Get pending assignments count (assignments not completed)
+        $total_assignments = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cm.id)
+             FROM {course_modules} cm
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             JOIN {enrol} e ON c.id = e.courseid
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid
+             WHERE ue.userid = ? 
+             AND m.name = 'assign'
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        $pending_assignments = $total_assignments - $completed_assignments;
+        
+        // Get average grade from all graded activities
+        $average_grade = $DB->get_field_sql(
+            "SELECT AVG(gg.finalgrade / gg.rawgrademax * 100)
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gg.itemid = gi.id
+             JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE gg.userid = ? 
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND c.visible = 1
+             AND c.id > 1",
+            [$userid]
+        ) ?: 0;
+        
+        // Calculate trends (comparing with previous quarter)
+        $current_quarter_start = strtotime('first day of this month');
+        $previous_quarter_start = strtotime('first day of -3 months');
+        
+        // Enrolled courses trend
+        $previous_courses = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id)
+             FROM {course} c
+             JOIN {enrol} e ON c.id = e.courseid
+             JOIN {user_enrolments} ue ON e.id = ue.enrolid
+             WHERE ue.userid = ? 
+             AND c.visible = 1
+             AND c.id > 1
+             AND ue.timecreated < ?",
+            [$userid, $previous_quarter_start]
+        ) ?: 0;
+        
+        $courses_trend = $previous_courses > 0 ? round((($enrolled_courses - $previous_courses) / $previous_courses) * 100) : 0;
+        
+        // Completed assignments trend
+        $previous_completed = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cmc.coursemoduleid)
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE cmc.userid = ? 
+             AND cmc.completionstate IN (1, 2)
+             AND m.name = 'assign'
+             AND c.visible = 1
+             AND c.id > 1
+             AND cmc.timemodified < ?",
+            [$userid, $previous_quarter_start]
+        ) ?: 0;
+        
+        $assignments_trend = $previous_completed > 0 ? round((($completed_assignments - $previous_completed) / $previous_completed) * 100) : 0;
+        
+        // Average grade trend
+        $previous_grade = $DB->get_field_sql(
+            "SELECT AVG(gg.finalgrade / gg.rawgrademax * 100)
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gg.itemid = gi.id
+             JOIN {course_modules} cm ON gi.iteminstance = cm.instance
+             JOIN {modules} m ON cm.module = m.id
+             JOIN {course} c ON cm.course = c.id
+             WHERE gg.userid = ? 
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND c.visible = 1
+             AND c.id > 1
+             AND gg.timemodified < ?",
+            [$userid, $previous_quarter_start]
+        ) ?: 0;
+        
+        $grade_trend = $previous_grade > 0 ? round($average_grade - $previous_grade) : 0;
+        
+        return [
+            'enrolled_courses' => $enrolled_courses,
+            'completed_assignments' => $completed_assignments,
+            'pending_assignments' => $pending_assignments,
+            'average_grade' => round($average_grade),
+            'courses_trend' => $courses_trend,
+            'assignments_trend' => $assignments_trend,
+            'grade_trend' => $grade_trend,
+            'pending_due_soon' => $pending_assignments > 0 // Simple logic for "Due soon"
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'enrolled_courses' => 0,
+            'completed_assignments' => 0,
+            'pending_assignments' => 0,
+            'average_grade' => 0,
+            'courses_trend' => 0,
+            'assignments_trend' => 0,
+            'grade_trend' => 0,
+            'pending_due_soon' => false
+        ];
     }
 }
