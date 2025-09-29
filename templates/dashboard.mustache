@@ -10,6 +10,9 @@
 
 {{> theme_remui_kids/common_start}}
 
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
 {{#custom_dashboard}}
 
 <div class="custom_dashboard">
@@ -449,7 +452,7 @@
                     {{#has_middle_courses}}
                     <div class="middle-courses-section">
                         <div class="section-header">
-                            <h3 class="section-title">Current Courses</h3>
+                            <h3 class="section-title">My Courses</h3>
                             <a href="{{{mycoursesurl}}}" class="view-all-link">View All ></a>
                         </div>
                         <div class="courses-static-grid">
@@ -938,7 +941,7 @@
                         {{#has_highschool_courses}}
                         <div class="middle-courses-section">
                             <div class="section-header">
-                                <h3 class="section-title">Current Courses</h3>
+                                <h3 class="section-title">My Courses</h3>
                                 <a href="{{{mycoursesurl}}}" class="view-all-link">View All ></a>
                             </div>
                             <div class="courses-static-grid">
@@ -996,13 +999,13 @@
                     <div class="col-lg-3">
                         <div class="middle-sidebar">
                             <!-- My Schedule -->
-                            <div class="sidebar-section">
-                                <h4 class="sidebar-title">
+                        <div class="sidebar-section">
+                            <h4 class="sidebar-title">
                                     <i class="fa fa-calendar"></i> My Schedule
                                     <a href="{{{calendarurl}}}" class="view-full-link">View Full Calendar ></a>
-                                </h4>
-                                <p class="schedule-subtitle">Next 7 Days</p>
-                                <div class="calendar-week">
+                            </h4>
+                            <p class="schedule-subtitle">Next 7 Days</p>
+                            <div class="calendar-week">
                                     {{#calendar_week}}
                                     <div class="calendar-day {{#has_events}}has-events{{/has_events}}" data-date="{{date}}">
                                         <div class="day-name">{{day_name}}</div>
@@ -1010,9 +1013,9 @@
                                         {{#has_events}}
                                         <div class="event-indicator">
                                             <div class="event-dot"></div>
-                                        </div>
+                                </div>
                                         {{/has_events}}
-                                    </div>
+                                </div>
                                     {{/calendar_week}}
                                 </div>
                                 
@@ -1023,25 +1026,25 @@
                                         <div class="event-date">
                                             <span class="event-day">{{event_day}}</span>
                                             <span class="event-month">{{event_month}}</span>
-                                        </div>
+                                </div>
                                         <div class="event-details">
                                             <div class="event-title">{{event_title}}</div>
                                             <div class="event-time">{{event_time}}</div>
                                             <div class="event-course">{{course_name}}</div>
-                                        </div>
+                                </div>
                                         <div class="event-type {{event_type}}">
                                             <i class="fa {{event_icon}}"></i>
-                                        </div>
+                                </div>
                                     </a>
                                     {{/upcoming_events}}
                                     {{^upcoming_events}}
                                     <div class="no-events">
                                         <i class="fa fa-calendar-o"></i>
                                         <p>No upcoming events in the next 7 days</p>
-                                    </div>
-                                    {{/upcoming_events}}
-                                </div>
                             </div>
+                                    {{/upcoming_events}}
+                        </div>
+                    </div>
                             
                             <!-- Learning Progress -->
                             <div class="sidebar-section">
@@ -1050,42 +1053,38 @@
                                     <div class="quick-stat-item">
                                         <div class="stat-icon">
                                             <i class="fa fa-book"></i>
-                                        </div>
+                </div>
                                         <div class="stat-details">
                                             <span class="stat-label">Active Courses</span>
                                             <span class="stat-value">{{#highschool_stats}}{{courses}}{{/highschool_stats}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="quick-stat-item">
-                                        <div class="stat-icon">
+            </div>
+                                          <div class="stat-icon">
                                             <i class="fa fa-tasks"></i>
-                                        </div>
+        </div>
                                         <div class="stat-details">
-                                            <span class="stat-label">Completed Activities</span>
+                                            <span class="stat-label">Activities</span>
                                             <span class="stat-value">{{#highschool_stats}}{{activities}}{{/highschool_stats}}</span>
                                         </div>
-                                    </div>
-                                    <div class="quick-stat-item">
-                                        <div class="stat-icon">
-                                            <i class="fa fa-calendar-check-o"></i>
-                                        </div>
-                                        <div class="stat-details">
-                                            <span class="stat-label">Assignments Due</span>
-                                            <span class="stat-value">{{#highschool_metrics}}{{pending_assignments}}{{/highschool_metrics}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="quick-stat-item">
-                                        <div class="stat-icon">
-                                            <i class="fa fa-percent"></i>
-                                        </div>
-                                        <div class="stat-details">
-                                            <span class="stat-label">Overall Progress</span>
-                                            <span class="stat-value">{{#highschool_stats}}{{progress}}%{{/highschool_stats}}</span>
-                                        </div>
-                                    </div>
+                                </div>
+                                    
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            
+                <!-- Weekly Activity Chart -->
+                <div class="weekly-activity-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fa fa-bar-chart"></i> This Week's Learning Activity
+                        </h3>
+                        <div class="chart-info">
+                            <span class="info-text">Activities completed each day</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weeklyActivityChart" width="800" height="300"></canvas>
                     </div>
                 </div>
             
@@ -1122,148 +1121,51 @@
                     </div>
                 </div>
             
-                <!-- Course Management -->
-                <div class="course-management">
-                    <div class="section-header">
-                        <h2><i class="fa fa-graduation-cap"></i> My Courses</h2>
-                        <div class="course-filters">
-                            <select class="filter-select">
-                                <option>All Courses</option>
-                                <option>In Progress</option>
-                                <option>Completed</option>
-                                <option>Upcoming</option>
-                            </select>
+               
+                <!-- Active Sections and Additional Content Row -->
+            <div class="row">
+                    <!-- Left Half - Active Sections -->
+                    <div class="col-lg-6">
+                        <div class="active-sections">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-list-alt"></i> Active Sections
+                                </h3>
+                                <div class="section-info">
+                                    <span class="info-text">Current course sections in progress</span>
+                                </div>
+                            </div>
+                            <div class="sections-list">
+                                {{#highschool_active_sections}}
+                                <a href="{{url}}" class="section-item section-link">
+                                    <div class="section-info">
+                                        <h4 class="section-name">{{name}}</h4>
+                                        <div class="course-name">{{coursename}}</div>
+                                    </div>
+                                    <div class="section-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%; background: linear-gradient(90deg, #4ECDC4, #96CEB4);"></div>
+                                        </div>
+                                        <div class="progress-text">{{progress_percentage}}%</div>
+                                    </div>
+                                </a>
+                                {{/highschool_active_sections}}
+                                {{^highschool_active_sections}}
+                                <div class="no-sections">
+                                    <i class="fa fa-info-circle"></i>
+                                    <p>No active sections found. Start a course to see your progress here.</p>
+                                </div>
+                                {{/highschool_active_sections}}
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="courses-grid">
-                        {{#highschool_courses}}
-                        <div class="course-card">
-                            <div class="course-header">
-                                <div class="course-badge">Active</div>
-                                <div class="course-progress-circle">
-                                    <svg class="progress-ring" width="60" height="60">
-                                        <circle class="progress-ring-circle" stroke="#E2E8F0" stroke-width="4" fill="transparent" r="26" cx="30" cy="30"/>
-                                        <circle class="progress-ring-circle progress-ring-fill" stroke="#FF6B6B" stroke-width="4" fill="transparent" r="26" cx="30" cy="30" style="stroke-dasharray: {{progress}} 100;"/>
-                                    </svg>
-                                    <span class="progress-text">{{progress}}%</span>
-                                </div>
-                            </div>
-                            
-                            <div class="course-content">
-                                <h3 class="course-title">{{fullname}}</h3>
-                                <p class="course-code">{{shortname}}</p>
-                                <p class="course-description">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
-                                
-                                <div class="course-metrics">
-                                    <div class="metric">
-                                        <i class="fa fa-clock-o"></i>
-                                        <span>24h remaining</span>
-                                    </div>
-                                    <div class="metric">
-                                        <i class="fa fa-tasks"></i>
-                                        <span>3 assignments</span>
-                                    </div>
-                                    <div class="metric">
-                                        <i class="fa fa-calendar"></i>
-                                        <span>Due: Dec 15</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="course-actions">
-                                <button class="action-btn preview-btn" data-course="{{fullname}}" data-courseid="{{id}}">
-                                    <i class="fa fa-eye"></i> Preview
-                                </button>
-                                <a href="{{courseurl}}" class="action-btn primary">
-                                    <i class="fa fa-play"></i> Continue
-                                </a>
-                            </div>
-                        </div>
-                        {{/highschool_courses}}
+                    <!-- Right Half - Placeholder for future content -->
+                    <div class="col-lg-6">
+                        <!-- Future content can go here -->
                     </div>
                 </div>
-            
-            <!-- Active Sections Section -->
-                <!-- Learning Insights -->
-                <div class="learning-insights">
-                    <div class="insights-grid">
-                        <div class="insight-card achievements">
-                            <div class="insight-header">
-                                <h3><i class="fa fa-trophy"></i> Recent Achievements</h3>
-                            </div>
-                            <div class="insight-content">
-                                <div class="achievement-item earned">
-                                    <div class="achievement-icon">
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                    <div class="achievement-details">
-                                        <h4>Perfect Week</h4>
-                                        <p>Completed all assignments on time</p>
-                                        <span class="achievement-date">2 days ago</span>
-                                    </div>
-                                </div>
-                                <div class="achievement-item earned">
-                                    <div class="achievement-icon">
-                                        <i class="fa fa-fire"></i>
-                                    </div>
-                                    <div class="achievement-details">
-                                        <h4>Study Streak</h4>
-                                        <p>12 days of consistent study</p>
-                                        <span class="achievement-date">1 week ago</span>
-                                    </div>
-                                </div>
-                                <div class="achievement-item locked">
-                                    <div class="achievement-icon">
-                                        <i class="fa fa-graduation-cap"></i>
-                                    </div>
-                                    <div class="achievement-details">
-                                        <h4>Honor Roll</h4>
-                                        <p>Maintain 3.5+ GPA for semester</p>
-                                        <span class="achievement-progress">75% complete</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="insight-card deadlines">
-                            <div class="insight-header">
-                                <h3><i class="fa fa-calendar-check-o"></i> Upcoming Deadlines</h3>
-                                </div>
-                            <div class="insight-content">
-                                <div class="deadline-item urgent">
-                                    <div class="deadline-icon">
-                                        <i class="fa fa-exclamation-triangle"></i>
-                                </div>
-                                    <div class="deadline-details">
-                                        <h4>Calculus Final Exam</h4>
-                                        <p>Advanced Mathematics</p>
-                                        <span class="deadline-time">Due in 2 days</span>
-                                </div>
-                                    <button class="deadline-action">Study</button>
-                                </div>
-                                <div class="deadline-item">
-                                    <div class="deadline-icon">
-                                        <i class="fa fa-file-text-o"></i>
-                                </div>
-                                    <div class="deadline-details">
-                                        <h4>Research Paper</h4>
-                                        <p>English Literature</p>
-                                        <span class="deadline-time">Due in 5 days</span>
-                                </div>
-                                    <button class="deadline-action">Continue</button>
-                            </div>
-                                <div class="deadline-item">
-                                    <div class="deadline-icon">
-                                        <i class="fa fa-flask"></i>
-                        </div>
-                                    <div class="deadline-details">
-                                        <h4>Lab Report</h4>
-                                        <p>Chemistry</p>
-                                        <span class="deadline-time">Due in 7 days</span>
-                    </div>
-                                    <button class="deadline-action">Start</button>
-                </div>
+              
             </div>
         </div>
             
@@ -1562,9 +1464,32 @@
         // Initialize all components
         initializeProgressRings();
         initializeInteractiveElements();
-        initializeCharts();
         initializeAnalytics();
         initializeAnimations();
+        
+        // Initialize charts only for high school dashboard
+        const highschoolDashboard = document.querySelector('.highschool-dashboard');
+        console.log('High school dashboard found:', highschoolDashboard);
+        if (highschoolDashboard) {
+            console.log('Initializing charts for high school dashboard...');
+            // Wait for Chart.js to load
+            if (typeof Chart !== 'undefined') {
+                initializeCharts();
+            } else {
+                console.log('Chart.js not loaded yet, waiting...');
+                // Try again after a short delay
+                setTimeout(() => {
+                    if (typeof Chart !== 'undefined') {
+                        console.log('Chart.js loaded after delay, initializing charts...');
+                        initializeCharts();
+                    } else {
+                        console.error('Chart.js still not loaded after delay');
+                    }
+                }, 1000);
+            }
+        } else {
+            console.log('No high school dashboard found, skipping chart initialization');
+        }
     });
     
     function initializeProgressRings() {
@@ -1641,114 +1566,366 @@
     }
     
     function initializeCharts() {
+        console.log('initializeCharts called');
+        console.log('Chart.js available:', typeof Chart !== 'undefined');
+        
+        // Weekly Activity Chart
+        const weeklyActivityCtx = document.getElementById('weeklyActivityChart');
+        console.log('Weekly activity canvas found:', weeklyActivityCtx);
+        if (weeklyActivityCtx) {
+            createWeeklyActivityChart(weeklyActivityCtx);
+        } else {
+            console.error('Weekly activity canvas not found!');
+        }
+        
         // Progress Chart
         const progressCtx = document.getElementById('progressChart');
+        console.log('Progress canvas found:', progressCtx);
         if (progressCtx) {
             createProgressChart(progressCtx);
+        } else {
+            console.error('Progress canvas not found!');
         }
         
         // Subject Chart
         const subjectCtx = document.getElementById('subjectChart');
+        console.log('Subject canvas found:', subjectCtx);
         if (subjectCtx) {
             createSubjectChart(subjectCtx);
+        } else {
+            console.error('Subject canvas not found!');
+        }
+    }
+    
+    function createWeeklyActivityChart(canvas) {
+        console.log('Creating weekly activity chart...');
+        console.log('Canvas element:', canvas);
+        
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
+        
+        // Dummy data for weekly activity completion
+        const weeklyData = {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Activities Completed',
+                data: [3, 5, 2, 7, 4, 1, 0],
+                backgroundColor: [
+                    'rgba(255, 107, 107, 0.8)',   // Coral
+                    'rgba(78, 205, 196, 0.8)',    // Teal
+                    'rgba(52, 152, 219, 0.8)',    // Blue
+                    'rgba(46, 204, 113, 0.8)',    // Green
+                    'rgba(155, 89, 182, 0.8)',    // Purple
+                    'rgba(241, 196, 15, 0.8)',    // Yellow
+                    'rgba(149, 165, 166, 0.8)'    // Gray
+                ],
+                borderColor: [
+                    'rgba(255, 107, 107, 1)',
+                    'rgba(78, 205, 196, 1)',
+                    'rgba(52, 152, 219, 1)',
+                    'rgba(46, 204, 113, 1)',
+                    'rgba(155, 89, 182, 1)',
+                    'rgba(241, 196, 15, 1)',
+                    'rgba(149, 165, 166, 1)'
+                ],
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: weeklyData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label + 'day';
+                            },
+                            label: function(context) {
+                                return context.parsed.y + ' activities completed';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: {
+                            stepSize: 1,
+                            color: '#6B7280',
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(107, 114, 128, 0.1)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#6B7280',
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        },
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart',
+                    delay: function(context) {
+                        return context.dataIndex * 200;
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        };
+
+        try {
+            const chart = new Chart(canvas, config);
+            console.log('Weekly activity chart created successfully:', chart);
+        } catch (error) {
+            console.error('Error creating weekly activity chart:', error);
         }
     }
     
     function createProgressChart(canvas) {
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+        console.log('Creating progress line chart...');
+        console.log('Canvas element:', canvas);
         
-        // Clear canvas
-        ctx.clearRect(0, 0, width, height);
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
         
-        // Set background
-        ctx.fillStyle = '#F8FAFC';
-        ctx.fillRect(0, 0, width, height);
-        
-        // Draw animated progress line
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const radius = 60;
-        
-        // Draw progress line
-        ctx.strokeStyle = '#FF6B6B';
-        ctx.lineWidth = 4;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        
-        // Animate the line drawing
-        const progress = 75; // 75% progress
-        const endAngle = (progress / 100) * 2 * Math.PI - Math.PI / 2;
-        
-        ctx.arc(centerX, centerY, radius, -Math.PI / 2, endAngle);
-        ctx.stroke();
-        
-        // Draw goal line
-        ctx.strokeStyle = '#4ECDC4';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, -Math.PI / 2, 2 * Math.PI - Math.PI / 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        
-        // Add text
-        ctx.fillStyle = '#2D3748';
-        ctx.font = 'bold 16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Learning Progress', centerX, centerY - 20);
-        
-        ctx.fillStyle = '#718096';
-        ctx.font = '14px Arial';
-        ctx.fillText('75% Complete', centerX, centerY + 10);
+        // Dummy data for learning progress over time (last 12 weeks)
+        const progressData = {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
+            datasets: [{
+                label: 'Learning Progress',
+                data: [15, 22, 28, 35, 42, 48, 55, 61, 67, 72, 75, 78],
+                borderColor: 'rgba(255, 107, 107, 1)',
+                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(255, 107, 107, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }, {
+                label: 'Target Goals',
+                data: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75],
+                borderColor: 'rgba(78, 205, 196, 1)',
+                backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(78, 205, 196, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: progressData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // We have custom legend in HTML
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 10,
+                            color: '#6B7280',
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(107, 114, 128, 0.1)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#6B7280',
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            maxTicksLimit: 8
+                        },
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        };
+
+        try {
+            const chart = new Chart(canvas, config);
+            console.log('Progress line chart created successfully:', chart);
+        } catch (error) {
+            console.error('Error creating progress line chart:', error);
+        }
     }
     
     function createSubjectChart(canvas) {
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+        console.log('Creating subject chart...');
+        console.log('Canvas element:', canvas);
         
-        // Clear canvas
-        ctx.clearRect(0, 0, width, height);
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
         
-        // Set background
-        ctx.fillStyle = '#F8FAFC';
-        ctx.fillRect(0, 0, width, height);
-        
-        // Draw pie chart
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const radius = 80;
-        
-        const data = [
-            { label: 'Math', value: 35, color: '#FF6B6B' },
-            { label: 'Science', value: 25, color: '#4ECDC4' },
-            { label: 'English', value: 20, color: '#45B7D1' },
-            { label: 'History', value: 20, color: '#96CEB4' }
-        ];
-        
-        let currentAngle = -Math.PI / 2;
-        
-        data.forEach(item => {
-            const sliceAngle = (item.value / 100) * 2 * Math.PI;
-            
-            ctx.fillStyle = item.color;
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
-            ctx.closePath();
-            ctx.fill();
-            
-            currentAngle += sliceAngle;
-        });
-        
-        // Add center text
-        ctx.fillStyle = '#2D3748';
-        ctx.font = 'bold 14px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Subject', centerX, centerY - 5);
-        ctx.fillText('Performance', centerX, centerY + 15);
+        const subjectData = {
+            labels: ['Math', 'Science', 'English', 'History'],
+            datasets: [{
+                data: [35, 25, 20, 20],
+                backgroundColor: [
+                    'rgba(255, 107, 107, 0.8)',   // Coral
+                    'rgba(78, 205, 196, 0.8)',    // Teal
+                    'rgba(69, 183, 209, 0.8)',    // Blue
+                    'rgba(150, 206, 180, 0.8)'    // Green
+                ],
+                borderColor: [
+                    'rgba(255, 107, 107, 1)',
+                    'rgba(78, 205, 196, 1)',
+                    'rgba(69, 183, 209, 1)',
+                    'rgba(150, 206, 180, 1)'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        const config = {
+            type: 'doughnut',
+            data: subjectData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            },
+                            color: '#6B7280'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                },
+                cutout: '60%',
+                animation: {
+                    animateRotate: true,
+                    duration: 2000
+                }
+            }
+        };
+
+        try {
+            const chart = new Chart(canvas, config);
+            console.log('Subject chart created successfully:', chart);
+        } catch (error) {
+            console.error('Error creating subject chart:', error);
+        }
     }
     
     function initializeAnalytics() {
