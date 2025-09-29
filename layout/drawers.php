@@ -261,6 +261,11 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     return; // Exit early to prevent normal rendering
 }
 
+// Check if this is the My Courses page and add custom message
+if ($PAGE->pagelayout == 'mycourses') {
+    $templatecontext['custom_mycourses_message'] = "THIS IS CUSTOM MY COURSES PAGE";
+}
+
 // For non-dashboard pages, use the original logic
 $coursecontext = context_course::instance($COURSE->id);
 if (!is_guest($coursecontext, $USER) &&
@@ -276,4 +281,10 @@ if (!is_guest($coursecontext, $USER) &&
 // Must be called before rendering the template.
 // This will ease us to add body classes directly to the array.
 require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
-echo $OUTPUT->render_from_template('theme_remui/drawers', $templatecontext);
+
+// Use custom template for mycourses page, otherwise use parent template
+if ($PAGE->pagelayout == 'mycourses') {
+    echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+} else {
+    echo $OUTPUT->render_from_template('theme_remui/drawers', $templatecontext);
+}

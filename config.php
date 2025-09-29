@@ -89,7 +89,7 @@ $THEME->layouts = array(
     ),
     // My courses page.
     'mycourses' => array(
-        'file' => 'drawers.php',
+        'file' => 'mycourses.php',
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
     ),
