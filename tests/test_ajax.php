@@ -89,6 +89,17 @@ try {
     
     // Get categories count
     $categories = $DB->count_records('course_categories', ['visible' => 1]);
+    
+    // Get department managers count
+    $department_managers = 0;
+    if ($DB->get_manager()->table_exists('company_users')) {
+        $department_managers = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT cu.userid) 
+             FROM {company_users} cu
+             JOIN {user} u ON cu.userid = u.id
+             WHERE cu.managertype = 2 AND u.deleted = 0 AND cu.suspended = 0"
+        );
+    }
 
     echo json_encode([
         'status' => 'success',
@@ -103,6 +114,7 @@ try {
         'completion_rate' => $completion_rate,
         'avg_rating' => $avg_rating,
         'categories' => $categories,
+        'department_managers' => $department_managers,
         'timestamp' => date('Y-m-d H:i:s')
     ]);
     

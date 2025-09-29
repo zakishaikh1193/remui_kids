@@ -35,20 +35,12 @@ if (isset($_GET['action'])) {
                 // Get pending approvals (mock data for now)
                 $pending_approvals = 0;
                 
-                // Get department managers
-                $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
+                // Get department managers from company_users table
                 $department_managers = 0;
-                if ($managerrole) {
-                    $department_managers = $DB->count_records_sql(
-                        "SELECT COUNT(DISTINCT u.id) 
-                         FROM {user} u 
-                         JOIN {role_assignments} ra ON u.id = ra.userid 
-                         JOIN {context} ctx ON ra.contextid = ctx.id 
-                         WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
-                        [CONTEXT_SYSTEM, $managerrole->id]
-                    );
-                }
-                
+                $count_sql = "SELECT COUNT(DISTINCT u.id) FROM {company_users} cu
+                JOIN {user} u ON cu.userid = u.id
+                WHERE cu.managertype IN (1, 2) AND u.deleted = 0 AND cu.suspended = 0"; 
+                $department_managers = $DB->count_records_sql($count_sql);
                 // Get recent uploads (users created this month)
                 $recent_uploads = $DB->count_records_sql(
                     "SELECT COUNT(*) FROM {user} WHERE timecreated > ? AND deleted = 0",
@@ -126,6 +118,14 @@ $active_users = $DB->count_records_sql(
 );
 $pending_approvals = 0;
 $department_managers = 0;
+if ($DB->get_manager()->table_exists('company_users')) {
+    $department_managers = $DB->count_records_sql(
+        "SELECT COUNT(DISTINCT cu.userid) 
+         FROM {company_users} cu
+         JOIN {user} u ON cu.userid = u.id
+         WHERE cu.managertype = 2 AND u.deleted = 0 AND cu.suspended = 0"
+    );
+}
 $recent_uploads = $DB->count_records_sql(
     "SELECT COUNT(*) FROM {user} WHERE timecreated > ? AND deleted = 0",
     [strtotime('first day of this month')]

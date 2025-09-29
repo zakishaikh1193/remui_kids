@@ -25,16 +25,15 @@ if (isset($_GET['action'])) {
             $offset = ($page - 1) * $per_page;
             
             try {
-                // Get recent user uploads from user table (users created this month)
+                // Get recent user uploads from user table (users created in last 30 days)
                 $sql = "SELECT u.id, u.username, u.firstname, u.lastname, u.email, u.timecreated,
                                u.timecreated as upload_date, u.auth, u.confirmed,
                                'CSV Upload' as upload_method, 'Completed' as status,
-                               '1' as users_count, 'N/A' as file_size,
-                               u.firstname || ' ' || u.lastname as uploaded_by
+                               '1' as users_count, 'N/A' as file_size
                         FROM {user} u
                         WHERE u.deleted = 0 AND u.timecreated > ?";
                 
-                $params = [strtotime('first day of this month')];
+                $params = [strtotime('-30 days')];
                 
                 if (!empty($search)) {
                     $sql .= " AND (u.firstname LIKE ? OR u.lastname LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
@@ -48,12 +47,16 @@ if (isset($_GET['action'])) {
                 
                 // Get total count
                 $count_sql = "SELECT COUNT(*) FROM {user} u WHERE u.deleted = 0 AND u.timecreated > ?";
-                $count_params = [strtotime('first day of this month')];
+                $count_params = [strtotime('-30 days')];
                 if (!empty($search)) {
                     $count_sql .= " AND (u.firstname LIKE ? OR u.lastname LIKE ? OR u.username LIKE ? OR u.email LIKE ?)";
                     $count_params = array_merge($count_params, [$search_param, $search_param, $search_param, $search_param]);
                 }
                 $total_count = $DB->count_records_sql($count_sql, $count_params);
+                
+                // Debug: Log the results
+                error_log("Uploads query result: " . count($uploads) . " records found");
+                error_log("Total count: " . $total_count);
                 
                 echo json_encode([
                     'status' => 'success',
@@ -64,6 +67,7 @@ if (isset($_GET['action'])) {
                     'total_pages' => ceil($total_count / $per_page)
                 ]);
             } catch (Exception $e) {
+                error_log("Uploads query error: " . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
             }
             exit;

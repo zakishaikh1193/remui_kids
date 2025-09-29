@@ -1,4 +1,16 @@
 <div class="detail-page">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Loading Recent Uploads...</p>
+        </div>
+    </div>
+
     <!-- Header Section -->
     <div class="detail-header">
         <div class="header-content">
@@ -10,7 +22,7 @@
             </div>
             <div class="header-info">
                 <h1 class="detail-title">
-                    <i class="fa fa-folder"></i>
+                    <i class="fa fa-cloud-upload-alt"></i>
                     Recent Uploads Details
                 </h1>
                 <p class="detail-subtitle">Users uploaded this month via CSV files</p>
@@ -26,8 +38,14 @@
                     <i class="fa fa-calendar"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="uploads-this-month">-</div>
+                    <div class="stat-number" id="uploads-this-month">
+                        <div class="number-loader"></div>
+                    </div>
                     <div class="stat-label">This Month</div>
+                    <div class="stat-trend" id="month-trend">
+                        <i class="fa fa-arrow-up"></i>
+                        <span>+12%</span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
@@ -35,8 +53,14 @@
                     <i class="fa fa-calendar-week"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="uploads-this-week">-</div>
+                    <div class="stat-number" id="uploads-this-week">
+                        <div class="number-loader"></div>
+                    </div>
                     <div class="stat-label">This Week</div>
+                    <div class="stat-trend" id="week-trend">
+                        <i class="fa fa-arrow-up"></i>
+                        <span>+8%</span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
@@ -44,8 +68,14 @@
                     <i class="fa fa-calendar-day"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="uploads-today">-</div>
+                    <div class="stat-number" id="uploads-today">
+                        <div class="number-loader"></div>
+                    </div>
                     <div class="stat-label">Today</div>
+                    <div class="stat-trend" id="today-trend">
+                        <i class="fa fa-minus"></i>
+                        <span>0%</span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
@@ -53,8 +83,14 @@
                     <i class="fa fa-users"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-users">-</div>
+                    <div class="stat-number" id="total-users">
+                        <div class="number-loader"></div>
+                    </div>
                     <div class="stat-label">Total Users</div>
+                    <div class="stat-trend" id="users-trend">
+                        <i class="fa fa-arrow-up"></i>
+                        <span>+5%</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,28 +100,40 @@
     <div class="filters-section">
         <div class="filters-container">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search recent uploads..." class="search-input">
-                <button id="searchBtn" class="search-btn">
-                    <i class="fa fa-search"></i>
-                </button>
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchInput" placeholder="Search recent uploads..." class="search-input">
+                    <button id="searchBtn" class="search-btn">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions"></div>
             </div>
             <div class="filter-controls">
-                <select id="sortSelect" class="filter-select">
-                    <option value="timecreated">Sort by Upload Date</option>
-                    <option value="firstname">Sort by First Name</option>
-                    <option value="lastname">Sort by Last Name</option>
-                    <option value="username">Sort by Username</option>
-                    <option value="email">Sort by Email</option>
-                </select>
-                <select id="orderSelect" class="filter-select">
-                    <option value="DESC">Most Recent First</option>
-                    <option value="ASC">Oldest First</option>
-                </select>
-                <select id="perPageSelect" class="filter-select">
-                    <option value="20">20 per page</option>
-                    <option value="50">50 per page</option>
-                    <option value="100">100 per page</option>
-                </select>
+                <div class="filter-group">
+                    <label class="filter-label">Sort By</label>
+                    <select id="sortSelect" class="filter-select">
+                        <option value="timecreated">Upload Date</option>
+                        <option value="firstname">First Name</option>
+                        <option value="lastname">Last Name</option>
+                        <option value="username">Username</option>
+                        <option value="email">Email</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Order</label>
+                    <select id="orderSelect" class="filter-select">
+                        <option value="DESC">Most Recent First</option>
+                        <option value="ASC">Oldest First</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Per Page</label>
+                    <select id="perPageSelect" class="filter-select">
+                        <option value="20">20 per page</option>
+                        <option value="50">50 per page</option>
+                        <option value="100">100 per page</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -93,15 +141,24 @@
     <!-- Uploads Table -->
     <div class="table-container">
         <div class="table-header">
-            <h3>Recent Upload History</h3>
+            <div class="table-title-section">
+                <h3>Recent Upload History</h3>
+                <div class="table-stats" id="tableStats">
+                    <span class="table-count">Loading...</span>
+                </div>
+            </div>
             <div class="table-actions">
                 <button id="refreshBtn" class="btn-refresh">
                     <i class="fa fa-refresh"></i>
-                    Refresh
+                    <span>Refresh</span>
                 </button>
                 <button id="uploadNewBtn" class="btn-upload">
-                    <i class="fa fa-upload"></i>
-                    Upload New
+                    <i class="fa fa-cloud-upload-alt"></i>
+                    <span>Upload New</span>
+                </button>
+                <button id="exportBtn" class="btn-export">
+                    <i class="fa fa-download"></i>
+                    <span>Export</span>
                 </button>
             </div>
         </div>
@@ -110,12 +167,27 @@
             <table class="uploads-table">
                 <thead>
                     <tr>
-                        <th>User Name</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Upload Date</th>
+                        <th class="sortable" data-sort="firstname">
+                            <span>User Name</span>
+                            <i class="fa fa-sort"></i>
+                        </th>
+                        <th class="sortable" data-sort="username">
+                            <span>Username</span>
+                            <i class="fa fa-sort"></i>
+                        </th>
+                        <th class="sortable" data-sort="email">
+                            <span>Email</span>
+                            <i class="fa fa-sort"></i>
+                        </th>
+                        <th class="sortable" data-sort="timecreated">
+                            <span>Upload Date</span>
+                            <i class="fa fa-sort"></i>
+                        </th>
                         <th>Method</th>
-                        <th>Status</th>
+                        <th class="sortable" data-sort="status">
+                            <span>Status</span>
+                            <i class="fa fa-sort"></i>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -123,90 +195,448 @@
                     <tr>
                         <td colspan="7" class="loading-cell">
                             <div class="loading-spinner">
-                                <i class="fa fa-spinner fa-spin"></i>
-                                Loading uploads...
+                                <div class="spinner-dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                                <p>Loading uploads...</p>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        <div class="pagination-container" id="paginationContainer" style="display: none;">
+            <div class="pagination-info" id="paginationInfo"></div>
+            <div class="pagination-controls">
+                <button id="prevPage" class="btn-pagination" disabled>
+                    <i class="fa fa-chevron-left"></i>
+                    Previous
+                </button>
+                <div class="page-numbers" id="pageNumbers"></div>
+                <button id="nextPage" class="btn-pagination">
+                    Next
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+/* Removed AOS import to prevent conflicts */
+
+/* Base Styles */
 .detail-page {
     padding: 20px;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
 }
 
+.detail-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="90" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(10px);
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-spinner-large {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.spinner-ring {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 5px;
+}
+
+.spinner-ring:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.spinner-ring:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Header Styles */
 .detail-header {
     background: linear-gradient(135deg, #fd7e14 0%, #e67e22 100%);
     color: white;
-    padding: 30px;
-    border-radius: 15px;
+    padding: 40px;
+    border-radius: 20px;
     margin-bottom: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.detail-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
 }
 
 .header-content {
     display: flex;
     align-items: center;
     gap: 30px;
+    position: relative;
+    z-index: 2;
 }
 
 .back-button .btn-back {
     background: rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 15px 25px;
+    border-radius: 12px;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .back-button .btn-back:hover {
     background: rgba(255, 255, 255, 0.3);
-    transform: translateX(-5px);
+    transform: translateX(-8px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .detail-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 3rem;
+    font-weight: 800;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.detail-title i {
+    font-size: 2.5rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
 }
 
 .detail-subtitle {
-    font-size: 1.1rem;
-    margin: 10px 0 0 0;
+    font-size: 1.2rem;
+    margin: 15px 0 0 0;
     opacity: 0.9;
+    font-weight: 300;
 }
 
+/* Statistics Overview */
+.stats-overview {
+    margin-bottom: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.number-loader {
+    width: 40px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.stat-trend i {
+    font-size: 0.8rem;
+}
+
+.stat-trend .fa-arrow-up {
+    color: #28a745;
+}
+
+.stat-trend .fa-arrow-down {
+    color: #dc3545;
+}
+
+.stat-trend .fa-minus {
+    color: #6c757d;
+}
+
+/* Filters Section */
+.filters-section {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 15px 50px 15px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+}
+
+.filter-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.filter-select {
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Table Styles */
 .table-container {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
 .table-header {
-    padding: 25px;
+    padding: 30px;
     border-bottom: 1px solid #e9ecef;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
-.table-header h3 {
-    margin: 0;
+.table-title-section h3 {
+    margin: 0 0 5px 0;
     color: #2c3e50;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.table-stats {
+    color: #6c757d;
+    font-size: 0.9rem;
 }
 
 .table-actions {
@@ -214,34 +644,47 @@
     gap: 15px;
 }
 
-.btn-refresh, .btn-upload {
-    padding: 10px 20px;
+.btn-refresh, .btn-upload, .btn-export {
+    padding: 12px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
 }
 
 .btn-refresh {
-    background: #17a2b8;
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
     color: white;
 }
 
 .btn-refresh:hover {
-    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
 }
 
 .btn-upload {
-    background: #28a745;
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
     color: white;
 }
 
 .btn-upload:hover {
-    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.btn-export {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
 }
 
 .table-wrapper {
@@ -254,90 +697,153 @@
 }
 
 .uploads-table th {
-    background: #f8f9fa;
-    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px 15px;
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
     color: #495057;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.uploads-table td {
-    padding: 15px;
-    border-bottom: 1px solid #e9ecef;
-    vertical-align: middle;
+.uploads-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
 }
 
-.uploads-table tr:hover {
-    background: #f8f9fa;
+.uploads-table th.sortable:hover {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
 }
 
-.loading-cell {
-    text-align: center;
-    padding: 40px;
-}
-
-.loading-spinner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: #6c757d;
-    font-size: 1.1rem;
-}
-
-.upload-filename {
-    font-weight: 600;
-    color: #2c3e50;
+.uploads-table th.sortable span {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
+.uploads-table th.sortable i {
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.uploads-table th.sortable:hover i {
+    opacity: 1;
+}
+
+.uploads-table td {
+    padding: 20px 15px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+}
+
+.uploads-table tr {
+    transition: all 0.3s ease;
+}
+
+.uploads-table tr:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    transform: scale(1.01);
+}
+
+.loading-cell {
+    text-align: center;
+    padding: 60px;
+}
+
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    color: #6c757d;
+}
+
+.spinner-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    background: #667eea;
+    border-radius: 50%;
+    animation: dotPulse 1.4s ease-in-out infinite both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+.dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes dotPulse {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+.upload-filename {
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .upload-filename i {
     color: #fd7e14;
+    font-size: 1.1rem;
 }
 
 .upload-user {
     color: #6c757d;
+    font-weight: 500;
+}
+
+.upload-email {
+    color: #495057;
+    font-weight: 500;
 }
 
 .upload-date {
     color: #495057;
-    font-weight: 500;
+    font-weight: 600;
 }
 
-.upload-count {
-    color: #495057;
-    font-weight: 500;
-}
-
-.upload-size {
+.upload-method {
     color: #6c757d;
-    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 8px 16px;
+    border-radius: 25px;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
 }
 
 .status-completed {
-    background: #d4edda;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
     color: #155724;
+    box-shadow: 0 2px 8px rgba(21, 87, 36, 0.2);
 }
 
 .status-processing {
-    background: #fff3cd;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
     color: #856404;
+    box-shadow: 0 2px 8px rgba(133, 100, 4, 0.2);
 }
 
 .status-failed {
-    background: #f8d7da;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
     color: #721c24;
+    box-shadow: 0 2px 8px rgba(114, 28, 36, 0.2);
 }
 
 .action-buttons {
@@ -346,57 +852,231 @@
 }
 
 .btn-action {
-    padding: 6px 12px;
+    padding: 8px 12px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-}
-
-.btn-download {
-    background: #17a2b8;
-    color: white;
-}
-
-.btn-download:hover {
-    background: #138496;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .btn-view {
-    background: #6c757d;
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
     color: white;
 }
 
 .btn-view:hover {
-    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
 }
 
-.btn-delete {
-    background: #dc3545;
+.btn-edit {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
     color: white;
 }
 
-.btn-delete:hover {
-    background: #c82333;
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+}
+
+/* Pagination */
+.pagination-container {
+    padding: 30px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.pagination-info {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-pagination {
+    padding: 10px 20px;
+    border: 2px solid #e9ecef;
+    background: white;
+    color: #495057;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.btn-pagination:hover:not(:disabled) {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.btn-pagination:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+.page-number {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #e9ecef;
+    background: white;
+    color: #495057;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.page-number:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: scale(1.1);
+}
+
+.page-number.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .detail-page {
+        padding: 10px;
+    }
+    
+    .detail-header {
+        padding: 20px;
+    }
+    
+    .detail-title {
+        font-size: 2rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pagination-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 </style>
 
 <script>
-let currentPage = 1;
-let currentPerPage = 20;
-let currentSearch = '';
-let currentSort = 'timecreated';
-let currentOrder = 'DESC';
-let totalPages = 1;
+(function() {
+    'use strict';
+    
+    // Variables
+    let currentPage = 1;
+    let currentPerPage = 20;
+    let currentSearch = '';
+    let currentSort = 'timecreated';
+    let currentOrder = 'DESC';
+    let totalPages = 1;
+    let isLoading = false;
 
-document.addEventListener('DOMContentLoaded', function() {
+function initializePage() {
+    console.log('Initializing page...');
+    showLoading();
+    
+    // Initialize event listeners
+    initializeEventListeners();
+    
+    // Load data immediately
+    console.log('Loading stats and uploads...');
     loadStats();
     loadUploads();
-    initializeEventListeners();
-});
+    
+    // Hide loading after a short delay
+    setTimeout(() => {
+        hideLoading();
+    }, 2000);
+}
+
+function showLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
 
 function initializeEventListeners() {
+    // Search functionality
     document.getElementById('searchBtn').addEventListener('click', handleSearch);
     document.getElementById('searchInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -404,6 +1084,17 @@ function initializeEventListeners() {
         }
     });
     
+    // Real-time search suggestions
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const query = this.value.trim();
+        if (query.length > 2) {
+            showSearchSuggestions(query);
+        } else {
+            hideSearchSuggestions();
+        }
+    });
+    
+    // Sort functionality
     document.getElementById('sortSelect').addEventListener('change', function() {
         currentSort = this.value;
         loadUploads();
@@ -420,39 +1111,183 @@ function initializeEventListeners() {
         loadUploads();
     });
     
+    // Table sorting
+    document.querySelectorAll('.sortable').forEach(th => {
+        th.addEventListener('click', function() {
+            const sortField = this.dataset.sort;
+            if (sortField) {
+                if (currentSort === sortField) {
+                    currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+                } else {
+                    currentSort = sortField;
+                    currentOrder = 'ASC';
+                }
+                loadUploads();
+            }
+        });
+    });
+    
+    // Action buttons
     document.getElementById('refreshBtn').addEventListener('click', function() {
+        animateButton(this);
         loadStats();
         loadUploads();
     });
     
     document.getElementById('uploadNewBtn').addEventListener('click', function() {
+        animateButton(this);
         window.open('{{config.wwwroot}}/theme/remui_kids/admin/upload_users.php', '_blank');
     });
+    
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        animateButton(this);
+        exportData();
+    });
+    
+    // Pagination
+    document.getElementById('prevPage').addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            loadUploads();
+        }
+    });
+    
+    document.getElementById('nextPage').addEventListener('click', function() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadUploads();
+        }
+    });
+}
+
+function animateButton(button) {
+    button.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        button.style.transform = 'scale(1)';
+    }, 150);
 }
 
 function handleSearch() {
     currentSearch = document.getElementById('searchInput').value.trim();
     currentPage = 1;
+    hideSearchSuggestions();
     loadUploads();
 }
 
+function showSearchSuggestions(query) {
+    // This would typically fetch suggestions from the backend
+    const suggestions = [
+        'John Doe', 'Jane Smith', 'CSV Upload', 'Bulk Import'
+    ].filter(item => item.toLowerCase().includes(query.toLowerCase()));
+    
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    if (suggestions.length > 0) {
+        suggestionsContainer.innerHTML = suggestions.map(suggestion => 
+            `<div class="suggestion-item" onclick="selectSuggestion('${suggestion}')">${suggestion}</div>`
+        ).join('');
+        suggestionsContainer.style.display = 'block';
+    }
+}
+
+function hideSearchSuggestions() {
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    suggestionsContainer.style.display = 'none';
+}
+
+function selectSuggestion(suggestion) {
+    document.getElementById('searchInput').value = suggestion;
+    hideSearchSuggestions();
+    handleSearch();
+}
+
 function loadStats() {
-    fetch('{{config.wwwroot}}/theme/remui_kids/admin/detail_recent_uploads.php?action=get_upload_stats')
-        .then(response => response.json())
+    console.log('Loading stats...');
+    if (isLoading) return;
+    isLoading = true;
+    
+    const url = '{{config.wwwroot}}/theme/remui_kids/admin/detail_recent_uploads.php?action=get_upload_stats';
+    console.log('Fetching stats from:', url);
+    
+    fetch(url)
+        .then(response => {
+            console.log('Stats response:', response);
+            return response.json();
+        })
         .then(data => {
+            console.log('Stats data:', data);
             if (data.status === 'success') {
-                document.getElementById('uploads-this-month').textContent = data.stats.uploads_this_month;
-                document.getElementById('uploads-this-week').textContent = data.stats.uploads_this_week;
-                document.getElementById('uploads-today').textContent = data.stats.uploads_today;
-                document.getElementById('total-users').textContent = data.stats.total_users;
+                animateNumberUpdate('uploads-this-month', data.stats.uploads_this_month);
+                animateNumberUpdate('uploads-this-week', data.stats.uploads_this_week);
+                animateNumberUpdate('uploads-today', data.stats.uploads_today);
+                animateNumberUpdate('total-users', data.stats.total_users);
+                
+                // Update trend indicators
+                updateTrends(data.stats);
+            } else {
+                console.error('Stats error:', data.message);
             }
         })
         .catch(error => {
             console.error('Error loading stats:', error);
+        })
+        .finally(() => {
+            isLoading = false;
         });
 }
 
+function animateNumberUpdate(elementId, newValue) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const currentValue = parseInt(element.textContent) || 0;
+    const targetValue = parseInt(newValue) || 0;
+    
+    if (currentValue === targetValue) return;
+    
+    // Remove loader
+    const loader = element.querySelector('.number-loader');
+    if (loader) {
+        loader.remove();
+    }
+    
+    // Animate number change
+    let current = currentValue;
+    const increment = (targetValue - currentValue) / 20;
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= targetValue) || (increment < 0 && current <= targetValue)) {
+            current = targetValue;
+            clearInterval(timer);
+        }
+        element.textContent = Math.round(current);
+    }, 50);
+}
+
+function updateTrends(stats) {
+    // This would calculate trends based on previous data
+    // For now, we'll use mock data
+    const trends = {
+        'month-trend': { icon: 'fa-arrow-up', value: '+12%', color: '#28a745' },
+        'week-trend': { icon: 'fa-arrow-up', value: '+8%', color: '#28a745' },
+        'today-trend': { icon: 'fa-minus', value: '0%', color: '#6c757d' },
+        'users-trend': { icon: 'fa-arrow-up', value: '+5%', color: '#28a745' }
+    };
+    
+    Object.keys(trends).forEach(trendId => {
+        const trendElement = document.getElementById(trendId);
+        if (trendElement) {
+            const trend = trends[trendId];
+            trendElement.innerHTML = `<i class="fa ${trend.icon}"></i><span>${trend.value}</span>`;
+            trendElement.style.color = trend.color;
+        }
+    });
+}
+
 function loadUploads() {
+    console.log('Loading uploads...');
+    if (isLoading) return;
+    isLoading = true;
+    
     const params = new URLSearchParams({
         action: 'get_uploads',
         page: currentPage,
@@ -462,18 +1297,67 @@ function loadUploads() {
         order: currentOrder
     });
     
-    fetch(`{{config.wwwroot}}/theme/remui_kids/admin/detail_recent_uploads.php?${params}`)
-        .then(response => response.json())
+    const url = `{{config.wwwroot}}/theme/remui_kids/admin/detail_recent_uploads.php?${params}`;
+    console.log('Fetching uploads from:', url);
+    
+    // Show loading state
+    const tbody = document.getElementById('uploadsTableBody');
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="loading-cell">
+                    <div class="loading-spinner">
+                        <div class="spinner-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <p>Loading uploads...</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+    } else {
+        console.error('Table body not found!');
+        return;
+    }
+    
+    fetch(url)
+        .then(response => {
+            console.log('Uploads response status:', response.status);
+            console.log('Uploads response headers:', response.headers);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text().then(text => {
+                console.log('Raw response text:', text);
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    console.error('Response text was:', text);
+                    throw new Error('Invalid JSON response');
+                }
+            });
+        })
         .then(data => {
+            console.log('Uploads data received:', data);
             if (data.status === 'success') {
+                console.log('Number of uploads:', data.uploads ? data.uploads.length : 0);
                 displayUploads(data.uploads);
                 updatePagination(data);
+                updateTableStats(data);
             } else {
                 console.error('Error loading uploads:', data.message);
+                showError('Error loading uploads: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error loading uploads:', error);
+            showError('Error loading uploads: ' + error.message);
+        })
+        .finally(() => {
+            isLoading = false;
         });
 }
 
@@ -481,12 +1365,21 @@ function displayUploads(uploads) {
     const tbody = document.getElementById('uploadsTableBody');
     
     if (uploads.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="loading-cell">No uploads found</td></tr>';
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="loading-cell">
+                    <div class="no-data">
+                        <i class="fa fa-inbox" style="font-size: 3rem; color: #6c757d; margin-bottom: 20px;"></i>
+                        <p style="font-size: 1.2rem; color: #6c757d;">No uploads found</p>
+                    </div>
+                </td>
+            </tr>
+        `;
         return;
     }
     
-    tbody.innerHTML = uploads.map(upload => `
-        <tr>
+    tbody.innerHTML = uploads.map((upload, index) => `
+        <tr class="fade-in" style="animation-delay: ${index * 0.1}s">
             <td>
                 <div class="upload-filename">
                     <i class="fa fa-user"></i>
@@ -510,16 +1403,27 @@ function displayUploads(uploads) {
             </td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-action btn-view" onclick="viewUpload(${upload.id})">
+                    <button class="btn-action btn-view" onclick="viewUpload(${upload.id})" title="View Details">
                         <i class="fa fa-eye"></i>
                     </button>
-                    <button class="btn-action btn-edit" onclick="editUpload(${upload.id})">
+                    <button class="btn-action btn-edit" onclick="editUpload(${upload.id})" title="Edit User">
                         <i class="fa fa-edit"></i>
                     </button>
                 </div>
             </td>
         </tr>
     `).join('');
+}
+
+function updateTableStats(data) {
+    const tableStats = document.getElementById('tableStats');
+    if (tableStats) {
+        const start = ((data.page - 1) * data.per_page) + 1;
+        const end = Math.min(data.page * data.per_page, data.total_count);
+        tableStats.innerHTML = `
+            <span class="table-count">Showing ${start} to ${end} of ${data.total_count} uploads</span>
+        `;
+    }
 }
 
 function formatDate(timestamp) {
@@ -542,14 +1446,115 @@ function editUpload(uploadId) {
     window.open(`{{config.wwwroot}}/theme/remui_kids/admin/edit_users.php?user_id=${uploadId}`, '_blank');
 }
 
+function exportData() {
+    // Implement export functionality
+    const params = new URLSearchParams({
+        action: 'export_uploads',
+        search: currentSearch,
+        sort: currentSort,
+        order: currentOrder
+    });
+    
+    window.open(`{{config.wwwroot}}/theme/remui_kids/admin/detail_recent_uploads.php?${params}`, '_blank');
+}
+
 function updatePagination(data) {
     totalPages = data.total_pages;
+    currentPage = data.page;
     
-    // Update pagination info if element exists
+    const paginationContainer = document.getElementById('paginationContainer');
     const paginationInfo = document.getElementById('paginationInfo');
+    const pageNumbers = document.getElementById('pageNumbers');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    paginationContainer.style.display = 'flex';
+    
+    // Update pagination info
     if (paginationInfo) {
-        paginationInfo.textContent = 
-            `Showing ${((data.page - 1) * data.per_page) + 1} to ${Math.min(data.page * data.per_page, data.total_count)} of ${data.total_count} uploads`;
+        const start = ((data.page - 1) * data.per_page) + 1;
+        const end = Math.min(data.page * data.per_page, data.total_count);
+        paginationInfo.textContent = `Showing ${start} to ${end} of ${data.total_count} uploads`;
+    }
+    
+    // Update page numbers
+    if (pageNumbers) {
+        let pageNumbersHtml = '';
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbersHtml += `
+                <div class="page-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">
+                    ${i}
+                </div>
+            `;
+        }
+        
+        pageNumbers.innerHTML = pageNumbersHtml;
+    }
+    
+    // Update navigation buttons
+    if (prevBtn) {
+        prevBtn.disabled = currentPage <= 1;
+    }
+    if (nextBtn) {
+        nextBtn.disabled = currentPage >= totalPages;
     }
 }
+
+function goToPage(page) {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+        currentPage = page;
+        loadUploads();
+    }
+}
+
+function showError(message) {
+    const tbody = document.getElementById('uploadsTableBody');
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="7" class="loading-cell">
+                <div class="error-message">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 2rem; color: #dc3545; margin-bottom: 15px;"></i>
+                    <p style="color: #dc3545; font-size: 1.1rem;">${message}</p>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+    // Initialize page when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing page...');
+            setTimeout(function() {
+                initializePage();
+            }, 500);
+        });
+    } else {
+        console.log('DOM already loaded, initializing page...');
+        setTimeout(function() {
+            initializePage();
+        }, 500);
+    }
+    
+    // Add smooth scrolling for better UX
+    function smoothScrollToTop() {
+        if (window.scrollTo) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+    
+})();
 </script>
