@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2025080200;
 $plugin->requires  = 2022041200;
@@ -31,4 +31,5 @@ $plugin->component = 'theme_remui_kids';
 $plugin->dependencies = array(
     'theme_remui' => 2025072400,
 );
+
 
