@@ -18,6 +18,97 @@
 }
 
 // ========================================
+// HIDE DEFAULT MOODLE DASHBOARD BLOCKS
+// ========================================
+
+// Hide default Moodle dashboard blocks and sections
+.block-myoverview,
+.block_recentlyaccesseditems,
+.block_timeline,
+.block_news,
+.block_blog,
+.block_glossary_random,
+.block_html,
+// Hide specific dashboard content sections
+[data-region="myoverview"],
+[data-region="timeline"],
+[data-region="recentlyaccesseditems"],
+// Hide course progress sections
+.edw-course-summary-container,
+.edw-course-list-container,
+.edw-course-card-grid,
+// Hide specific text and labels
+.seeallmycourses,
+.nav-display-selector,
+.nav-search-sort-selector,
+.nav-grouping-selector,
+// Hide specific dashboard blocks by content and structure
+.block[data-block="myoverview"],
+.block[data-block="timeline"],
+.block[data-block="recentlyaccesseditems"],
+// Hide entire block regions
+.region-side-pre .block,
+.region-main .block:not(.block_remui_kids),
+// Hide specific course sections
+.course-progress,
+.course-tabs,
+.course-filters,
+.course-search,
+// Hide navigation elements
+.nav-tabs .nav-link,
+.filter-wrapper,
+.search-wrapper,
+.sort-wrapper,
+// Hide specific content areas
+.dashboard-content .block,
+.dashboard-blocks,
+.course-blocks,
+// Hide all blocks except our custom dashboard
+.block:not([class*="remui_kids"]):not([class*="custom"]),
+// Hide entire dashboard regions
+.region-main > .block,
+.region-side-pre > .block,
+.region-side-post > .block,
+// Hide specific dashboard regions and content
+.region-main .block,
+.region-side-pre,
+.region-side-post,
+// Hide specific Moodle blocks
+.block_myoverview,
+.block_timeline,
+.block_recentlyaccesseditems,
+.block_news,
+.block_blog,
+// Hide course overview sections
+.course-overview,
+.my-courses,
+.recent-courses,
+.timeline-view,
+// Hide navigation and filters
+.course-nav,
+.course-filters,
+.course-search,
+.course-sort,
+// Hide specific content containers
+.dashboard-blocks .block,
+.course-blocks .block,
+.activity-blocks .block,
+// Hide all default dashboard content
+.dashboard .block:not([class*="remui_kids"]),
+.dashboard .block:not([class*="custom"]),
+// Hide specific sections by ID and class
+#block-myoverview,
+#block-timeline,
+#block-recentlyaccesseditems,
+// Hide navigation tabs and filters
+.nav-tabs,
+.filter-tabs,
+.course-tabs,
+.activity-tabs {
+    display: none !important;
+}
+
+// ========================================
 // COURSE SECTION CARDS STYLES (Horizontal Layout)
 // ========================================
 
@@ -5306,6 +5397,181 @@ body.custom-dashboard-page.has-student-sidebar {
                 }
             }
         }
+    }
+    
+    // Medals Container for High School Dashboard - Circular Medals in Row
+    .medals-container {
+        display: flex;
+        flex-direction: row;
+        gap: 1.5rem;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 0;
+        
+        .medal-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                transform: translateY(-5px) scale(1.05);
+            }
+            
+            .medal-icon {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                margin-bottom: 0.75rem;
+                transition: all 0.3s ease;
+                
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: -4px;
+                    left: -4px;
+                    right: -4px;
+                    bottom: -4px;
+                    border-radius: 50%;
+                    background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+                    z-index: -1;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+                
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: -8px;
+                    left: -8px;
+                    right: -8px;
+                    bottom: -8px;
+                    border-radius: 50%;
+                    background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #FFD700);
+                    z-index: -2;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    animation: rotate 3s linear infinite;
+                }
+                
+                .achieved & {
+                    background: linear-gradient(135deg, #FFD700, #FFA500, #FF8C00);
+                    box-shadow: 
+                        0 8px 25px rgba(255, 215, 0, 0.4),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+                    
+                    &::before {
+                        opacity: 1;
+                    }
+                    
+                    &::after {
+                        opacity: 0.6;
+                    }
+                    
+                    i {
+                        color: white;
+                        font-size: 32px;
+                        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+                    }
+                    
+                    &:hover {
+                        background: linear-gradient(135deg, #FFD700, #FFA500, #FF8C00, #FFD700);
+                        box-shadow: 
+                            0 12px 35px rgba(255, 215, 0, 0.6),
+                            inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                            inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+                    }
+                }
+                
+                .unachieved & {
+                    background: linear-gradient(135deg, #6c757d, #495057);
+                    box-shadow: 
+                        0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+                    opacity: 0.6;
+                    
+                    i {
+                        color: #adb5bd;
+                        font-size: 32px;
+                        filter: grayscale(100%);
+                    }
+                    
+                    &:hover {
+                        opacity: 0.8;
+                        box-shadow: 
+                            0 6px 20px rgba(0, 0, 0, 0.3),
+                            inset 0 2px 4px rgba(255, 255, 255, 0.15),
+                            inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+                    }
+                }
+            }
+            
+            .medal-content {
+                .medal-title {
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    margin-bottom: 0.25rem;
+                    line-height: 1.2;
+                    
+                    .achieved & {
+                        color: #2c3e50;
+                    }
+                    
+                    .unachieved & {
+                        color: #6c757d;
+                    }
+                }
+                
+                .medal-description {
+                    font-size: 0.75rem;
+                    margin-bottom: 0.5rem;
+                    line-height: 1.3;
+                    
+                    .achieved & {
+                        color: #495057;
+                    }
+                    
+                    .unachieved & {
+                        color: #adb5bd;
+                    }
+                }
+                
+                .medal-status {
+                    font-size: 0.7rem;
+                    font-weight: 600;
+                    padding: 0.2rem 0.6rem;
+                    border-radius: 1rem;
+                    display: inline-block;
+                    
+                    &.achieved {
+                        background: linear-gradient(135deg, #28a745, #20c997);
+                        color: white;
+                        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+                    }
+                    
+                    &.unachieved {
+                        background: #e9ecef;
+                        color: #6c757d;
+                        border: 1px solid #dee2e6;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Medal rotation animation
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
     
     // Legacy card styles for compatibility

@@ -1412,27 +1412,45 @@
                         </div>
                     </div>
                             
-                            <!-- Learning Progress -->
+                            <!-- Learning Progress - Medals -->
                             <div class="sidebar-section">
                                 <h4 class="sidebar-title">Learning Progress</h4>
-                                <div class="quick-stats-list">
-                                    <div class="quick-stat-item">
-                                        <div class="stat-icon">
-                                            <i class="fa fa-book"></i>
-                </div>
-                                        <div class="stat-details">
-                                            <span class="stat-label">Active Courses</span>
-                                            <span class="stat-value">{{#highschool_stats}}{{courses}}{{/highschool_stats}}</span>
-            </div>
-                                          <div class="stat-icon">
-                                            <i class="fa fa-tasks"></i>
-        </div>
-                                        <div class="stat-details">
-                                            <span class="stat-label">Activities</span>
-                                            <span class="stat-value">{{#highschool_stats}}{{activities}}{{/highschool_stats}}</span>
+                                <div class="medals-container">
+                                    <!-- Achieved Medal 1: Course Master -->
+                                    <div class="medal-item achieved">
+                                        <div class="medal-icon">
+                                            <i class="fa fa-graduation-cap"></i>
                                         </div>
-                                </div>
+                                        <div class="medal-content">
+                                            <div class="medal-title">Course Master</div>
+                                            <div class="medal-description">Complete 5 courses</div>
+                                            <div class="medal-status achieved">Achieved</div>
+                                        </div>
+                                    </div>
                                     
+                                    <!-- Achieved Medal 2: Study Champion -->
+                                    <div class="medal-item achieved">
+                                        <div class="medal-icon">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="medal-content">
+                                            <div class="medal-title">Study Champion</div>
+                                            <div class="medal-description">Study 20 hours</div>
+                                            <div class="medal-status achieved">Achieved</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Locked Medal: Perfect Score -->
+                                    <div class="medal-item unachieved">
+                                        <div class="medal-icon">
+                                            <i class="fa fa-trophy"></i>
+                                        </div>
+                                        <div class="medal-content">
+                                            <div class="medal-title">Perfect Score</div>
+                                            <div class="medal-description">Get 100% on 3 quizzes</div>
+                                            <div class="medal-status unachieved">Locked</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1592,151 +1610,20 @@
               
             </div>
         </div>
-            
-            <!-- Course Preview Modal -->
-            <div id="highschoolCoursePreviewModal" class="preview-modal">
-                <div class="modal-overlay" onclick="closePreviewModal()"></div>
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="modalCourseTitle">Course Preview</h3>
-                        <button class="modal-close" onclick="closePreviewModal()">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="course-sections-list" id="courseSectionsList">
-                            <!-- Sections will be loaded here -->
-                        </div>
-                        
-                        <div class="insight-card study-stats">
-                            <div class="insight-header">
-                                <h3><i class="fa fa-lightbulb-o"></i> Study Insights</h3>
-                            </div>
-                            <div class="insight-content">
-                                <div class="study-stat">
-                                    <div class="stat-icon">
-                                        <i class="fa fa-clock-o"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <h4>Peak Study Time</h4>
-                                        <p>You're most productive between 2-4 PM</p>
-                                    </div>
-                                </div>
-                                <div class="study-stat">
-                                    <div class="stat-icon">
-                                        <i class="fa fa-book"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <h4>Strongest Subject</h4>
-                                        <p>Mathematics - 95% average</p>
-                                    </div>
-                                </div>
-                                <div class="study-stat">
-                                    <div class="stat-icon">
-                                        <i class="fa fa-target"></i>
-                                    </div>
-                                    <div class="stat-details">
-                                        <h4>Goal Progress</h4>
-                                        <p>On track to complete 5 courses this semester</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             
             <!-- Learning Analytics Section -->
             <div class="learning-analytics mb-4">
             <div class="row">
                     <div class="col-lg-6">
-                        <div class="analytics-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-chart-line"></i> Learning Progress
-                                </h3>
-                                <div class="time-filter">
-                                    <select class="form-select">
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>This Semester</option>
-                                        <option>All Time</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="card-body">
-                                <div class="progress-chart-container">
-                                    <canvas id="learningProgressChart" width="400" height="200"></canvas>
-                        </div>
-                                <div class="chart-stats">
-                                    <div class="chart-stat-item">
-                                        <span class="stat-label">Average Score</span>
-                                        <span class="stat-value">87%</span>
-                    </div>
-                                    <div class="chart-stat-item">
-                                        <span class="stat-label">Study Time</span>
-                                        <span class="stat-value">24h</span>
-                </div>
-                                    <div class="chart-stat-item">
-                                        <span class="stat-label">Completion Rate</span>
-                                        <span class="stat-value">92%</span>
-            </div>
+                 
         </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="col-lg-6">
-                        <div class="analytics-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-calendar-check-o"></i> Upcoming Deadlines
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="deadlines-list">
-                                    <div class="deadline-item urgent">
-                                        <div class="deadline-icon">
-                                            <i class="fa fa-exclamation-triangle"></i>
-                                        </div>
-                                        <div class="deadline-content">
-                                            <h4>Calculus Final Exam</h4>
-                                            <p>Advanced Mathematics</p>
-                                            <span class="deadline-time">Due in 2 days</span>
-                                        </div>
-                                        <div class="deadline-action">
-                                            <button class="btn btn-sm btn-outline-primary">Study</button>
-                                        </div>
-                                    </div>
-                                    <div class="deadline-item">
-                                        <div class="deadline-icon">
-                                            <i class="fa fa-file-text-o"></i>
-                                        </div>
-                                        <div class="deadline-content">
-                                            <h4>Research Paper</h4>
-                                            <p>English Literature</p>
-                                            <span class="deadline-time">Due in 5 days</span>
-                                        </div>
-                                        <div class="deadline-action">
-                                            <button class="btn btn-sm btn-outline-primary">Continue</button>
-                                        </div>
-                                    </div>
-                                    <div class="deadline-item">
-                                        <div class="deadline-icon">
-                                            <i class="fa fa-flask"></i>
-                                        </div>
-                                        <div class="deadline-content">
-                                            <h4>Lab Report</h4>
-                                            <p>Chemistry</p>
-                                            <span class="deadline-time">Due in 7 days</span>
-                                        </div>
-                                        <div class="deadline-action">
-                                            <button class="btn btn-sm btn-outline-primary">Start</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
             </div>
