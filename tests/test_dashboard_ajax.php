@@ -72,7 +72,7 @@ try {
     echo "<div class='result'>";
     echo "<h3>3. Live AJAX Endpoint Test</h3>";
     
-    $ajax_url = 'http://localhost/Kodeit-Iomad-local/iomad-test/test_ajax.php';
+    $ajax_url = '$CFG->wwwroot/test_ajax.php';
     
     echo "<p><strong>AJAX URL:</strong> <a href='$ajax_url' target='_blank'>$ajax_url</a></p>";
     

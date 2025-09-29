@@ -2098,7 +2098,8 @@ function theme_remui_kids_get_admin_sidebar_template_data() {
         $sidebar_data = theme_remui_kids_get_admin_sidebar_data($current_page);
         
         return array_merge([
-            'show_admin_sidebar' => true
+            'show_admin_sidebar' => true,
+            'wwwroot' => $CFG->wwwroot
         ], $sidebar_data);
         
     } catch (Exception $e) {

@@ -7,7 +7,7 @@ echo "<h2>Testing AJAX Endpoint</h2>";
 echo "<p>Testing: /theme/remui_kids/tests/test_ajax.php</p>";
 
 // Test the AJAX endpoint
-$url = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/tests/test_ajax.php';
+$url = '$CFG->wwwroot/theme/remui_kids/tests/test_ajax.php';
 
 echo "<h3>Testing via cURL:</h3>";
 $ch = curl_init();

@@ -990,27 +990,27 @@ function selectCourseForContent(courseId) {
 
 function assignToSchool() {
     // Redirect to modern school course assignment page
-    window.location.href = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/assign_to_school.php';
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/assign_to_school.php';
 }
 
 function manageSchoolGroups() {
     // Redirect to school groups management
-    window.location.href = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/search.php#linkcourses';
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/search.php#linkcourses';
 }
 
 function assignCourseGroups() {
     // Redirect to course groups assignment
-    window.location.href = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/search.php#linkcourses';
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/search.php#linkcourses';
 }
 
 function manageTeachingLocations() {
     // Redirect to teaching locations management
-    window.location.href = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/search.php#linkcourses';
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/search.php#linkcourses';
 }
 
 function manageLearningPaths() {
     // Redirect to learning paths management
-    window.location.href = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/search.php#linkcourses';
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/search.php#linkcourses';
 }
 
 function showMessage(message, type) {

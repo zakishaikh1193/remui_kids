@@ -38,6 +38,7 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['custom_dashboard'] = true;
         $templatecontext['dashboard_type'] = 'admin';
         $templatecontext['admin_dashboard'] = true;
+        $templatecontext['wwwroot'] = $CFG->wwwroot;
         $templatecontext['admin_stats'] = theme_remui_kids_get_admin_dashboard_stats();
         $templatecontext['admin_user_stats'] = theme_remui_kids_get_admin_user_stats();
         $templatecontext['admin_course_stats'] = theme_remui_kids_get_admin_course_stats();

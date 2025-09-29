@@ -1488,10 +1488,10 @@
                 </div>
             
                
-                <!-- Active Sections and Additional Content Row -->
+                <!-- Active Sections and Learning Progress Row -->
             <div class="row">
-                    <!-- Left Half - Active Sections -->
-                    <div class="col-lg-6">
+                    <!-- Left Side - Active Sections (70% width) -->
+                    <div class="col-lg-8">
                         <div class="active-sections">
                             <div class="section-header">
                                 <h3 class="section-title">
@@ -1526,9 +1526,67 @@
                         </div>
                     </div>
                     
-                    <!-- Right Half - Placeholder for future content -->
-                    <div class="col-lg-6">
-                        <!-- Future content can go here -->
+                    <!-- Right Side - Learning Progress (30% width) -->
+                    <div class="col-lg-4">
+                        <div class="learning-progress-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <i class="fa fa-chart-line"></i> Learning Progress
+                                </h3>
+                                <div class="section-info">
+                                    <span class="info-text">Your academic performance overview</span>
+                                </div>
+                            </div>
+                            <div class="progress-stats-container">
+                                <div class="progress-stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-title">Active Courses</div>
+                                        <div class="stat-number">{{highschool_stats.total_courses}}</div>
+                                        <div class="stat-subtext">enrolled</div>
+                                        <div class="stat-trend">+12% this week</div>
+                                    </div>
+                                    <div class="stat-icon-container blue">
+                                        <i class="fa fa-book"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-title">Lessons Completed</div>
+                                        <div class="stat-number">{{highschool_stats.lessons_completed}}</div>
+                                        <div class="stat-subtext">this month</div>
+                                        <div class="stat-trend">+8% this week</div>
+                                    </div>
+                                    <div class="stat-icon-container green">
+                                        <i class="fa fa-bullseye"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-title">Study Time</div>
+                                        <div class="stat-number">24h</div>
+                                        <div class="stat-subtext">this week</div>
+                                        <div class="stat-trend">+5% this week</div>
+                                    </div>
+                                    <div class="stat-icon-container purple">
+                                        <i class="fa fa-clock-o"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-title">Achievements</div>
+                                        <div class="stat-number">12</div>
+                                        <div class="stat-subtext">total earned</div>
+                                        <div class="stat-trend">+3% this week</div>
+                                    </div>
+                                    <div class="stat-icon-container orange">
+                                        <i class="fa fa-trophy"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
               

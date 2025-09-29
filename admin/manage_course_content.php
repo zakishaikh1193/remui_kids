@@ -463,7 +463,7 @@ function toggleCategory(categoryId) {
 
 function viewCourse(courseId) {
     // Redirect to course view page
-    window.location.href = `http://localhost/Kodeit-Iomad-local/iomad-test/course/view.php?id=${courseId}`;
+    window.location.href = `<?php echo $CFG->wwwroot; ?>/course/view.php?id=${courseId}`;
 }
 
 // Initialize page
