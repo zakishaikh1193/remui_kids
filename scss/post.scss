@@ -272,6 +272,7 @@
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 1rem;
+            margin-bottom: 1rem;
             color: #2c3e50;
         }
         
@@ -8945,8 +8946,47 @@ body:has(.admin-sidebar-wrapper) {
                 
                 .course-stat-item {
                     font-size: 0.75rem;
+                    
+                    i {
+                        color: #3498db;
+                        font-size: 0.7rem;
+                    }
+                }
+            }
+            
+            .course-status {
+                font-size: 0.75rem;
+                color: #e74c3c;
+                margin-bottom: 0.75rem;
+                font-weight: 500;
+            }
+            
+            .course-buttons {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 0.5rem;
+            }
+            
+            .course-button {
+                flex: 1;
+                padding: 0.6rem 1rem;
+                border-radius: 0.5rem;
+                text-decoration: none;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.4rem;
+                transition: all 0.3s ease;
+                font-size: 0.85rem;
+                text-align: center;
+                
+                &:hover {
+                    transform: translateY(-2px);
+                    text-decoration: none;
                     color: #7f8c8d;
                     margin-bottom: 0.25rem;
+
                 }
                 
                 .course-status {
@@ -8954,6 +8994,202 @@ body:has(.admin-sidebar-wrapper) {
                     color: #e74c3c;
                     font-weight: 500;
                 }
+                
+                &.primary {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+                    
+                    &:hover {
+                        background: linear-gradient(135deg, #5a6fd8, #6a4190);
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                        color: white;
+                    }
+                }
+                
+                &.secondary {
+                    background: white;
+                    color: #2c3e50;
+                    border: 2px solid #e9ecef;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    
+                    &:hover {
+                        background: #f8f9fa;
+                        border-color: #667eea;
+                        color: #2c3e50;
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+                    }
+                }
+            }
+        }
+    }
+    
+    // Course Preview Modal
+    .preview-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            
+            .modal-title {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+            
+            .modal-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: #6c757d;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+                
+                &:hover {
+                    background: #e9ecef;
+                    color: #2c3e50;
+                    transform: scale(1.1);
+                }
+            }
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+            
+            .loading-spinner {
+                text-align: center;
+                padding: 2rem;
+                color: #6c757d;
+                
+                i {
+                    font-size: 1.5rem;
+                    margin-right: 0.5rem;
+                }
+            }
+            
+            .course-sections-list {
+                .section-item {
+                    background: #f8f9fa;
+                    border: 1px solid #e9ecef;
+                    border-radius: 0.75rem;
+                    padding: 1.25rem;
+                    margin-bottom: 1rem;
+                    transition: all 0.3s ease;
+                    
+                    &:hover {
+                        background: #e9ecef;
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+                    
+                    .section-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-bottom: 0.75rem;
+                        
+                        .section-name {
+                            margin: 0;
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            color: #2c3e50;
+                            flex: 1;
+                        }
+                        
+                        .section-activities {
+                            background: #3498db;
+                            color: white;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 1rem;
+                            font-size: 0.8rem;
+                            font-weight: 500;
+                            white-space: nowrap;
+                        }
+                    }
+                    
+                    .section-description {
+                        margin: 0;
+                        color: #6c757d;
+                        font-size: 0.9rem;
+                        line-height: 1.5;
+                    }
+                }
+            }
+        }
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    // Current Lessons
+    .current-lessons-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        
+        .current-lesson-card {
+            background: #f8f9fa;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s ease;
+            
+            &:hover {
+                transform: translateY(-2px);
             }
             
             .course-buttons {
@@ -9593,6 +9829,1342 @@ body:has(.admin-sidebar-wrapper) {
         }
     }
 }
+        }
+    }
+}
+
+// ========================================
+// ADMIN DASHBOARD STYLES - FULL SCREEN LAYOUT
+// ========================================
+
+// Full screen admin layout
+.admin-dashboard-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 100;
+}
+
+// Admin Sidebar Navigation - Sticky on all pages
+.admin-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    border-right: 1px solid #e9ecef;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    will-change: transform;
+    backface-visibility: hidden;
+    
+    .sidebar-content {
+        padding: 6rem 0 2rem 0;
+        
+        .sidebar-section {
+            margin-bottom: 2rem;
+            
+            .sidebar-category {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #6c757d;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 1rem;
+                padding: 0 2rem;
+                margin-top: 0;
+            }
+            
+            .sidebar-menu {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                
+                .sidebar-item {
+                    margin-bottom: 0.25rem;
+                    
+                    .sidebar-link {
+                        display: flex;
+                        align-items: center;
+                        padding: 0.75rem 2rem;
+                        color: #495057;
+                        text-decoration: none;
+                        transition: all 0.3s ease;
+                        border-left: 3px solid transparent;
+                        
+                        &:hover {
+                            background-color: #f8f9fa;
+                            color: #2c3e50;
+                            text-decoration: none;
+                            border-left-color: #667eea;
+                        }
+                        
+                        .sidebar-icon {
+                            width: 20px;
+                            height: 20px;
+                            margin-right: 1rem;
+                            font-size: 1rem;
+                            color: #6c757d;
+                            text-align: center;
+                        }
+                        
+                        .sidebar-text {
+                            font-size: 0.9rem;
+                            font-weight: 500;
+                        }
+                    }
+                    
+                    &.active {
+                        .sidebar-link {
+                            background-color: #e3f2fd;
+                            color: #1976d2;
+                            border-left-color: #1976d2;
+                            
+                            .sidebar-icon {
+                                color: #1976d2;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Scrollbar styling
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+}
+
+// Main content area with sidebar - FULL SCREEN
+.admin-main-content {
+    position: fixed;
+    top: 0;
+    left: 280px;
+    width: calc(100vw - 280px);
+    height: 100vh;
+    background-color: #ffffff;
+    overflow-y: auto;
+    z-index: 99;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+// Adjust admin dashboard header for sidebar - FULL WIDTH
+.admin-dashboard-header {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    
+    .container-fluid {
+        padding: 0.25rem 1rem;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+// Adjust all admin dashboard sections for FULL SCREEN layout
+.admin-dashboard-stats,
+.admin-user-stats-section,
+.admin-course-stats-section,
+.admin-recent-activity-section {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    
+    .container-fluid {
+        padding: 0.1rem 1rem;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+// Responsive adjustments for FULL SCREEN layout
+@media (max-width: 768px) {
+    .admin-dashboard-wrapper {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .admin-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1001;
+        
+        &.sidebar-open {
+            transform: translateX(0);
+        }
+    }
+    
+    .admin-main-content {
+        position: relative;
+        left: 0;
+        width: 100vw;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .admin-dashboard-stats,
+    .admin-user-stats-section,
+    .admin-course-stats-section,
+    .admin-recent-activity-section {
+        .container-fluid {
+            padding: 0.1rem 0rem;
+            max-width: none;
+            width: 100%;
+        }
+        
+        .section-header {
+            padding: 0 1rem;
+        }
+    }
+    
+    .user-stats-container,
+    .course-stats-container {
+        padding: 0 1rem;
+    }
+    
+    .recent-activity-container {
+        margin: 0 1rem;
+    }
+}
+
+// Compact section headers
+.admin-dashboard-stats .section-header,
+.admin-user-stats-section .section-header,
+.admin-course-stats-section .section-header,
+.admin-recent-activity-section .section-header {
+    margin-bottom: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+
+// Reduce margins between sections
+.admin-dashboard-stats + .admin-user-stats-section,
+.admin-user-stats-section + .admin-course-stats-section,
+.admin-course-stats-section + .admin-recent-activity-section {
+    margin-top: 0;
+}
+
+// Additional spacing optimizations
+.admin-dashboard-stats {
+    margin-bottom: 0;
+}
+
+.admin-user-stats-section {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.admin-course-stats-section {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.admin-recent-activity-section {
+    margin-top: 0;
+}
+
+// Additional full-screen optimizations
+.admin-dashboard {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+// Eliminate all default margins and padding
+.admin-dashboard * {
+    box-sizing: border-box;
+}
+
+.admin-dashboard .row {
+    margin: 0 !important;
+}
+
+.admin-dashboard .col,
+.admin-dashboard [class*="col-"] {
+    padding: 0.1rem !important;
+}
+
+// Remove any remaining spacing from cards and containers
+.admin-stat-card *,
+.admin-user-stat-card *,
+.admin-course-stat-card * {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+// Ultra-compact card content
+.admin-stat-card .card-body,
+.admin-user-stat-card .card-body,
+.admin-course-stat-card .card-body {
+    padding: 0.1rem !important;
+}
+
+// Remove spacing from badges and labels
+.admin-dashboard .badge,
+.admin-dashboard .label {
+    margin: 0 !important;
+    padding: 0.1rem 0.2rem !important;
+}
+
+// Ultra-compact text spacing
+.admin-dashboard h1,
+.admin-dashboard h2,
+.admin-dashboard h3,
+.admin-dashboard h4,
+.admin-dashboard h5,
+.admin-dashboard h6 {
+    margin: 0 !important;
+    line-height: 1.1 !important;
+}
+
+.admin-dashboard p {
+    margin: 0 !important;
+    line-height: 1.0 !important;
+}
+
+// Remove spacing from lists and other elements
+.admin-dashboard ul,
+.admin-dashboard ol,
+.admin-dashboard li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+// Compact button spacing
+.admin-dashboard .btn {
+    margin: 0 !important;
+    padding: 0.1rem 0.2rem !important;
+}
+
+// Target specific Bootstrap spacing classes
+.admin-dashboard .mb-1,
+.admin-dashboard .mb-2,
+.admin-dashboard .mb-3,
+.admin-dashboard .mb-4,
+.admin-dashboard .mb-5,
+.admin-dashboard .mt-1,
+.admin-dashboard .mt-2,
+.admin-dashboard .mt-3,
+.admin-dashboard .mt-4,
+.admin-dashboard .mt-5 {
+    margin: 0 !important;
+}
+
+.admin-dashboard .p-1,
+.admin-dashboard .p-2,
+.admin-dashboard .p-3,
+.admin-dashboard .p-4,
+.admin-dashboard .p-5,
+.admin-dashboard .px-1,
+.admin-dashboard .px-2,
+.admin-dashboard .px-3,
+.admin-dashboard .py-1,
+.admin-dashboard .py-2,
+.admin-dashboard .py-3 {
+    padding: 0.1rem !important;
+}
+
+// Override any container spacing
+.admin-dashboard .container,
+.admin-dashboard .container-fluid {
+    padding: 0.1rem !important;
+    margin: 0 !important;
+}
+
+// Ensure all grid containers use full width
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.1rem;
+    width: 100%;
+    margin: 0;
+}
+
+.admin-user-stats-grid,
+.admin-course-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.1rem;
+    width: 100%;
+    margin: 0;
+}
+
+// Full width cards - Ultra Compact
+.admin-stat-card,
+.admin-user-stat-card,
+.admin-course-stat-card {
+    width: 100%;
+    min-height: 50px;
+    margin: 0;
+    padding: 0.1rem;
+}
+
+// Full width activity containers
+.admin-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 0.1rem;
+    width: 100%;
+    margin: 0;
+}
+
+// Mobile sidebar toggle button - FULL SCREEN
+.sidebar-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1002;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    
+    @media (max-width: 768px) {
+        display: block;
+    }
+    
+    &:hover {
+        background: #5a6fd8;
+    }
+}
+
+.admin-dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    padding: 2rem;
+    margin: -15px -15px 2rem -15px;
+    border-radius: 0 0 1.5rem 1.5rem;
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
+    
+    .admin-dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .admin-dashboard-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+    }
+    
+    .admin-dashboard-badge {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        
+        i {
+            color: white;
+            font-size: 2.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        padding: 1.5rem 1rem;
+        margin: -15px -15px 1.5rem -15px;
+        
+        .admin-dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .admin-dashboard-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .admin-dashboard-badge {
+            width: 70px;
+            height: 70px;
+            margin-top: 1rem;
+            
+            i {
+                font-size: 1.8rem;
+            }
+        }
+    }
+}
+
+// Stats Section Headers - Completely remove container backgrounds
+.stats-section-container {
+    width: 100%;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+    
+    .section-header {
+        background: transparent;
+        color: #2c3e50;
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            color: #6c757d;
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+        }
+        
+        .live-indicator {
+            background: #28a745;
+            border: none;
+            color: white;
+        }
+    }
+    
+    .container-fluid {
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+    }
+}
+
+// Management Dashboard Statistics
+.admin-dashboard-stats {
+    margin-bottom: 0;
+    padding: 5rem 2rem 2rem 2rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+    
+    .admin-stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        margin-bottom: 0;
+        max-width: none;
+        
+        .admin-stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            }
+            
+            .stat-icon-container {
+                position: absolute;
+                top: 1.5rem;
+                right: 1.5rem;
+                width: 50px;
+                height: 50px;
+                border-radius: 0.8rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                
+                .stat-icon {
+                    font-size: 1.5rem;
+                    color: white;
+                }
+            }
+            
+            .stat-content {
+                .stat-number {
+                    font-size: 2.2rem;
+                    font-weight: 700;
+                    color: #2c3e50;
+                    line-height: 1;
+                    margin-bottom: 0.5rem;
+                }
+                
+                .stat-label {
+                    font-size: 0.85rem;
+                    color: #7f8c8d;
+                    font-weight: 600;
+                    margin-bottom: 0.25rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                
+                .stat-status {
+                    font-size: 0.8rem;
+                    color: #27ae60;
+                    font-weight: 500;
+                }
+            }
+            
+            // Individual card colors
+            &.schools-card {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #3498db, #2980b9);
+                }
+            }
+            
+            &.courses-card {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #27ae60, #229954);
+                }
+            }
+            
+            &.students-card {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+                }
+            }
+            
+            &.rating-card {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #f39c12, #e67e22);
+                }
+            }
+        }
+        
+        @media (max-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            
+            .admin-stat-card {
+                padding: 1.5rem 1rem;
+                min-height: 140px;
+                
+                .stat-icon-container {
+                    width: 50px;
+                    height: 50px;
+                    top: 1.25rem;
+                    right: 1.25rem;
+                    
+                    .stat-icon {
+                        font-size: 1.5rem;
+                    }
+                }
+                
+                .stat-content {
+                    .stat-number {
+                        font-size: 2rem;
+                    }
+                    
+                    .stat-label {
+                        font-size: 0.8rem;
+                    }
+                    
+                    .stat-status {
+                        font-size: 0.75rem;
+                    }
+                }
+            }
+        }
+        
+        @media (max-width: 480px) {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+}
+
+// User Statistics Section
+.admin-user-stats-section {
+    margin-bottom: 0;
+    padding: 2rem 2rem 2rem 2rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin: 0.25rem 0 0 0;
+        }
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #27ae60;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            
+            .live-dot {
+                width: 8px;
+                height: 8px;
+                background: white;
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+            }
+        }
+    }
+    
+    .user-stats-container {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1.5rem;
+        padding: 0;
+        
+        .user-stat-card {
+            background: #e3f2fd;
+            border-radius: 0.75rem;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+                color: #7f8c8d;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            // Individual card colors matching the image
+            &.total-users {
+                .stat-number { color: #1976d2; }
+                .stat-label { color: #1976d2; }
+                background: #e3f2fd;
+            }
+            
+            &.teachers {
+                .stat-number { color: #388e3c; }
+                .stat-label { color: #388e3c; }
+                background: #e8f5e8;
+            }
+            
+            &.students {
+                .stat-number { color: #7b1fa2; }
+                .stat-label { color: #7b1fa2; }
+                background: #f3e5f5;
+            }
+            
+            &.admins {
+                .stat-number { color: #f57c00; }
+                .stat-label { color: #f57c00; }
+                background: #fff3e0;
+            }
+            
+            &.active-users {
+                .stat-number { color: #1976d2; }
+                .stat-label { color: #1976d2; }
+                background: #e3f2fd;
+            }
+            
+            &.new-users {
+                .stat-number { color: #d32f2f; }
+                .stat-label { color: #d32f2f; }
+                background: #ffebee;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            
+            .user-stat-card {
+                padding: 1rem 0.75rem;
+                
+                .stat-number {
+                    font-size: 1.5rem;
+                }
+                
+                .stat-label {
+                    font-size: 0.7rem;
+                }
+            }
+        }
+        
+        @media (max-width: 480px) {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+    }
+}
+
+// Course Statistics Section
+.admin-course-stats-section {
+    margin-bottom: 0;
+    padding: 2rem 2rem 2rem 2rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin: 0.25rem 0 0 0;
+        }
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #27ae60;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            
+            .live-dot {
+                width: 8px;
+                height: 8px;
+                background: white;
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+            }
+        }
+    }
+    
+    .course-stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        padding: 0 2rem;
+        
+        .course-stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            }
+            
+            .stat-icon-container {
+                width: 50px;
+                height: 50px;
+                border-radius: 0.75rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+                
+                .stat-icon {
+                    font-size: 1.5rem;
+                    color: white;
+                }
+            }
+            
+            .stat-content {
+                flex: 1;
+                
+                .stat-number {
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                    color: #2c3e50;
+                    line-height: 1;
+                    margin-bottom: 0.25rem;
+                }
+                
+                .stat-label {
+                    font-size: 0.9rem;
+                    color: #7f8c8d;
+                    font-weight: 500;
+                }
+            }
+            
+            // Individual card colors
+            &.total-courses {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #3498db, #2980b9);
+                }
+            }
+            
+            &.completion-rate {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #27ae60, #229954);
+                }
+            }
+            
+            &.avg-rating {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #f39c12, #e67e22);
+                }
+            }
+            
+            &.categories {
+                .stat-icon-container {
+                    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+                }
+            }
+        }
+        
+        @media (max-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            
+            .course-stat-card {
+                padding: 1.25rem 1rem;
+                
+                .stat-icon-container {
+                    width: 45px;
+                    height: 45px;
+                    
+                    .stat-icon {
+                        font-size: 1.3rem;
+                    }
+                }
+                
+                .stat-content {
+                    .stat-number {
+                        font-size: 1.5rem;
+                    }
+                    
+                    .stat-label {
+                        font-size: 0.8rem;
+                    }
+                }
+            }
+        }
+        
+        @media (max-width: 480px) {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+    
+    // Course Categories Section
+    .course-categories-section {
+        margin-top: 2rem;
+        
+        .subsection-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .categories-list {
+            .category-item {
+                background: #f8f9fa;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                border-left: 4px solid #667eea;
+                
+                .category-info {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 0.5rem;
+                    
+                    .category-name {
+                        font-weight: 600;
+                        color: #2c3e50;
+                        font-size: 0.9rem;
+                    }
+                    
+                    .category-stats {
+                        display: flex;
+                        gap: 1rem;
+                        font-size: 0.8rem;
+                        color: #6c757d;
+                        
+                        span {
+                            white-space: nowrap;
+                        }
+                    }
+                }
+                
+                .progress-bar {
+                    width: 100%;
+                    height: 6px;
+                    background: #e9ecef;
+                    border-radius: 3px;
+                    overflow: hidden;
+                    
+                    .progress-fill {
+                        height: 100%;
+                        background: linear-gradient(90deg, #667eea, #764ba2);
+                        border-radius: 3px;
+                        transition: width 0.3s ease;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Top Performing Courses Section
+    .top-courses-section {
+        margin-top: 2rem;
+        
+        .subsection-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .top-courses-list {
+            .course-item {
+                display: flex;
+                align-items: center;
+                padding: 0.75rem;
+                background: #f8f9fa;
+                border-radius: 0.5rem;
+                margin-bottom: 0.5rem;
+                transition: background-color 0.2s ease;
+                
+                &:hover {
+                    background: #e9ecef;
+                }
+                
+                .course-icon {
+                    width: 40px;
+                    height: 40px;
+                    background: #667eea;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 1rem;
+                    
+                    i {
+                        color: white;
+                        font-size: 1rem;
+                    }
+                }
+                
+                .course-info {
+                    flex: 1;
+                    
+                    .course-name {
+                        font-weight: 600;
+                        color: #2c3e50;
+                        font-size: 0.9rem;
+                        margin-bottom: 0.25rem;
+                    }
+                    
+                    .course-stats {
+                        font-size: 0.8rem;
+                        color: #6c757d;
+                    }
+                }
+            }
+            
+            .no-courses {
+                text-align: center;
+                padding: 2rem;
+                color: #6c757d;
+                font-style: italic;
+            }
+        }
+    }
+}
+
+// Recent Activity Section
+.admin-recent-activity-section {
+    margin-bottom: 0;
+    padding: 1rem 0;
+    background: transparent;
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin: 0.25rem 0 0 0;
+        }
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #9b59b6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            
+            .live-dot {
+                width: 8px;
+                height: 8px;
+                background: white;
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+                
+                &.purple {
+                    background: white;
+                }
+            }
+        }
+    }
+    
+    .recent-activity-container {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        margin: 0 2rem;
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f3f4;
+            
+            &:last-child {
+                border-bottom: none;
+            }
+            
+            .activity-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                
+                i {
+                    font-size: 1.2rem;
+                    color: white;
+                }
+                
+                &.red {
+                    background: linear-gradient(135deg, #e74c3c, #c0392b);
+                }
+                
+                &.blue {
+                    background: linear-gradient(135deg, #3498db, #2980b9);
+                }
+                
+                &.green {
+                    background: linear-gradient(135deg, #27ae60, #229954);
+                }
+                
+                &.purple {
+                    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+                }
+            }
+            
+            .activity-content {
+                flex: 1;
+                
+                .activity-title {
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    color: #2c3e50;
+                    margin-bottom: 0.25rem;
+                }
+                
+                .activity-author {
+                    font-size: 0.8rem;
+                    color: #7f8c8d;
+                }
+            }
+            
+            .activity-time {
+                font-size: 0.8rem;
+                color: #95a5a6;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+        }
+        
+        .no-activity {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            
+            i {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+                display: block;
+            }
+            
+            p {
+                margin: 0;
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+// Floating Action Button
+.admin-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    
+    .fab-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s ease;
+        
+        &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+}
+
+// Animations
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// Responsive adjustments for admin dashboard
+@media (max-width: 768px) {
+    .admin-dashboard-header {
+        .admin-dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .admin-dashboard-subtitle {
+            font-size: 1rem;
+        }
+    }
+    
+    .admin-fab {
+        bottom: 1rem;
+        right: 1rem;
+        
+        .fab-button {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
         }
     }
 }
