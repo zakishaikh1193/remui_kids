@@ -53,3 +53,5 @@ echo "<button onclick=\"window.location.href='" . $CFG->wwwroot . "/course/view.
 echo "<hr>";
 echo "<p><a href='javascript:history.back()'>← Go Back</a></p>";
 ?>
+
+

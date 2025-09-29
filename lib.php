@@ -1080,14 +1080,8 @@ function theme_remui_kids_get_admin_dashboard_stats() {
         // Exclude system categories and count only meaningful school categories
         $totalschools = $DB->count_records_sql(
             "SELECT COUNT(*) 
-             FROM {course_categories} 
-             WHERE visible = 1 
-             AND id > 1 
-             AND (name NOT LIKE '%Miscellaneous%' 
-                  AND name NOT LIKE '%Default%' 
-                  AND name NOT LIKE '%System%'
-                  AND name NOT LIKE '%General%')
-             AND parent = 0", // Only top-level categories
+             FROM {company} ",
+             
             []
         );
         
@@ -1152,7 +1146,7 @@ function theme_remui_kids_get_admin_user_stats() {
         $totalusers = $DB->count_records('user', ['deleted' => 0]);
         
         // Get teachers count
-        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teachers']);
         $teachers = 0;
         if ($teacherrole) {
             $teachers = $DB->count_records_sql(
@@ -1194,10 +1188,10 @@ function theme_remui_kids_get_admin_user_stats() {
         
         // Get active users (logged in within last 30 days)
         $activeusers = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT userid) 
-             FROM {user_lastaccess} 
-             WHERE lastaccess > ?",
-            [time() - (30 * 24 * 60 * 60)]
+            "SELECT COUNT(DISTINCT u.id) FROM {user} u 
+             JOIN {user_lastaccess} ul ON u.id = ul.userid 
+             WHERE u.deleted = 0 AND ul.timeaccess > ?",
+            [time() - (30 * 24 * 60 * 60)] // Last 30 days
         );
         
         // Get new users this month

@@ -103,3 +103,5 @@ echo "<p><strong>Test 7 - All Parameters:</strong> <a href='" . $url7 . "' targe
 echo "<hr>";
 echo "<p><a href='javascript:history.back()'>← Go Back</a></p>";
 ?>
+
+

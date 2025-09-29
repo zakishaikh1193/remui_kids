@@ -52,3 +52,5 @@ echo "<p><strong>Course URL:</strong> <a href='" . $course_url . "' target='_bla
 echo "<hr>";
 echo "<p><a href='javascript:history.back()'>← Go Back</a></p>";
 ?>
+
+

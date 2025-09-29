@@ -787,22 +787,6 @@ echo $OUTPUT->header();
                         </div>
                     </div>
 
-                    <div class="management-card" onclick="manageIOMADSettings()">
-                        <div class="card-icon settings-icon">
-                            <i class="fa fa-cogs"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Manage IOMAD Course Settings</h3>
-                            <p class="card-subtitle">Course Configuration</p>
-                            <p class="card-description">Configure advanced course settings and parameters</p>
-                            <div class="card-status">
-                                <span class="status-available">Available</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
-                        </div>
-                    </div>
 
                     <div class="management-card" onclick="assignToSchool()">
                         <div class="card-icon school-icon">
@@ -1003,10 +987,6 @@ function selectCourseForContent(courseId) {
     viewCourse(courseId);
 }
 
-function manageIOMADSettings() {
-    // Redirect to IOMAD settings
-    window.location.href = 'http://localhost/Kodeit-Iomad-local/iomad-test/theme/remui_kids/admin/search.php#linkcourses';
-}
 
 function assignToSchool() {
     // Redirect to modern school course assignment page
