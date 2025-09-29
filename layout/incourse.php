@@ -30,7 +30,7 @@ if(!apply_latest_user_pref()){
     user_preference_allow_ajax_update('enable_focus_mode', PARAM_BOOL);
 }
 
-require_once($CFG->dirroot . '/theme/remui/layout/common.php');
+require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
 if (isset($templatecontext['focusdata']['enabled']) && $templatecontext['focusdata']['enabled']) {
     if (isset($PAGE->cm->id)) {
