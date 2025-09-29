@@ -24,7 +24,7 @@
 
  defined('MOODLE_INTERNAL') || die();
 
- $plugin->version   = 2025012600;    // updated to a higher version
+ $plugin->version   = 2025080200;    // updated to a higher version
  $plugin->requires  = 2022041200;    // Moodle version required
  $plugin->release   = '1.1.0';       // updated release version
  $plugin->component = 'theme_remui_kids';

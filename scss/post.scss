@@ -2,8 +2,7 @@
 // This file contains all the custom styles for the child theme
 // The parent theme styles are automatically inherited
 
-// 
-====================================
+// ====================================
 // MOODLE MAIN CONTENT OVERRIDE
 // ========================================
 
@@ -8648,6 +8647,9 @@ body:has(.admin-sidebar-wrapper) {
             .modal-body {
                 padding: 1rem;
             }
+        }
+    }
+}
         }
     }
 }
