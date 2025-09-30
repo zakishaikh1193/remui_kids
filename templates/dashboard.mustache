@@ -1117,42 +1117,6 @@
     // Auto-refresh middle school course count every 30 seconds
     setInterval(refreshMiddleCourseCount, 30000);
 
-    // Debug function to test AJAX endpoint
-    function testAjaxEndpoint() {
-        console.log('Testing AJAX endpoint...');
-        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.text();
-            })
-            .then(text => {
-                console.log('Raw response:', text);
-                try {
-                    const data = JSON.parse(text);
-                    console.log('Parsed data:', data);
-                    alert('AJAX Test Result: ' + JSON.stringify(data, null, 2));
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                    alert('JSON Parse Error: ' + e.message + '\nRaw response: ' + text);
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                alert('Fetch Error: ' + error.message);
-            });
-    }
-
-    // Add test button for debugging
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add a test button for debugging (remove this in production)
-        const testButton = document.createElement('button');
-        testButton.textContent = 'Test AJAX';
-        testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;';
-        testButton.onclick = testAjaxEndpoint;
-        document.body.appendChild(testButton);
-        
-        console.log('Dashboard loaded, AJAX functions available');
-    });
     </script>
     {{/middle}}
 
