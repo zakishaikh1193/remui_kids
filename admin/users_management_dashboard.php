@@ -159,6 +159,317 @@ $templatecontext = [
 ];
 
 echo $OUTPUT->header();
+
+// Admin Sidebar Navigation
+echo "<div class='admin-sidebar'>";
+echo "<div class='sidebar-content'>";
+echo "<!-- DASHBOARD Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>DASHBOARD</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/my/' class='sidebar-link'>";
+echo "<i class='fa fa-th-large sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Admin Dashboard</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/admin/search.php' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Site Administration</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Community</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Enrollments</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- TEACHERS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>TEACHERS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/teachers_list.php' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Teachers</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-medal sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Master Trainers</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- COURSES & PROGRAMS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
+echo "<i class='fa fa-book sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Courses & Programs</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Certifications</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Assessments</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-school sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Schools</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- INSIGHTS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>INSIGHTS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/local/edwiserreports/index.php' class='sidebar-link'>";
+echo "<i class='fa fa-chart-bar sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Analytics</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-chart-line sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Predictive Models</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-file-alt sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Reports</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-map sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Competencies Map</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- SETTINGS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>SETTINGS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>System Settings</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item active'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/users_management_dashboard.php' class='sidebar-link'>";
+echo "<i class='fa fa-user-friends sidebar-icon'></i>";
+echo "<span class='sidebar-text'>User Management</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Cohort Navigation</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+echo "</div>";
+echo "</div>";
+
+// Main content area with sidebar
+echo "<div class='admin-main-content'>";
+
+// Add CSS for sidebar
+echo "<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    
+    /* Admin Sidebar Navigation - Sticky on all pages */
+    .admin-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        z-index: 1000;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+    
+    .admin-sidebar .sidebar-content {
+        padding: 6rem 0 2rem 0;
+    }
+    
+    .admin-sidebar .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .admin-sidebar .sidebar-category {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        margin-top: 0;
+    }
+    
+    .admin-sidebar .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-sidebar .sidebar-item {
+        margin-bottom: 0.25rem;
+    }
+    
+    .admin-sidebar .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .admin-sidebar .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border-left-color: #667eea;
+    }
+    
+    .admin-sidebar .sidebar-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 1rem;
+        font-size: 1rem;
+        color: #6c757d;
+        text-align: center;
+    }
+    
+    .admin-sidebar .sidebar-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-link {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border-left-color: #1976d2;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-icon {
+        color: #1976d2;
+    }
+    
+    /* Scrollbar styling */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Main content area with sidebar - FULL SCREEN */
+    .admin-main-content {
+        position: fixed;
+        top: 0;
+        left: 280px;
+        width: calc(100vw - 280px);
+        height: 100vh;
+        background-color: #ffffff;
+        overflow-y: auto;
+        z-index: 99;
+        will-change: transform;
+        backface-visibility: hidden;
+        padding-top: 80px; /* Add padding to account for topbar */
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .admin-sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+        
+        .admin-main-content {
+            position: relative;
+            left: 0;
+            width: 100vw;
+            height: auto;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+    }
+</style>";
+
 echo $OUTPUT->render_from_template('theme_remui_kids/users_management_dashboard', $templatecontext);
+echo "</div>"; // End admin-main-content
 echo $OUTPUT->footer();
 ?>
