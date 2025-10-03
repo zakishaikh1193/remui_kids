@@ -428,126 +428,153 @@ echo "<div class='admin-main-content'>";
 .courses-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px;
+    background: #ffffff;
     min-height: 100vh;
 }
 
 .courses-header {
     text-align: center;
-    margin-bottom: 40px;
-    color: white;
+    margin-bottom: 50px;
+    color: #2c3e50;
     position: relative;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
+
+.courses-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #28a745,#764ba2,#fd7e14);
+}
+
 
 .courses-header h1 {
     font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    animation: titleGlow 2s ease-in-out infinite alternate;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    text-shadow: none;
 }
 
 .courses-header p {
     font-size: 1.1rem;
-    opacity: 0.9;
+    color: #6c757d;
     margin-bottom: 30px;
+    font-weight: 500;
 }
 
 .header-actions {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 20px;
+    right: 20px;
     display: flex;
     gap: 15px;
 }
 
 .header-btn {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 20px;
-    border-radius: 25px;
+    background: #ffffff;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+    padding: 12px 24px;
+    border-radius: 12px;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .header-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: #f8f9fa;
+    border-color: #dee2e6;
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
 .header-btn.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
     border: none;
 }
 
 .header-btn.primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
 }
 
-@keyframes titleGlow {
-    from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
-    to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.6); }
-}
 
 .stats-row {
     display: flex;
-    justify-content: center;
-    gap: 30px;
+    justify-content: space-between;
+    gap: 20px;
     margin-bottom: 40px;
     flex-wrap: wrap;
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 25px;
-    border-radius: 20px;
+    background:rgb(247, 247, 247);
+    padding: 30px;
+    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
     transition: all 0.3s ease;
     animation: fadeInUp 0.6s ease-out;
     display: flex;
     align-items: center;
     gap: 20px;
-    min-width: 200px;
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #28a745);
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border-color: #dee2e6;
 }
 
-.stat-card.stat-courses {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+.stat-card.stat-courses::before {
+    background: linear-gradient(90deg, #007bff, #0056b3);
 }
 
-.stat-card.stat-categories {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
+.stat-card.stat-categories::before {
+    background: linear-gradient(90deg, #28a745, #1e7e34);
 }
 
-.stat-card.stat-enrollments {
-    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
-    color: white;
+.stat-card.stat-enrollments::before {
+    background: linear-gradient(90deg, #6f42c1, #5a359a);
 }
 
-.stat-card.stat-paths {
-    background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
-    color: white;
+.stat-card.stat-paths::before {
+    background: linear-gradient(90deg, #fd7e14, #e55a00);
 }
 
 .stat-icon {
     font-size: 2.5rem;
+    color: #6c757d;
     opacity: 0.8;
 }
 
@@ -560,11 +587,12 @@ echo "<div class='admin-main-content'>";
     font-weight: 700;
     margin-bottom: 5px;
     line-height: 1;
+    color: #2c3e50;
 }
 
 .stat-content .label {
     font-size: 1rem;
-    opacity: 0.9;
+    color: #6c757d;
     font-weight: 500;
 }
 
@@ -583,11 +611,11 @@ echo "<div class='admin-main-content'>";
 
 .section-title {
     text-align: center;
-    color: white;
+    color: #2c3e50;
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    margin-bottom: 40px;
+    text-shadow: none;
 }
 
 /* Management Cards Grid */
@@ -606,77 +634,84 @@ echo "<div class='admin-main-content'>";
 
 .management-card {
     width: 100%;
-    max-width: 300px;
-    background: rgba(45, 45, 45, 0.95);
+    max-width: 320px;
+    background:#ffffff;
     border-radius: 15px;
     padding: 25px;
-    color: white;
+    color: #2c3e50;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
     display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
+    flex-direction: column;
+    gap: 15px;
 }
 
 .management-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    background: rgba(55, 55, 55, 0.95);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border-color: #dee2e6;
 }
 
 .card-icon {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     flex-shrink: 0;
+    align-self: flex-start;
+    color: #ffffff;
 }
 
 .create-icon { background: linear-gradient(135deg, #28a745, #20c997); }
 .enrollment-icon { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
 .content-icon { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
 .settings-icon { background: linear-gradient(135deg, #fd7e14, #dc3545); }
-.school-icon { background: linear-gradient(135deg, #28a745, #20c997); }
-.groups-icon { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
-.course-groups-icon { background: linear-gradient(135deg, #e83e8c, #fd7e14); }
-.location-icon { background: linear-gradient(135deg, #fd7e14, #dc3545); }
-.learning-paths-icon { background: linear-gradient(135deg, #17a2b8, #6f42c1); }
+.view-courses-icon { background: linear-gradient(135deg, #17a2b8, #138496); }
 
 .card-content {
+    width: 100%;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .card-content h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.2rem;
+    margin: 0;
+    font-size: 1.3rem;
     font-weight: 600;
-    color: white;
+    color: #2c3e50;
+    line-height: 1.3;
 }
 
 .card-subtitle {
-    margin: 0 0 8px 0;
-    font-size: 0.9rem;
-    color: #ccc;
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6c757d;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .card-description {
-    margin: 0 0 12px 0;
-    font-size: 0.85rem;
-    color: #aaa;
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
     line-height: 1.4;
 }
 
 .card-status {
-    margin-top: 10px;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .status-available {
@@ -690,28 +725,29 @@ echo "<div class='admin-main-content'>";
 }
 
 .card-arrow {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 1.1rem;
+    color: #6c757d;
     transition: all 0.3s ease;
+    align-self: flex-end;
 }
 
 .management-card:hover .card-arrow {
-    color: white;
-    transform: translateX(5px);
+    color: #007bff;
+    transform: translateX(3px);
 }
 
 
 .action-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     color: white;
     border: none;
     padding: 15px 30px;
-    border-radius: 50px;
+    border-radius: 12px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,123,255,0.2);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -720,9 +756,10 @@ echo "<div class='admin-main-content'>";
 
 .action-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 25px rgba(0,123,255,0.3);
     color: white;
     text-decoration: none;
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
 }
 
 .action-btn i {
@@ -931,13 +968,14 @@ echo "<div class='admin-main-content'>";
     
     .stats-row {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
+        gap: 15px;
     }
     
     .stat-card {
         min-width: auto;
         width: 100%;
-        max-width: 300px;
+        flex: none;
     }
     
     .management-grid {
@@ -983,9 +1021,9 @@ echo "<div class='admin-main-content'>";
                 <i class="fa fa-refresh"></i>
                 Refresh
             </button> -->
-            <button class="header-btn primary" onclick="window.location.href='course_categories.php'">
-                <i class="fa fa-plus"></i>
-                Quick Add
+            <button class="header-btn primary"  onclick="viewAllCourses()">
+                <i class="fa fa-list"></i>
+                View All Courses
             </button>
         </div>
         <h1>Courses & Categories Management</h1>
@@ -1053,10 +1091,10 @@ echo "<div class='admin-main-content'>";
                             <p class="card-description">Add new courses and organize them into categories</p>
                             <div class="card-status">
                                 <span class="status-available"><?php echo $total_categories; ?> Available</span>
+                                <div class="card-arrow">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
                         </div>
                     </div>
 
@@ -1065,15 +1103,15 @@ echo "<div class='admin-main-content'>";
                             <i class="fa fa-user-plus"></i>
                         </div>
                         <div class="card-content">
-                        <h3>User Enrollments</h3>
-                        <p class="card-subtitle">Enrollment Management</p>
-                        <p class="card-description">Manage student enrollments and track progress</p>
+                            <h3>User Enrollments</h3>
+                            <p class="card-subtitle">Enrollment Management</p>
+                            <p class="card-description">Manage student enrollments and track progress</p>
                             <div class="card-status">
                                 <span class="status-available"><?php echo number_format($total_enrollments); ?> Available</span>
+                                <div class="card-arrow">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
                         </div>
                     </div>
 
@@ -1087,98 +1125,32 @@ echo "<div class='admin-main-content'>";
                             <p class="card-description">Add Activities, Quiz, Etc...</p>
                             <div class="card-status">
                                 <span class="status-available"><?php echo $total_courses; ?> Available</span>
+                                <div class="card-arrow">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
+                    </div>
+
+                    <div class="management-card" onclick="viewAllCourses()">
+                        <div class="card-icon view-courses-icon">
+                            <i class="fa fa-list"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>View All Courses</h3>
+                            <p class="card-subtitle">Course Overview</p>
+                            <p class="card-description">Browse and manage all courses in the system</p>
+                            <div class="card-status">
+                                <span class="status-available"><?php echo $total_courses; ?> Total</span>
+                                <div class="card-arrow">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
 
-                    <div class="management-card" onclick="assignToSchool()">
-                        <div class="card-icon school-icon">
-                            <i class="fa fa-building"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Assign to School</h3>
-                            <p class="card-subtitle">School Assignment</p>
-                            <p class="card-description">Assign courses to specific schools and institutions</p>
-                            <div class="card-status">
-                                <span class="status-available">Available</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
-                        </div>
-                    </div>
 
-                    <div class="management-card" onclick="manageSchoolGroups()">
-                        <div class="card-icon groups-icon">
-                            <i class="fa fa-users"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Manage School Groups</h3>
-                            <p class="card-subtitle">Group Management</p>
-                            <p class="card-description">Create and manage groups within schools</p>
-                            <div class="card-status">
-                                <span class="status-available">Available</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="management-card" onclick="assignCourseGroups()">
-                        <div class="card-icon course-groups-icon">
-                            <i class="fa fa-th"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Assign Course Groups</h3>
-                            <p class="card-subtitle">Group Assignment</p>
-                            <p class="card-description">Assign courses to specific user groups</p>
-                            <div class="card-status">
-                                <span class="status-available">Available</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="management-card" onclick="manageTeachingLocations()">
-                        <div class="card-icon location-icon">
-                            <i class="fa fa-map-marker"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Teaching Locations</h3>
-                            <p class="card-subtitle">Location Management</p>
-                            <p class="card-description">Manage physical and virtual teaching locations</p>
-                            <div class="card-status">
-                                <span class="status-available">Available</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <i class="fa fa-arrow-right"></i>
-            </div>
-        </div>
-        
-                <div class="management-card" onclick="manageLearningPaths()">
-                    <div class="card-icon learning-paths-icon">
-                        <i class="fa fa-sitemap"></i>
-            </div>
-                    <div class="card-content">
-                        <h3>Learning Paths</h3>
-                        <p class="card-subtitle">Path Management</p>
-                        <p class="card-description">Create structured learning journeys and pathways</p>
-                        <div class="card-status">
-                            <span class="status-available">57 Available</span>
-        </div>
-        </div>
-                    <div class="card-arrow">
-                        <i class="fa fa-arrow-right"></i>
-    </div>
-                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -1297,31 +1269,13 @@ function selectCourseForContent(courseId) {
     viewCourse(courseId);
 }
 
-
-function assignToSchool() {
-    // Redirect to modern school course assignment page
-    window.location.href = WWWROOT + '/theme/remui_kids/admin/assign_to_school.php';
+function viewAllCourses() {
+    // Redirect to course management page
+    window.location.href = WWWROOT + '/course/management.php';
 }
 
-function manageSchoolGroups() {
-    // Redirect to school groups management
-    window.location.href = WWWROOT + '/theme/remui_kids/admin/search.php#linkcourses';
-}
 
-function assignCourseGroups() {
-    // Redirect to course groups assignment
-    window.location.href = WWWROOT + '/theme/remui_kids/admin/search.php#linkcourses';
-}
 
-function manageTeachingLocations() {
-    // Redirect to teaching locations management
-    window.location.href = WWWROOT + '/theme/remui_kids/admin/search.php#linkcourses';
-}
-
-function manageLearningPaths() {
-    // Redirect to learning paths management
-    window.location.href = WWWROOT + '/theme/remui_kids/admin/search.php#linkcourses';
-}
 
 function showMessage(message, type) {
     const messageDiv = document.createElement('div');

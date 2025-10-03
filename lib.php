@@ -232,11 +232,13 @@ function theme_remui_kids_get_section_image($sectionnum) {
     // Default course section images - you can customize these
     $default_images = [
         1 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
-        2 => 'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
-        3 => 'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        2 =>  'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        3 =>'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
         4 => 'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
         5 => 'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
-        6 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg'
+        6 => 'https://img.freepik.com/free-photo/smiling-schoolgirl-holding-books-looking_171337-271.jpg',
+        7 => 'https://img.freepik.com/free-photo/sideways-school-boy-copy-space_23-2148764003.jpg',
+        8 => 'https://img.freepik.com/free-photo/little-girl-t-shirt-jumpsuit-pointing-up-looking-attentive_176474-39979.jpg',
     ];
     
     $index = (($sectionnum - 1) % 6) + 1;
@@ -488,11 +490,13 @@ function theme_remui_kids_get_course_image($course) {
     
     // Default course images based on category or course name
     $default_images = [
-       'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
         'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
         'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
         'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
-        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
+        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
+        'https://img.freepik.com/free-photo/sideways-school-boy-copy-space_23-2148764003.jpg',
+        'https://img.freepik.com/free-photo/little-girl-t-shirt-jumpsuit-pointing-up-looking-attentive_176474-39979.jpg',
     ];
     
     // Use course ID to consistently select the same image for the same course
@@ -700,11 +704,13 @@ function theme_remui_kids_get_elementary_courses($userid) {
             } else {
                 // Fallback to default course images from Unsplash
                 $defaultimages = [
-                    'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
-                    'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
-                    'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
-                    'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
-                    'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
+         'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
+        'https://img.freepik.com/free-photo/sideways-school-boy-copy-space_23-2148764003.jpg',
+        'https://img.freepik.com/free-photo/little-girl-t-shirt-jumpsuit-pointing-up-looking-attentive_176474-39979.jpg',
                 ];
                 $courseimage = $defaultimages[array_rand($defaultimages)];
             }
