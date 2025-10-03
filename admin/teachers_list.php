@@ -763,7 +763,7 @@ echo "<div class='admin-main-content'>";
 
 try {
     // Get teachers role
-    $teacherrole = $DB->get_record('role', ['shortname' => 'teachers']);
+    $teacherrole = $DB->get_record('role', ['shortname' => 'teachers'|| 'editingteacher' || 'teacher']);
     
     if (!$teacherrole) {
         echo "<div class='alert alert-warning'>";

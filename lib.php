@@ -231,12 +231,12 @@ function theme_remui_kids_get_section_image($sectionnum) {
     
     // Default course section images - you can customize these
     $default_images = [
-        1 => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop&crop=center',
-        2 => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop&crop=center',
-        3 => 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=200&fit=crop&crop=center',
-        4 => 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=200&fit=crop&crop=center',
-        5 => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop&crop=center',
-        6 => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop&crop=center',
+        1 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        2 => 'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        3 => 'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        4 => 'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+        5 => 'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
+        6 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg'
     ];
     
     $index = (($sectionnum - 1) % 6) + 1;
@@ -488,11 +488,11 @@ function theme_remui_kids_get_course_image($course) {
     
     // Default course images based on category or course name
     $default_images = [
-        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&h=400&fit=crop&crop=center',
+       'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
     ];
     
     // Use course ID to consistently select the same image for the same course
@@ -700,11 +700,11 @@ function theme_remui_kids_get_elementary_courses($userid) {
             } else {
                 // Fallback to default course images from Unsplash
                 $defaultimages = [
-                    'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1523240798036-942441c8ece9?w=400&h=200&fit=crop'
+                    'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+                    'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+                    'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+                    'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+                    'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
                 ];
                 $courseimage = $defaultimages[array_rand($defaultimages)];
             }
