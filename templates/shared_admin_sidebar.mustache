@@ -1,0 +1,124 @@
+{{!
+    Shared Admin Sidebar Template for remui_kids theme
+    
+    This template provides a consistent admin sidebar navigation component
+    that can be used in both the admin dashboard and individual admin pages.
+}}
+
+<!-- Global Admin Sidebar Navigation -->
+<div class="admin-sidebar">
+    <div class="sidebar-content">
+        <!-- DASHBOARD Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">DASHBOARD</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item {{#dashboard_active}}active{{/dashboard_active}}">
+                    <a href="{{{wwwroot}}}/my/" class="sidebar-link">
+                        <i class="fa fa-th-large sidebar-icon"></i>
+                        <span class="sidebar-text">Admin Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{#site_admin_active}}active{{/site_admin_active}}">
+                    <a href="{{{wwwroot}}}/admin/search.php" class="sidebar-link">
+                        <i class="fa fa-cog sidebar-icon"></i>
+                        <span class="sidebar-text">Site Administration</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{{wwwroot}}}/theme/remui_kids/admin/enrollments.php" class="sidebar-link">
+                        <i class="fa fa-graduation-cap sidebar-icon"></i>
+                        <span class="sidebar-text">Enrollments</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- TEACHERS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">TEACHERS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item {{#teachers_list_active}}active{{/teachers_list_active}}">
+                    <a href="{{{wwwroot}}}/theme/remui_kids/admin/teachers_list.php" class="sidebar-link">
+                        <i class="fa fa-users sidebar-icon"></i>
+                        <span class="sidebar-text">Teachers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-medal sidebar-icon"></i>
+                        <span class="sidebar-text">Master Trainers</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- COURSES & PROGRAMS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">COURSES & PROGRAMS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item {{#course_content_active}}active{{/course_content_active}}">
+                    <a href="{{{wwwroot}}}/theme/remui_kids/admin/manage_course_content.php" class="sidebar-link">
+                        <i class="fa fa-book sidebar-icon"></i>
+                        <span class="sidebar-text">Course Content</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-graduation-cap sidebar-icon"></i>
+                        <span class="sidebar-text">Certifications</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-clipboard-list sidebar-icon"></i>
+                        <span class="sidebar-text">Assessments</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-school sidebar-icon"></i>
+                        <span class="sidebar-text">Schools</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- INSIGHTS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">INSIGHTS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-chart-bar sidebar-icon"></i>
+                        <span class="sidebar-text">Analytics</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-file-alt sidebar-icon"></i>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- SETTINGS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">SETTINGS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item {{#system_settings_active}}active{{/system_settings_active}}">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-cog sidebar-icon"></i>
+                        <span class="sidebar-text">System Settings</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{#user_management_active}}active{{/user_management_active}}">
+                    <a href="{{{wwwroot}}}/theme/remui_kids/admin/user_management.php" class="sidebar-link">
+                        <i class="fa fa-users sidebar-icon"></i>
+                        <span class="sidebar-text">User Management</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

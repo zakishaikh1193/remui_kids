@@ -5,12 +5,12 @@
 1. **Copy Theme Files**: The theme files are already in place at `theme/remui_kids/`
 
 2. **Access Moodle Admin**:
-   - Go to: `http://localhost/Kodeit-Iomad-local/iomad-test`
-   - Login as admin (username: `admin`)
+   - Go to: `{your-site-url}` (e.g., `http://yourdomain.com/moodle`)
+   - Login as admin
 
 3. **Navigate to Theme Settings**:
    - Go to: **Site Administration** → **Appearance** → **Themes** → **Theme selector**
-   - Or directly: `http://localhost/Kodeit-Iomad-local/iomad-test/admin/settings.php?section=themesetting`
+   - Or directly: `{your-site-url}/admin/settings.php?section=themesetting`
 
 4. **Select RemUI Kids Theme**:
    - Find "RemUI Kids" in the theme list

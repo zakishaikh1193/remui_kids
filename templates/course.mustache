@@ -282,9 +282,26 @@
                                             </a>
                                             {{/has_started}}
                                             {{^has_started}}
-                                            <a href="{{{url}}}" class="btn btn-start">
-                                                Start <i class="fa fa-arrow-right" aria-hidden="true"></i>
-                                            </a>
+                                                {{^modname}}
+                                                    {{#is_subsection}}
+                                                        <!-- No Start button for subsection activities -->
+                                                    {{/is_subsection}}
+                                                    {{^is_subsection}}
+                                                        <a href="{{{url}}}" class="btn btn-start">
+                                                            Start <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                                        </a>
+                                                    {{/is_subsection}}
+                                                {{/modname}}
+                                                {{#modname}}
+                                                    {{#is_subsection}}
+                                                        <!-- No Start button for subsection activities -->
+                                                    {{/is_subsection}}
+                                                    {{^is_subsection}}
+                                                        <a href="{{{url}}}" class="btn btn-start">
+                                                            Start <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                                        </a>
+                                                    {{/is_subsection}}
+                                                {{/modname}}
                                             {{/has_started}}
                                         {{/is_completed}}
                                     </div>

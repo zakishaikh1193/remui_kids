@@ -258,6 +258,15 @@
             border-radius: 1rem;
             padding: 2rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            
+            // Ensure container takes full width
+            .container-fluid {
+                width: 100%;
+                max-width: 100%;
+                padding-left: 0;
+                padding-right: 0;
+            }
     
     .section-header {
         text-align: center;
@@ -289,6 +298,7 @@
             align-items: center;
             gap: 1rem;
             position: relative;
+            width: 100%;
             
             // Vertical progress line connector
             &::before {
@@ -373,6 +383,8 @@
                 transition: all 0.3s ease;
                 overflow: hidden;
                 background-color: #f8f9fa;
+                width: 100%;
+                flex: 1;
                 
                 &:hover {
                     transform: translateY(-2px);
@@ -385,6 +397,7 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
+            width: 100%;
         }
         
         .activity-image {
@@ -5476,6 +5489,7 @@ body.custom-dashboard-page.has-student-sidebar {
                                 list-style: none;
                                 padding: 0;
                                 margin: 0;
+                                width: 100%;
                                 
                                 .activity-item {
                                     display: flex;
@@ -7206,7 +7220,7 @@ body.has-student-sidebar {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
-        padding: 0 2rem;
+        padding: 0;
         
         .section-title {
             font-size: 1.5rem;
@@ -7246,7 +7260,7 @@ body.has-student-sidebar {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 2rem;
-        padding: 0 2rem;
+        padding: 0;
         
         .course-stat-card {
             background: white;
@@ -7497,7 +7511,7 @@ body.has-student-sidebar {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
-        padding: 0 2rem;
+        padding: 0;
         
         .section-title {
             font-size: 1.5rem;
@@ -7543,7 +7557,7 @@ body.has-student-sidebar {
         padding: 2rem;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         border: 1px solid rgba(0, 0, 0, 0.05);
-        margin: 0 2rem;
+        margin: 0;
         
         .activity-item {
             display: flex;
@@ -7630,36 +7644,6 @@ body.has-student-sidebar {
     }
 }
 
-// Floating Action Button
-.admin-fab {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000;
-    
-    .fab-button {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-        transition: all 0.3s ease;
-        
-        &:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-        }
-        
-        &:active {
-            transform: scale(0.95);
-        }
-    }
-}
-
 // Animations
 @keyframes pulse {
     0% {
@@ -7685,17 +7669,6 @@ body.has-student-sidebar {
         
         .admin-dashboard-subtitle {
             font-size: 1rem;
-        }
-    }
-    
-    .admin-fab {
-        bottom: 1rem;
-        right: 1rem;
-        
-        .fab-button {
-            width: 50px;
-            height: 50px;
-            font-size: 1.2rem;
         }
     }
 }
@@ -9657,6 +9630,7 @@ body:has(.admin-sidebar-wrapper) {
                             list-style: none;
                             padding: 0;
                             margin: 0;
+                            width: 100%;
                             
                             .activity-item {
                                 padding: 0.75rem 1rem;
@@ -10675,7 +10649,7 @@ body:has(.admin-sidebar-wrapper) {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
-        padding: 0 2rem;
+        padding: 0;
         
         .section-title {
             font-size: 1.5rem;
@@ -10715,7 +10689,7 @@ body:has(.admin-sidebar-wrapper) {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 2rem;
-        padding: 0 2rem;
+        padding: 0;
         
         .course-stat-card {
             background: white;
@@ -10966,7 +10940,7 @@ body:has(.admin-sidebar-wrapper) {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
-        padding: 0 2rem;
+        padding: 0;
         
         .section-title {
             font-size: 1.5rem;
@@ -11012,7 +10986,7 @@ body:has(.admin-sidebar-wrapper) {
         padding: 2rem;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         border: 1px solid rgba(0, 0, 0, 0.05);
-        margin: 0 2rem;
+        margin: 0;
         
         .activity-item {
             display: flex;
@@ -11099,36 +11073,6 @@ body:has(.admin-sidebar-wrapper) {
     }
 }
 
-// Floating Action Button
-.admin-fab {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000;
-    
-    .fab-button {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-        transition: all 0.3s ease;
-        
-        &:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-        }
-        
-        &:active {
-            transform: scale(0.95);
-        }
-    }
-}
-
 // Animations
 @keyframes pulse {
     0% {
@@ -11154,17 +11098,6 @@ body:has(.admin-sidebar-wrapper) {
         
         .admin-dashboard-subtitle {
             font-size: 1rem;
-        }
-    }
-    
-    .admin-fab {
-        bottom: 1rem;
-        right: 1rem;
-        
-        .fab-button {
-            width: 50px;
-            height: 50px;
-            font-size: 1.2rem;
         }
     }
 }

@@ -3,6 +3,8 @@
  * Simple AJAX Test - Test the AJAX endpoint directly
  */
 
+require_once('../../../config.php');
+
 echo "<h2>Simple AJAX Test</h2>";
 echo "<style>
     body { font-family: Arial, sans-serif; margin: 20px; }
@@ -13,7 +15,7 @@ echo "<style>
 </style>";
 
 // Test the AJAX endpoint
-$ajax_url = 'http://localhost/Kodeit-Iomad-local/iomad-test/test_ajax.php';
+$ajax_url = $CFG->wwwroot . '/test_ajax.php';
 
 echo "<div class='result'>";
 echo "<h3>Testing AJAX Endpoint</h3>";

@@ -148,6 +148,11 @@ function theme_remui_kids_get_course_sections_data($course) {
             continue;
         }
         
+        // Skip sections that are modules (subsections) - they should only be accessible within their parent sections
+        if ($section->component === 'mod_subsection') {
+            continue;
+        }
+        
         $section_data = [
             'id' => $section->id,
             'section' => $section->section,
@@ -273,7 +278,8 @@ function theme_remui_kids_get_section_activities($course, $sectionnum) {
                     'is_completed' => false,
                     'has_started' => false,
                     'start_date' => $cm->availablefrom ? date('M d, Y', $cm->availablefrom) : 'Available Now',
-                    'end_date' => $cm->availableuntil ? date('M d, Y', $cm->availableuntil) : 'No Deadline'
+                    'end_date' => $cm->availableuntil ? date('M d, Y', $cm->availableuntil) : 'No Deadline',
+                    'is_subsection' => ($cm->modname === 'subsection')
                 ];
                 
                 // Check completion if enabled
@@ -423,9 +429,12 @@ function theme_remui_kids_get_course_header_data($course) {
     
     foreach ($sections as $section) {
         if ($section->section > 0) { // Skip general section
-            $sectionscount++;
-            if (isset($modinfo->sections[$section->section])) {
-                $lessonscount += count($modinfo->sections[$section->section]);
+            // Skip sections that are modules (subsections) - they should only be accessible within their parent sections
+            if ($section->component !== 'mod_subsection') {
+                $sectionscount++;
+                if (isset($modinfo->sections[$section->section])) {
+                    $lessonscount += count($modinfo->sections[$section->section]);
+                }
             }
         }
     }
