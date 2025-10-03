@@ -155,7 +155,7 @@ try {
     echo "<div class='result'>";
     echo "<h3>4. AJAX Endpoint Test</h3>";
     
-    $ajax_url = 'http://localhost/Kodeit-Iomad-local/iomad-test/test_ajax.php';
+    $ajax_url = $CFG->wwwroot . '/test_ajax.php';
     
     $context = stream_context_create([
         'http' => [

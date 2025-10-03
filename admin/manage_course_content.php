@@ -431,6 +431,9 @@ echo "<div id='session-status' style='position: fixed; top: 10px; right: 10px; b
 </div>
 
 <script>
+// Get base URL from PHP
+const WWWROOT = '<?php echo $CFG->wwwroot; ?>';
+
 // Ensure jQuery is available
 if (typeof $ === 'undefined') {
     console.warn('jQuery not loaded, using vanilla JavaScript');
@@ -463,7 +466,7 @@ function toggleCategory(categoryId) {
 
 function viewCourse(courseId) {
     // Redirect to course view page
-    window.location.href = `http://localhost/Kodeit-Iomad-local/iomad-test/course/view.php?id=${courseId}`;
+    window.location.href = `${WWWROOT}/course/view.php?id=${courseId}`;
 }
 
 // Initialize page
