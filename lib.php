@@ -148,6 +148,11 @@ function theme_remui_kids_get_course_sections_data($course) {
             continue;
         }
         
+        // Skip sections that are modules (subsections) - they should only be accessible within their parent sections
+        if ($section->component === 'mod_subsection') {
+            continue;
+        }
+        
         $section_data = [
             'id' => $section->id,
             'section' => $section->section,
@@ -226,12 +231,12 @@ function theme_remui_kids_get_section_image($sectionnum) {
     
     // Default course section images - you can customize these
     $default_images = [
-        1 => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop&crop=center',
-        2 => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop&crop=center',
-        3 => 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=200&fit=crop&crop=center',
-        4 => 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=200&fit=crop&crop=center',
-        5 => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop&crop=center',
-        6 => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop&crop=center',
+        1 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        2 => 'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        3 => 'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        4 => 'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+        5 => 'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
+        6 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg'
     ];
     
     $index = (($sectionnum - 1) % 6) + 1;
@@ -273,7 +278,8 @@ function theme_remui_kids_get_section_activities($course, $sectionnum) {
                     'is_completed' => false,
                     'has_started' => false,
                     'start_date' => $cm->availablefrom ? date('M d, Y', $cm->availablefrom) : 'Available Now',
-                    'end_date' => $cm->availableuntil ? date('M d, Y', $cm->availableuntil) : 'No Deadline'
+                    'end_date' => $cm->availableuntil ? date('M d, Y', $cm->availableuntil) : 'No Deadline',
+                    'is_subsection' => ($cm->modname === 'subsection')
                 ];
                 
                 // Check completion if enabled
@@ -344,17 +350,17 @@ function theme_remui_kids_get_course_header_data($course) {
     // Get course image
     $courseimage = theme_remui_kids_get_course_image($course);
     
-    // Get enrolled students count (users with 'student' role)
-    $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+    // Get enrolled students count (users with 'trainee' role)
+    $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
     $enrolledstudentscount = 0;
-    if ($studentrole) {
+    if ($traineerole) {
         $enrolledstudentscount = $DB->count_records_sql(
             "SELECT COUNT(DISTINCT u.id) 
              FROM {user} u 
              JOIN {role_assignments} ra ON u.id = ra.userid 
              JOIN {context} ctx ON ra.contextid = ctx.id 
              WHERE ctx.contextlevel = ? AND ctx.instanceid = ? AND ra.roleid = ? AND u.deleted = 0",
-            [CONTEXT_COURSE, $course->id, $studentrole->id]
+            [CONTEXT_COURSE, $course->id, $traineerole->id]
         );
     }
     
@@ -423,9 +429,12 @@ function theme_remui_kids_get_course_header_data($course) {
     
     foreach ($sections as $section) {
         if ($section->section > 0) { // Skip general section
-            $sectionscount++;
-            if (isset($modinfo->sections[$section->section])) {
-                $lessonscount += count($modinfo->sections[$section->section]);
+            // Skip sections that are modules (subsections) - they should only be accessible within their parent sections
+            if ($section->component !== 'mod_subsection') {
+                $sectionscount++;
+                if (isset($modinfo->sections[$section->section])) {
+                    $lessonscount += count($modinfo->sections[$section->section]);
+                }
             }
         }
     }
@@ -479,11 +488,11 @@ function theme_remui_kids_get_course_image($course) {
     
     // Default course images based on category or course name
     $default_images = [
-        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=1200&h=400&fit=crop&crop=center',
-        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&h=400&fit=crop&crop=center',
+       'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
     ];
     
     // Use course ID to consistently select the same image for the same course
@@ -691,11 +700,11 @@ function theme_remui_kids_get_elementary_courses($userid) {
             } else {
                 // Fallback to default course images from Unsplash
                 $defaultimages = [
-                    'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop',
-                    'https://images.unsplash.com/photo-1523240798036-942441c8ece9?w=400&h=200&fit=crop'
+                    'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+                    'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+                    'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+                    'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+                    'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
                 ];
                 $courseimage = $defaultimages[array_rand($defaultimages)];
             }
@@ -1076,23 +1085,40 @@ function theme_remui_kids_get_admin_dashboard_stats() {
     global $DB;
     
     try {
-        // Get total schools (organizations)
-        $totalschools = $DB->count_records('course_categories', ['visible' => 1]);
+        // Get total schools - improved logic to count actual school-like categories
+        // Exclude system categories and count only meaningful school categories
+        $totalschools = $DB->count_records_sql(
+            "SELECT COUNT(*) 
+             FROM {company} ",
+             
+            []
+        );
         
-        // Get total courses
-        $totalcourses = $DB->count_records('course', ['visible' => 1]);
+        // If no meaningful categories found, fall back to all visible categories
+        if ($totalschools == 0) {
+            $totalschools = $DB->count_records_sql(
+                "SELECT COUNT(*) FROM {course_categories} WHERE visible = 1 AND id > 1",
+                []
+            );
+        }
         
-        // Get total students
-        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        // Get total courses (excluding site course)
+        $totalcourses = $DB->count_records_sql(
+            "SELECT COUNT(*) FROM {course} WHERE visible = 1 AND id > 1",
+            []
+        );
+        
+        // Get total students - using trainee role for consistency with enrollment system
+        $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
         $totalstudents = 0;
-        if ($studentrole) {
+        if ($traineerole) {
+
             $totalstudents = $DB->count_records_sql(
                 "SELECT COUNT(DISTINCT u.id) 
                  FROM {user} u 
                  JOIN {role_assignments} ra ON u.id = ra.userid 
-                 JOIN {context} ctx ON ra.contextid = ctx.id 
-                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
-                [CONTEXT_SYSTEM, $studentrole->id]
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname = 'trainee'||'student' AND u.deleted = 0 AND u.suspended = 0"
             );
         }
         
@@ -1103,14 +1129,16 @@ function theme_remui_kids_get_admin_dashboard_stats() {
             'total_schools' => $totalschools,
             'total_courses' => $totalcourses,
             'total_students' => $totalstudents,
-            'avg_course_rating' => $avgcourserating
+            'avg_course_rating' => $avgcourserating,
+            'last_updated' => time() // Add timestamp for real-time tracking
         ];
     } catch (Exception $e) {
         return [
             'total_schools' => 0,
             'total_courses' => 0,
             'total_students' => 0,
-            'avg_course_rating' => 0
+            'avg_course_rating' => 0,
+            'last_updated' => time()
         ];
     }
 }
@@ -1128,7 +1156,7 @@ function theme_remui_kids_get_admin_user_stats() {
         $totalusers = $DB->count_records('user', ['deleted' => 0]);
         
         // Get teachers count
-        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teachers']);
         $teachers = 0;
         if ($teacherrole) {
             $teachers = $DB->count_records_sql(
@@ -1141,17 +1169,17 @@ function theme_remui_kids_get_admin_user_stats() {
             );
         }
         
-        // Get students count
-        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        // Get students count - using trainee role for consistency with enrollment system
+        $traineerole = $DB->get_record('role', ['shortname' => 'trainee'||'student']);
         $students = 0;
-        if ($studentrole) {
+        if ($traineerole) {
             $students = $DB->count_records_sql(
                 "SELECT COUNT(DISTINCT u.id) 
                  FROM {user} u 
                  JOIN {role_assignments} ra ON u.id = ra.userid 
-                 JOIN {context} ctx ON ra.contextid = ctx.id 
-                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
-                [CONTEXT_SYSTEM, $studentrole->id]
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname = 'trainee' || 'student' AND u.deleted = 0"
+
             );
         }
         
@@ -1171,10 +1199,11 @@ function theme_remui_kids_get_admin_user_stats() {
         
         // Get active users (logged in within last 30 days)
         $activeusers = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT userid) 
-             FROM {user_lastaccess} 
-             WHERE lastaccess > ?",
-            [time() - (30 * 24 * 60 * 60)]
+            "SELECT COUNT(DISTINCT u.id) FROM {user} u 
+             JOIN {user_lastaccess} ul ON u.id = ul.userid 
+             WHERE u.deleted = 0 AND ul.timeaccess > ?",
+            [time() - (30 * 24 * 60 * 60)] // Last 30 days
+
         );
         
         // Get new users this month
@@ -1215,7 +1244,11 @@ function theme_remui_kids_get_admin_course_stats() {
     
     try {
         // Get total courses
-        $totalcourses = $DB->count_records('course', ['visible' => 1]);
+        //$totalcourses = $DB->count_records('course', ['visible' => 1]);
+        $totalcourses = $DB->count_records_sql(
+            "SELECT COUNT(*) FROM {course} WHERE visible = 1 AND id > 1",
+            []
+        );
         
         // Get completion rate (mock data for now)
         $completionrate = 0; // Will be implemented when completion tracking is analyzed
@@ -2276,4 +2309,3 @@ function theme_remui_kids_get_highschool_dashboard_metrics($userid) {
         ];
     }
 }
-

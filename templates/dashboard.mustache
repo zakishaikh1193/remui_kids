@@ -127,13 +127,19 @@
                 <div class="col-12">
                     <div class="elementary-stats-container">
                         <!-- Total Courses Card -->
-                        <div class="elementary-stat-card courses-card">
+                        <div class="elementary-stat-card courses-card" id="courses-card">
                             <div class="stat-icon-container">
                                 <i class="fa fa-book stat-icon"></i>
                             </div>
                             <div class="stat-content">
-                                <div class="stat-number">{{total_courses}}</div>
+                                <div class="stat-number" id="total-courses-count">{{total_courses}}</div>
                                 <div class="stat-label">Courses</div>
+                                <div class="stat-updated" id="courses-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
+                                    Last updated: {{#elementary_stats}}{{#last_updated}}{{last_updated}}{{/last_updated}}{{/elementary_stats}}
+                                </div>
+                            </div>
+                            <div class="stat-refresh-btn" onclick="refreshCourseCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer; color: #666; font-size: 14px;" title="Refresh Course Count">
+                                <i class="fa fa-refresh" id="courses-refresh-icon"></i>
                             </div>
                         </div>
                         
@@ -396,15 +402,21 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="middle-stats-container">
-                        <div class="middle-stat-card">
+                        <div class="middle-stat-card" id="middle-courses-card">
                             <div class="stat-content">
                                 <div class="stat-title">Active Courses</div>
-                                <div class="stat-number">{{middle_stats.total_courses}}</div>
+                                <div class="stat-number" id="middle-total-courses-count">{{middle_stats.total_courses}}</div>
                                 <div class="stat-subtext">2 in progress</div>
                                 <div class="stat-trend">+12% this week</div>
+                                <div class="stat-updated" id="middle-courses-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
+                                    Last updated: {{#middle_stats}}{{#last_updated}}{{last_updated}}{{/last_updated}}{{/middle_stats}}
+                                </div>
                             </div>
                             <div class="stat-icon-container blue">
                                 <i class="fa fa-book"></i>
+                            </div>
+                            <div class="stat-refresh-btn" onclick="refreshMiddleCourseCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer; color: #666; font-size: 14px;">
+                                <i class="fa fa-refresh" id="middle-courses-refresh-icon"></i>
                             </div>
                         </div>
                         <div class="middle-stat-card">
@@ -493,6 +505,7 @@
                                         <a href="{{courseurl}}" class="course-button primary">
                                             <i class="fa fa-play"></i> Continue Learning
                                         </a>
+
                                                 <button class="course-button secondary preview-btn" onclick="openPreviewModal({{id}}, '{{fullname}}')">
                                                     <i class="fa fa-eye"></i> Preview
                                                 </button>
@@ -786,10 +799,363 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
-        </div>
-    {{/middle}}
+            
+            <!-- Course Preview Modal -->
+            <div id="coursePreviewModal" class="preview-modal">
+                <div class="modal-overlay" onclick="closePreviewModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="modalCourseTitle">Course Preview</h3>
+                        <button class="modal-close" onclick="closePreviewModal()">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="course-sections-list" id="courseSectionsList">
+                            <!-- Sections will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/middle}}
     
+
+    {{#middle}}
+    <script>
+    let currentCourseIndex = 0;
+    const courses = document.querySelectorAll('.middle-course-card');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    function showCourse(index) {
+        // Hide all courses
+        courses.forEach(course => {
+            course.style.display = 'none';
+        });
+        
+        // Show current course
+        if (courses[index]) {
+            courses[index].style.display = 'block';
+        }
+        
+        // Update indicators
+        indicators.forEach((indicator, i) => {
+            indicator.classList.toggle('active', i === index);
+        });
+        
+        // Navigation buttons are always enabled for circular navigation
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        
+        if (prevBtn) prevBtn.style.opacity = '1';
+        if (nextBtn) nextBtn.style.opacity = '1';
+    }
+    
+    function changeCourse(direction) {
+        if (courses.length === 0) return;
+        
+        if (direction === 1) {
+            // Move to next course (circular)
+            currentCourseIndex = (currentCourseIndex + 1) % courses.length;
+        } else {
+            // Move to previous course (circular)
+            currentCourseIndex = (currentCourseIndex - 1 + courses.length) % courses.length;
+        }
+        
+        showCourse(currentCourseIndex);
+    }
+    
+    function goToCourse(index) {
+        if (index >= 0 && index < courses.length) {
+            currentCourseIndex = index;
+            showCourse(currentCourseIndex);
+        }
+    }
+    
+    // Initialize carousel
+    document.addEventListener('DOMContentLoaded', function() {
+        if (courses.length > 0) {
+            showCourse(0);
+        }
+    });
+    
+    // Modal functionality
+    function openPreviewModal(courseId, courseName) {
+        const modal = document.getElementById('coursePreviewModal');
+        const modalTitle = document.getElementById('modalCourseTitle');
+        const sectionsList = document.getElementById('courseSectionsList');
+        
+        // Set modal title
+        modalTitle.textContent = courseName + ' - Course Sections';
+        
+        // Show loading state
+        sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+        
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Load course sections via AJAX
+        loadCourseSections(courseId, sectionsList);
+    }
+    
+    function closePreviewModal() {
+        const modal = document.getElementById('coursePreviewModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    function loadCourseSections(courseId, container) {
+        // Create a simple AJAX request to load sections
+        // For now, we'll simulate the data structure
+        const sections = [
+            { id: 1, name: 'Introduction to Digital Learning', description: 'Welcome to the course and overview of digital tools', activities: 3 },
+            { id: 2, name: 'Basic Computer Skills', description: 'Learning fundamental computer operations', activities: 5 },
+            { id: 3, name: 'Digital Safety and Security', description: 'Understanding online safety and privacy', activities: 4 },
+            { id: 4, name: 'Creative Digital Projects', description: 'Hands-on projects using digital tools', activities: 6 },
+            { id: 5, name: 'Assessment and Review', description: 'Final assessment and course review', activities: 2 }
+        ];
+        
+        // Clear loading state
+        container.innerHTML = '';
+        
+        // Add sections to the modal
+        sections.forEach(section => {
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'section-item';
+            sectionElement.innerHTML = `
+                <div class="section-header">
+                    <h4 class="section-name">${section.name}</h4>
+                    <span class="section-activities">${section.activities} activities</span>
+                </div>
+                <p class="section-description">${section.description}</p>
+            `;
+            container.appendChild(sectionElement);
+        });
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('coursePreviewModal');
+        if (e.target === modal) {
+            closePreviewModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+        }
+    });
+
+    // Real-time course count update functions
+    function refreshCourseCount() {
+        console.log('refreshCourseCount called'); // Debug log
+        const refreshIcon = document.getElementById('courses-refresh-icon');
+        const coursesCount = document.getElementById('total-courses-count');
+        const coursesUpdated = document.getElementById('courses-updated');
+
+        if (!refreshIcon || !coursesCount || !coursesUpdated) {
+            console.error('Required elements not found:', {refreshIcon, coursesCount, coursesUpdated});
+            return;
+        }
+
+        // Show loading state
+        refreshIcon.classList.add('fa-spin');
+        console.log('Fetching data from: {{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php'); // Debug log
+
+        // Fetch real-time data
+        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.text(); // Get as text first
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.status === 'success') {
+                        // Update the count with animation
+                        animateCountUpdate(coursesCount, data.total_courses);
+                        coursesUpdated.textContent = 'Last updated: ' + data.timestamp;
+
+                        // Show success feedback
+                        showUpdateFeedback('courses-card', 'success');
+                    } else {
+                        console.error('API Error:', data);
+                        showUpdateFeedback('courses-card', 'error');
+                    }
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.error('Response text:', text);
+                    showUpdateFeedback('courses-card', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                showUpdateFeedback('courses-card', 'error');
+            })
+            .finally(() => {
+                // Remove loading state
+                refreshIcon.classList.remove('fa-spin');
+            });
+    }
+
+    function animateCountUpdate(element, newValue) {
+        const currentValue = parseInt(element.textContent) || 0;
+        const increment = newValue > currentValue ? 1 : -1;
+        const duration = 1000; // 1 second
+        const steps = Math.abs(newValue - currentValue);
+        const stepDuration = duration / steps;
+
+        let currentStep = 0;
+        const timer = setInterval(() => {
+            currentStep++;
+            const newDisplayValue = currentValue + (increment * currentStep);
+            element.textContent = newDisplayValue;
+
+            if (currentStep >= steps) {
+                clearInterval(timer);
+                element.textContent = newValue;
+            }
+        }, stepDuration);
+    }
+
+    function showUpdateFeedback(cardId, type) {
+        const card = document.getElementById(cardId);
+        const feedback = document.createElement('div');
+        feedback.className = `update-feedback ${type}`;
+        feedback.textContent = type === 'success' ? '✓ Updated' : '✗ Error';
+        feedback.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        `;
+
+        card.style.position = 'relative';
+        card.appendChild(feedback);
+
+        // Fade in
+        setTimeout(() => feedback.style.opacity = '1', 10);
+
+        // Fade out and remove
+        setTimeout(() => {
+            feedback.style.opacity = '0';
+            setTimeout(() => card.removeChild(feedback), 300);
+        }, 2000);
+    }
+
+    // Auto-refresh course count every 30 seconds
+    setInterval(refreshCourseCount, 30000);
+
+    // Middle school course count refresh function
+    function refreshMiddleCourseCount() {
+        console.log('refreshMiddleCourseCount called'); // Debug log
+        const refreshIcon = document.getElementById('middle-courses-refresh-icon');
+        const coursesCount = document.getElementById('middle-total-courses-count');
+        const coursesUpdated = document.getElementById('middle-courses-updated');
+
+        if (!refreshIcon || !coursesCount || !coursesUpdated) {
+            console.error('Required elements not found:', {refreshIcon, coursesCount, coursesUpdated});
+            return;
+        }
+
+        // Show loading state
+        refreshIcon.classList.add('fa-spin');
+        console.log('Fetching data from: {{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php'); // Debug log
+
+        // Fetch real-time data
+        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.text(); // Get as text first
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.status === 'success') {
+                        // Update the count with animation
+                        animateCountUpdate(coursesCount, data.total_courses);
+                        coursesUpdated.textContent = 'Last updated: ' + data.timestamp;
+
+                        // Show success feedback
+                        showUpdateFeedback('middle-courses-card', 'success');
+                    } else {
+                        console.error('API Error:', data);
+                        showUpdateFeedback('middle-courses-card', 'error');
+                    }
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.error('Response text:', text);
+                    showUpdateFeedback('middle-courses-card', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                showUpdateFeedback('middle-courses-card', 'error');
+            })
+            .finally(() => {
+                // Remove loading state
+                refreshIcon.classList.remove('fa-spin');
+            });
+    }
+
+    // Auto-refresh middle school course count every 30 seconds
+    setInterval(refreshMiddleCourseCount, 30000);
+
+    // Debug function to test AJAX endpoint
+    function testAjaxEndpoint() {
+        console.log('Testing AJAX endpoint...');
+        fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Raw response:', text);
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Parsed data:', data);
+                    alert('AJAX Test Result: ' + JSON.stringify(data, null, 2));
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    alert('JSON Parse Error: ' + e.message + '\nRaw response: ' + text);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('Fetch Error: ' + error.message);
+            });
+    }
+
+    // Add test button for debugging
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add a test button for debugging (remove this in production)
+        const testButton = document.createElement('button');
+        testButton.textContent = 'Test AJAX';
+        testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;';
+        testButton.onclick = testAjaxEndpoint;
+        document.body.appendChild(testButton);
+        
+        console.log('Dashboard loaded, AJAX functions available');
+    });
+    </script>
+    {{/middle}}
+
     
     {{#highschool}}
         <!-- Student Sidebar -->
@@ -1222,239 +1588,7 @@
                 </div>
             </div>
             
-            <!-- Learning Analytics Section -->
-            <div class="learning-analytics mb-4">
-            <div class="row">
-                    <div class="col-lg-6">
-                        <div class="analytics-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-chart-line"></i> Learning Progress
-                                </h3>
-                                <div class="time-filter">
-                                    <select class="form-select">
-                                        <option>Last 7 Days</option>
-                                        <option>Last 30 Days</option>
-                                        <option>This Semester</option>
-                                        <option>All Time</option>
-                                    </select>
-                                </div>
-                        </div>
-                        <div class="card-body">
-                                <div class="progress-chart-container">
-                                    <canvas id="learningProgressChart" width="400" height="200"></canvas>
-                        </div>
-                                <div class="chart-stats">
-                                    <div class="chart-stat-item">
-                                        <span class="stat-label">Average Score</span>
-                                        <span class="stat-value">87%</span>
-                    </div>
-                                    <div class="chart-stat-item">
-                                        <span class="stat-label">Study Time</span>
-                                        <span class="stat-value">24h</span>
-                </div>
-                                    <div class="chart-stat-item">
-                                        <span class="stat-label">Completion Rate</span>
-                                        <span class="stat-value">92%</span>
-            </div>
-        </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-6">
-                        <div class="analytics-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-calendar-check-o"></i> Upcoming Deadlines
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="deadlines-list">
-                                    <div class="deadline-item urgent">
-                                        <div class="deadline-icon">
-                                            <i class="fa fa-exclamation-triangle"></i>
-                                        </div>
-                                        <div class="deadline-content">
-                                            <h4>Calculus Final Exam</h4>
-                                            <p>Advanced Mathematics</p>
-                                            <span class="deadline-time">Due in 2 days</span>
-                                        </div>
-                                        <div class="deadline-action">
-                                            <button class="btn btn-sm btn-outline-primary">Study</button>
-                                        </div>
-                                    </div>
-                                    <div class="deadline-item">
-                                        <div class="deadline-icon">
-                                            <i class="fa fa-file-text-o"></i>
-                                        </div>
-                                        <div class="deadline-content">
-                                            <h4>Research Paper</h4>
-                                            <p>English Literature</p>
-                                            <span class="deadline-time">Due in 5 days</span>
-                                        </div>
-                                        <div class="deadline-action">
-                                            <button class="btn btn-sm btn-outline-primary">Continue</button>
-                                        </div>
-                                    </div>
-                                    <div class="deadline-item">
-                                        <div class="deadline-icon">
-                                            <i class="fa fa-flask"></i>
-                                        </div>
-                                        <div class="deadline-content">
-                                            <h4>Lab Report</h4>
-                                            <p>Chemistry</p>
-                                            <span class="deadline-time">Due in 7 days</span>
-                                        </div>
-                                        <div class="deadline-action">
-                                            <button class="btn btn-sm btn-outline-primary">Start</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
-            <!-- Performance Insights -->
-            <div class="performance-insights mb-4">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="insight-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-trophy"></i> Recent Achievements
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="achievements-list">
-                                    <div class="achievement-item earned">
-                                        <div class="achievement-icon">
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="achievement-content">
-                                            <h4>Perfect Week</h4>
-                                            <p>Completed all assignments on time</p>
-                                            <span class="achievement-date">2 days ago</span>
-                                        </div>
-                                    </div>
-                                    <div class="achievement-item earned">
-                                        <div class="achievement-icon">
-                                            <i class="fa fa-fire"></i>
-                                        </div>
-                                        <div class="achievement-content">
-                                            <h4>Study Streak</h4>
-                                            <p>12 days of consistent study</p>
-                                            <span class="achievement-date">1 week ago</span>
-                                        </div>
-                                    </div>
-                                    <div class="achievement-item locked">
-                                        <div class="achievement-icon">
-                                            <i class="fa fa-graduation-cap"></i>
-                                        </div>
-                                        <div class="achievement-content">
-                                            <h4>Honor Roll</h4>
-                                            <p>Maintain 3.5+ GPA for semester</p>
-                                            <span class="achievement-progress">75% complete</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-4">
-                        <div class="insight-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-lightbulb-o"></i> Study Insights
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="insights-list">
-                                    <div class="insight-item">
-                                        <div class="insight-icon">
-                                            <i class="fa fa-clock-o"></i>
-                                        </div>
-                                        <div class="insight-content">
-                                            <h4>Peak Study Time</h4>
-                                            <p>You're most productive between 2-4 PM</p>
-                                        </div>
-                                    </div>
-                                    <div class="insight-item">
-                                        <div class="insight-icon">
-                                            <i class="fa fa-book"></i>
-                                        </div>
-                                        <div class="insight-content">
-                                            <h4>Strongest Subject</h4>
-                                            <p>Mathematics - 95% average</p>
-                                        </div>
-                                    </div>
-                                    <div class="insight-item">
-                                        <div class="insight-icon">
-                                            <i class="fa fa-target"></i>
-                                        </div>
-                                        <div class="insight-content">
-                                            <h4>Goal Progress</h4>
-                                            <p>On track to complete 5 courses this semester</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-4">
-                        <div class="insight-card">
-                            <div class="card-header">
-                                <h3 class="section-title">
-                                    <i class="fa fa-bar-chart"></i> Subject Performance
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="subject-performance">
-                                    <div class="subject-item">
-                                        <div class="subject-info">
-                                            <span class="subject-name">Mathematics</span>
-                                            <span class="subject-grade">A+</span>
-                                        </div>
-                                        <div class="subject-progress">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 95%"></div>
-                                            </div>
-                                            <span class="progress-text">95%</span>
-                                        </div>
-                                    </div>
-                                    <div class="subject-item">
-                                        <div class="subject-info">
-                                            <span class="subject-name">Science</span>
-                                            <span class="subject-grade">A</span>
-                                        </div>
-                                        <div class="subject-progress">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 88%"></div>
-                                            </div>
-                                            <span class="progress-text">88%</span>
-                                        </div>
-                                    </div>
-                                    <div class="subject-item">
-                                        <div class="subject-info">
-                                            <span class="subject-name">English</span>
-                                            <span class="subject-grade">B+</span>
-                                        </div>
-                                        <div class="subject-progress">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: 82%"></div>
-                                            </div>
-                                            <span class="progress-text">82%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                </div>
-            </div>
         </div>
     {{/highschool}}
      

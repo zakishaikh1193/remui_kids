@@ -36,7 +36,148 @@
     </div>
 </div>
 
-{{> theme_remui_kids/admin_sidebar}}
+<!-- Admin Sidebar Navigation -->
+<div class="admin-sidebar">
+    <div class="sidebar-content">
+        <!-- DASHBOARD Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">DASHBOARD</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/my/" class="sidebar-link">
+                        <i class="fa fa-th-large sidebar-icon"></i>
+                        <span class="sidebar-text">Admin Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/admin/search.php" class="sidebar-link">
+                        <i class="fa fa-cog sidebar-icon"></i>
+                        <span class="sidebar-text">Site Administration</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-users sidebar-icon"></i>
+                        <span class="sidebar-text">Community</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/admin/enrollments.php" class="sidebar-link">
+                        <i class="fa fa-graduation-cap sidebar-icon"></i>
+                        <span class="sidebar-text">Enrollments</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- TEACHERS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">TEACHERS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/admin/teachers_list.php" class="sidebar-link">
+                        <i class="fa fa-users sidebar-icon"></i>
+                        <span class="sidebar-text">Teachers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-medal sidebar-icon"></i>
+                        <span class="sidebar-text">Master Trainers</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- COURSES & PROGRAMS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">COURSES & PROGRAMS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/admin/courses.php" class="sidebar-link">
+                        <i class="fa fa-book sidebar-icon"></i>
+                        <span class="sidebar-text">Courses & Programs</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-graduation-cap sidebar-icon"></i>
+                        <span class="sidebar-text">Certifications</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-clipboard-list sidebar-icon"></i>
+                        <span class="sidebar-text">Assessments</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-school sidebar-icon"></i>
+                        <span class="sidebar-text">Schools</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- INSIGHTS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">INSIGHTS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/local/edwiserreports/index.php" class="sidebar-link">
+                        <i class="fa fa-chart-bar sidebar-icon"></i>
+                        <span class="sidebar-text">Analytics</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-chart-line sidebar-icon"></i>
+                        <span class="sidebar-text">Predictive Models</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-file-alt sidebar-icon"></i>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-map sidebar-icon"></i>
+                        <span class="sidebar-text">Competencies Map</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- SETTINGS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">SETTINGS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-cog sidebar-icon"></i>
+                        <span class="sidebar-text">System Settings</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/admin/users_management_dashboard.php" class="sidebar-link">
+                        <i class="fa fa-user-friends sidebar-icon"></i>
+                        <span class="sidebar-text">User Management</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-users-cog sidebar-icon"></i>
+                        <span class="sidebar-text">Cohort Navigation</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 
 <!-- Main Content Area with Sidebar -->
 <div class="admin-main-content">
@@ -54,38 +195,57 @@
                     <div class="admin-stats-container">
                     {{#admin_stats}}
                     <!-- Total Schools Card -->
-                    <div class="admin-stat-card schools-card">
+                    <div class="admin-stat-card schools-card" id="schools-card">
+
                         <div class="stat-icon-container">
                             <i class="fa fa-building stat-icon"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number">{{total_schools}}</div>
+                            <div class="stat-number" id="total-schools-count">{{total_schools}}</div>
                             <div class="stat-label">TOTAL SCHOOLS</div>
                             <div class="stat-status">• Active</div>
+                            <div class="stat-updated" id="schools-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
+                                Last updated: {{#admin_stats}}{{#last_updated}}{{last_updated}}{{/last_updated}}{{/admin_stats}}
+                            </div>
+                        </div>
+                        <div class="stat-refresh-btn" onclick="refreshSchoolCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
+                            <i class="fa fa-refresh" id="schools-refresh-icon"></i>
                         </div>
                     </div>
                     
                     <!-- Total Courses Card -->
-                    <div class="admin-stat-card courses-card">
+                    <div class="admin-stat-card courses-card" id="courses-card">
                         <div class="stat-icon-container">
                             <i class="fa fa-book stat-icon"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number">{{total_courses}}</div>
+                            <div class="stat-number" id="total-courses-count">{{total_courses}}</div>
                             <div class="stat-label">TOTAL COURSES</div>
                             <div class="stat-status">• Available</div>
+                            <div class="stat-updated" id="courses-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
+                                Last updated: {{#admin_stats}}{{#last_updated}}{{last_updated}}{{/last_updated}}{{/admin_stats}}
+                            </div>
+                        </div>
+                        <div class="stat-refresh-btn" onclick="refreshCourseCountAdmin()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
+                            <i class="fa fa-refresh" id="courses-refresh-icon"></i>
                         </div>
                     </div>
                     
                     <!-- Total Students Card -->
-                    <div class="admin-stat-card students-card">
+                    <div class="admin-stat-card students-card" id="students-card">
                         <div class="stat-icon-container">
                             <i class="fa fa-users stat-icon"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number">{{total_students}}</div>
+                            <div class="stat-number" id="total-students-count">{{total_students}}</div>
                             <div class="stat-label">TOTAL STUDENTS</div>
                             <div class="stat-status">• Enrolled</div>
+                            <div class="stat-updated" id="students-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
+                                Last updated: {{#admin_stats}}{{#last_updated}}{{last_updated}}{{/last_updated}}{{/admin_stats}}
+                            </div>
+                        </div>
+                        <div class="stat-refresh-btn" onclick="refreshStudentCountAdmin()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
+                            <i class="fa fa-refresh" id="students-refresh-icon"></i>
                         </div>
                     </div>
                     
@@ -120,33 +280,37 @@
                 <div class="col-12">
                     <div class="user-stats-container">
                     {{#admin_user_stats}}
-                    <div class="user-stat-card total-users">
-                        <div class="stat-number">{{total_users}}</div>
+                    <div class="user-stat-card total-users" id="total-users-card">
+                        <div class="stat-number" id="total-users-count">{{total_users}}</div>
                         <div class="stat-label">Total Users</div>
+                        <div class="stat-refresh-btn" onclick="refreshAllStats()" style="position: absolute; top: 5px; right: 5px; cursor: pointer; color: #666; font-size: 12px;" title="Refresh All Stats">
+                            <i class="fa fa-refresh" id="all-stats-refresh-icon"></i>
+                        </div>
                     </div>
                     
-                    <div class="user-stat-card teachers">
-                        <div class="stat-number">{{teachers}}</div>
+                    <div class="user-stat-card teachers" id="teachers-card">
+                        <div class="stat-number" id="teachers-count">{{teachers}}</div>
                         <div class="stat-label">Teachers</div>
                     </div>
                     
-                    <div class="user-stat-card students">
-                        <div class="stat-number">{{students}}</div>
+                    <div class="user-stat-card students" id="students-card">
+                        <div class="stat-number" id="students-count">{{students}}</div>
                         <div class="stat-label">Students</div>
                     </div>
                     
-                    <div class="user-stat-card admins">
-                        <div class="stat-number">{{admins}}</div>
+                    <div class="user-stat-card admins" id="admins-card">
+                        <div class="stat-number" id="admins-count">{{admins}}</div>
                         <div class="stat-label">Admins</div>
                     </div>
                     
-                    <div class="user-stat-card active-users">
-                        <div class="stat-number">{{active_users}}</div>
+                    <div class="user-stat-card active-users" id="active-users-card">
+                        <div class="stat-number" id="active-users-count">{{active_users}}</div>
                         <div class="stat-label">Active Users</div>
                     </div>
                     
-                    <div class="user-stat-card new-users">
-                        <div class="stat-number">{{new_this_month}}</div>
+                    <div class="user-stat-card new-users" id="new-users-card">
+                        <div class="stat-number" id="new-users-count">{{new_this_month}}</div>
+
                         <div class="stat-label">New This Month</div>
                     </div>
                     {{/admin_user_stats}}
@@ -157,82 +321,74 @@
     </div>
 </div>
 
-<!-- Side by Side Layout: Course Statistics and Recent Activity -->
+<!-- Course Statistics and Recent Activity Section -->
 <div class="admin-stats-activity-container">
     <div class="container-fluid">
         <div class="row">
             <!-- Left Column: Course Statistics -->
             <div class="col-md-6">
-<div class="admin-course-stats-section">
-    <div class="stats-section-container">
-        <div class="section-header">
-            <h3 class="section-title">Course Statistics</h3>
-                
-            </div>
-                        <div class="course-stats-grid">
-                    {{#admin_course_stats}}
-                    <div class="course-stat-card total-courses">
-                            <div class="stat-icon-square blue">
-                                <i class="fa fa-book"></i>
+                <div class="admin-course-stats-section">
+                    <div class="stats-section-container">
+                        <div class="section-header">
+                            <h3 class="section-title">Course Statistics</h3>
+                            
                         </div>
-                        <div class="stat-content">
-                            <div class="stat-number">{{total_courses}}</div>
-                            <div class="stat-label">Total Courses</div>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="course-stats-grid">
+                                        <!-- Total Courses Card -->
+                                        <div class="course-stat-card total-courses">
+                                            <div class="stat-content">
+                                                <div class="stat-label">Total Courses</div>
+                                                <div class="stat-number">0</div>
+                                            </div>
+                                            <div class="stat-icon-container">
+                                                <i class="fa fa-book stat-icon"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Completion Rate Card -->
+                                        <div class="course-stat-card completion-rate">
+                                            <div class="stat-content">
+                                                <div class="stat-label">Completion Rate</div>
+                                                <div class="stat-number">0%</div>
+                                            </div>
+                                            <div class="stat-icon-container">
+                                                <i class="fa fa-bullseye stat-icon"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Average Rating Card -->
+                                        <div class="course-stat-card avg-rating">
+                                            <div class="stat-content">
+                                                <div class="stat-label">Avg Rating</div>
+                                                <div class="stat-number">0/5</div>
+                                            </div>
+                                            <div class="stat-icon-container">
+                                                <i class="fa fa-star stat-icon"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Categories Card -->
+                                        <div class="course-stat-card categories">
+                                            <div class="stat-content">
+                                                <div class="stat-label">Categories</div>
+                                                <div class="stat-number">11</div>
+                                            </div>
+                                            <div class="stat-icon-container">
+                                                <i class="fa fa-building stat-icon"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="course-stat-card completion-rate">
-                            <div class="stat-icon-square green">
-                                <i class="fa fa-bullseye"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">{{completion_rate}}%</div>
-                            <div class="stat-label">Completion Rate</div>
-                        </div>
-                    </div>
-                    
-                    <div class="course-stat-card avg-rating">
-                            <div class="stat-icon-square yellow">
-                                <i class="fa fa-star"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">{{avg_rating}}/5</div>
-                            <div class="stat-label">Avg Rating</div>
-                        </div>
-                    </div>
-                    
-                    <div class="course-stat-card categories">
-                            <div class="stat-icon-square purple">
-                                <i class="fa fa-building"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">{{categories}}</div>
-                            <div class="stat-label">Categories</div>
-                        </div>
-                    </div>
-                    {{/admin_course_stats}}
-        </div>
-        
-        <!-- Course Categories Section -->
-        <div class="course-categories-section">
-                            <h4 class="categories-title">Course Categories</h4>
-            <div class="categories-list">
-                {{#course_categories}}
-                <div class="category-item">
-                                    <div class="category-left">
-                        <div class="category-name">{{name}}</div>
-                                        <div class="category-enrollments">{{enrollments}} enrollments</div>
-                        </div>
-                                    <div class="category-right">
-                                        <div class="category-courses">{{courses}} courses</div>
-                                        <div class="category-completion">{{completion}}% completion</div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{completion}}%"></div>
-                    </div>
-                </div>
-                {{/course_categories}}
-                                {{^course_categories}}
+                        
+                        <!-- Course Categories Section -->
+                        <div class="course-categories-section">
+                            <h4 class="subsection-title">Course Categories</h4>
+                            <div class="categories-list">
                                 <div class="category-item">
                                     <div class="category-left">
                                         <div class="category-name">Saudi International School</div>
@@ -246,6 +402,7 @@
                                         <div class="progress-fill" style="width: 0%"></div>
                                     </div>
                                 </div>
+                                
                                 <div class="category-item">
                                     <div class="category-left">
                                         <div class="category-name">Grade 1 Courses</div>
@@ -259,6 +416,7 @@
                                         <div class="progress-fill" style="width: 0%"></div>
                                     </div>
                                 </div>
+                                
                                 <div class="category-item">
                                     <div class="category-left">
                                         <div class="category-name">G1-G3 Courses</div>
@@ -272,9 +430,10 @@
                                         <div class="progress-fill" style="width: 0%"></div>
                                     </div>
                                 </div>
+                                
                                 <div class="category-item">
                                     <div class="category-left">
-                                        <div class="category-name">Template Blueprints</div>
+                                        <div class="category-name">UAE_international_school</div>
                                         <div class="category-enrollments">0 enrollments</div>
                                     </div>
                                     <div class="category-right">
@@ -285,10 +444,8 @@
                                         <div class="progress-fill" style="width: 0%"></div>
                                     </div>
                                 </div>
-                                {{/course_categories}}
-            </div>
-        </div>
-        
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -297,130 +454,84 @@
             <div class="col-md-6">
                 <div class="admin-recent-activity-section">
                     <div class="stats-section-container">
+                        <div class="section-header">
+                            <h3 class="section-title">Recent Activity</h3>
+                            
+                        </div>
                         <div class="recent-activity-container">
-                            <h3 class="activity-section-title">Recent Activity</h3>
-                        {{#admin_recent_activity}}
-                        <div class="activity-item">
-                            <div class="activity-icon {{color}}">
-                                <i class="fa {{icon}}"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">{{title}}</div>
-                                <div class="activity-description">{{description}}</div>
-                                <div class="activity-meta">
-                                    <span class="activity-time">
-                                        <i class="fa fa-clock-o"></i>
-                                        {{time}}
-                                    </span>
-                                    {{#author}}
-                                    <span class="activity-author">
-                                        <span class="author-dot"></span>
-                                        {{author}}
-                                    </span>
-                                    {{/author}}
+                            <!-- Course Completion -->
+                            <div class="activity-item">
+                                <div class="activity-icon purple">
+                                    <i class="fa fa-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Course Completion</div>
+                                    <div class="activity-description">9 teachers completed "Advanced Teaching Methods"</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-time">9/23/2025</span>
+                                        <span class="activity-author">Fatima ki</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {{/admin_recent_activity}}
-                        
-                        {{^admin_recent_activity}}
-                        <!-- Default Activity Items Matching Image -->
-                        <div class="activity-item">
-                            <div class="activity-icon purple">
-                                <i class="fa fa-building"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New School Added</div>
-                                <div class="activity-description">Al-Huda-Global-School joined the platform</div>
-                                <div class="activity-meta">
-                                    <span class="activity-time">
-                                        <i class="fa fa-clock-o"></i>
-                                        23h ago
-                                    </span>
+                            
+                            <!-- Teacher Certified -->
+                            <div class="activity-item">
+                                <div class="activity-icon purple">
+                                    <i class="fa fa-graduation-cap"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Teacher Certified</div>
+                                    <div class="activity-description">za ki received Master Trainer certification</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-time">9/23/2025</span>
+                                        <span class="activity-author">za ki</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon green">
-                                <i class="fa fa-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Course Completion</div>
-                                <div class="activity-description">8 teachers completed "Advanced Teaching Methods"</div>
-                                <div class="activity-meta">
-                                    <span class="activity-time">
-                                        <i class="fa fa-clock-o"></i>
-                                        Yesterday
-                                    </span>
-                                    <span class="activity-author">
-                                        <span class="author-dot"></span>
-                                        za ki
-                                    </span>
+                            
+                            <!-- New School Added -->
+                            <div class="activity-item">
+                                <div class="activity-icon purple">
+                                    <i class="fa fa-building"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">New School Added</div>
+                                    <div class="activity-description">Al-Huda-Global-School joined the platform</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-time">9/23/2025</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon orange">
-                                <i class="fa fa-book"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New Course Created</div>
-                                <div class="activity-description">"Digital Learning Fundamentals" course published</div>
-                                <div class="activity-meta">
-                                    <span class="activity-time">
-                                        <i class="fa fa-clock-o"></i>
-                                        Yesterday
-                                    </span>
-                                    <span class="activity-author">
-                                        <span class="author-dot"></span>
-                                        shak zaki
-                                    </span>
+                            
+                            <!-- New Course Created -->
+                            <div class="activity-item">
+                                <div class="activity-icon purple">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">New Course Created</div>
+                                    <div class="activity-description">"Digital Learning Fundamentals" course published</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-time">9/23/2025</span>
+                                        <span class="activity-author">shak zaki</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon orange">
-                                <i class="fa fa-book"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">New Course Created</div>
-                                <div class="activity-description">"Digital Learning Fundamentals" course published</div>
-                                <div class="activity-meta">
-                                    <span class="activity-time">
-                                        <i class="fa fa-clock-o"></i>
-                                        9/21/2025
-                                    </span>
-                                    <span class="activity-author">
-                                        <span class="author-dot"></span>
-                                        za ki
-                                    </span>
+                            
+                            <!-- Course Completion -->
+                            <div class="activity-item">
+                                <div class="activity-icon purple">
+                                    <i class="fa fa-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Course Completion</div>
+                                    <div class="activity-description">8 teachers completed "Advanced Teaching Methods"</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-time">9/22/2025</span>
+                                        <span class="activity-author">za ki</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon green">
-                                <i class="fa fa-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Course Completion</div>
-                                <div class="activity-description">10 teachers completed "Advanced Teaching Methods"</div>
-                                <div class="activity-meta">
-                                    <span class="activity-time">
-                                        <i class="fa fa-clock-o"></i>
-                                        9/20/2025
-                                    </span>
-                                    <span class="activity-author">
-                                        <span class="author-dot"></span>
-                                        Fatima ki
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        {{/admin_recent_activity}}
                         </div>
                     </div>
                 </div>
@@ -1007,5 +1118,311 @@ window.addEventListener('resize', function() {
         sidebar.classList.remove('sidebar-open');
     }
 });
+
+// Highlight active sidebar menu item based on current URL
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUrl = window.location.href;
+    const currentPath = window.location.pathname;
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    
+    // Remove all active classes first
+    sidebarItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Find and highlight the matching menu item
+    sidebarItems.forEach(item => {
+        const link = item.querySelector('.sidebar-link');
+        if (link) {
+            const href = link.getAttribute('href');
+            
+            // Skip empty or hash-only links
+            if (!href || href === '#') {
+                return;
+            }
+            
+            // Check if current URL matches this link
+            if (currentUrl === href || currentUrl.includes(href)) {
+                item.classList.add('active');
+            } else {
+                // Try matching just the filename
+                const linkPath = href.split('/').pop().split('?')[0];
+                const currentFile = currentPath.split('/').pop().split('?')[0];
+                
+                if (linkPath && currentFile && linkPath === currentFile) {
+                    item.classList.add('active');
+                }
+            }
+        }
+    });
+    
+    // If no item is active and we're on /my/ page, activate Admin Dashboard
+    const hasActive = document.querySelector('.sidebar-item.active');
+    if (!hasActive && (currentPath.includes('/my/') || currentPath.endsWith('/my'))) {
+        const dashboardItem = document.querySelector('.sidebar-item a[href*="/my/"]');
+        if (dashboardItem) {
+            dashboardItem.closest('.sidebar-item').classList.add('active');
+        }
+    }
+});
+
+// Real-time statistics update functions
+function refreshSchoolCount() {
+    const refreshIcon = document.getElementById('schools-refresh-icon');
+    const schoolsCount = document.getElementById('total-schools-count');
+    const schoolsUpdated = document.getElementById('schools-updated');
+    
+    // Show loading state
+    refreshIcon.classList.add('fa-spin');
+    
+    // Fetch real-time data
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.text(); // Get as text first
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                if (data.status === 'success') {
+                    // Update the count with animation
+                    animateCountUpdate(schoolsCount, data.total_schools);
+                    schoolsUpdated.textContent = 'Last updated: ' + data.timestamp;
+                    
+                    // Show success feedback
+                    showUpdateFeedback('schools-card', 'success');
+                } else {
+                    console.error('API Error:', data);
+                    showUpdateFeedback('schools-card', 'error');
+                }
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                console.error('Response text:', text);
+                showUpdateFeedback('schools-card', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            showUpdateFeedback('schools-card', 'error');
+        })
+        .finally(() => {
+            // Remove loading state
+            refreshIcon.classList.remove('fa-spin');
+        });
+}
+
+// Course count refresh function for admin dashboard
+function refreshCourseCountAdmin() {
+    const refreshIcon = document.getElementById('courses-refresh-icon');
+    const coursesCount = document.getElementById('total-courses-count');
+    const coursesUpdated = document.getElementById('courses-updated');
+    
+    // Show loading state
+    refreshIcon.classList.add('fa-spin');
+    
+    // Fetch real-time data
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.text(); // Get as text first
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                if (data.status === 'success') {
+                    // Update the count with animation
+                    animateCountUpdate(coursesCount, data.total_courses);
+                    coursesUpdated.textContent = 'Last updated: ' + data.timestamp;
+                    
+                    // Show success feedback
+                    showUpdateFeedback('courses-card', 'success');
+                } else {
+                    console.error('API Error:', data);
+                    showUpdateFeedback('courses-card', 'error');
+                }
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                console.error('Response text:', text);
+                showUpdateFeedback('courses-card', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            showUpdateFeedback('courses-card', 'error');
+        })
+        .finally(() => {
+            // Remove loading state
+            refreshIcon.classList.remove('fa-spin');
+        });
+}
+
+function animateCountUpdate(element, newValue) {
+    const currentValue = parseInt(element.textContent) || 0;
+    const increment = newValue > currentValue ? 1 : -1;
+    const duration = 1000; // 1 second
+    const steps = Math.abs(newValue - currentValue);
+    const stepDuration = duration / steps;
+    
+    let currentStep = 0;
+    const timer = setInterval(() => {
+        currentStep++;
+        const newDisplayValue = currentValue + (increment * currentStep);
+        element.textContent = newDisplayValue;
+        
+        if (currentStep >= steps) {
+            clearInterval(timer);
+            element.textContent = newValue;
+        }
+    }, stepDuration);
+}
+
+function showUpdateFeedback(cardId, type) {
+    const card = document.getElementById(cardId);
+    const feedback = document.createElement('div');
+    feedback.className = `update-feedback ${type}`;
+    feedback.textContent = type === 'success' ? '✓ Updated' : '✗ Error';
+    feedback.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s;
+    `;
+    
+    card.style.position = 'relative';
+    card.appendChild(feedback);
+    
+    // Fade in
+    setTimeout(() => feedback.style.opacity = '1', 10);
+    
+    // Fade out and remove
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+        setTimeout(() => card.removeChild(feedback), 300);
+    }, 2000);
+}
+
+// Student count refresh function for admin dashboard
+function refreshStudentCountAdmin() {
+    const refreshIcon = document.getElementById('students-refresh-icon');
+    const studentsCount = document.getElementById('total-students-count');
+    const studentsUpdated = document.getElementById('students-updated');
+    
+    // Show loading state
+    refreshIcon.classList.add('fa-spin');
+    
+    // Fetch real-time data
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.text(); // Get as text first
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                if (data.status === 'success') {
+                    // Update the count with animation
+                    animateCountUpdate(studentsCount, data.total_students);
+                    studentsUpdated.textContent = 'Last updated: ' + data.timestamp;
+                    
+                    // Show success feedback
+                    showUpdateFeedback('students-card', 'success');
+                } else {
+                    console.error('API Error:', data);
+                    showUpdateFeedback('students-card', 'error');
+                }
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                console.error('Response text:', text);
+                showUpdateFeedback('students-card', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            showUpdateFeedback('students-card', 'error');
+        })
+        .finally(() => {
+            // Remove loading state
+            refreshIcon.classList.remove('fa-spin');
+        });
+}
+
+// Refresh all stats function
+function refreshAllStats() {
+    const refreshIcon = document.getElementById('all-stats-refresh-icon');
+    
+    // Show loading state
+    refreshIcon.classList.add('fa-spin');
+    
+    // Fetch real-time data
+    fetch('{{config.wwwroot}}/theme/remui_kids/tests/test_ajax.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.text();
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                if (data.status === 'success') {
+                    // Update all counts with animation
+                    animateCountUpdate(document.getElementById('total-schools-count'), data.total_schools);
+                    animateCountUpdate(document.getElementById('total-courses-count'), data.total_courses);
+                    animateCountUpdate(document.getElementById('total-students-count'), data.total_students);
+                    animateCountUpdate(document.getElementById('total-users-count'), data.total_users);
+                    animateCountUpdate(document.getElementById('teachers-count'), data.teachers);
+                    animateCountUpdate(document.getElementById('students-count'), data.total_students);
+                    animateCountUpdate(document.getElementById('admins-count'), data.admins);
+                    animateCountUpdate(document.getElementById('active-users-count'), data.active_users);
+                    animateCountUpdate(document.getElementById('new-users-count'), data.new_this_month);
+                    
+                    // Update timestamps
+                    const timestamp = data.timestamp;
+                    const timestampElements = document.querySelectorAll('[id$="-updated"]');
+                    timestampElements.forEach(element => {
+                        element.textContent = 'Last updated: ' + timestamp;
+                    });
+                    
+                    // Show success feedback
+                    showUpdateFeedback('total-users-card', 'success');
+                } else {
+                    console.error('API Error:', data);
+                    showUpdateFeedback('total-users-card', 'error');
+                }
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                console.error('Response text:', text);
+                showUpdateFeedback('total-users-card', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            showUpdateFeedback('total-users-card', 'error');
+        })
+        .finally(() => {
+            // Remove loading state
+            refreshIcon.classList.remove('fa-spin');
+        });
+}
+
+// Auto-refresh every 30 seconds
+setInterval(refreshSchoolCount, 30000);
+setInterval(refreshCourseCountAdmin, 30000);
+setInterval(refreshStudentCountAdmin, 30000);
+setInterval(refreshAllStats, 30000);
 </script>
 </div> <!-- End admin-dashboard-wrapper -->
