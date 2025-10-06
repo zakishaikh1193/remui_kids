@@ -401,6 +401,20 @@
     background: linear-gradient(90deg, #10b981, #34d399);
 }
 
+/* ------------------------------------------------------------------
+     Flush main page container so content sits directly beside fixed sidebar
+     Targets only the main page wrapper to avoid changing other .container usages
+------------------------------------------------------------------- */
+#page .main-inner > .container {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+}
+
+
 .progress-detail {
     margin-top: 0.5rem;
 }

@@ -86,6 +86,14 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['teacher_courses'] = theme_remui_kids_get_teacher_courses();
         $templatecontext['teacher_students'] = theme_remui_kids_get_teacher_students();
         $templatecontext['teacher_assignments'] = theme_remui_kids_get_teacher_assignments();
+        // Add top courses and top students for teacher
+        $templatecontext['top_courses'] = theme_remui_kids_get_top_courses_by_enrollment(5);
+        $templatecontext['top_students'] = theme_remui_kids_get_top_students(5);
+        // Add chart datasets as JSON for template JS
+        $performance = theme_remui_kids_get_course_performance_chart_data();
+        $templatecontext['performanceChart'] = json_encode($performance);
+        $completion = theme_remui_kids_get_course_completion_summary();
+        $templatecontext['completionSummary'] = json_encode($completion);
         
         // Must be called before rendering the template.
         require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');

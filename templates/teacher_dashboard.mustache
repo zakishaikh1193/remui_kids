@@ -162,7 +162,6 @@
     <div class="stats-section-container">
         <div class="section-header">
             <h3 class="section-title">Dashboard</h3>
-            <p class="section-subtitle">Key teaching metrics and course overview</p>
         </div>
         <div class="container-fluid">
             <div class="row">
@@ -1129,29 +1128,26 @@ function initializeCharts() {
     // Performance Chart
     const performanceCtx = document.getElementById('performanceChart');
     if (performanceCtx) {
+        // Try to use server-provided data
+        let perfData = null;
+        try {
+            perfData = {{#performanceChart}}{{{performanceChart}}}{{/performanceChart}}{{^performanceChart}}null{{/performanceChart}};
+        } catch (e) {
+            perfData = null;
+        }
+
+        const labels = perfData && perfData.labels ? perfData.labels : ['Math', 'Science', 'History', 'English', 'Art', 'Music'];
+        const dataset = perfData && perfData.data ? perfData.data : [85, 78, 92, 88, 76, 82];
+
         new Chart(performanceCtx, {
             type: 'bar',
             data: {
-                labels: ['Math', 'Science', 'History', 'English', 'Art', 'Music'],
+                labels: labels,
                 datasets: [{
                     label: 'Average Score',
-                    data: [85, 78, 92, 88, 76, 82],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.5)',
-                        'rgba(255, 99, 132, 0.5)',
-                        'rgba(255, 206, 86, 0.5)',
-                        'rgba(75, 192, 192, 0.5)',
-                        'rgba(153, 102, 255, 0.5)',
-                        'rgba(255, 159, 64, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
+                    data: dataset,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
             },
@@ -1171,12 +1167,23 @@ function initializeCharts() {
     // Completion Chart
     const completionCtx = document.getElementById('completionChart');
     if (completionCtx) {
+        // Try to use server-provided completion summary
+        let compSummary = null;
+        try {
+            compSummary = {{#completionSummary}}{{{completionSummary}}}{{/completionSummary}}{{^completionSummary}}null{{/completionSummary}};
+        } catch (e) {
+            compSummary = null;
+        }
+
+        const labels = ['Completed', 'In Progress', 'Not Started'];
+        const data = compSummary ? [compSummary.completed || 0, compSummary.inprogress || 0, compSummary.not_started || 0] : [65, 25, 10];
+
         new Chart(completionCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Completed', 'In Progress', 'Not Started'],
+                labels: labels,
                 datasets: [{
-                    data: [65, 25, 10],
+                    data: data,
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.5)',
                         'rgba(255, 206, 86, 0.5)',
