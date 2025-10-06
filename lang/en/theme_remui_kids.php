@@ -64,3 +64,13 @@ $string['scss'] = 'SCSS';
 $string['scss_desc'] = 'This SCSS code is injected after the rest of the SCSS.';
 $string['googleanalytics'] = 'Google Analytics Code';
 $string['googleanalyticsdesc'] = 'Enter your Google Analytics tracking code (e.g., UA-XXXXX-X)';
+
+// Teacher section strings
+$string['teacher_students'] = 'My Students';
+$string['enrolled_students'] = 'Enrolled Students';
+$string['noteachingcourses'] = 'You are not teaching any courses.';
+$string['nostudentsenrolled'] = 'No students are currently enrolled in this course.';
+$string['fullname'] = 'Full Name';
+$string['email'] = 'Email';
+$string['lastaccess'] = 'Last Access';
+$string['never'] = 'Never';
