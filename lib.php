@@ -2333,10 +2333,9 @@ function theme_remui_kids_get_teacher_dashboard_stats() {
              JOIN {context} ctx ON ra.contextid = ctx.id 
              JOIN {role} r ON ra.roleid = r.id 
              WHERE ra.userid = ? 
-             AND ctx.contextlevel = ? 
              AND r.shortname IN ('editingteacher', 'teacher')
              AND c.visible = 1",
-            [$USER->id, CONTEXT_COURSE]
+            [$USER->id]
         );
         
         // Get total students across all teacher's courses
