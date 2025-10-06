@@ -232,11 +232,13 @@ function theme_remui_kids_get_section_image($sectionnum) {
     // Default course section images - you can customize these
     $default_images = [
         1 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
-        2 => 'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
-        3 => 'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        2 =>  'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        3 =>'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
         4 => 'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
         5 => 'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
-        6 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg'
+        6 => 'https://img.freepik.com/free-photo/smiling-schoolgirl-holding-books-looking_171337-271.jpg',
+        7 => 'https://img.freepik.com/free-photo/sideways-school-boy-copy-space_23-2148764003.jpg',
+        8 => 'https://img.freepik.com/free-photo/little-girl-t-shirt-jumpsuit-pointing-up-looking-attentive_176474-39979.jpg',
     ];
     
     $index = (($sectionnum - 1) % 6) + 1;
@@ -488,11 +490,13 @@ function theme_remui_kids_get_course_image($course) {
     
     // Default course images based on category or course name
     $default_images = [
-       'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
         'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
         'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
         'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
-        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
+        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
+        'https://img.freepik.com/free-photo/sideways-school-boy-copy-space_23-2148764003.jpg',
+        'https://img.freepik.com/free-photo/little-girl-t-shirt-jumpsuit-pointing-up-looking-attentive_176474-39979.jpg',
     ];
     
     // Use course ID to consistently select the same image for the same course
@@ -700,11 +704,13 @@ function theme_remui_kids_get_elementary_courses($userid) {
             } else {
                 // Fallback to default course images from Unsplash
                 $defaultimages = [
-                    'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
-                    'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
-                    'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
-                    'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
-                    'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg'
+         'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',
+        'https://img.freepik.com/free-photo/young-people-row-with-thumbs-up_1098-2557.jpg',
+        'https://img.freepik.com/free-photo/pleased-little-schoolboy-holding-book-points-side-isolated-purple-wall-with-copy-space_141793-75006.jpg',
+        'https://img.freepik.com/free-photo/cheerful-student-writing-holding-books_1098-3439.jpg',
+        'https://img.freepik.com/free-photo/copy-space-boy-with-backpack_23-2148601395.jpg',
+        'https://img.freepik.com/free-photo/sideways-school-boy-copy-space_23-2148764003.jpg',
+        'https://img.freepik.com/free-photo/little-girl-t-shirt-jumpsuit-pointing-up-looking-attentive_176474-39979.jpg',
                 ];
                 $courseimage = $defaultimages[array_rand($defaultimages)];
             }
@@ -2307,5 +2313,260 @@ function theme_remui_kids_get_highschool_dashboard_metrics($userid) {
             'grade_trend' => 0,
             'pending_due_soon' => false
         ];
+    }
+}
+
+/**
+ * Get teacher dashboard statistics
+ *
+ * @return array Array containing teacher dashboard statistics
+ */
+function theme_remui_kids_get_teacher_dashboard_stats() {
+    global $DB, $USER;
+    
+    try {
+        // Get total courses where user is teacher
+        $total_courses = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id) 
+             FROM {course} c 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             WHERE ra.userid = ? 
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND c.visible = 1",
+            [$USER->id]
+        );
+        
+        // Get total students across all teacher's courses
+        $total_students = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT ue.userid) 
+             FROM {user_enrolments} ue 
+             JOIN {enrol} e ON ue.enrolid = e.id 
+             JOIN {course} c ON e.courseid = c.id 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             JOIN {role_assignments} ra2 ON c.id = ra2.contextid 
+             JOIN {context} ctx2 ON ra2.contextid = ctx2.id 
+             JOIN {role} r2 ON ra2.roleid = r2.id 
+             WHERE ra.userid = ? 
+             AND ra2.userid = ue.userid
+             AND ctx.contextlevel = ? 
+             AND ctx2.contextlevel = ?
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND r2.shortname = 'student'
+             AND c.visible = 1",
+            [$USER->id, CONTEXT_COURSE, CONTEXT_COURSE]
+        );
+        
+        // Get pending assignments (assignments not yet graded)
+        $pending_assignments = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT a.id) 
+             FROM {assign} a 
+             JOIN {course} c ON a.course = c.id 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             WHERE ra.userid = ? 
+             AND ctx.contextlevel = ? 
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND c.visible = 1
+             AND a.duedate > ?",
+            [$USER->id, CONTEXT_COURSE, time()]
+        );
+        
+        // Get upcoming classes (courses with recent activity)
+        $upcoming_classes = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT c.id) 
+             FROM {course} c 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             WHERE ra.userid = ? 
+             AND ctx.contextlevel = ? 
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND c.visible = 1
+             AND c.timemodified > ?",
+            [$USER->id, CONTEXT_COURSE, (time() - 86400)] // Last 24 hours
+        );
+        
+        return [
+            'total_courses' => $total_courses,
+            'total_students' => $total_students,
+            'pending_assignments' => $pending_assignments,
+            'upcoming_classes' => $upcoming_classes,
+            'last_updated' => date('Y-m-d H:i:s')
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'total_courses' => 0,
+            'total_students' => 0,
+            'pending_assignments' => 0,
+            'upcoming_classes' => 0,
+            'last_updated' => date('Y-m-d H:i:s')
+        ];
+    }
+}
+
+/**
+ * Get teacher's courses
+ *
+ * @return array Array containing teacher's courses
+ */
+function theme_remui_kids_get_teacher_courses() {
+    global $DB, $USER;
+    
+    try {
+        $courses = $DB->get_records_sql(
+            "SELECT c.id, c.fullname, c.shortname, c.summary, c.timemodified,
+                    COUNT(DISTINCT ue.userid) as student_count
+             FROM {course} c 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             LEFT JOIN {enrol} e ON c.id = e.courseid 
+             LEFT JOIN {user_enrolments} ue ON e.id = ue.enrolid 
+             WHERE ra.userid = ? 
+             AND ctx.contextlevel = ? 
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND c.visible = 1
+             GROUP BY c.id, c.fullname, c.shortname, c.summary, c.timemodified
+             ORDER BY c.timemodified DESC
+             LIMIT 5",
+            [$USER->id, CONTEXT_COURSE]
+        );
+        
+        $formatted_courses = [];
+        foreach ($courses as $course) {
+            $formatted_courses[] = [
+                'id' => $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname,
+                'summary' => $course->summary,
+                'student_count' => $course->student_count,
+                'last_modified' => date('M j, Y', $course->timemodified),
+                'url' => new moodle_url('/course/view.php', ['id' => $course->id])
+            ];
+        }
+        
+        return $formatted_courses;
+        
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get teacher's students
+ *
+ * @return array Array containing teacher's students
+ */
+function theme_remui_kids_get_teacher_students() {
+    global $DB, $USER;
+    
+    try {
+        $students = $DB->get_records_sql(
+            "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.lastaccess,
+                    COUNT(DISTINCT c.id) as course_count
+             FROM {user} u 
+             JOIN {user_enrolments} ue ON u.id = ue.userid 
+             JOIN {enrol} e ON ue.enrolid = e.id 
+             JOIN {course} c ON e.courseid = c.id 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             JOIN {role_assignments} ra2 ON c.id = ra2.contextid 
+             JOIN {context} ctx2 ON ra2.contextid = ctx2.id 
+             JOIN {role} r2 ON ra2.roleid = r2.id 
+             WHERE ra.userid = ? 
+             AND ra2.userid = u.id
+             AND ctx.contextlevel = ? 
+             AND ctx2.contextlevel = ?
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND r2.shortname = 'student'
+             AND c.visible = 1
+             GROUP BY u.id, u.firstname, u.lastname, u.email, u.lastaccess
+             ORDER BY u.lastaccess DESC
+             LIMIT 10",
+            [$USER->id, CONTEXT_COURSE, CONTEXT_COURSE]
+        );
+        
+        $formatted_students = [];
+        foreach ($students as $student) {
+            $formatted_students[] = [
+                'id' => $student->id,
+                'name' => $student->firstname . ' ' . $student->lastname,
+                'email' => $student->email,
+                'course_count' => $student->course_count,
+                'last_access' => $student->lastaccess ? date('M j, Y', $student->lastaccess) : 'Never',
+                'profile_url' => new moodle_url('/user/profile.php', ['id' => $student->id])
+            ];
+        }
+        
+        return $formatted_students;
+        
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get teacher's assignments
+ *
+ * @return array Array containing teacher's assignments
+ */
+function theme_remui_kids_get_teacher_assignments() {
+    global $DB, $USER;
+    
+    try {
+        $assignments = $DB->get_records_sql(
+            "SELECT a.id, a.name, a.duedate, c.fullname as course_name, c.id as course_id,
+                    COUNT(DISTINCT s.id) as submission_count,
+                    COUNT(DISTINCT g.id) as graded_count
+             FROM {assign} a 
+             JOIN {course} c ON a.course = c.id 
+             JOIN {role_assignments} ra ON c.id = ra.contextid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             JOIN {role} r ON ra.roleid = r.id 
+             LEFT JOIN {assign_submission} s ON a.id = s.assignment 
+             LEFT JOIN {assign_grades} g ON a.id = g.assignment 
+             WHERE ra.userid = ? 
+             AND ctx.contextlevel = ? 
+             AND r.shortname IN ('editingteacher', 'teacher')
+             AND c.visible = 1
+             GROUP BY a.id, a.name, a.duedate, c.fullname, c.id
+             ORDER BY a.duedate ASC
+             LIMIT 10",
+            [$USER->id, CONTEXT_COURSE]
+        );
+        
+        $formatted_assignments = [];
+        foreach ($assignments as $assignment) {
+            $status = 'pending';
+            if ($assignment->duedate < time()) {
+                $status = 'overdue';
+            } elseif ($assignment->duedate < (time() + 86400)) {
+                $status = 'due_soon';
+            }
+            
+            $formatted_assignments[] = [
+                'id' => $assignment->id,
+                'name' => $assignment->name,
+                'course_name' => $assignment->course_name,
+                'course_id' => $assignment->course_id,
+                'due_date' => $assignment->duedate ? date('M j, Y', $assignment->duedate) : 'No due date',
+                'submission_count' => $assignment->submission_count,
+                'graded_count' => $assignment->graded_count,
+                'status' => $status,
+                'url' => new moodle_url('/mod/assign/view.php', ['id' => $assignment->id])
+            ];
+        }
+        
+        return $formatted_assignments;
+        
+    } catch (Exception $e) {
+        return [];
     }
 }

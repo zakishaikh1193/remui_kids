@@ -51,6 +51,50 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         return; // Exit early to prevent normal rendering
     }
     
+    // Check if user is a teacher (editingteacher, teacher, or has teacher capabilities)
+    $isteacher = false;
+    $context = context_system::instance();
+    
+    // Check for teacher roles in any course context
+    $teacherroles = $DB->get_records_sql(
+        "SELECT DISTINCT r.shortname 
+         FROM {role} r 
+         JOIN {role_assignments} ra ON r.id = ra.roleid 
+         JOIN {context} ctx ON ra.contextid = ctx.id 
+         WHERE ra.userid = ? 
+         AND ctx.contextlevel = ? 
+         AND r.shortname IN ('editingteacher', 'teacher')",
+        [$USER->id, CONTEXT_COURSE]
+    );
+    
+    if (!empty($teacherroles)) {
+        $isteacher = true;
+    }
+    
+    // Also check for teacher capabilities in system context
+    if (!$isteacher && (has_capability('moodle/course:create', $context, $USER) || 
+                       has_capability('moodle/course:manageactivities', $context, $USER))) {
+        $isteacher = true;
+    }
+    
+    if ($isteacher) {
+        // Show teacher dashboard
+        $templatecontext['custom_dashboard'] = true;
+        $templatecontext['dashboard_type'] = 'teacher';
+        $templatecontext['teacher_dashboard'] = true;
+        $templatecontext['teacher_stats'] = theme_remui_kids_get_teacher_dashboard_stats();
+        $templatecontext['teacher_courses'] = theme_remui_kids_get_teacher_courses();
+        $templatecontext['teacher_students'] = theme_remui_kids_get_teacher_students();
+        $templatecontext['teacher_assignments'] = theme_remui_kids_get_teacher_assignments();
+        
+        // Must be called before rendering the template.
+        require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
+        
+        // Render our custom teacher dashboard template
+        echo $OUTPUT->render_from_template('theme_remui_kids/teacher_dashboard', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
     // Get user's cohort information for non-admin users
     $usercohorts = $DB->get_records_sql(
         "SELECT c.name, c.id 

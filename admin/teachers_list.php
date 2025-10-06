@@ -324,6 +324,16 @@ echo "<style>
         background: #f8d7da;
         color: #721c24;
     }
+    .role-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        background: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
     .action-buttons {
         display: flex;
         gap: 8px;
@@ -762,19 +772,26 @@ echo "</div>";
 echo "<div class='admin-main-content'>";
 
 try {
-    // Get teachers role
-    $teacherrole = $DB->get_record('role', ['shortname' => 'teachers'|| 'editingteacher' || 'teacher']);
+    // Get teacher roles (both 'editingteacher' and 'teacher')
+    $teacherroles = $DB->get_records_sql(
+        "SELECT * FROM {role} WHERE shortname IN ('editingteacher', 'teacher')"
+    );
     
-    if (!$teacherrole) {
+    if (empty($teacherroles)) {
         echo "<div class='alert alert-warning'>";
-        echo "<h4>⚠️ Teachers Role Not Found</h4>";
-        echo "<p>The 'teachers' role does not exist in your system. Please create it first.</p>";
+        echo "<h4>⚠️ Teacher Roles Not Found</h4>";
+        echo "<p>The 'editingteacher' and 'teacher' roles do not exist in your system. Please create them first.</p>";
         echo "</div>";
+        echo "</div>"; // End admin-main-content
         echo $OUTPUT->footer();
         exit;
     }
     
-    // Get all teachers with their details
+    // Get role IDs for the SQL query
+    $role_ids = array_column($teacherroles, 'id');
+    $role_ids_placeholder = implode(',', array_fill(0, count($role_ids), '?'));
+    
+    // Get all teachers with their details (both editingteacher and teacher roles)
     $teachers = $DB->get_records_sql(
         "SELECT 
             u.id,
@@ -787,14 +804,17 @@ try {
             u.lastaccess,
             u.timecreated,
             FROM_UNIXTIME(ra.timemodified) as role_assigned_date,
-            ra.timemodified as role_timestamp
+            ra.timemodified as role_timestamp,
+            r.shortname as role_shortname,
+            r.name as role_name
          FROM {user} u
          JOIN {role_assignments} ra ON u.id = ra.userid
          JOIN {context} ctx ON ra.contextid = ctx.id
-         WHERE ra.roleid = ? AND ctx.contextlevel = ?
+         JOIN {role} r ON ra.roleid = r.id
+         WHERE ra.roleid IN ($role_ids_placeholder) AND ctx.contextlevel = ?
          AND u.deleted = 0
          ORDER BY u.firstname, u.lastname",
-        [$teacherrole->id, CONTEXT_SYSTEM]
+        array_merge($role_ids, [CONTEXT_SYSTEM])
     );
     
     // Count statistics
@@ -861,6 +881,7 @@ try {
         echo "<th>Teacher</th>";
         echo "<th>Username</th>";
         echo "<th>Email</th>";
+        echo "<th>Role</th>";
         echo "<th>Status</th>";
         echo "<th>Last Access</th>";
         echo "<th>Role Assigned</th>";
@@ -891,6 +912,7 @@ try {
             echo "</td>";
             echo "<td>{$teacher->username}</td>";
             echo "<td>{$teacher->email}</td>";
+            echo "<td><span class='role-badge'>" . ucfirst($teacher->role_shortname) . "</span></td>";
             echo "<td><span class='status-badge $status_class'>$status_text</span></td>";
             echo "<td>$last_access</td>";
             echo "<td>$role_assigned</td>";
