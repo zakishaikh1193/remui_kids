@@ -2320,11 +2320,15 @@ function theme_remui_kids_get_teacher_dashboard_stats() {
         // Upcoming classes: courses modified in last 24 hours
         $upcoming_classes = $DB->count_records_select('course', "id {$coursesql} AND timemodified > :since", array_merge($courseparams, ['since' => (time() - 86400)]));
 
+        // Total quizzes in teacher's courses
+        $total_quizzes = $DB->count_records_select('quiz', "course {$coursesql}", $courseparams);
+
         return [
             'total_courses' => $total_courses,
             'total_students' => $total_students,
             'pending_assignments' => $pending_assignments,
             'upcoming_classes' => $upcoming_classes,
+            'total_quizzes' => $total_quizzes,
             'last_updated' => date('Y-m-d H:i:s')
         ];
 
@@ -2334,6 +2338,7 @@ function theme_remui_kids_get_teacher_dashboard_stats() {
             'total_students' => 0,
             'pending_assignments' => 0,
             'upcoming_classes' => 0,
+            'total_quizzes' => 0,
             'last_updated' => date('Y-m-d H:i:s')
         ];
     }
@@ -2462,13 +2467,32 @@ function theme_remui_kids_get_teacher_students() {
 
         $formatted_students = [];
         foreach ($students as $student) {
+            // Get up to 3 of the teacher's courses this student is enrolled in
+            $coursessql = "SELECT c.id, c.fullname
+                           FROM {enrol} e
+                           JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                           JOIN {course} c ON e.courseid = c.id
+                           WHERE ue.userid = :uid
+                           AND c.id {$coursesql}
+                           ORDER BY c.fullname ASC
+                           LIMIT 3";
+
+            $courseparams_with_uid = array_merge($courseparams, ['uid' => $student->id]);
+            $courserecs = $DB->get_records_sql($coursessql, $courseparams_with_uid);
+            $coursenames = [];
+            foreach ($courserecs as $cr) {
+                $coursenames[] = $cr->fullname;
+            }
+
             $formatted_students[] = [
                 'id' => $student->id,
                 'name' => $student->firstname . ' ' . $student->lastname,
                 'email' => $student->email,
                 'course_count' => (int)$student->course_count,
+                'enrolled_courses' => $coursenames,
                 'last_access' => $student->lastaccess ? date('M j, Y', $student->lastaccess) : 'Never',
-                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out()
+                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out(),
+                'avatar_url' => (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out()
             ];
         }
 
@@ -2598,15 +2622,41 @@ function theme_remui_kids_get_top_courses_by_enrollment($limit = 5) {
 
         list($coursesql, $courseparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'c');
 
-        $sql = "SELECT c.id, c.fullname as name,
-                       (SELECT COUNT(DISTINCT ue.userid) FROM {user_enrolments} ue JOIN {enrol} e ON ue.enrolid = e.id WHERE e.courseid = c.id) as enrollment_count
-                FROM {course} c
-                WHERE c.id {$coursesql} AND c.visible = 1
-                ORDER BY enrollment_count DESC
-                LIMIT :limit";
+        // Prefer counting users who hold the 'student' or 'trainee' role in the course context
+        $studentroles = $DB->get_records_list('role', 'shortname', ['student', 'trainee']);
+        $studentroleids = $studentroles ? array_keys($studentroles) : [];
 
-        $courseparams['limit'] = $limit;
-        $records = $DB->get_records_sql($sql, $courseparams);
+        if (!empty($studentroleids)) {
+            list($insqlr, $roleparams) = $DB->get_in_or_equal($studentroleids, SQL_PARAMS_NAMED, 'sr');
+
+            $sql = "SELECT c.id, c.fullname as name,
+                           (SELECT COUNT(DISTINCT ra.userid)
+                            FROM {role_assignments} ra
+                            JOIN {context} ctx2 ON ra.contextid = ctx2.id AND ctx2.contextlevel = " . CONTEXT_COURSE . "
+                            WHERE ctx2.instanceid = c.id
+                            AND ra.roleid {$insqlr}
+                           ) AS enrollment_count
+                    FROM {course} c
+                    WHERE c.id {$coursesql} AND c.visible = 1
+                    ORDER BY enrollment_count DESC
+                    LIMIT :limit";
+
+            // merge courseparams and roleparams and add limit
+            $params = array_merge($courseparams, $roleparams);
+            $params['limit'] = $limit;
+            $records = $DB->get_records_sql($sql, $params);
+        } else {
+            // Fallback: count enrolments from enrol/user_enrolments if student roles are not defined
+            $sql = "SELECT c.id, c.fullname as name,
+                           (SELECT COUNT(DISTINCT ue.userid) FROM {user_enrolments} ue JOIN {enrol} e ON ue.enrolid = e.id WHERE e.courseid = c.id) as enrollment_count
+                    FROM {course} c
+                    WHERE c.id {$coursesql} AND c.visible = 1
+                    ORDER BY enrollment_count DESC
+                    LIMIT :limit";
+
+            $courseparams['limit'] = $limit;
+            $records = $DB->get_records_sql($sql, $courseparams);
+        }
 
         $out = [];
         foreach ($records as $r) {
@@ -2614,6 +2664,8 @@ function theme_remui_kids_get_top_courses_by_enrollment($limit = 5) {
                 'id' => $r->id,
                 'name' => $r->name,
                 'enrollment_count' => (int)$r->enrollment_count,
+                // compute element count (visible course modules)
+                'element_count' => (int)$DB->get_field_sql("SELECT COUNT(*) FROM {course_modules} cm WHERE cm.course = ? AND cm.visible = 1 AND cm.deletioninprogress = 0", [$r->id]),
                 'url' => (new moodle_url('/course/view.php', ['id' => $r->id]))->out()
             ];
         }
@@ -2663,21 +2715,32 @@ function theme_remui_kids_get_top_students($limit = 5) {
         // Compute average percentage grade per student across those courses
         list($coursesql, $courseparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'c');
 
-        $sql = "SELECT u.id, u.firstname, u.lastname,
+        // Only include students who have been active recently (e.g., last 30 days)
+        $active_since = time() - (30 * 24 * 60 * 60); // 30 days
+
+        // Join role assignments to ensure we only pick users with student/trainee roles
+        $sql = "SELECT u.id, u.firstname, u.lastname, u.lastaccess,
                        ROUND(AVG( (gg.finalgrade/NULLIF(gg.rawgrademax,0))*100 ),2) as avg_percent
                 FROM {user} u
+                JOIN {role_assignments} ra ON ra.userid = u.id
+                JOIN {context} ctx ON ra.contextid = ctx.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
+                JOIN {role} r ON ra.roleid = r.id AND r.shortname IN ('student','trainee')
                 JOIN {grade_grades} gg ON gg.userid = u.id
                 JOIN {grade_items} gi ON gi.id = gg.itemid
                 JOIN {course_modules} cm ON gi.iteminstance = cm.instance
                 JOIN {course} c ON cm.course = c.id
                 WHERE c.id {$coursesql}
+                AND u.deleted = 0
+                AND u.suspended = 0
+                AND u.lastaccess > :activesince
                 AND gg.finalgrade IS NOT NULL
                 AND gg.rawgrademax > 0
-                GROUP BY u.id, u.firstname, u.lastname
+                GROUP BY u.id, u.firstname, u.lastname, u.lastaccess
                 ORDER BY avg_percent DESC
                 LIMIT :limit";
 
         $courseparams['limit'] = $limit;
+        $courseparams['activesince'] = $active_since;
         $students = $DB->get_records_sql($sql, $courseparams);
 
         $out = [];
@@ -2688,7 +2751,9 @@ function theme_remui_kids_get_top_students($limit = 5) {
                 'name' => $fullname,
                 'score' => (float)$s->avg_percent,
                 'avatar_url' => (new moodle_url('/user/pix.php/' . $s->id . '/f1.jpg'))->out(),
-                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $s->id]))->out()
+                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $s->id]))->out(),
+                'last_access' => $s->lastaccess ? date('M j, Y', $s->lastaccess) : 'Never',
+                'is_active' => ($s->lastaccess && $s->lastaccess > $active_since)
             ];
         }
 
@@ -2734,30 +2799,38 @@ function theme_remui_kids_get_course_performance_chart_data() {
 
         list($coursesql, $courseparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'c');
 
-        $sql = "SELECT c.id, c.fullname,
-                       ROUND(AVG( (gg.finalgrade/NULLIF(gg.rawgrademax,0))*100 ),2) as avg_percent
+        // Use course completion rates as performance metric
+        $sql = "SELECT c.id, c.shortname as course_name,
+                       COUNT(DISTINCT ue.userid) as total_students,
+                       COUNT(DISTINCT CASE WHEN cmc.completionstate = 1 THEN cmc.userid END) as completed_students,
+                       ROUND(COUNT(DISTINCT CASE WHEN cmc.completionstate = 1 THEN cmc.userid END) * 100.0 / NULLIF(COUNT(DISTINCT ue.userid), 0), 1) as completion_rate
                 FROM {course} c
-                LEFT JOIN {course_modules} cm ON cm.course = c.id
-                LEFT JOIN {grade_items} gi ON gi.iteminstance = cm.instance
-                LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id
+                LEFT JOIN {enrol} e ON e.courseid = c.id
+                LEFT JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                LEFT JOIN {course_modules_completion} cmc ON cmc.userid = ue.userid
+                LEFT JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid AND cm.course = c.id
                 WHERE c.id {$coursesql}
-                AND gg.finalgrade IS NOT NULL
-                AND gg.rawgrademax > 0
-                GROUP BY c.id, c.fullname
-                ORDER BY c.fullname";
+                GROUP BY c.id, c.shortname
+                HAVING total_students > 0
+                ORDER BY completion_rate DESC
+                LIMIT 6";
 
         $records = $DB->get_records_sql($sql, $courseparams);
 
         $labels = [];
         $data = [];
+        $counts = [];
+
         foreach ($records as $r) {
-            $labels[] = $r->fullname;
-            $data[] = $r->avg_percent ? (float)$r->avg_percent : 0;
+            $labels[] = $r->course_name;
+            $data[] = $r->completion_rate ?: 0;
+            $counts[] = $r->total_students;
         }
 
-        return ['labels' => $labels, 'data' => $data];
+        return ['labels' => $labels, 'data' => $data, 'counts' => $counts];
+
     } catch (Exception $e) {
-        return ['labels' => [], 'data' => []];
+        return ['labels' => [], 'data' => [], 'counts' => []];
     }
 }
 
@@ -2829,5 +2902,243 @@ function theme_remui_kids_get_course_completion_summary() {
         return ['completed' => (int)$completed, 'inprogress' => (int)$inprogress, 'not_started' => (int)$not_started];
     } catch (Exception $e) {
         return ['completed' => 0, 'inprogress' => 0, 'not_started' => 0];
+    }
+}
+
+/**
+ * Get teaching progress data for teacher dashboard
+ *
+ * @return array Teaching progress data
+ */
+function theme_remui_kids_get_teaching_progress_data() {
+    global $DB, $USER;
+
+    try {
+        // Get teacher's course ids
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = $teacherroles ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return ['progress_percentage' => 0, 'progress_label' => 'No courses assigned'];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid AS courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $courseidlist = array_map(function($r) { return $r->courseid; }, $courseids);
+        if (empty($courseidlist)) {
+            return ['progress_percentage' => 0, 'progress_label' => 'No courses assigned'];
+        }
+
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($courseidlist, SQL_PARAMS_NAMED, 'c');
+
+        // Calculate progress based on completed activities vs total activities
+        $total_activities = $DB->get_field_sql(
+            "SELECT COUNT(*) FROM {course_modules} cm 
+             WHERE cm.course {$coursesql} AND cm.visible = 1 AND cm.deletioninprogress = 0",
+            $courseparams
+        ) ?: 0;
+
+        $completed_activities = $DB->get_field_sql(
+            "SELECT COUNT(DISTINCT cmc.coursemoduleid) 
+             FROM {course_modules_completion} cmc
+             JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+             WHERE cm.course {$coursesql} AND cm.visible = 1 AND cm.deletioninprogress = 0
+             AND cmc.completionstate = 1",
+            $courseparams
+        ) ?: 0;
+
+        $progress_percentage = $total_activities > 0 ? round(($completed_activities / $total_activities) * 100) : 0;
+        $progress_label = "{$completed_activities} of {$total_activities} activities completed";
+
+        return [
+            'progress_percentage' => $progress_percentage,
+            'progress_label' => $progress_label
+        ];
+
+    } catch (Exception $e) {
+        return ['progress_percentage' => 0, 'progress_label' => 'Error calculating progress'];
+    }
+}
+
+/**
+ * Get student feedback data for teacher dashboard
+ *
+ * @return array Student feedback data
+ */
+function theme_remui_kids_get_student_feedback_data() {
+    global $DB, $USER;
+
+    try {
+        // Get teacher's course ids
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = $teacherroles ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [
+                'average_rating' => 0,
+                'total_reviews' => 0,
+                'rating_breakdown' => [
+                    '5_stars' => 0, '4_stars' => 0, '3_stars' => 0, '2_stars' => 0, '1_star' => 0
+                ]
+            ];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid AS courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $courseidlist = array_map(function($r) { return $r->courseid; }, $courseids);
+        if (empty($courseidlist)) {
+            return [
+                'average_rating' => 0,
+                'total_reviews' => 0,
+                'rating_breakdown' => [
+                    '5_stars' => 0, '4_stars' => 0, '3_stars' => 0, '2_stars' => 0, '1_star' => 0
+                ]
+            ];
+        }
+
+        // Compute grade-based analytics as real data proxy for feedback
+        // Get all graded items for teacher's courses and compute average and distribution
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($courseidlist, SQL_PARAMS_NAMED, 'c');
+
+        $grades = $DB->get_records_sql(
+            "SELECT gg.finalgrade, gi.grademax
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gi.id = gg.itemid
+             WHERE gi.courseid {$coursesql}
+               AND gg.finalgrade IS NOT NULL
+               AND gi.grademax > 0",
+            $courseparams
+        );
+
+        $total = 0; $sumPercent = 0.0;
+        $buckets = [
+            '80_100' => 0,
+            '60_79' => 0,
+            '40_59' => 0,
+            '20_39' => 0,
+            '0_19' => 0
+        ];
+
+        foreach ($grades as $g) {
+            $pct = ($g->finalgrade / $g->grademax) * 100.0;
+            $sumPercent += $pct;
+            $total++;
+            if ($pct >= 80) $buckets['80_100']++; else if ($pct >= 60) $buckets['60_79']++; else if ($pct >= 40) $buckets['40_59']++; else if ($pct >= 20) $buckets['20_39']++; else $buckets['0_19']++;
+        }
+
+        $average_percent = $total > 0 ? round($sumPercent / $total, 1) : 0;
+
+        $percent_breakdown = [];
+        foreach ($buckets as $k => $v) {
+            $percent_breakdown[$k.'_percent'] = $total > 0 ? round(($v / $total) * 100) : 0;
+        }
+
+        return [
+            'average_percent' => $average_percent,
+            'total_graded' => $total,
+            'distribution' => array_merge($buckets, $percent_breakdown)
+        ];
+
+    } catch (Exception $e) {
+        return [
+            'average_percent' => 0,
+            'total_graded' => 0,
+            'distribution' => [
+                '80_100' => 0, '60_79' => 0, '40_59' => 0, '20_39' => 0, '0_19' => 0,
+                '80_100_percent' => 0, '60_79_percent' => 0, '40_59_percent' => 0, '20_39_percent' => 0, '0_19_percent' => 0
+            ]
+        ];
+    }
+}
+
+/**
+ * Get recent feedback data for teacher dashboard
+ *
+ * @return array Recent feedback data
+ */
+function theme_remui_kids_get_recent_feedback_data() {
+    global $DB, $USER;
+
+    try {
+        // Get teacher's course ids
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = $teacherroles ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid AS courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $courseidlist = array_map(function($r) { return $r->courseid; }, $courseids);
+        if (empty($courseidlist)) {
+            return [];
+        }
+
+        // Real data: recently graded items for teacher's courses
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($courseidlist, SQL_PARAMS_NAMED, 'c');
+
+        $rows = $DB->get_records_sql(
+            "SELECT u.id as userid, u.firstname, u.lastname, gg.timemodified, gg.finalgrade, gi.grademax, gi.itemname, c.fullname as coursename
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gi.id = gg.itemid
+             JOIN {course} c ON c.id = gi.courseid
+             JOIN {user} u ON u.id = gg.userid
+             WHERE gi.courseid {$coursesql}
+               AND gg.finalgrade IS NOT NULL
+             ORDER BY gg.timemodified DESC
+             LIMIT 8",
+            $courseparams
+        );
+
+        $out = [];
+        foreach ($rows as $r) {
+            $pct = $r->grademax > 0 ? round(($r->finalgrade / $r->grademax) * 100) : 0;
+            $out[] = [
+                'student_name' => fullname((object)['firstname'=>$r->firstname,'lastname'=>$r->lastname]),
+                'date' => userdate($r->timemodified, '%b %e, %Y'),
+                'grade_percent' => $pct,
+                'item_name' => $r->itemname ?: 'Graded item',
+                'course_name' => $r->coursename
+            ];
+        }
+
+        return $out;
+
+    } catch (Exception $e) {
+        return [];
     }
 }

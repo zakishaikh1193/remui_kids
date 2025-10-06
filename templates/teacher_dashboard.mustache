@@ -260,7 +260,7 @@
 </div>
 
 <!-- Charts and Analytics Section -->
-<div class="row mt-4">
+<div class="row mt-3">
     <div class="col-md-8">
         <div class="dashboard-card">
             <div class="card-header">
@@ -318,33 +318,45 @@
         </div>
     </div>
     
-    <!-- Top Students Section -->
+    <!-- Student Enrollment Section -->
     <div class="col-md-4">
         <div class="dashboard-card">
             <div class="card-header">
-                <h5 class="card-title">Top Students</h5>
+                <h5 class="card-title">Student Enrollment</h5>
             </div>
             <div class="card-body">
                 <div class="top-students-list">
-                    {{#top_students}}
-                    <div class="student-item">
-                        <div class="student-avatar">
-                            <img src="{{avatar_url}}" alt="{{name}}">
-                        </div>
-                        <div class="student-info">
-                            <div class="student-name">{{name}}</div>
-                            <div class="student-score">{{score}} points</div>
-                        </div>
+                {{#teacher_students}}
+                <div class="student-item">
+                    <div class="student-avatar">
+                        <img src="/theme/image.php/remui_kids/core/164/f1" alt="{{name}}">
                     </div>
-                    {{/top_students}}
-                    {{^top_students}}
-                    <div class="no-data-message">
-                        <p>No student data available</p>
+                    <div class="student-info">
+                        <div class="student-name">{{name}}</div>
+                        <div class="student-email small text-muted">{{email}}</div>
+                        <div class="student-courses-list small mt-1">
+                            {{#enrolled_courses}}
+                                <div class="enrolled-course">• {{.}}</div>
+                            {{/enrolled_courses}}
+                            {{^enrolled_courses}}
+                                <div class="enrolled-course text-muted">No enrolled courses</div>
+                            {{/enrolled_courses}}
+                        </div>
+                        <div class="student-last-seen"><small>Last seen: {{last_access}}</small></div>
                     </div>
-                    {{/top_students}}
+                    <div class="student-actions ml-2">
+                        <a href="{{profile_url}}" class="btn btn-outline-primary btn-sm">View</a>
+                    </div>
                 </div>
+                {{/teacher_students}}
+                {{^teacher_students}}
+                <div class="no-data-message">
+                    <p>No students found. Enroll students in your courses to see them here.</p>
+                </div>
+                {{/teacher_students}}
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Top Courses Section -->
@@ -362,7 +374,7 @@
                         </div>
                         <div class="course-info">
                             <div class="course-name">{{name}}</div>
-                            <div class="course-enrollment">{{enrollment_count}} students</div>
+                            <div class="course-enrollment">{{enrollment_count}} students • {{element_count}} elements</div>
                         </div>
                     </div>
                     {{/top_courses}}
@@ -378,7 +390,7 @@
 </div>
 
 <!-- Recent Courses and Students Section -->
-<div class="row mt-4">
+<div class="row mt-3">
     <div class="col-md-6">
         <div class="dashboard-card">
             <div class="card-header">
@@ -462,7 +474,7 @@
 </div>
 
 <!-- Recent Assignments Section -->
-<div class="row mt-4">
+<div class="row mt-3">
     <div class="col-md-12">
         <div class="dashboard-card">
             <div class="card-header">
@@ -507,7 +519,7 @@
 </div>
 
 <!-- Student Feedback Section -->
-<div class="row mt-4">
+<div class="row mt-3">
     <div class="col-md-6">
         <div class="dashboard-card">
             <div class="card-header">
@@ -1138,6 +1150,7 @@ function initializeCharts() {
 
         const labels = perfData && perfData.labels ? perfData.labels : ['Math', 'Science', 'History', 'English', 'Art', 'Music'];
         const dataset = perfData && perfData.data ? perfData.data : [85, 78, 92, 88, 76, 82];
+    const counts = perfData && perfData.counts ? perfData.counts : [];
 
         new Chart(performanceCtx, {
             type: 'bar',
@@ -1158,6 +1171,18 @@ function initializeCharts() {
                     y: {
                         beginAtZero: true,
                         max: 100
+                    }
+                }
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                const score = context.parsed.y;
+                                const count = counts[idx] !== undefined ? counts[idx] : 'N/A';
+                                return 'Avg: ' + score + '% — ' + count + ' students';
+                            }
+                        }
                     }
                 }
             }
