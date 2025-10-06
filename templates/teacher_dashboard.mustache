@@ -16,25 +16,7 @@
     </button>
 
 <!-- Teacher Dashboard Header -->
-<div class="teacher-dashboard-header">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="teacher-dashboard-title mb-2">
-                    Teacher Dashboard
-                </h1>
-                <p class="teacher-dashboard-subtitle mb-0">
-                    Welcome back, Teacher! Here's your teaching overview
-                </p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <div class="teacher-dashboard-badge">
-                    <i class="fa fa-chalkboard-teacher"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Teacher Sidebar Navigation -->
 <div class="teacher-sidebar">
@@ -195,9 +177,8 @@
                         <div class="stat-content">
                             <div class="stat-number" id="total-courses-count">{{total_courses}}</div>
                             <div class="stat-label">TOTAL COURSES</div>
-                            <div class="stat-status">• Teaching</div>
-                            <div class="stat-updated" id="courses-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
-                                Last updated: {{last_updated}}
+                            <div class="stat-change positive">
+                                <i class="fa fa-arrow-up"></i> +1.34%
                             </div>
                         </div>
                         <div class="stat-refresh-btn" onclick="refreshCourseCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
@@ -213,9 +194,8 @@
                         <div class="stat-content">
                             <div class="stat-number" id="total-students-count">{{total_students}}</div>
                             <div class="stat-label">TOTAL STUDENTS</div>
-                            <div class="stat-status">• Enrolled</div>
-                            <div class="stat-updated" id="students-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
-                                Last updated: {{last_updated}}
+                            <div class="stat-change negative">
+                                <i class="fa fa-arrow-down"></i> -1.34%
                             </div>
                         </div>
                         <div class="stat-refresh-btn" onclick="refreshStudentCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
@@ -223,17 +203,16 @@
                         </div>
                     </div>
                     
-                    <!-- Pending Assignments Card -->
+                    <!-- Assignments Card -->
                     <div class="teacher-stat-card assignments-card" id="assignments-card">
                         <div class="stat-icon-container">
                             <i class="fa fa-tasks stat-icon"></i>
                         </div>
                         <div class="stat-content">
                             <div class="stat-number" id="pending-assignments-count">{{pending_assignments}}</div>
-                            <div class="stat-label">PENDING ASSIGNMENTS</div>
-                            <div class="stat-status">• To Grade</div>
-                            <div class="stat-updated" id="assignments-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
-                                Last updated: {{last_updated}}
+                            <div class="stat-label">TOTAL ASSIGNMENTS</div>
+                            <div class="stat-change positive">
+                                <i class="fa fa-arrow-up"></i> +5.67%
                             </div>
                         </div>
                         <div class="stat-refresh-btn" onclick="refreshAssignmentCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
@@ -249,9 +228,24 @@
                         <div class="stat-content">
                             <div class="stat-number" id="upcoming-classes-count">{{upcoming_classes}}</div>
                             <div class="stat-label">UPCOMING CLASSES</div>
-                            <div class="stat-status">• Today</div>
-                            <div class="stat-updated" id="classes-updated" style="font-size: 10px; color: #666; margin-top: 5px;">
-                                Last updated: {{last_updated}}
+                            <div class="stat-change positive">
+                                <i class="fa fa-arrow-up"></i> +2.45%
+                            </div>
+                        </div>
+                        <div class="stat-refresh-btn" onclick="refreshClassCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
+                            <i class="fa fa-refresh" id="classes-refresh-icon"></i>
+                        </div>
+                    </div>
+                    <!-- Total Quizzes -->
+                    <div class="teacher-stat-card classes-card" id="classes-card">
+                        <div class="stat-icon-container">
+                            <i class="fa fa-calendar stat-icon"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="upcoming-classes-count">{{upcoming_classes}}</div>
+                            <div class="stat-label">Total Quizzes</div>
+                            <div class="stat-change positive">
+                                <i class="fa fa-arrow-up"></i> +2.45%
                             </div>
                         </div>
                         <div class="stat-refresh-btn" onclick="refreshClassCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
@@ -266,130 +260,341 @@
     </div>
 </div>
 
-<!-- Recent Courses Section -->
-<div class="teacher-recent-courses-section">
-    <div class="container-fluid">
-        <div class="recent-courses-container">
-            <div class="section-header">
-                <h3 class="section-title">Recent Courses</h3>
-                <p class="section-subtitle">Your most recently updated courses</p>
+<!-- Charts and Analytics Section -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Student Performance by Course</h5>
+                <div class="card-actions">
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </button>
+                </div>
             </div>
-            
-            <div class="courses-list">
-                {{#teacher_courses}}
-                <div class="course-item">
-                    <div class="course-info">
-                        <div class="course-icon">
-                            <i class="fa fa-book"></i>
-                        </div>
-                        <div class="course-details">
-                            <div class="course-name">{{fullname}}</div>
-                            <div class="course-shortname">{{shortname}}</div>
-                            <div class="course-meta">
-                                <span class="course-students">{{student_count}} students</span>
-                                <span class="course-updated">Updated {{last_modified}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="course-actions">
-                        <a href="{{url}}" class="btn btn-primary btn-sm">View Course</a>
-                    </div>
+            <div class="card-body">
+                <canvas id="performanceChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Course Completion Rate</h5>
+                <div class="card-actions">
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </button>
                 </div>
-                {{/teacher_courses}}
-                
-                {{^teacher_courses}}
-                <div class="no-courses-message">
-                    <i class="fa fa-book"></i>
-                    <p>No courses found. Create your first course to get started!</p>
-                    <a href="{{config.wwwroot}}/course/edit.php" class="btn btn-primary">Create Course</a>
-                </div>
-                {{/teacher_courses}}
+            </div>
+            <div class="card-body">
+                <canvas id="completionChart" height="200"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Students Section -->
-<div class="teacher-recent-students-section">
-    <div class="container-fluid">
-        <div class="recent-students-container">
-            <div class="section-header">
-                <h3 class="section-title">Recent Students</h3>
-                <p class="section-subtitle">Students from your courses</p>
+<!-- Top Sections Row -->
+<div class="row mt-4">
+    <!-- Teaching Progress Section -->
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Teaching Progress</h5>
             </div>
-            
-            <div class="students-list">
-                {{#teacher_students}}
-                <div class="student-item">
-                    <div class="student-info">
-                        <div class="student-icon">
-                            <i class="fa fa-user"></i>
+            <div class="card-body">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label">Monthly Goal</span>
+                        <span class="progress-value">68%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 68%" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="progress-detail mt-2">
+                        <small>68% of monthly teaching goal achieved</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Students Section -->
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Top Students</h5>
+            </div>
+            <div class="card-body">
+                <div class="top-students-list">
+                    {{#top_students}}
+                    <div class="student-item">
+                        <div class="student-avatar">
+                            <img src="{{avatar_url}}" alt="{{name}}">
                         </div>
-                        <div class="student-details">
+                        <div class="student-info">
                             <div class="student-name">{{name}}</div>
-                            <div class="student-email">{{email}}</div>
-                            <div class="student-meta">
-                                <span class="student-courses">{{course_count}} courses</span>
-                                <span class="student-last-access">Last seen {{last_access}}</span>
+                            <div class="student-score">{{score}} points</div>
+                        </div>
+                    </div>
+                    {{/top_students}}
+                    {{^top_students}}
+                    <div class="no-data-message">
+                        <p>No student data available</p>
+                    </div>
+                    {{/top_students}}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Courses Section -->
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Top Courses by Enrollment</h5>
+            </div>
+            <div class="card-body">
+                <div class="top-courses-list">
+                    {{#top_courses}}
+                    <div class="course-item">
+                        <div class="course-icon">
+                            <i class="fa fa-book"></i>
+                        </div>
+                        <div class="course-info">
+                            <div class="course-name">{{name}}</div>
+                            <div class="course-enrollment">{{enrollment_count}} students</div>
+                        </div>
+                    </div>
+                    {{/top_courses}}
+                    {{^top_courses}}
+                    <div class="no-data-message">
+                        <p>No course data available</p>
+                    </div>
+                    {{/top_courses}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Courses and Students Section -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Courses</h5>
+                <a href="{{config.wwwroot}}/course/index.php" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="courses-list">
+                    {{#teacher_courses}}
+                    <div class="course-item">
+                        <div class="course-info">
+                            <div class="course-icon">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="course-details">
+                                <div class="course-name">{{fullname}}</div>
+                                <div class="course-shortname">{{shortname}}</div>
+                                <div class="course-meta">
+                                    <span class="course-students">{{student_count}} students</span>
+                                    <span class="course-updated">Updated {{last_modified}}</span>
+                                </div>
                             </div>
                         </div>
+                        <div class="course-actions">
+                            <a href="{{url}}" class="btn btn-primary btn-sm">View Course</a>
+                        </div>
                     </div>
-                    <div class="student-actions">
-                        <a href="{{profile_url}}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                    {{/teacher_courses}}
+                    
+                    {{^teacher_courses}}
+                    <div class="no-courses-message">
+                        <i class="fa fa-book"></i>
+                        <p>No courses found. Create your first course to get started!</p>
+                        <a href="{{config.wwwroot}}/course/edit.php" class="btn btn-primary">Create Course</a>
                     </div>
+                    {{/teacher_courses}}
                 </div>
-                {{/teacher_students}}
-                
-                {{^teacher_students}}
-                <div class="no-students-message">
-                    <i class="fa fa-users"></i>
-                    <p>No students found. Enroll students in your courses to see them here.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Students</h5>
+                <a href="{{config.wwwroot}}/user/index.php" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="students-list">
+                    {{#teacher_students}}
+                    <div class="student-item">
+                        <div class="student-info">
+                            <div class="student-icon">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <div class="student-details">
+                                <div class="student-name">{{name}}</div>
+                                <div class="student-email">{{email}}</div>
+                                <div class="student-meta">
+                                    <span class="student-courses">{{course_count}} courses</span>
+                                    <span class="student-last-access">Last seen {{last_access}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="student-actions">
+                            <a href="{{profile_url}}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                    {{/teacher_students}}
+                    
+                    {{^teacher_students}}
+                    <div class="no-students-message">
+                        <i class="fa fa-users"></i>
+                        <p>No students found. Enroll students in your courses to see them here.</p>
+                    </div>
+                    {{/teacher_students}}
                 </div>
-                {{/teacher_students}}
             </div>
         </div>
     </div>
 </div>
 
 <!-- Recent Assignments Section -->
-<div class="teacher-recent-assignments-section">
-    <div class="container-fluid">
-        <div class="recent-assignments-container">
-            <div class="section-header">
-                <h3 class="section-title">Recent Assignments</h3>
-                <p class="section-subtitle">Assignments that need your attention</p>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Assignments</h5>
+                <a href="{{config.wwwroot}}/mod/assign/index.php" class="btn btn-sm btn-primary">View All</a>
             </div>
-            
-            <div class="assignments-list">
-                {{#teacher_assignments}}
-                <div class="assignment-item">
-                    <div class="assignment-info">
-                        <div class="assignment-icon">
-                            <i class="fa fa-tasks"></i>
-                        </div>
-                        <div class="assignment-details">
-                            <div class="assignment-name">{{name}}</div>
-                            <div class="assignment-course">{{course_name}}</div>
-                            <div class="assignment-meta">
-                                <span class="assignment-due">Due {{due_date}}</span>
-                                <span class="assignment-submissions">{{submission_count}} submissions</span>
-                                <span class="assignment-graded">{{graded_count}} graded</span>
+            <div class="card-body">
+                <div class="assignments-list">
+                    {{#teacher_assignments}}
+                    <div class="assignment-item">
+                        <div class="assignment-info">
+                            <div class="assignment-icon">
+                                <i class="fa fa-tasks"></i>
+                            </div>
+                            <div class="assignment-details">
+                                <div class="assignment-name">{{name}}</div>
+                                <div class="assignment-course">{{course_name}}</div>
+                                <div class="assignment-meta">
+                                    <span class="assignment-due">Due {{due_date}}</span>
+                                    <span class="assignment-submissions">{{submission_count}} submissions</span>
+                                    <span class="assignment-graded">{{graded_count}} graded</span>
+                                </div>
                             </div>
                         </div>
+                        <div class="assignment-status">
+                            <span class="status-badge status-{{status}}">{{status}}</span>
+                            <a href="{{url}}" class="btn btn-primary btn-sm">Grade</a>
+                        </div>
                     </div>
-                    <div class="assignment-status">
-                        <span class="status-badge status-{{status}}">{{status}}</span>
-                        <a href="{{url}}" class="btn btn-primary btn-sm">Grade</a>
+                    {{/teacher_assignments}}
+                    
+                    {{^teacher_assignments}}
+                    <div class="no-assignments-message">
+                        <i class="fa fa-tasks"></i>
+                        <p>No assignments found. Create assignments in your courses to see them here.</p>
+                    </div>
+                    {{/teacher_assignments}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student Feedback Section -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Student Feedback</h5>
+            </div>
+            <div class="card-body">
+                <div class="feedback-overview">
+                    <div class="rating-summary">
+                        <div class="rating-number">4.5</div>
+                        <div class="rating-stars">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-half-alt"></i>
+                        </div>
+                        <div class="rating-count">Based on 128 reviews</div>
+                    </div>
+                    <div class="rating-breakdown">
+                        <div class="rating-bar">
+                            <span class="rating-label">5 stars</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="rating-percentage">65%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">4 stars</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="rating-percentage">20%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">3 stars</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="rating-percentage">10%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">2 stars</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 3%" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="rating-percentage">3%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">1 star</span>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 2%" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="rating-percentage">2%</span>
+                        </div>
                     </div>
                 </div>
-                {{/teacher_assignments}}
-                
-                {{^teacher_assignments}}
-                <div class="no-assignments-message">
-                    <i class="fa fa-tasks"></i>
-                    <p>No assignments found. Create assignments in your courses to see them here.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Feedback</h5>
+            </div>
+            <div class="card-body">
+                <div class="feedback-list">
+                    {{#recent_feedback}}
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="student-name">{{student_name}}</div>
+                            <div class="feedback-date">{{date}}</div>
+                        </div>
+                        <div class="feedback-rating">
+                            {{#stars}}<i class="fa fa-star"></i>{{/stars}}
+                            {{#empty_stars}}<i class="far fa-star"></i>{{/empty_stars}}
+                        </div>
+                        <div class="feedback-comment">{{comment}}</div>
+                    </div>
+                    {{/recent_feedback}}
+                    {{^recent_feedback}}
+                    <div class="no-feedback-message">
+                        <p>No feedback available yet.</p>
+                    </div>
+                    {{/recent_feedback}}
                 </div>
-                {{/teacher_assignments}}
             </div>
         </div>
     </div>
@@ -411,6 +616,331 @@
 </div>
 
 {{> theme_remui/common_end}}
+
+<style>
+/* Dashboard Card Styles */
+.dashboard-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    border: none;
+}
+
+.dashboard-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-card .card-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.dashboard-card .card-body {
+    padding: 20px;
+}
+
+/* Stat Card Styles */
+.teacher-stat-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.teacher-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.courses-card .stat-icon-container {
+    background-color: rgba(54, 162, 235, 0.1);
+    color: #36a2eb;
+}
+
+.students-card .stat-icon-container {
+    background-color: rgba(255, 99, 132, 0.1);
+    color: #ff6384;
+}
+
+.assignments-card .stat-icon-container {
+    background-color: rgba(255, 206, 86, 0.1);
+    color: #ffce56;
+}
+
+.classes-card .stat-icon-container {
+    background-color: rgba(75, 192, 192, 0.1);
+    color: #4bc0c0;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.stat-change {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.stat-change.positive {
+    color: #28a745;
+}
+
+.stat-change.negative {
+    color: #dc3545;
+}
+
+/* Progress Styles */
+.progress-container {
+    margin-bottom: 15px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.progress-label {
+    font-weight: 600;
+}
+
+.progress-value {
+    font-weight: 700;
+}
+
+.progress {
+    height: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 5px;
+}
+
+/* Top Lists Styles */
+.top-students-list, .top-courses-list {
+    margin-top: 10px;
+}
+
+.student-item, .course-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.student-item:last-child, .course-item:last-child {
+    border-bottom: none;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+}
+
+.student-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.course-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: #666;
+}
+
+.student-info, .course-info {
+    flex: 1;
+}
+
+.student-name, .course-name {
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.student-score, .course-enrollment {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Feedback Styles */
+.feedback-overview {
+    display: flex;
+    flex-direction: column;
+}
+
+.rating-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.rating-number {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.rating-stars {
+    color: #ffc107;
+    margin-bottom: 5px;
+}
+
+.rating-count {
+    font-size: 14px;
+    color: #666;
+}
+
+.rating-breakdown {
+    margin-top: 15px;
+}
+
+.rating-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.rating-label {
+    width: 60px;
+    font-size: 14px;
+}
+
+.rating-bar .progress {
+    flex: 1;
+    height: 8px;
+    margin: 0 10px;
+    background-color: #f0f0f0;
+}
+
+.rating-bar .progress-bar {
+    background-color: #ffc107;
+}
+
+.rating-percentage {
+    width: 40px;
+    text-align: right;
+    font-size: 14px;
+}
+
+.feedback-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.feedback-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.feedback-item:last-child {
+    border-bottom: none;
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.student-name {
+    font-weight: 600;
+}
+
+.feedback-date {
+    font-size: 14px;
+    color: #666;
+}
+
+.feedback-rating {
+    color: #ffc107;
+    margin-bottom: 5px;
+}
+
+.feedback-comment {
+    font-size: 14px;
+    color: #333;
+}
+
+/* No Data Message Styles */
+.no-data-message, .no-courses-message, .no-students-message, .no-assignments-message, .no-feedback-message {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.no-data-message i, .no-courses-message i, .no-students-message i, .no-assignments-message i, .no-feedback-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #ddd;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .teacher-stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    
+    .teacher-stat-card {
+        width: 48%;
+        margin-bottom: 15px;
+    }
+    
+    .feedback-overview {
+        flex-direction: column;
+    }
+    
+    .rating-summary {
+        margin-bottom: 20px;
+    }
+}
+</style>
 
 <script>
 function toggleTeacherSidebar() {
@@ -483,13 +1013,15 @@ document.addEventListener('DOMContentLoaded', function() {
             dashboardItem.closest('.sidebar-item').classList.add('active');
         }
     }
+    
+    // Initialize Charts
+    initializeCharts();
 });
 
 // Real-time statistics update functions
 function refreshCourseCount() {
     const refreshIcon = document.getElementById('courses-refresh-icon');
     const coursesCount = document.getElementById('total-courses-count');
-    const coursesUpdated = document.getElementById('courses-updated');
     
     // Show loading state
     refreshIcon.classList.add('fa-spin');
@@ -499,7 +1031,6 @@ function refreshCourseCount() {
         // Update the count (this would come from API)
         const currentValue = parseInt(coursesCount.textContent) || 0;
         coursesCount.textContent = currentValue;
-        coursesUpdated.textContent = 'Last updated: ' + new Date().toLocaleString();
         
         // Remove loading state
         refreshIcon.classList.remove('fa-spin');
@@ -512,7 +1043,6 @@ function refreshCourseCount() {
 function refreshStudentCount() {
     const refreshIcon = document.getElementById('students-refresh-icon');
     const studentsCount = document.getElementById('total-students-count');
-    const studentsUpdated = document.getElementById('students-updated');
     
     // Show loading state
     refreshIcon.classList.add('fa-spin');
@@ -521,7 +1051,6 @@ function refreshStudentCount() {
     setTimeout(() => {
         const currentValue = parseInt(studentsCount.textContent) || 0;
         studentsCount.textContent = currentValue;
-        studentsUpdated.textContent = 'Last updated: ' + new Date().toLocaleString();
         
         refreshIcon.classList.remove('fa-spin');
         showUpdateFeedback('students-card', 'success');
@@ -531,7 +1060,6 @@ function refreshStudentCount() {
 function refreshAssignmentCount() {
     const refreshIcon = document.getElementById('assignments-refresh-icon');
     const assignmentsCount = document.getElementById('pending-assignments-count');
-    const assignmentsUpdated = document.getElementById('assignments-updated');
     
     // Show loading state
     refreshIcon.classList.add('fa-spin');
@@ -540,7 +1068,6 @@ function refreshAssignmentCount() {
     setTimeout(() => {
         const currentValue = parseInt(assignmentsCount.textContent) || 0;
         assignmentsCount.textContent = currentValue;
-        assignmentsUpdated.textContent = 'Last updated: ' + new Date().toLocaleString();
         
         refreshIcon.classList.remove('fa-spin');
         showUpdateFeedback('assignments-card', 'success');
@@ -550,7 +1077,6 @@ function refreshAssignmentCount() {
 function refreshClassCount() {
     const refreshIcon = document.getElementById('classes-refresh-icon');
     const classesCount = document.getElementById('upcoming-classes-count');
-    const classesUpdated = document.getElementById('classes-updated');
     
     // Show loading state
     refreshIcon.classList.add('fa-spin');
@@ -559,7 +1085,6 @@ function refreshClassCount() {
     setTimeout(() => {
         const currentValue = parseInt(classesCount.textContent) || 0;
         classesCount.textContent = currentValue;
-        classesUpdated.textContent = 'Last updated: ' + new Date().toLocaleString();
         
         refreshIcon.classList.remove('fa-spin');
         showUpdateFeedback('classes-card', 'success');
@@ -597,6 +1122,80 @@ function showUpdateFeedback(cardId, type) {
         feedback.style.opacity = '0';
         setTimeout(() => card.removeChild(feedback), 300);
     }, 2000);
+}
+
+// Initialize Charts
+function initializeCharts() {
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart');
+    if (performanceCtx) {
+        new Chart(performanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Math', 'Science', 'History', 'English', 'Art', 'Music'],
+                datasets: [{
+                    label: 'Average Score',
+                    data: [85, 78, 92, 88, 76, 82],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+    
+    // Completion Chart
+    const completionCtx = document.getElementById('completionChart');
+    if (completionCtx) {
+        new Chart(completionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'In Progress', 'Not Started'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(255, 99, 132, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
 }
 
 // Auto-refresh every 30 seconds
