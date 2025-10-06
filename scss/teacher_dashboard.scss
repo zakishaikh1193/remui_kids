@@ -2,11 +2,17 @@
    TEACHER DASHBOARD STYLES - ECOMMERCE STYLE
    ======================================== */
 
-   .teacher-dashboard-wrapper {
+.teacher-dashboard-wrapper {
     min-height: 100vh;
     background: #f5f7fa;
     position: relative;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    /* subtle outer padding for breathing room */
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
 /* Teacher Dashboard Header */
@@ -157,6 +163,10 @@
     width: 100%;
 }
 
+/* Nuke side paddings inside dashboard containers */
+.teacher-dashboard-wrapper .container,
+.teacher-dashboard-wrapper .container-fluid { padding-left: 0 !important; padding-right: 0 !important; }
+
 /* Override Bootstrap row margins */
 .teacher-dashboard-wrapper .row {
     margin-left: 0;
@@ -168,20 +178,19 @@
 .teacher-dashboard-wrapper .col-md-4,
 .teacher-dashboard-wrapper .col-md-6,
 .teacher-dashboard-wrapper .col-md-8 {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Teacher Dashboard Statistics */
 .teacher-dashboard-stats {
     margin-bottom: 1.5rem;
-    padding: 0 1rem;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Stats section container for better spacing */
-.stats-section-container {
-    padding: 0 1rem;
-}
+.stats-section-container { padding-left: 0 !important; padding-right: 0 !important; }
 
 .teacher-stats-container {
     display: grid;
@@ -332,10 +341,7 @@
 }
 
 /* Add padding to main content sections */
-.teacher-dashboard-wrapper .row > [class*="col-"] {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-}
+.teacher-dashboard-wrapper .row > [class*="col-"] { padding-left: 8px !important; padding-right: 8px !important; }
 
 .dashboard-card:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
