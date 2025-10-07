@@ -24,7 +24,9 @@
 
 /* Neutralize the default main container for this page to avoid empty top/bottom bars */
 .students-page #region-main, /* some themes use this id */
-.students-page [role="main"] {
+.students-page [role="main"],
+.quizzes-page #region-main,
+.quizzes-page [role="main"] {
     background: transparent !important;
     box-shadow: none !important;
     border: 0 !important;
@@ -37,7 +39,10 @@
 /* Also remove any inner spacing wrappers sometimes injected under role="main" */
 .students-page [role="main"] > .card, 
 .students-page [role="main"] > .container, 
-.students-page [role="main"] > .container-fluid {
+.students-page [role="main"] > .container-fluid,
+.quizzes-page [role="main"] > .card,
+.quizzes-page [role="main"] > .container,
+.quizzes-page [role="main"] > .container-fluid {
     background: transparent;
     box-shadow: none;
     border: 0;
@@ -49,10 +54,24 @@
 .students-page #page-content,
 .students-page .page-content,
 .students-page #region-main-box,
-.students-page .main-inner {
+.students-page .main-inner,
+.quizzes-page .teacher-main-content,
+.quizzes-page .teacher-dashboard-wrapper,
+.quizzes-page #page-content,
+.quizzes-page .page-content,
+.quizzes-page #region-main-box,
+.quizzes-page .main-inner {
     padding-top: 0 !important;
     margin-top: 0 !important;
     border: 0 !important;
+}
+
+/* Hide Moodle's native secondary/tertiary nav bars on custom teacher pages */
+.quizzes-page .secondary-navigation,
+.quizzes-page .tertiary-navigation,
+.quizzes-page .moremenu,
+.quizzes-page .secondarynavigation {
+    display: none !important;
 }
 
 /* Page Header - Minimalistic */
@@ -152,6 +171,17 @@
     border: 1px solid #e2e8f0;
     position: relative;
     overflow: hidden;
+}
+
+/* Review table row status colors */
+.answer-correct {
+    background: #e6fffa; /* teal-50 */
+}
+.answer-wrong {
+    background: #ffe4e6; /* rose-100 */
+}
+.answer-partial {
+    background: #fff7ed; /* amber-50 */
 }
 
 .students-container::before {
