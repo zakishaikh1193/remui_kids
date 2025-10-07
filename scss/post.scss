@@ -2,6 +2,12 @@
 // This file contains all the custom styles for the child theme
 // The parent theme styles are automatically inherited
 
+// Import dropdown fixes
+@import 'dropdown_fixes';
+
+// Import enhanced course cards
+@import 'enhanced_course_cards';
+
 // ====================================
 // MOODLE MAIN CONTENT OVERRIDE
 // ========================================
