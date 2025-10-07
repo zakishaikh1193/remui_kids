@@ -87,6 +87,42 @@
     margin-top: 0; /* no extra gap above header */
 }
 
+.header-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.back-button {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.back-button:hover {
+    background: #e9ecef;
+    color: #495057;
+    border-color: #dee2e6;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-text {
+    flex: 1;
+}
+
 .students-page-title {
     font-size: 1.6rem;
     font-weight: 600;
@@ -261,73 +297,167 @@
 
 /* Removed students-header styles as header is no longer used */
 
-/* Search and Filter Bar - Minimalistic */
+/* Search and Filter Bar - Enhanced UI */
 .students-controls {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
     flex-wrap: wrap;
     align-items: center;
+    background: #f8f9fa;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .search-box {
     flex: 1;
-    min-width: 250px;
+    min-width: 280px;
     position: relative;
 }
 
 .search-input {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    padding: 0.875rem 1.25rem 0.875rem 3rem;
     border: 2px solid #e1e8ed;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 0.95rem;
+    font-weight: 500;
     transition: all 0.3s ease;
-    background: #f8f9fa;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .search-input:focus {
     outline: none;
     border-color: #90cdf4;
     background: white;
-    box-shadow: 0 0 0 3px rgba(144, 205, 244, 0.1);
+    box-shadow: 0 0 0 3px rgba(144, 205, 244, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
 }
 
 .search-icon {
     position: absolute;
-    left: 0.75rem;
+    left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #6c757d;
+    color: #6b7280;
     font-size: 1.1rem;
+    z-index: 1;
 }
 
 .filter-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
+    align-items: center;
 }
 
-.filter-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #e1e8ed;
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
     background: white;
-    border-radius: 8px;
-    color: #495057;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sort-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4a5568;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.sort-dropdown {
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
+    background: white;
+    color: #2d3748;
+    font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 0.9rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    padding-right: 2.75rem;
+    min-width: 200px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.filter-btn:hover,
-.filter-btn.active {
-    background: #bee3f8;
+.sort-dropdown:hover {
+    border-color: #a0aec0;
+    box-shadow: 0 0 0 3px rgba(160, 174, 192, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.sort-dropdown:focus {
+    outline: none;
+    border-color: #90cdf4;
+    box-shadow: 0 0 0 3px rgba(144, 205, 244, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.filter-btn {
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #e1e8ed;
+    background: white;
+    border-radius: 10px;
+    color: #495057;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+.filter-btn:hover::before {
+    left: 100%;
+}
+
+.filter-btn:hover {
+    background: #f8f9fa;
     color: #2d3748;
     border-color: #90cdf4;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(190, 227, 248, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #bee3f8 0%, #c6f6d5 100%);
+    color: #2d3748;
+    border-color: #90cdf4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(190, 227, 248, 0.4);
+    font-weight: 700;
 }
 
 /* Modern Table Styling */
@@ -520,6 +650,16 @@
         margin-bottom: 1.5rem;
     }
     
+    .header-content {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .back-button {
+        align-self: flex-start;
+        margin-top: 0;
+    }
+    
     .students-page-title {
         font-size: 1.8rem;
     }
@@ -556,10 +696,30 @@
     .students-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: 1rem;
+        padding: 1rem;
     }
     
     .search-box {
         min-width: auto;
+        width: 100%;
+    }
+    
+    .filter-buttons {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .sort-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+    
+    .sort-dropdown {
+        min-width: auto;
+        width: 100%;
     }
     
     .course-tabs {
