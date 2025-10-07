@@ -3164,7 +3164,28 @@ function theme_remui_kids_get_recent_student_activity() {
     global $DB, $USER;
 
     try {
-        $courseids = get_teacher_course_ids();
+        // Get teacher course ids
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = $teacherroles ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids_records = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid as courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $courseids = array_map(function($r) { return $r->courseid; }, $courseids_records);
         if (empty($courseids)) {
             return [];
         }
@@ -3286,7 +3307,28 @@ function theme_remui_kids_get_course_overview() {
     global $DB, $USER;
 
     try {
-        $courseids = get_teacher_course_ids();
+        // Get teacher course ids
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = $teacherroles ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids_records = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid as courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $courseids = array_map(function($r) { return $r->courseid; }, $courseids_records);
         if (empty($courseids)) {
             return [];
         }
