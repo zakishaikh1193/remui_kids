@@ -157,16 +157,11 @@
 <!-- Main Content Area with Sidebar -->
 <div class="teacher-main-content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-
-<!-- Teacher Dashboard Statistics -->
-<div class="teacher-dashboard-stats">
-    <div class="stats-section-container">
-        <div class="section-header">
-            <h3 class="section-title">Dashboard</h3>
-        </div>
-        <div class="container-fluid">
+        <!-- Teacher Dashboard Statistics -->
+        <div class="teacher-dashboard-stats">
+            <div class="section-header">
+                <h3 class="section-title">Dashboard</h3>
+            </div>
             <div class="row">
                 <div class="col-12">
                     <div class="teacher-stats-container">
@@ -259,11 +254,9 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Real Data Sections -->
-<div class="row mt-3">
+        <!-- Real Data Sections -->
+        <div class="row mt-3">
     <div class="col-md-8">
         <div class="dashboard-card">
             <div class="card-header">
@@ -358,8 +351,8 @@
     </div>
 </div>
 
-<!-- Top Sections Row -->
-<div class="row mt-4">
+        <!-- Top Sections Row -->
+        <div class="row mt-3">
     <!-- Teaching Progress Section -->
     <div class="col-md-4">
         <div class="dashboard-card">
@@ -540,8 +533,8 @@
     </div>
 </div>
 
-<!-- Recent Courses and Students Section -->
-<div class="row mt-3">
+        <!-- Recent Courses and Students Section -->
+        <div class="row mt-3">
     <div class="col-md-6">
         <div class="dashboard-card">
             <div class="card-header">
@@ -624,8 +617,8 @@
     </div>
 </div>
 
-<!-- Recent Assignments Section -->
-<div class="row mt-3">
+        <!-- Recent Assignments Section -->
+        <div class="row mt-3">
     <div class="col-md-12">
         <div class="dashboard-card">
             <div class="card-header">
@@ -670,8 +663,8 @@
     </div>
 </div>
 
-<!-- Student Feedback Section -->
-<div class="row mt-3">
+        <!-- Student Feedback Section -->
+        <div class="row mt-3">
     <div class="col-md-6">
         <div class="dashboard-card">
             <div class="card-header">
@@ -763,9 +756,7 @@
     </div>
 </div>
 
-            </div>
-        </div>
-    </div>
+    </div> <!-- End container-fluid -->
 </div> <!-- End teacher-main-content -->
 
 {{/teacher_dashboard}}
@@ -783,8 +774,10 @@
 
 {{> theme_remui/common_end}}
 
-<style>
-/* Dashboard Card Styles */
+<!-- All styling moved to teacher_dashboard.scss -->
+
+<script>
+/* Dashboard Card Styles - REMOVED - Now in teacher_dashboard.scss */
 .dashboard-card {
     background-color: #fff;
     border-radius: 8px;
@@ -1106,9 +1099,11 @@
         margin-bottom: 20px;
     }
 }
-</style>
+*/
+</script>
 
 <script>
+// Teacher Dashboard JavaScript
 function toggleTeacherSidebar() {
     const sidebar = document.querySelector('.teacher-sidebar');
     sidebar.classList.toggle('sidebar-open');
