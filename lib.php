@@ -264,73 +264,6 @@ function theme_remui_kids_get_section_image($sectionnum) {
 }
 
 /**
- * Get activities for a specific section
- *
- * @param object $course The course object
- * @param int $sectionnum Section number
- * @return array Array of activity data
- */
-function theme_remui_kids_get_section_activities($course, $sectionnum) {
-    global $CFG, $USER;
-    
-    require_once($CFG->dirroot . '/course/lib.php');
-    require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
-    
-    $modinfo = get_fast_modinfo($course);
-    $section = $modinfo->get_section_info($sectionnum);
-    $completion = new \completion_info($course);
-    
-    $activities = [];
-    
-    if (isset($modinfo->sections[$sectionnum])) {
-        foreach ($modinfo->sections[$sectionnum] as $cmid) {
-            $cm = $modinfo->cms[$cmid];
-            if ($cm->uservisible) {
-                $activity = [
-                    'id' => $cm->id,
-                    'name' => $cm->name,
-                    'modname' => $cm->modname,
-                    'url' => $cm->url,
-                    'icon' => $cm->get_icon_url(),
-                    'activity_image' => theme_remui_kids_get_activity_image($cm->modname),
-                    'description' => $cm->content ?? 'Complete this activity to progress in your learning.',
-                    'completion' => null,
-                    'is_completed' => false,
-                    'has_started' => false,
-                    'start_date' => $cm->availablefrom ? date('M d, Y', $cm->availablefrom) : 'Available Now',
-                    'end_date' => $cm->availableuntil ? date('M d, Y', $cm->availableuntil) : 'No Deadline',
-                    'is_subsection' => ($cm->modname === 'subsection')
-                ];
-                
-                // Check completion if enabled
-                if ($completion->is_enabled($cm)) {
-                    $completiondata = $completion->get_data($cm, false, $USER->id);
-                    $activity['completion'] = $completiondata->completionstate;
-                    
-                    if ($completiondata->completionstate == COMPLETION_COMPLETE || 
-                        $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
-                        $activity['is_completed'] = true;
-                    }
-                    
-                    if ($completiondata->timestarted > 0) {
-                        $activity['has_started'] = true;
-                    }
-                }
-                
-                $activities[] = $activity;
-            }
-        }
-    }
-    
-    return [
-        'section' => $section,
-        'section_name' => get_section_name($course, $section),
-        'section_summary' => $section->summary,
-        'activities' => $activities
-    ];
-}
-
-/**
  * Get default activity image based on activity type
  *
  * @param string $modname Activity module name
@@ -385,7 +318,9 @@ function theme_remui_kids_get_course_header_data($course) {
     }
     
     // Get teachers count (users with 'teacher' or 'editingteacher' role)
-    $teacherroles = $DB->get_records_list('role', 'shortname', ['teacher', 'editingteacher']);
+    $teacherroles = $DB->count_records_sql(
+        "SELECT * FROM {role} WHERE shortname IN ('editingteacher', 'teacher')"
+    );
     $teacherscount = 0;
     $teacherslist = [];
     
@@ -2918,10 +2853,13 @@ function theme_remui_kids_get_teacher_students() {
             // Generate avatar URL using Moodle's standard approach
             $avatar_url = (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out();
             
-            // Alternative approach using gravatar or default
+            // Alternative approach using core user avatar
             if (empty($avatar_url)) {
                 $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
             }
+            
+            // Profile URL for the student
+            $profile_url = (new moodle_url('/user/profile.php', ['id' => $student->id]))->out();
 
         // Get course progress data for each student
         $course_progress = get_student_course_progress($student->id, $courseids);
@@ -2942,8 +2880,8 @@ function theme_remui_kids_get_teacher_students() {
                 'finished_courses' => $course_progress['completed'],
                 'enrolled_courses_list' => $coursenames,
                 'last_access' => $student->lastaccess ? date('M j, Y', $student->lastaccess) : 'Never',
-                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out(),
-                'avatar_url' => $avatar_url
+                'avatar_url' => $avatar_url,
+                'profile_url' => $profile_url
             ];
         }
 
@@ -3951,6 +3889,432 @@ function get_student_course_progress($studentid, $courseids) {
             'in_progress' => 0,
             'total_enrolled' => 0,
             'completed' => 0
+        ];
+    }
+}
+
+/**
+ * Get student questions from Moodle's messaging and forum systems
+ * Integrates with built-in Moodle communication features
+ *
+ * @param int $teacherid The teacher's user ID
+ * @return array Array of student questions with metadata
+ */
+function theme_remui_kids_get_student_questions_integrated($teacherid) {
+    global $DB, $CFG;
+    
+    try {
+        $questions = [];
+        
+        // Get questions from Moodle's messaging system
+        $messaging_questions = theme_remui_kids_get_questions_from_messaging($teacherid);
+        
+        // Get questions from Moodle's forum system
+        $forum_questions = theme_remui_kids_get_questions_from_forums($teacherid);
+        
+        // Combine and format questions
+        $questions = array_merge($messaging_questions, $forum_questions);
+        
+        // Sort by date (newest first)
+        usort($questions, function($a, $b) {
+            return $b['timestamp'] - $a['timestamp'];
+        });
+        
+        return $questions;
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_student_questions_integrated: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get questions from Moodle's messaging system
+ *
+ * @param int $teacherid The teacher's user ID
+ * @return array Array of questions from messaging
+ */
+function theme_remui_kids_get_questions_from_messaging($teacherid) {
+    global $DB;
+    
+    try {
+        $questions = [];
+        
+        // Get recent messages sent to the teacher
+        $sql = "SELECT m.*, u.firstname, u.lastname, u.email, c.fullname as course_name
+                FROM {messages} m
+                JOIN {user} u ON m.useridfrom = u.id
+                LEFT JOIN {course} c ON m.courseid = c.id
+                WHERE m.useridto = :teacherid 
+                AND m.timecreated > :recent_time
+                AND m.smallmessage LIKE '%?%'
+                ORDER BY m.timecreated DESC
+                LIMIT 20";
+        
+        $params = [
+            'teacherid' => $teacherid,
+            'recent_time' => time() - (7 * 24 * 60 * 60) // Last 7 days
+        ];
+        
+        $messages = $DB->get_records_sql($sql, $params);
+        
+        foreach ($messages as $message) {
+            $questions[] = [
+                'id' => 'msg_' . $message->id,
+                'type' => 'message',
+                'title' => 'Question via Message',
+                'content' => $message->smallmessage,
+                'student_name' => $message->firstname . ' ' . $message->lastname,
+                'student_email' => $message->email,
+                'course_name' => $message->course_name ?: 'General',
+                'timestamp' => $message->timecreated,
+                'status' => 'pending',
+                'grade' => 'All Grades',
+                'upvotes' => 0,
+                'replies' => 0,
+                'url' => new moodle_url('/message/index.php', ['id' => $message->useridfrom])
+            ];
+        }
+        
+        return $questions;
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_questions_from_messaging: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get questions from Moodle's forum system
+ *
+ * @param int $teacherid The teacher's user ID
+ * @return array Array of questions from forums
+ */
+function theme_remui_kids_get_questions_from_forums($teacherid) {
+    global $DB;
+    
+    try {
+        $questions = [];
+        
+        // Get teacher's courses
+        $teacher_courses = enrol_get_my_courses($teacherid, true);
+        if (empty($teacher_courses)) {
+            return $questions;
+        }
+        
+        $course_ids = array_keys($teacher_courses);
+        list($insql, $params) = $DB->get_in_or_equal($course_ids);
+        
+        // Get forum discussions that contain questions
+        $sql = "SELECT fd.*, fp.subject, fp.message, fp.created, 
+                       u.firstname, u.lastname, u.email,
+                       c.fullname as course_name, f.name as forum_name
+                FROM {forum_discussions} fd
+                JOIN {forum_posts} fp ON fd.firstpost = fp.id
+                JOIN {user} u ON fd.userid = u.id
+                JOIN {forum} f ON fd.forum = f.id
+                JOIN {course} c ON f.course = c.id
+                WHERE c.id $insql
+                AND (fp.subject LIKE '%?%' OR fp.message LIKE '%?%')
+                AND fd.timemodified > :recent_time
+                ORDER BY fd.timemodified DESC
+                LIMIT 20";
+        
+        $params['recent_time'] = time() - (7 * 24 * 60 * 60); // Last 7 days
+        
+        $discussions = $DB->get_records_sql($sql, $params);
+        
+        foreach ($discussions as $discussion) {
+            $questions[] = [
+                'id' => 'forum_' . $discussion->id,
+                'type' => 'forum',
+                'title' => $discussion->subject,
+                'content' => strip_tags($discussion->message),
+                'student_name' => $discussion->firstname . ' ' . $discussion->lastname,
+                'student_email' => $discussion->email,
+                'course_name' => $discussion->course_name,
+                'forum_name' => $discussion->forum_name,
+                'timestamp' => $discussion->created,
+                'status' => 'pending',
+                'grade' => 'All Grades',
+                'upvotes' => 0,
+                'replies' => $discussion->numreplies,
+                'url' => new moodle_url('/mod/forum/discuss.php', ['d' => $discussion->id])
+            ];
+        }
+        
+        return $questions;
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_questions_from_forums: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Send a message to a teacher when a student asks a question
+ * Uses Moodle's built-in messaging system
+ *
+ * @param int $studentid The student's user ID
+ * @param int $teacherid The teacher's user ID
+ * @param string $question The question text
+ * @param string $course_name The course name
+ * @return bool Success status
+ */
+function theme_remui_kids_send_question_notification($studentid, $teacherid, $question, $course_name = '') {
+    global $CFG;
+    
+    try {
+        // Check if messaging is enabled
+        if (empty($CFG->messaging)) {
+            return false;
+        }
+        
+        $student = core_user::get_user($studentid);
+        $teacher = core_user::get_user($teacherid);
+        
+        if (!$student || !$teacher) {
+            return false;
+        }
+        
+        // Create message content
+        $subject = get_string('new_question_from_student', 'theme_remui_kids', [
+            'student' => fullname($student),
+            'course' => $course_name
+        ]);
+        
+        $message = get_string('question_message_content', 'theme_remui_kids', [
+            'student' => fullname($student),
+            'question' => $question,
+            'course' => $course_name,
+            'time' => userdate(time())
+        ]);
+        
+        // Send the message using Moodle's messaging API
+        $eventdata = new \core\message\message();
+        $eventdata->courseid = 1;
+        $eventdata->component = 'theme_remui_kids';
+        $eventdata->name = 'student_question';
+        $eventdata->userfrom = $student;
+        $eventdata->userto = $teacher;
+        $eventdata->subject = $subject;
+        $eventdata->fullmessage = $message;
+        $eventdata->fullmessageformat = FORMAT_PLAIN;
+        $eventdata->smallmessage = $question;
+        $eventdata->timecreated = time();
+        $eventdata->notification = 1;
+        
+        return message_send($eventdata);
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_send_question_notification: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Create a forum discussion for a student question
+ * Uses Moodle's built-in forum system
+ *
+ * @param int $studentid The student's user ID
+ * @param int $courseid The course ID
+ * @param string $question The question text
+ * @param string $subject The question subject
+ * @return int|false Forum discussion ID or false on failure
+ */
+function theme_remui_kids_create_question_forum_discussion($studentid, $courseid, $question, $subject) {
+    global $DB, $CFG;
+    
+    try {
+        // Get or create a Q&A forum for the course
+        $forum = theme_remui_kids_get_or_create_qa_forum($courseid);
+        if (!$forum) {
+            return false;
+        }
+        
+        // Create the discussion
+        $discussion = new stdClass();
+        $discussion->course = $courseid;
+        $discussion->forum = $forum->id;
+        $discussion->name = $subject;
+        $discussion->userid = $studentid;
+        $discussion->groupid = 0;
+        $discussion->timestart = 0;
+        $discussion->timeend = 0;
+        $discussion->pinned = 0;
+        $discussion->locked = 0;
+        $discussion->timemodified = time();
+        
+        $discussionid = $DB->insert_record('forum_discussions', $discussion);
+        
+        // Create the first post
+        $post = new stdClass();
+        $post->discussion = $discussionid;
+        $post->parent = 0;
+        $post->userid = $studentid;
+        $post->created = time();
+        $post->modified = time();
+        $post->mailed = 0;
+        $post->subject = $subject;
+        $post->message = $question;
+        $post->messageformat = FORMAT_HTML;
+        $post->messagetrust = 0;
+        $post->attachment = 0;
+        $post->totalscore = 0;
+        $post->mailnow = 0;
+        
+        $postid = $DB->insert_record('forum_posts', $post);
+        
+        // Update discussion with first post ID
+        $DB->set_field('forum_discussions', 'firstpost', $postid, ['id' => $discussionid]);
+        
+        return $discussionid;
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_create_question_forum_discussion: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Get or create a Q&A forum for a course
+ *
+ * @param int $courseid The course ID
+ * @return object|false Forum object or false on failure
+ */
+function theme_remui_kids_get_or_create_qa_forum($courseid) {
+    global $DB;
+    
+    try {
+        // Check if Q&A forum already exists
+        $forum = $DB->get_record('forum', [
+            'course' => $courseid,
+            'type' => 'qanda',
+            'name' => 'Student Questions'
+        ]);
+        
+        if ($forum) {
+            return $forum;
+        }
+        
+        // Create new Q&A forum
+        $forum = new stdClass();
+        $forum->course = $courseid;
+        $forum->type = 'qanda';
+        $forum->name = 'Student Questions';
+        $forum->intro = 'Ask questions about the course content here.';
+        $forum->introformat = FORMAT_HTML;
+        $forum->assessed = 0;
+        $forum->assesstimestart = 0;
+        $forum->assesstimefinish = 0;
+        $forum->scale = 0;
+        $forum->maxbytes = 0;
+        $forum->maxattachments = 1;
+        $forum->forcesubscribe = 0;
+        $forum->trackingtype = 1;
+        $forum->rsstype = 0;
+        $forum->rssarticles = 0;
+        $forum->timemodified = time();
+        $forum->warnafter = 0;
+        $forum->blockafter = 0;
+        $forum->blockperiod = 0;
+        $forum->completiondiscussions = 0;
+        $forum->completionreplies = 0;
+        $forum->completionposts = 0;
+        $forum->cutoffdate = 0;
+        $forum->duedate = 0;
+        
+        $forumid = $DB->insert_record('forum', $forum);
+        $forum->id = $forumid;
+        
+        return $forum;
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_or_create_qa_forum: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Get section activities for course view
+ *
+ * @param object $course The course object
+ * @param int $sectionnum Section number
+ * @return array Array of activity data
+ */
+function theme_remui_kids_get_section_activities($course, $sectionnum) {
+    global $CFG, $USER;
+    
+    require_once($CFG->dirroot . '/course/lib.php');
+    require_once($CFG->dirroot . '/lib/completionlib.php');
+    
+    try {
+        $modinfo = get_fast_modinfo($course);
+        $section = $modinfo->get_section_info($sectionnum);
+        
+        // Check if completion is enabled
+        $completion_enabled = $course->enablecompletion;
+        $completion = null;
+        if ($completion_enabled) {
+            $completion = new completion_info($course);
+        }
+        
+        $activities = [];
+        
+        if (isset($modinfo->sections[$sectionnum])) {
+            foreach ($modinfo->sections[$sectionnum] as $cmid) {
+                $cm = $modinfo->cms[$cmid];
+                if ($cm->uservisible) {
+                    $activity = [
+                        'id' => $cm->id,
+                        'name' => $cm->name,
+                        'modname' => $cm->modname,
+                        'url' => $cm->url ? $cm->url->out() : '',
+                        'icon' => $cm->get_icon_url()->out(),
+                        'activity_image' => theme_remui_kids_get_activity_image($cm->modname),
+                        'description' => $cm->get_formatted_content() ?? 'Complete this activity to progress in your learning.',
+                        'completion' => null,
+                        'is_completed' => false,
+                        'has_started' => false,
+                        'start_date' => 'Available Now',
+                        'end_date' => 'No Deadline',
+                        'is_subsection' => false
+                    ];
+                    
+                    // Check completion if enabled
+                    if ($completion && $completion->is_enabled($cm)) {
+                        $completiondata = $completion->get_data($cm, false, $USER->id);
+                        $activity['completion'] = $completiondata->completionstate;
+                        
+                        if ($completiondata->completionstate == COMPLETION_COMPLETE || 
+                            $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                            $activity['is_completed'] = true;
+                        }
+                        
+                        if (isset($completiondata->timestarted) && $completiondata->timestarted > 0) {
+                            $activity['has_started'] = true;
+                        }
+                    }
+                    
+                    $activities[] = $activity;
+                }
+            }
+        }
+        
+        return [
+            'section' => $section,
+            'section_name' => get_section_name($course, $section),
+            'section_summary' => format_text($section->summary, FORMAT_HTML),
+            'activities' => $activities
+        ];
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_section_activities: " . $e->getMessage());
+        return [
+            'section' => null,
+            'section_name' => 'Section ' . $sectionnum,
+            'section_summary' => '',
+            'activities' => []
         ];
     }
 }

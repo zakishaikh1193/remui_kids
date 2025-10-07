@@ -43,85 +43,48 @@ $PAGE->set_pagelayout('base');
 // Get active tab
 $active_tab = optional_param('tab', 'questions', PARAM_ALPHA);
 
-        // Get real questions from database
-        $questions = [];
-        try {
-            $sql = "SELECT q.*, 
-                           u.firstname, u.lastname, u.email,
-                           c.shortname as course_name,
-                           f.name as forum_name,
-                           d.name as discussion_name,
-                           d.timemodified as last_activity
-                    FROM {theme_remui_kids_student_questions} q
-                    JOIN {user} u ON q.student_id = u.id
-                    JOIN {course} c ON q.course_id = c.id
-                    JOIN {forum} f ON q.forum_id = f.id
-                    JOIN {forum_discussions} d ON q.discussion_id = d.id
-                    ORDER BY q.created_at DESC
-                    LIMIT 20";
-            
-            $db_questions = $DB->get_records_sql($sql);
-            
-            foreach ($db_questions as $q) {
-                $questions[] = [
-                    'id' => $q->id,
-                    'title' => $q->discussion_name,
-                    'content' => $q->question_text,
-                    'student_name' => $q->firstname . ' ' . $q->lastname,
-                    'grade' => $q->grade,
-                    'course' => $q->subject,
-                    'date' => date('d M Y', $q->created_at),
-                    'status' => ucfirst($q->status),
-                    'status_class' => $q->status,
-                    'upvotes' => 0,
-                    'replies' => 0,
-                    'forum_url' => new moodle_url('/mod/forum/discuss.php', ['d' => $q->discussion_id])
-                ];
-            }
-        } catch (Exception $e) {
-            // Fallback to mock data if database tables don't exist yet
-            $questions = [
-                [
-                    'id' => 1,
-                    'title' => 'What wrong in this code',
-                    'content' => 'I am getting an error when trying to run this JavaScript function. Can someone help me understand what is wrong?',
-                    'student_name' => 'Katakam koteswararao',
-                    'grade' => 'Grade 9',
-                    'course' => 'Mathematics',
-                    'date' => '14 Apr 2025',
-                    'status' => 'MENTOR REPLIED',
-                    'status_class' => 'mentor-replied',
-                    'upvotes' => 0,
-                    'replies' => 1
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'How to solve quadratic equations?',
-                    'content' => 'I am struggling with the quadratic formula. Can someone explain it step by step?',
-                    'student_name' => 'Emma Wilson',
-                    'grade' => 'Grade 10',
-                    'course' => 'Mathematics',
-                    'date' => '2 days ago',
-                    'status' => 'Pending',
-                    'status_class' => 'pending',
-                    'upvotes' => 0,
-                    'replies' => 0
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'Physics lab experiment help',
-                    'content' => 'I need assistance with the pendulum experiment. The results are not matching the expected values.',
-                    'student_name' => 'Ryan Chen',
-                    'grade' => 'Grade 11',
-                    'course' => 'Science',
-                    'date' => '1 day ago',
-                    'status' => 'MENTOR REPLIED',
-                    'status_class' => 'mentor-replied',
-                    'upvotes' => 2,
-                    'replies' => 1
-                ]
-            ];
-        }
+// Mock questions data
+$questions = [
+    [
+        'id' => 1,
+        'title' => 'What wrong in this code',
+        'content' => 'I am getting an error when trying to run this JavaScript function. Can someone help me understand what is wrong?',
+        'student_name' => 'Katakam koteswararao',
+        'grade' => 'Grade 9',
+        'course' => 'Mathematics',
+        'date' => '14 Apr 2025',
+        'status' => 'MENTOR REPLIED',
+        'status_class' => 'mentor-replied',
+        'upvotes' => 0,
+        'replies' => 1
+    ],
+    [
+        'id' => 2,
+        'title' => 'How to solve quadratic equations?',
+        'content' => 'I am struggling with the quadratic formula. Can someone explain it step by step?',
+        'student_name' => 'Emma Wilson',
+        'grade' => 'Grade 10',
+        'course' => 'Mathematics',
+        'date' => '2 days ago',
+        'status' => 'Pending',
+        'status_class' => 'pending',
+        'upvotes' => 0,
+        'replies' => 0
+    ],
+    [
+        'id' => 3,
+        'title' => 'Physics lab experiment help',
+        'content' => 'I need assistance with the pendulum experiment. The results are not matching the expected values.',
+        'student_name' => 'Ryan Chen',
+        'grade' => 'Grade 11',
+        'course' => 'Science',
+        'date' => '1 day ago',
+        'status' => 'MENTOR REPLIED',
+        'status_class' => 'mentor-replied',
+        'upvotes' => 2,
+        'replies' => 1
+    ]
+];
 
 // Mock chat data
 $chat_messages = [
@@ -1693,104 +1656,8 @@ function filterQuestions() {
 }
 
 function answerQuestion(questionId) {
-    const answer = prompt('Enter your answer:');
-    if (answer) {
-        // Send answer to server
-        fetch('ajax/answer_question.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                question_id: questionId,
-                answer_text: answer
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Answer submitted successfully!');
-                // Refresh questions list
-                loadQuestions();
-            } else {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error submitting answer');
-        });
-    }
-}
-
-function loadQuestions() {
-    // Load questions from server
-    fetch('ajax/get_questions.php')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update questions list in the UI
-            updateQuestionsList(data.questions);
-        } else {
-            console.error('Error loading questions:', data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-function updateQuestionsList(questions) {
-    const questionsList = document.getElementById('questions-list');
-    if (!questionsList) return;
-    
-    questionsList.innerHTML = '';
-    
-    questions.forEach(question => {
-        const questionItem = document.createElement('div');
-        questionItem.className = 'question-item';
-        questionItem.innerHTML = `
-            <div class="question-header">
-                <h3 class="question-title">${question.title}</h3>
-                <div class="question-meta">
-                    <span class="question-grade">${question.grade}</span>
-                    <span class="question-course">${question.course}</span>
-                </div>
-            </div>
-            <div class="question-content">
-                <p class="question-text">${question.content}</p>
-                <div class="question-student">
-                    <span class="student-name">${question.student_name}</span>
-                    <span class="question-date">${question.date}</span>
-                </div>
-            </div>
-            <div class="question-status">
-                <span class="status-badge ${question.status_class}">${question.status}</span>
-                <div class="question-stats">
-                    <span class="upvotes">${question.upvotes} upvotes</span>
-                    <span class="replies">${question.replies} replies</span>
-                </div>
-            </div>
-            <div class="question-actions">
-                <button class="btn-action" onclick="answerQuestion(${question.id})">
-                    <i class="fas fa-reply"></i> Answer
-                </button>
-                <button class="btn-action" onclick="startVideoCall(${question.id})">
-                    <i class="fas fa-video"></i> Video Call
-                </button>
-                <button class="btn-action" onclick="startAudioCall(${question.id})">
-                    <i class="fas fa-phone"></i> Audio Call
-                </button>
-                <button class="btn-action" onclick="startChat(${question.id})">
-                    <i class="fas fa-comments"></i> Chat
-                </button>
-                <button class="btn-action" onclick="groupCall(${question.id})">
-                    <i class="fas fa-users"></i> Group Call
-                </button>
-            </div>
-        `;
-        questionsList.appendChild(questionItem);
-    });
+    console.log('Answering question:', questionId);
+    alert('Answer question feature will be implemented');
 }
 
 function startVideoCall(questionId) {
@@ -1823,38 +1690,11 @@ function submitQuestion(event) {
     const formData = new FormData(event.target);
     const questionData = Object.fromEntries(formData.entries());
     
-    // Validate required fields
-    if (!questionData.question_text || !questionData.course_id || !questionData.grade || !questionData.subject) {
-        alert('Please fill in all required fields');
-        return;
-    }
+    console.log('Submitting question:', questionData);
+    alert('Question submitted successfully! (This is a demo)');
     
-    // Send question to server
-    fetch('ajax/submit_question.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(questionData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Question submitted successfully!');
-            // Reset form
-            event.target.reset();
-            // Switch to questions tab
-            switchTab('questions');
-            // Reload questions
-            loadQuestions();
-        } else {
-            alert('Error: ' + data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error submitting question');
-    });
+    // Switch to questions tab
+    switchTab('questions');
 }
 
 function saveDraft() {

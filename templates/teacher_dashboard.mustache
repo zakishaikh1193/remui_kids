@@ -188,18 +188,13 @@
             <div class="stat-card courses-card" id="courses-card">
                 <div class="stat-card-header">
                     <div class="stat-icon">
-                        <i class="fa fa-book"></i>
+                        <i class="fa fa-file-text"></i>
                     </div>
-                    <div class="stat-refresh-btn" onclick="refreshCourseCount()">
-                        <i class="fa fa-refresh" id="courses-refresh-icon"></i>
-                    </div>
+                    
                 </div>
                 <div class="stat-card-content">
                     <div class="stat-number" id="total-courses-count">{{total_courses}}</div>
-                    <div class="stat-label">Total Courses</div>
-                    <div class="stat-change positive">
-                        <i class="fa fa-arrow-up"></i> +1.34%
-                    </div>
+                    <div class="stat-label">TOTAL COURSES</div>
                 </div>
             </div>
             
@@ -207,18 +202,13 @@
             <div class="stat-card students-card" id="students-card">
                 <div class="stat-card-header">
                     <div class="stat-icon">
-                        <i class="fa fa-users"></i>
+                        <i class="fa fa-user-friends"></i>
                     </div>
-                    <div class="stat-refresh-btn" onclick="refreshStudentCount()">
-                        <i class="fa fa-refresh" id="students-refresh-icon"></i>
-                    </div>
+                    
                 </div>
                 <div class="stat-card-content">
                     <div class="stat-number" id="total-students-count">{{total_students}}</div>
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-change negative">
-                        <i class="fa fa-arrow-down"></i> -1.34%
-                    </div>
+                    <div class="stat-label">TOTAL STUDENTS</div>
                 </div>
             </div>
             
@@ -228,16 +218,11 @@
                     <div class="stat-icon">
                         <i class="fa fa-tasks"></i>
                     </div>
-                    <div class="stat-refresh-btn" onclick="refreshAssignmentCount()">
-                        <i class="fa fa-refresh" id="assignments-refresh-icon"></i>
-                    </div>
+                    
                 </div>
                 <div class="stat-card-content">
                     <div class="stat-number" id="pending-assignments-count">{{pending_assignments}}</div>
-                    <div class="stat-label">Total Assignments</div>
-                    <div class="stat-change positive">
-                        <i class="fa fa-arrow-up"></i> +5.67%
-                    </div>
+                    <div class="stat-label">TOTAL ASSIGNMENTS</div>
                 </div>
             </div>
             
@@ -245,18 +230,13 @@
             <div class="stat-card classes-card" id="classes-card">
                 <div class="stat-card-header">
                     <div class="stat-icon">
-                        <i class="fa fa-calendar"></i>
+                        <i class="fa fa-calendar-alt"></i>
                     </div>
-                    <div class="stat-refresh-btn" onclick="refreshClassCount()">
-                        <i class="fa fa-refresh" id="classes-refresh-icon"></i>
-                    </div>
+                    
                 </div>
                 <div class="stat-card-content">
                     <div class="stat-number" id="upcoming-classes-count">{{upcoming_classes}}</div>
-                    <div class="stat-label">Upcoming Classes</div>
-                    <div class="stat-change positive">
-                        <i class="fa fa-arrow-up"></i> +2.45%
-                    </div>
+                    <div class="stat-label">UPCOMING CLASSES</div>
                 </div>
             </div>
             
@@ -266,16 +246,11 @@
                     <div class="stat-icon">
                         <i class="fa fa-question-circle"></i>
                     </div>
-                    <div class="stat-refresh-btn" onclick="refreshQuizCount()">
-                        <i class="fa fa-refresh" id="quizzes-refresh-icon"></i>
-                    </div>
+                    
                 </div>
                 <div class="stat-card-content">
                     <div class="stat-number" id="total-quizzes-count">{{total_quizzes}}</div>
-                    <div class="stat-label">Total Quizzes</div>
-                    <div class="stat-change positive">
-                        <i class="fa fa-arrow-up"></i> +2.45%
-                    </div>
+                    <div class="stat-label">TOTAL QUIZZES</div>
                 </div>
             </div>
             
@@ -291,9 +266,7 @@
                         <i class="fa fa-history"></i>
                         <span>Recent Student Activity</span>
                     </div>
-                    <button class="btn-refresh" onclick="location.reload()" title="Refresh Activity">
-                        <i class="fa fa-refresh"></i>
-                    </button>
+                    
                 </div>
                 <div class="card-content">
                     <div class="activity-feed">
@@ -416,9 +389,7 @@
                         <span>Student Enrollment</span>
                     </div>
                     <div class="card-actions">
-                        <button class="btn-refresh" onclick="refreshStudentEnrollment()" title="Refresh">
-                            <i class="fa fa-refresh"></i>
-                        </button>
+                        
                         <button class="btn-link" onclick="addNewStudent()" title="Add Student">
                             <i class="fa fa-user-plus"></i>
                         </button>
@@ -471,7 +442,7 @@
                                 <tr>
                                     <td class="avatar-col">
                                         <div class="student-avatar">
-                                            <img src="{{avatar_url}}" alt="{{firstname}} {{lastname}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                                            <img src="{{avatar_url}}" alt="{{firstname}} {{lastname}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                                         </div>
                                     </td>
                                     <td>
@@ -687,9 +658,24 @@
                         <button class="btn-link" onclick="viewAllQuestions()" title="View All Questions">
                             <i class="fa fa-list"></i>
                         </button>
+                        <button class="btn-link" onclick="openMoodleMessaging()" title="Open Moodle Messaging">
+                            <i class="fa fa-envelope"></i>
+                        </button>
+                        <button class="btn-link" onclick="openMoodleForums()" title="Open Moodle Forums">
+                            <i class="fa fa-comments"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="card-content">
+                    <!-- Integration Status -->
+                    <div class="integration-status">
+                        <div class="integration-content">
+                            <i class="fa fa-check-circle"></i>
+                            <span>Integrated with Moodle Messaging & Forums</span>
+                        </div>
+                        
+                    </div>
+                    
                     <!-- Question Filters -->
                     <div class="questions-toolbar">
                         <div class="filter-group">
@@ -1699,6 +1685,120 @@ function groupCall(questionId) {
     console.log('Starting group call for question:', questionId);
     // Implement group call functionality
     alert('Group call feature will be implemented');
+}
+
+// Moodle Integration Functions
+function openMoodleMessaging() {
+    // Navigate within the same tab
+    window.location.href = '{{config.wwwroot}}/message/index.php';
+}
+
+function openMoodleForums() {
+    // Navigate within the same tab
+    window.location.href = '{{config.wwwroot}}/mod/forum/index.php';
+}
+
+function refreshIntegratedQuestions() {
+    // Refresh questions from Moodle messaging and forums
+    console.log('Refreshing integrated questions...');
+    
+    fetch('{{config.wwwroot}}/theme/remui_kids/ajax/student_questions.php?action=get_questions', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Loaded', data.questions.length, 'integrated questions');
+            // Update the questions list with new data
+            updateQuestionsList(data.questions);
+        } else {
+            console.error('Failed to load integrated questions:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading integrated questions:', error);
+    });
+}
+
+function updateQuestionsList(questions) {
+    // Update the questions list with new data from Moodle
+    const questionsList = document.querySelector('.questions-list');
+    if (!questionsList) return;
+    
+    // Clear existing questions
+    questionsList.innerHTML = '';
+    
+    if (questions.length === 0) {
+        questionsList.innerHTML = `
+            <div class="empty-state">
+                <i class="fa fa-question-circle"></i>
+                <p>No questions available from Moodle systems</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Add new questions
+    questions.forEach(question => {
+        const questionElement = createQuestionElement(question);
+        questionsList.appendChild(questionElement);
+    });
+}
+
+function createQuestionElement(question) {
+    const div = document.createElement('div');
+    div.className = 'question-item';
+    div.setAttribute('data-grade', question.grade || 'All Grades');
+    div.setAttribute('data-course', question.course_name || 'General');
+    
+    const statusClass = question.status === 'MENTOR REPLIED' ? 'mentor-replied' : 
+                      question.status === 'Clarified' ? 'clarified' : 'pending';
+    
+    div.innerHTML = `
+        <div class="question-header">
+            <h4 class="question-title">${question.title}</h4>
+            <div class="question-meta">
+                <span class="question-grade">${question.grade || 'All Grades'}</span>
+                <span class="question-course">${question.course_name || 'General'}</span>
+            </div>
+        </div>
+        <div class="question-content">
+            <p class="question-text">${question.content}</p>
+            <div class="question-student">
+                <span class="student-name">${question.student_name}</span>
+                <span class="question-date">${new Date(question.timestamp * 1000).toLocaleDateString()}</span>
+            </div>
+        </div>
+        <div class="question-status">
+            <span class="status-badge ${statusClass}">${question.status}</span>
+            <div class="question-stats">
+                <span class="upvotes">${question.upvotes || 0} UPVOTES</span>
+                <span class="replies">${question.replies || 0} REPLIES</span>
+            </div>
+        </div>
+        <div class="question-actions">
+            <button class="btn-action" onclick="answerQuestion('${question.id}')" title="Answer">
+                <i class="fa fa-reply"></i>
+            </button>
+            <button class="btn-action" onclick="startVideoCall('${question.id}')" title="Video Call">
+                <i class="fa fa-video"></i>
+            </button>
+            <button class="btn-action" onclick="startAudioCall('${question.id}')" title="Audio Call">
+                <i class="fa fa-phone"></i>
+            </button>
+            <button class="btn-action" onclick="startChat('${question.id}')" title="Chat">
+                <i class="fa fa-comments"></i>
+            </button>
+            <button class="btn-action" onclick="groupCall('${question.id}')" title="Group Call">
+                <i class="fa fa-users"></i>
+            </button>
+        </div>
+    `;
+    
+    return div;
 }
 
 function refreshCharts() {

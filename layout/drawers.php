@@ -184,8 +184,16 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
             error_log("Loaded " . count($templatecontext['recent_student_activity']) . " recent activities");
         }
 
-        // Student Questions System
-        $templatecontext['student_questions'] = [
+        // Student Questions System - Integrated with Moodle messaging and forums
+        $integrated_questions = theme_remui_kids_get_student_questions_integrated($USER->id);
+        
+        if (!empty($integrated_questions)) {
+            // Use real data from Moodle messaging and forums
+            $templatecontext['student_questions'] = $integrated_questions;
+            error_log("Loaded " . count($integrated_questions) . " integrated questions from Moodle systems");
+        } else {
+            // Fallback to mock data if no real questions found
+            $templatecontext['student_questions'] = [
             [
                 'id' => 1,
                 'title' => 'What wrong in this code',
@@ -290,7 +298,8 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
                 'upvotes' => 1,
                 'replies' => 2
             ]
-        ];
+            ];
+        }
 
         $templatecontext['course_overview'] = theme_remui_kids_get_course_overview();
         if (empty($templatecontext['course_overview'])) {
