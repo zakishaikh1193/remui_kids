@@ -142,5 +142,3 @@ window.addEventListener("resize", function() {
 </script>';
 
 echo $OUTPUT->footer();
-
-
