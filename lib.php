@@ -2460,6 +2460,11 @@ function theme_remui_kids_get_teacher_students() {
                 JOIN {enrol} e ON ue.enrolid = e.id
                 WHERE e.courseid {$coursesql}
                 AND u.deleted = 0
+                AND NOT EXISTS (SELECT 1 FROM {role_assignments} ra2 
+                               JOIN {context} cx2 ON ra2.contextid = cx2.id
+                               JOIN {role} r2 ON r2.id = ra2.roleid
+                               WHERE ra2.userid = u.id 
+                               AND (r2.shortname IN ('manager', 'editingteacher', 'teacher')))
                 ORDER BY u.lastaccess DESC
                 LIMIT 10";
 
@@ -2484,6 +2489,14 @@ function theme_remui_kids_get_teacher_students() {
                 $coursenames[] = $cr->fullname;
             }
 
+            // Generate avatar URL using Moodle's standard approach
+            $avatar_url = (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out();
+            
+            // Alternative approach using gravatar or default
+            if (empty($avatar_url)) {
+                $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
+            }
+
             $formatted_students[] = [
                 'id' => $student->id,
                 'name' => $student->firstname . ' ' . $student->lastname,
@@ -2492,7 +2505,7 @@ function theme_remui_kids_get_teacher_students() {
                 'enrolled_courses' => $coursenames,
                 'last_access' => $student->lastaccess ? date('M j, Y', $student->lastaccess) : 'Never',
                 'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out(),
-                'avatar_url' => (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out()
+                'avatar_url' => $avatar_url
             ];
         }
 
@@ -3139,6 +3152,192 @@ function theme_remui_kids_get_recent_feedback_data() {
         return $out;
 
     } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get recent student activity across teacher's courses
+ * Returns quiz attempts, assignment submissions, forum posts
+ */
+function theme_remui_kids_get_recent_student_activity() {
+    global $DB, $USER;
+
+    try {
+        $courseids = get_teacher_course_ids();
+        if (empty($courseids)) {
+            return [];
+        }
+
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'c');
+
+        // Get recent quiz attempts
+        $quiz_sql = "SELECT qa.id, qa.userid, qa.quiz, qa.attempt, qa.timestart, qa.timefinish,
+                            q.name as activity_name, c.id as courseid, c.shortname as course_name,
+                            u.firstname, u.lastname, u.email,
+                            'quiz' as activity_type
+                     FROM {quiz_attempts} qa
+                     JOIN {quiz} q ON qa.quiz = q.id
+                     JOIN {course} c ON q.course = c.id
+                     JOIN {user} u ON qa.userid = u.id
+                     WHERE c.id {$coursesql}
+                     AND qa.timefinish > 0
+                     AND qa.timefinish > " . (time() - (30 * 24 * 60 * 60)) . "
+                     ORDER BY qa.timefinish DESC
+                     LIMIT 10";
+
+        $quiz_attempts = $DB->get_records_sql($quiz_sql, $courseparams);
+
+        // Get recent assignment submissions
+        $assign_sql = "SELECT asub.id, asub.userid, asub.assignment, asub.timemodified,
+                              a.name as activity_name, c.id as courseid, c.shortname as course_name,
+                              u.firstname, u.lastname, u.email,
+                              'assign' as activity_type
+                       FROM {assign_submission} asub
+                       JOIN {assign} a ON asub.assignment = a.id
+                       JOIN {course} c ON a.course = c.id
+                       JOIN {user} u ON asub.userid = u.id
+                       WHERE c.id {$coursesql}
+                       AND asub.status = 'submitted'
+                       AND asub.timemodified > " . (time() - (30 * 24 * 60 * 60)) . "
+                       ORDER BY asub.timemodified DESC
+                       LIMIT 10";
+
+        $assignments = $DB->get_records_sql($assign_sql, $courseparams);
+
+        // Get recent forum posts
+        $forum_sql = "SELECT fp.id, fp.userid, fp.discussion, fp.created, fp.modified,
+                             fd.name as discussion_name, f.name as activity_name,
+                             c.id as courseid, c.shortname as course_name,
+                             u.firstname, u.lastname, u.email,
+                             'forum' as activity_type
+                      FROM {forum_posts} fp
+                      JOIN {forum_discussions} fd ON fp.discussion = fd.id
+                      JOIN {forum} f ON fd.forum = f.id
+                      JOIN {course} c ON f.course = c.id
+                      JOIN {user} u ON fp.userid = u.id
+                      WHERE c.id {$coursesql}
+                      AND fp.created > " . (time() - (30 * 24 * 60 * 60)) . "
+                      ORDER BY fp.created DESC
+                      LIMIT 10";
+
+        $forum_posts = $DB->get_records_sql($forum_sql, $courseparams);
+
+        // Combine and format all activities
+        $activities = [];
+
+        foreach ($quiz_attempts as $qa) {
+            $activities[] = [
+                'student_name' => $qa->firstname . ' ' . $qa->lastname,
+                'activity_name' => $qa->activity_name,
+                'activity_type' => 'Quiz Attempt',
+                'course_name' => $qa->course_name,
+                'time' => userdate($qa->timefinish, '%b %e, %Y %H:%M'),
+                'timestamp' => $qa->timefinish,
+                'icon' => 'fa-star',
+                'color' => '#FF9800'
+            ];
+        }
+
+        foreach ($assignments as $asub) {
+            $activities[] = [
+                'student_name' => $asub->firstname . ' ' . $asub->lastname,
+                'activity_name' => $asub->activity_name,
+                'activity_type' => 'Assignment Submitted',
+                'course_name' => $asub->course_name,
+                'time' => userdate($asub->timemodified, '%b %e, %Y %H:%M'),
+                'timestamp' => $asub->timemodified,
+                'icon' => 'fa-file-text',
+                'color' => '#4CAF50'
+            ];
+        }
+
+        foreach ($forum_posts as $fp) {
+            $activities[] = [
+                'student_name' => $fp->firstname . ' ' . $fp->lastname,
+                'activity_name' => $fp->activity_name,
+                'activity_type' => 'Forum Post',
+                'course_name' => $fp->course_name,
+                'time' => userdate($fp->created, '%b %e, %Y %H:%M'),
+                'timestamp' => $fp->created,
+                'icon' => 'fa-comments',
+                'color' => '#2196F3'
+            ];
+        }
+
+        // Sort by timestamp (most recent first)
+        usort($activities, function($a, $b) {
+            return $b['timestamp'] - $a['timestamp'];
+        });
+
+        // Return top 15
+        return array_slice($activities, 0, 15);
+
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_recent_student_activity: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get course overview with enrollment and activity statistics
+ */
+function theme_remui_kids_get_course_overview() {
+    global $DB, $USER;
+
+    try {
+        $courseids = get_teacher_course_ids();
+        if (empty($courseids)) {
+            return [];
+        }
+
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'c');
+
+        $sql = "SELECT c.id, c.fullname, c.shortname,
+                       (SELECT COUNT(DISTINCT ue.userid)
+                        FROM {user_enrolments} ue
+                        JOIN {enrol} e ON ue.enrolid = e.id
+                        WHERE e.courseid = c.id) as student_count,
+                       (SELECT COUNT(*)
+                        FROM {course_modules} cm
+                        WHERE cm.course = c.id
+                        AND cm.visible = 1) as activity_count,
+                       (SELECT COUNT(*)
+                        FROM {course_modules} cm
+                        JOIN {modules} m ON cm.module = m.id
+                        WHERE cm.course = c.id
+                        AND m.name = 'assign'
+                        AND cm.visible = 1) as assignment_count,
+                       (SELECT COUNT(*)
+                        FROM {course_modules} cm
+                        JOIN {modules} m ON cm.module = m.id
+                        WHERE cm.course = c.id
+                        AND m.name = 'quiz'
+                        AND cm.visible = 1) as quiz_count
+                FROM {course} c
+                WHERE c.id {$coursesql}
+                ORDER BY c.shortname ASC";
+
+        $courses = $DB->get_records_sql($sql, $courseparams);
+
+        $formatted = [];
+        foreach ($courses as $course) {
+            $formatted[] = [
+                'id' => $course->id,
+                'name' => $course->fullname,
+                'shortname' => $course->shortname,
+                'student_count' => (int)$course->student_count,
+                'activity_count' => (int)$course->activity_count,
+                'assignment_count' => (int)$course->assignment_count,
+                'quiz_count' => (int)$course->quiz_count,
+                'url' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out()
+            ];
+        }
+
+        return $formatted;
+
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_course_overview: " . $e->getMessage());
         return [];
     }
 }

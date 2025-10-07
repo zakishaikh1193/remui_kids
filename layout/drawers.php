@@ -86,6 +86,7 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['teacher_courses'] = theme_remui_kids_get_teacher_courses();
         $templatecontext['teacher_students'] = theme_remui_kids_get_teacher_students();
         $templatecontext['teacher_assignments'] = theme_remui_kids_get_teacher_assignments();
+        
         // Top Courses (real data, with mock fallback for layout preview)
         $templatecontext['top_courses'] = theme_remui_kids_get_top_courses_by_enrollment(5);
         if (empty($templatecontext['top_courses'])) {
@@ -97,22 +98,29 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
                 ['id' => 0, 'name' => 'History Overview', 'enrollment_count' => 15, 'element_count' => 31, 'url' => '#']
             ];
         }
-        // Charts data (performance and completion summary)
-        $perf = theme_remui_kids_get_course_performance_chart_data();
-        if (empty($perf['labels'])) {
-            $perf = [
-                'labels' => ['Math', 'Science', 'English', 'Art', 'History', 'Music'],
-                'data' => [85, 78, 92, 88, 76, 82],
-                'counts' => [30, 25, 28, 18, 20, 16]
+        
+        // Real data sections - Recent Student Activity and Course Overview
+        $templatecontext['recent_student_activity'] = theme_remui_kids_get_recent_student_activity();
+        if (empty($templatecontext['recent_student_activity'])) {
+            error_log("No recent student activity found");
+            $templatecontext['recent_student_activity'] = [
+                ['student_name' => 'No recent activity', 'activity_name' => '-', 'activity_type' => '-', 
+                 'course_name' => '-', 'time' => '-', 'icon' => 'fa-info-circle', 'color' => '#999']
             ];
+        } else {
+            error_log("Loaded " . count($templatecontext['recent_student_activity']) . " recent activities");
         }
-        $templatecontext['performanceChart'] = json_encode($perf);
 
-        $comp = theme_remui_kids_get_course_completion_summary();
-        if (empty($comp) || ($comp['completed'] + $comp['inprogress'] + $comp['not_started']) === 0) {
-            $comp = ['completed' => 65, 'inprogress' => 25, 'not_started' => 10];
+        $templatecontext['course_overview'] = theme_remui_kids_get_course_overview();
+        if (empty($templatecontext['course_overview'])) {
+            error_log("No courses found for overview");
+            $templatecontext['course_overview'] = [
+                ['id' => 0, 'name' => 'No courses yet', 'shortname' => '-', 'student_count' => 0, 
+                 'activity_count' => 0, 'assignment_count' => 0, 'quiz_count' => 0, 'url' => '#']
+            ];
+        } else {
+            error_log("Loaded " . count($templatecontext['course_overview']) . " courses for overview");
         }
-        $templatecontext['completionSummary'] = json_encode($comp);
         
         // Additional real data for teacher dashboard
         $templatecontext['teaching_progress'] = theme_remui_kids_get_teaching_progress_data();
@@ -152,83 +160,6 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
                 ]
             ];
         }
-
-        // Compute simple trends vs previous 30 days
-        $now = time();
-        $prev30 = $now - 30 * 24 * 60 * 60;
-
-        // Courses trend (new courses teacher gained last 30 days vs previous 30)
-        // Using course modification as proxy
-        $templatecontext['courses_trend'] = null;
-        $templatecontext['students_trend'] = null;
-        $templatecontext['assignments_trend'] = null;
-        $templatecontext['classes_trend'] = null;
-        $templatecontext['quizzes_trend'] = null;
-
-        try {
-            // Get teacher's course ids first
-            $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
-            $roleids = $teacherroles ? array_keys($teacherroles) : [];
-            
-            if (!empty($roleids)) {
-                list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
-                $params['userid'] = $USER->id;
-                $params['ctxlevel'] = CONTEXT_COURSE;
-
-                $courseids = $DB->get_records_sql(
-                    "SELECT DISTINCT ctx.instanceid AS courseid
-                     FROM {role_assignments} ra
-                     JOIN {context} ctx ON ra.contextid = ctx.id
-                     WHERE ra.userid = :userid
-                     AND ctx.contextlevel = :ctxlevel
-                     AND ra.roleid {$insql}",
-                    $params
-                );
-            }
-            
-            if (empty($courseids)) {
-                // No courses, skip trend calculations
-                return;
-            }
-            
-            $courseidlist = array_map(function($r){return $r->courseid;}, $courseids);
-            list($coursesql, $courseparams) = $DB->get_in_or_equal($courseidlist, SQL_PARAMS_NAMED, 'c');
-
-            // Courses (modified)
-            $curr = $DB->count_records_select('course', "id {$coursesql} AND timemodified >= :from AND visible = 1", array_merge($courseparams, ['from' => $prev30]));
-            $prev = $DB->count_records_select('course', "id {$coursesql} AND timemodified < :from AND timemodified >= :from2 AND visible = 1", array_merge($courseparams, ['from' => $prev30, 'from2' => $prev30 - 30*24*60*60]));
-            $pct = ($prev > 0) ? round((($curr - $prev) / $prev) * 100) : ($curr > 0 ? 100 : 0);
-            $templatecontext['courses_trend'] = ['percent' => $pct, 'is_positive' => ($pct >= 0)];
-
-            // Students (new enrolments)
-            $curr = $DB->count_records_sql("SELECT COUNT(DISTINCT ue.userid) FROM {user_enrolments} ue JOIN {enrol} e ON ue.enrolid=e.id WHERE e.courseid {$coursesql} AND ue.timecreated >= :from", array_merge($courseparams, ['from' => $prev30]));
-            $prev = $DB->count_records_sql("SELECT COUNT(DISTINCT ue.userid) FROM {user_enrolments} ue JOIN {enrol} e ON ue.enrolid=e.id WHERE e.courseid {$coursesql} AND ue.timecreated < :from AND ue.timecreated >= :from2", array_merge($courseparams, ['from' => $prev30, 'from2' => $prev30 - 30*24*60*60]));
-            $pct = ($prev > 0) ? round((($curr - $prev) / $prev) * 100) : ($curr > 0 ? 100 : 0);
-            $templatecontext['students_trend'] = ['percent' => $pct, 'is_positive' => ($pct >= 0)];
-
-            // Assignments (new assign created)
-            $curr = $DB->count_records_select('assign', "course {$coursesql} AND timecreated >= :from", array_merge($courseparams, ['from' => $prev30]));
-            $prev = $DB->count_records_select('assign', "course {$coursesql} AND timecreated < :from AND timecreated >= :from2", array_merge($courseparams, ['from' => $prev30, 'from2' => $prev30 - 30*24*60*60]));
-            $pct = ($prev > 0) ? round((($curr - $prev) / $prev) * 100) : ($curr > 0 ? 100 : 0);
-            $templatecontext['assignments_trend'] = ['percent' => $pct, 'is_positive' => ($pct >= 0)];
-
-            // Classes (activity edits as proxy): course_modules modified
-            $curr = $DB->count_records_sql("SELECT COUNT(*) FROM {course_modules} cm JOIN {course} c ON c.id=cm.course WHERE c.id {$coursesql} AND cm.added >= :from", array_merge($courseparams, ['from' => $prev30]));
-            $prev = $DB->count_records_sql("SELECT COUNT(*) FROM {course_modules} cm JOIN {course} c ON c.id=cm.course WHERE c.id {$coursesql} AND cm.added < :from AND cm.added >= :from2", array_merge($courseparams, ['from' => $prev30, 'from2' => $prev30 - 30*24*60*60]));
-            $pct = ($prev > 0) ? round((($curr - $prev) / $prev) * 100) : ($curr > 0 ? 100 : 0);
-            $templatecontext['classes_trend'] = ['percent' => $pct, 'is_positive' => ($pct >= 0)];
-
-            // Quizzes (new quiz created)
-            $curr = $DB->count_records_select('quiz', "course {$coursesql} AND timecreated >= :from", array_merge($courseparams, ['from' => $prev30]));
-            $prev = $DB->count_records_select('quiz', "course {$coursesql} AND timecreated < :from AND timecreated >= :from2", array_merge($courseparams, ['from' => $prev30, 'from2' => $prev30 - 30*24*60*60]));
-            $pct = ($prev > 0) ? round((($curr - $prev) / $prev) * 100) : ($curr > 0 ? 100 : 0);
-            $templatecontext['quizzes_trend'] = ['percent' => $pct, 'is_positive' => ($pct >= 0)];
-        } catch (Exception $e) {
-            // Leave trends null if any error
-        }
-        
-        // Debug: Log the top courses data
-        error_log("Teacher Dashboard - Top Courses Data: " . print_r($templatecontext['top_courses'], true));
         
         // Must be called before rendering the template.
         require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');

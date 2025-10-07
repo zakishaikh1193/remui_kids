@@ -5,6 +5,9 @@ header('Content-Type: application/json');
 
 global $DB, $USER;
 
+// Debug logging
+error_log("Teacher Students AJAX - Starting request");
+
 try {
     $page = max(1, optional_param('page', 1, PARAM_INT));
     $perpage = min(50, max(5, optional_param('perpage', 10, PARAM_INT)));
@@ -52,6 +55,11 @@ try {
         $where .= " AND EXISTS (SELECT 1 FROM {role_assignments} ra2 JOIN {context} cx2 ON ra2.contextid = cx2.id
                                  JOIN {role} r2 ON r2.id = ra2.roleid
                                  WHERE ra2.userid = u.id AND (r2.shortname IN ('manager'))) ";
+    } else {
+        // By default, exclude managers and show only students
+        $where .= " AND NOT EXISTS (SELECT 1 FROM {role_assignments} ra2 JOIN {context} cx2 ON ra2.contextid = cx2.id
+                                     JOIN {role} r2 ON r2.id = ra2.roleid
+                                     WHERE ra2.userid = u.id AND (r2.shortname IN ('manager', 'editingteacher', 'teacher'))) ";
     }
 
     $countsql = "SELECT COUNT(DISTINCT u.id)
@@ -73,9 +81,21 @@ try {
                 ORDER BY u.lastname ASC, u.firstname ASC";
 
     $students = $DB->get_records_sql($listsql, $sqlparams, $offset, $perpage);
+    
+    // Debug logging
+    error_log("Teacher Students AJAX - Found " . count($students) . " students");
+    error_log("Teacher Students AJAX - Total: " . $total);
 
     $out = [];
     foreach ($students as $s) {
+        // Generate avatar URL using Moodle's standard approach
+        $avatar_url = (new moodle_url('/user/pix.php/' . $s->id . '/f1.jpg'))->out();
+        
+        // Alternative approach using gravatar or default
+        if (empty($avatar_url)) {
+            $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
+        }
+        
         $out[] = [
             'id' => (int)$s->id,
             'first_name' => $s->firstname,
@@ -85,7 +105,7 @@ try {
             'last_access' => $s->lastaccess ? userdate($s->lastaccess, '%b %e, %Y') : 'Never',
             'course_count' => (int)$s->course_count,
             'profile_url' => (new moodle_url('/user/profile.php', ['id' => $s->id]))->out(),
-            'avatar_url' => (new moodle_url('/user/pix.php/' . $s->id . '/f1.jpg'))->out()
+            'avatar_url' => $avatar_url
         ];
     }
 
@@ -99,3 +119,4 @@ try {
     http_response_code(500);
     echo json_encode(['error' => true, 'message' => $e->getMessage()]);
 }
+
