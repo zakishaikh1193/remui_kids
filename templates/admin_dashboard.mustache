@@ -1093,6 +1093,13 @@
 
 {{> theme_remui/common_end}}
 
+{{#js}}
+require(['theme_remui_kids/admin_dropdown_fix', 'theme_remui_kids/bootstrap_compatibility'], function(DropdownFix, BootstrapCompat) {
+    DropdownFix.init();
+    BootstrapCompat.init();
+});
+{{/js}}
+
 <script>
 function toggleSidebar() {
     const sidebar = document.querySelector('.admin-sidebar');

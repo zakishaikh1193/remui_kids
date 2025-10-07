@@ -32,6 +32,35 @@ defined('MOODLE_INTERNAL') || die();
 class core_renderer extends \theme_remui\output\core_renderer {
 
     /**
+     * Render student courses template
+     */
+    public function render_student_courses($context) {
+        return $this->render_from_template('theme_remui_kids/student_courses', $context);
+    }
+
+    /**
+     * Render my courses template
+     */
+    public function render_my_courses($context) {
+        return $this->render_from_template('theme_remui_kids/my_courses', $context);
+    }
+
+    /**
+     * Ensure dropdown JavaScript is loaded on admin pages
+     */
+    public function ensure_dropdown_js() {
+        global $PAGE;
+        
+        // Load dropdown fixes on admin pages
+        if (strpos($PAGE->url->get_path(), '/admin/') !== false || 
+            strpos($PAGE->url->get_path(), '/theme/remui_kids/admin/') !== false) {
+            
+            $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
+            $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+        }
+    }
+
+    /**
      * Override the render method to add admin sidebar data
      */
     public function render_from_template($template, $context) {
