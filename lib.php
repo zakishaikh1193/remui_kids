@@ -32,12 +32,21 @@ defined('MOODLE_INTERNAL') || die();
 function theme_remui_kids_page_init($page) {
     global $PAGE;
     
-    // Load dropdown fixes on admin pages
+    // Only load dropdown fixes on admin pages and NON-EDIT course pages
     if (strpos($PAGE->url->get_path(), '/admin/') !== false || 
         strpos($PAGE->url->get_path(), '/theme/remui_kids/admin/') !== false) {
         
         $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
         $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+    }
+    
+    // Load course-specific dropdown fixes ONLY for non-edit course pages
+    if ((strpos($PAGE->url->get_path(), '/course/view.php') !== false ||
+         strpos($PAGE->url->get_path(), '/course/') !== false) &&
+        !$PAGE->user_is_editing()) {
+        $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
+        $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+        $PAGE->requires->js_call_amd('theme_remui_kids/course_dropdown_fix', 'init');
     }
 }
 

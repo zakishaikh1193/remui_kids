@@ -1,8 +1,6 @@
 // Kids-friendly theme customizations
 // This file contains all the custom styles for the child theme
 // The parent theme styles are automatically inherited
-
-// Import dropdown fixes
 // Import enhanced course cards
 @import 'enhanced_course_cards';
 
@@ -533,6 +531,31 @@
 // KIDS-FRIENDLY GLOBAL STYLES
 // ========================================
 
+// CRITICAL: Exclude ALL custom styles from edit mode
+// Edit mode should be handled entirely by the parent theme
+body.editing,
+body.editing *,
+#page-course-view.editing,
+#page-course-view.editing * {
+    // Reset all our custom transforms and effects in edit mode
+    transform: none !important;
+    transition: none !important;
+}
+
+// Specifically target course edit mode elements
+body.editing .course-content,
+body.editing .activity-item,
+body.editing .section,
+body.editing .activity,
+body.editing .mod-indent,
+body.editing .activityinstance,
+body.editing .dropdown,
+body.editing .dropdown-menu,
+body.editing .dropdown-toggle {
+    transform: none !important;
+    transition: none !important;
+}
+
 // Override some parent theme colors with kids-friendly ones
 :root {
     --primary-color: #FF6B35;
@@ -543,8 +566,8 @@
     --danger-color: #DDA0DD;
 }
 
-// Make buttons more rounded and playful
-.btn {
+// Make buttons more rounded and playful - EXCLUDE EDIT MODE
+body:not(.editing) .btn {
     border-radius: 1rem !important;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -555,8 +578,8 @@
     }
 }
 
-// Make cards more rounded
-.card {
+// Make cards more rounded - EXCLUDE EDIT MODE
+body:not(.editing) .card {
     border-radius: 1rem !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
@@ -567,8 +590,8 @@
     }
 }
 
-// Make form elements more rounded
-.form-control {
+// Make form elements more rounded - EXCLUDE EDIT MODE
+body:not(.editing) .form-control {
     border-radius: 0.75rem !important;
 }
 

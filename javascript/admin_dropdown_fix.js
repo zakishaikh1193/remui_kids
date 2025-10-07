@@ -19,7 +19,7 @@
 
         initializeDropdowns: function() {
             // Handle dropdown toggle clicks
-            $(document).on('click', '[data-toggle="dropdown"]', function(e) {
+            $(document).on('click', '[data-toggle="dropdown"], [data-bs-toggle="dropdown"]', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -36,6 +36,34 @@
                 
                 // Update aria-expanded
                 $(this).attr('aria-expanded', $dropdown.hasClass('show'));
+            });
+            
+            // Handle hover events for better UX
+            $(document).on('mouseenter', '.dropdown', function() {
+                var $dropdown = $(this);
+                var $menu = $dropdown.find('.dropdown-menu');
+                
+                // Close other dropdowns
+                $('.dropdown').not($dropdown).removeClass('show');
+                $('.dropdown-menu').not($menu).removeClass('show');
+                
+                // Show current dropdown
+                $dropdown.addClass('show');
+                $menu.addClass('show');
+            });
+            
+            // Handle mouse leave with delay to prevent flickering
+            $(document).on('mouseleave', '.dropdown', function() {
+                var $dropdown = $(this);
+                var $menu = $dropdown.find('.dropdown-menu');
+                
+                // Add small delay to prevent flickering
+                setTimeout(function() {
+                    if (!$dropdown.is(':hover') && !$menu.is(':hover')) {
+                        $dropdown.removeClass('show');
+                        $menu.removeClass('show');
+                    }
+                }, 150);
             });
 
             // Close dropdowns when clicking outside
