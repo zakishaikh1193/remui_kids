@@ -106,6 +106,105 @@ echo '<h1 class="students-page-title">Quizzes</h1>';
 echo '<p class="students-page-subtitle">Browse and manage quizzes in your courses</p>';
 echo '</div>';
 
+// Calculate overall statistics across all teacher's courses
+$courseids = array_keys($teachercourses);
+if (!empty($courseids)) {
+    list($insql, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+    
+    // Total quizzes
+    $totalquizzes = $DB->count_records_sql(
+        "SELECT COUNT(DISTINCT q.id) 
+         FROM {quiz} q 
+         JOIN {course_modules} cm ON cm.instance = q.id 
+         JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
+         WHERE q.course $insql",
+        $params
+    );
+    
+    // Get all quiz IDs for this teacher's courses
+    $quizids = $DB->get_fieldset_sql(
+        "SELECT DISTINCT q.id 
+         FROM {quiz} q 
+         WHERE q.course $insql",
+        $params
+    );
+    
+    $activestudents = 0;
+    $totalattempts = 0;
+    $finishedattempts = 0;
+    
+    if (!empty($quizids)) {
+        list($quizinsql, $quizparams) = $DB->get_in_or_equal($quizids, SQL_PARAMS_NAMED);
+        
+        // Active students (unique students who have attempted any quiz)
+        $activestudents = $DB->count_records_sql(
+            "SELECT COUNT(DISTINCT userid) 
+             FROM {quiz_attempts} 
+             WHERE quiz $quizinsql",
+            $quizparams
+        );
+        
+        // Total attempts
+        $totalattempts = $DB->count_records_sql(
+            "SELECT COUNT(*) 
+             FROM {quiz_attempts} 
+             WHERE quiz $quizinsql",
+            $quizparams
+        );
+        
+        // Finished attempts for completion rate
+        $finishedattempts = $DB->count_records_sql(
+            "SELECT COUNT(*) 
+             FROM {quiz_attempts} 
+             WHERE quiz $quizinsql AND state = 'finished'",
+            $quizparams
+        );
+    }
+    
+    $completionrate = ($totalattempts > 0) ? round(($finishedattempts / $totalattempts) * 100, 1) : 0;
+    
+    // Display statistics cards
+    echo '<div class="stats-grid">';
+    
+    // Card 1: Total Quizzes
+    echo '<div class="stat-card">';
+    echo '<div class="stat-icon"><i class="fa fa-question-circle"></i></div>';
+    echo '<div class="stat-content">';
+    echo '<div class="stat-value">' . $totalquizzes . '</div>';
+    echo '<div class="stat-label">Total Quizzes</div>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Card 2: Active Students
+    echo '<div class="stat-card">';
+    echo '<div class="stat-icon"><i class="fa fa-users"></i></div>';
+    echo '<div class="stat-content">';
+    echo '<div class="stat-value">' . $activestudents . '</div>';
+    echo '<div class="stat-label">Active Students</div>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Card 3: Total Attempts
+    echo '<div class="stat-card">';
+    echo '<div class="stat-icon"><i class="fa fa-edit"></i></div>';
+    echo '<div class="stat-content">';
+    echo '<div class="stat-value">' . $totalattempts . '</div>';
+    echo '<div class="stat-label">Total Attempts</div>';
+    echo '</div>';
+    echo '</div>';
+    
+    // Card 4: Completion Rate
+    echo '<div class="stat-card">';
+    echo '<div class="stat-icon"><i class="fa fa-check-circle"></i></div>';
+    echo '<div class="stat-content">';
+    echo '<div class="stat-value">' . $completionrate . '%</div>';
+    echo '<div class="stat-label">Completion Rate</div>';
+    echo '</div>';
+    echo '</div>';
+    
+    echo '</div>'; // stats-grid
+}
+
 // Course selector
 echo '<div class="course-selector">';
 echo '<div class="course-dropdown-wrapper">';
