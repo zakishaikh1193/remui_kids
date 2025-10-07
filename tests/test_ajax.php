@@ -24,7 +24,7 @@ try {
     );
     
     // Get total students - using trainee role count (any context)
-    $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
+    $traineerole = $DB->get_record('role', ['shortname' => 'student']);
     $students = 0;
     if ($traineerole) {
         $students = $DB->count_records_sql(
@@ -32,7 +32,7 @@ try {
              FROM {user} u
              JOIN {role_assignments} ra ON u.id = ra.userid
              JOIN {role} r ON ra.roleid = r.id
-             WHERE r.shortname = 'trainee' AND u.deleted = 0 AND u.suspended = 0"
+             WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0"
         );
     }
     
@@ -40,18 +40,34 @@ try {
     $total_users = $DB->count_records('user', ['deleted' => 0]);
     
     // Get teacher count (users with teachers role)
-    $teacherrole = $DB->get_record('role', ['shortname' => 'teachers']);
-    $teachers = 0;
-    if ($teacherrole) {
-        $teachers = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT u.id)
-             FROM {user} u
-             JOIN {role_assignments} ra ON u.id = ra.userid
-             JOIN {context} ctx ON ra.contextid = ctx.id
-             WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0 ",
-            [CONTEXT_SYSTEM, $teacherrole->id]
-        );
-    }
+    //  $teacherroles = $DB->count_records_sql(
+    //     "SELECT * FROM {role} WHERE shortname IN ('editingteacher', 'editingteacher')"
+    // );
+    // $teachers = 0;
+    // if ($teacherroles) {
+    //     $teachers = $DB->count_records_sql(
+    //         "SELECT COUNT(DISTINCT u.id)
+    //          FROM {user} u
+    //          JOIN {role_assignments} ra ON u.id = ra.userid
+    //          JOIN {context} ctx ON ra.contextid = ctx.id
+    //          WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0 ",
+    //         [CONTEXT_SYSTEM, $teacherroles->id]
+    //     );
+    // }
+
+     // Get teachers count
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        $teachers = 0;
+        if ($teacherrole) {
+            $teachers = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {context} ctx ON ra.contextid = ctx.id 
+                 WHERE ctx.contextlevel = ? AND ra.roleid = ? AND u.deleted = 0",
+                [CONTEXT_SYSTEM, $teacherrole->id]
+            );
+        }
     
     // Get admin count (users with manager role)
     $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
@@ -88,7 +104,7 @@ try {
     $avg_rating = 0; // Will be implemented when rating system is available
     
     // Get categories count
-    $categories = $DB->count_records('course_categories', ['visible' => 1]);
+    $categories = $DB->count_records('course_categories', ['visible' => 1 , 'parent' => 0]);
 
     echo json_encode([
         'status' => 'success',
