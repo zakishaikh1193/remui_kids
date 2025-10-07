@@ -328,6 +328,7 @@
             <!-- Left Column: Course Statistics -->
             <div class="col-md-6">
                 <div class="admin-course-stats-section">
+                {{#admin_course_stats}}
                     <div class="stats-section-container">
                         <div class="section-header">
                             <h3 class="section-title">Course Statistics</h3>
@@ -341,7 +342,7 @@
                                         <div class="course-stat-card total-courses">
                                             <div class="stat-content">
                                                 <div class="stat-label">Total Courses</div>
-                                                <div class="stat-number">0</div>
+                                                <div class="stat-number">{{total_courses}}</div>
                                             </div>
                                             <div class="stat-icon-container">
                                                 <i class="fa fa-book stat-icon"></i>
@@ -374,7 +375,7 @@
                                         <div class="course-stat-card categories">
                                             <div class="stat-content">
                                                 <div class="stat-label">Categories</div>
-                                                <div class="stat-number">11</div>
+                                                <div class="stat-number">{{categories}}</div>
                                             </div>
                                             <div class="stat-icon-container">
                                                 <i class="fa fa-building stat-icon"></i>
@@ -389,23 +390,26 @@
                         <div class="course-categories-section">
                             <h4 class="subsection-title">Course Categories</h4>
                             <div class="categories-list">
+                                {{#admin_course_categories}}
                                 <div class="category-item">
                                     <div class="category-left">
-                                        <div class="category-name">Saudi International School</div>
-                                        <div class="category-enrollments">0 enrollments</div>
+                                        <div class="category-name">{{name}}</div>
+                                        <div class="category-enrollments">{{enrollment_count}} enrollments</div>
                                     </div>
                                     <div class="category-right">
-                                        <div class="category-courses">0 courses</div>
-                                        <div class="category-completion">0% completion</div>
+                                        <div class="category-courses">{{course_count}} courses</div>
+                                        <div class="category-completion">{{completion_rate}}% completion</div>
                                     </div>
                                     <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
+                                        <div class="progress-fill" style="width: {{completion_rate}}%"></div>
                                     </div>
                                 </div>
+                                {{/admin_course_categories}}
                                 
+                                {{^admin_course_categories}}
                                 <div class="category-item">
                                     <div class="category-left">
-                                        <div class="category-name">Grade 1 Courses</div>
+                                        <div class="category-name">No categories found</div>
                                         <div class="category-enrollments">0 enrollments</div>
                                     </div>
                                     <div class="category-right">
@@ -416,37 +420,11 @@
                                         <div class="progress-fill" style="width: 0%"></div>
                                     </div>
                                 </div>
-                                
-                                <div class="category-item">
-                                    <div class="category-left">
-                                        <div class="category-name">G1-G3 Courses</div>
-                                        <div class="category-enrollments">0 enrollments</div>
-                                    </div>
-                                    <div class="category-right">
-                                        <div class="category-courses">0 courses</div>
-                                        <div class="category-completion">0% completion</div>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="category-item">
-                                    <div class="category-left">
-                                        <div class="category-name">UAE_international_school</div>
-                                        <div class="category-enrollments">0 enrollments</div>
-                                    </div>
-                                    <div class="category-right">
-                                        <div class="category-courses">0 courses</div>
-                                        <div class="category-completion">0% completion</div>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                </div>
+                                {{/admin_course_categories}}
                             </div>
                         </div>
                     </div>
+                    {{/admin_course_stats}}
                 </div>
             </div>
             
@@ -545,18 +523,23 @@
     <div class="container-fluid">
         <div class="student-enrollments-container">
         <div class="section-header">
+            <div class="section-header-left">
                 <h3 class="section-title">Student Enrollments</h3>
                 <p class="section-subtitle">Real-time enrollment data from Moodle API</p>
-            <div class="live-indicator">
-                <span class="live-dot purple"></span>
-                    <span class="live-text">Live Data</span>
-                </div>
             </div>
+            <div class="section-header-right">
+                
+                <a class="view-all-btn" href="{{config.wwwroot}}/theme/remui_kids/admin/enrollments.php">
+                    <span class="btn-glow"></span>
+                    <i class="fa fa-arrow-right"></i>
+                    View All
+                </a>
+            </div>
+        </div>
             
             <div class="recent-enrollments-section">
                 <div class="subsection-header">
                     <h4 class="subsection-title">Recent Student Enrollments</h4>
-                    <span class="subsection-note">Based on real API data</span>
                 </div>
                 
                 <div class="enrollments-list">
@@ -713,12 +696,13 @@
             
             <!-- Summary Cards -->
             <div class="activities-summary-cards">
+                {{#admin_student_activity_stats}}
                 <div class="summary-card total-students">
                     <div class="card-icon">
                         <i class="fa fa-users"></i>
                     </div>
                     <div class="card-content">
-                        <div class="card-number">76</div>
+                        <div class="card-number">{{total_students}}</div>
                         <div class="card-label">Total Students</div>
                     </div>
                 </div>
@@ -728,7 +712,7 @@
                         <i class="fa fa-user-check"></i>
                     </div>
                     <div class="card-content">
-                        <div class="card-number">6</div>
+                        <div class="card-number">{{active_students}}</div>
                         <div class="card-label">Active Students</div>
                     </div>
                 </div>
@@ -738,10 +722,11 @@
                         <i class="fa fa-chart-line"></i>
                     </div>
                     <div class="card-content">
-                        <div class="card-number">0</div>
+                        <div class="card-number">{{avg_activity_level}}</div>
                         <div class="card-label">Avg Activity Level</div>
                     </div>
                 </div>
+                {{/admin_student_activity_stats}}
             </div>
             
             <!-- All Student Activities Section -->
@@ -1063,10 +1048,12 @@
             <!-- Bottom Summary Bar -->
             <div class="bottom-summary-bar">
                 <div class="summary-stats">
-                    <span class="summary-stat">6 Active Students</span>
-                    <span class="summary-stat">0 Avg Activity Level</span>
+                    {{#admin_student_activity_stats}}
+                    <span class="summary-stat">{{active_students}} Active Students</span>
+                    <span class="summary-stat">{{avg_activity_level}} Avg Activity Level</span>
                     <span class="summary-stat">0 Total Course Access</span>
-                    <span class="summary-stat">78 Total Logins</span>
+                    <span class="summary-stat">0 Total Logins</span>
+                    {{/admin_student_activity_stats}}
                 </div>
                 <div class="floating-action-btn">
                     <i class="fa fa-plus"></i>
@@ -1092,6 +1079,13 @@
 </div>
 
 {{> theme_remui/common_end}}
+
+{{#js}}
+require(['theme_remui_kids/admin_dropdown_fix', 'theme_remui_kids/bootstrap_compatibility'], function(DropdownFix, BootstrapCompat) {
+    DropdownFix.init();
+    BootstrapCompat.init();
+});
+{{/js}}
 
 <script>
 function toggleSidebar() {

@@ -82,7 +82,7 @@
             <h3 class="sidebar-category">STUDENTS</h3>
             <ul class="sidebar-menu">
                 <li class="sidebar-item">
-                    <a href="{{config.wwwroot}}/user/index.php" class="sidebar-link">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/teacher/students.php" class="sidebar-link">
                         <i class="fa fa-users sidebar-icon"></i>
                         <span class="sidebar-text">All Students</span>
                     </a>
@@ -113,7 +113,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="{{config.wwwroot}}/mod/quiz/index.php" class="sidebar-link">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/teacher/quizzes.php" class="sidebar-link">
                         <i class="fa fa-question-circle sidebar-icon"></i>
                         <span class="sidebar-text">Quizzes</span>
                     </a>
@@ -157,395 +157,369 @@
 <!-- Main Content Area with Sidebar -->
 <div class="teacher-main-content">
     <div class="container-fluid">
-        <!-- Teacher Dashboard Statistics -->
-        <div class="teacher-dashboard-stats">
-            <div class="section-header">
-                <h3 class="section-title">Dashboard</h3>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">Dashboard</h1>
+                <p class="dashboard-subtitle">Teacher Overview</p>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="teacher-stats-container">
-                    {{#teacher_stats}}
-                    <!-- Total Courses Card -->
-                    <div class="teacher-stat-card courses-card" id="courses-card">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-book stat-icon"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="total-courses-count">{{total_courses}}</div>
-                            <div class="stat-label">TOTAL COURSES</div>
-                            <div class="stat-change positive">
-                                <i class="fa fa-arrow-up"></i> +1.34%
-                            </div>
-                        </div>
-                        <div class="stat-refresh-btn" onclick="refreshCourseCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
-                            <i class="fa fa-refresh" id="courses-refresh-icon"></i>
-                        </div>
-                    </div>
-                    
-                    <!-- Total Students Card -->
-                    <div class="teacher-stat-card students-card" id="students-card">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-users stat-icon"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="total-students-count">{{total_students}}</div>
-                            <div class="stat-label">TOTAL STUDENTS</div>
-                            <div class="stat-change negative">
-                                <i class="fa fa-arrow-down"></i> -1.34%
-                            </div>
-                        </div>
-                        <div class="stat-refresh-btn" onclick="refreshStudentCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
-                            <i class="fa fa-refresh" id="students-refresh-icon"></i>
-                        </div>
-                    </div>
-                    
-                    <!-- Assignments Card -->
-                    <div class="teacher-stat-card assignments-card" id="assignments-card">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-tasks stat-icon"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="pending-assignments-count">{{pending_assignments}}</div>
-                            <div class="stat-label">TOTAL ASSIGNMENTS</div>
-                            <div class="stat-change positive">
-                                <i class="fa fa-arrow-up"></i> +5.67%
-                            </div>
-                        </div>
-                        <div class="stat-refresh-btn" onclick="refreshAssignmentCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
-                            <i class="fa fa-refresh" id="assignments-refresh-icon"></i>
-                        </div>
-                    </div>
-                    
-                    <!-- Upcoming Classes Card -->
-                    <div class="teacher-stat-card classes-card" id="classes-card">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-calendar stat-icon"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="upcoming-classes-count">{{upcoming_classes}}</div>
-                            <div class="stat-label">UPCOMING CLASSES</div>
-                            <div class="stat-change positive">
-                                <i class="fa fa-arrow-up"></i> +2.45%
-                            </div>
-                        </div>
-                        <div class="stat-refresh-btn" onclick="refreshClassCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
-                            <i class="fa fa-refresh" id="classes-refresh-icon"></i>
-                        </div>
-                    </div>
-                    <!-- Total Quizzes -->
-                    <div class="teacher-stat-card classes-card" id="classes-card">
-                        <div class="stat-icon-container">
-                            <i class="fa fa-calendar stat-icon"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="upcoming-classes-count">{{upcoming_classes}}</div>
-                            <div class="stat-label">Total Quizzes</div>
-                            <div class="stat-change positive">
-                                <i class="fa fa-arrow-up"></i> +2.45%
-                            </div>
-                        </div>
-                        <div class="stat-refresh-btn" onclick="refreshClassCount()" style="position: absolute; top: 10px; right: 10px; cursor: pointer;">
-                            <i class="fa fa-refresh" id="classes-refresh-icon"></i>
-                        </div>
-                    </div>
-                    {{/teacher_stats}}
-                    </div>
-                </div>
+            <div class="header-actions">
+                <span class="dashboard-badge">Teacher</span>
             </div>
         </div>
 
-        <!-- Real Data Sections -->
-        <div class="row mt-3">
-    <div class="col-md-8">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="header-content">
-                    <i class="fa fa-history header-icon"></i>
-                    <h5 class="card-title">Recent Student Activity</h5>
-                </div>
-                <div class="card-actions">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()" title="Refresh Activity">
-                        <i class="fa fa-refresh"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="activity-feed">
-                    {{#recent_student_activity}}
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background-color: {{color}};">
-                            <i class="fa {{icon}}"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-header">
-                                <strong>{{student_name}}</strong>
-                                <span class="activity-type-badge">{{activity_type}}</span>
-                            </div>
-                            <div class="activity-details">
-                                {{activity_name}} <span class="text-muted">in</span> {{course_name}}
-                            </div>
-                            <div class="activity-time">
-                                <i class="fa fa-clock-o"></i> {{time}}
-                            </div>
-                        </div>
+        <!-- Statistics Cards Grid -->
+        <div class="stats-grid">
+            {{#teacher_stats}}
+            <!-- Total Courses Card -->
+            <div class="stat-card courses-card" id="courses-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fa fa-book"></i>
                     </div>
-                    {{/recent_student_activity}}
-                    {{^recent_student_activity}}
-                    <div class="text-center text-muted py-4">
-                        <i class="fa fa-inbox fa-3x mb-2"></i>
-                        <p>No recent student activity</p>
+                    <div class="stat-refresh-btn" onclick="refreshCourseCount()">
+                        <i class="fa fa-refresh" id="courses-refresh-icon"></i>
                     </div>
-                    {{/recent_student_activity}}
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="header-content">
-                    <i class="fa fa-graduation-cap header-icon"></i>
-                    <h5 class="card-title">Course Overview</h5>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="course-overview-list">
-                    {{#course_overview}}
-                    <div class="course-overview-item">
-                        <div class="course-info">
-                            <a href="{{url}}" class="course-link">
-                                <div class="course-title">{{name}}</div>
-                                <div class="course-shortname text-muted">{{shortname}}</div>
-                            </a>
-                        </div>
-                        <div class="course-stats">
-                            <div class="stat-item">
-                                <i class="fa fa-users"></i>
-                                <span>{{student_count}}</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fa fa-tasks"></i>
-                                <span>{{activity_count}}</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fa fa-file-text"></i>
-                                <span>{{assignment_count}}</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fa fa-star"></i>
-                                <span>{{quiz_count}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    {{/course_overview}}
-                    {{^course_overview}}
-                    <div class="text-center text-muted py-4">
-                        <i class="fa fa-book fa-3x mb-2"></i>
-                        <p>No courses found</p>
-                    </div>
-                    {{/course_overview}}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-        <!-- Top Sections Row -->
-        <div class="row mt-3">
-    <!-- Teaching Progress Section -->
-    <div class="col-md-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="header-content">
-                    <i class="fa fa-tasks header-icon"></i>
-                    <h5 class="card-title">Teaching Progress</h5>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="progress-container">
-                    <div class="progress-info">
-                        <span class="progress-label">Monthly Goal</span>
-                        <span class="progress-value">68%</span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 68%" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress-detail mt-2">
-                        <small>68% of monthly teaching goal achieved</small>
+                <div class="stat-card-content">
+                    <div class="stat-number" id="total-courses-count">{{total_courses}}</div>
+                    <div class="stat-label">Total Courses</div>
+                    <div class="stat-change positive">
+                        <i class="fa fa-arrow-up"></i> +1.34%
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Student Enrollment Section -->
-    <div class="col-md-4">
-        <div class="dashboard-card enrollment-card">
-            <div class="card-header">
-                <div class="header-content">
-                    <i class="fa fa-users header-icon"></i>
-                    <h5 class="card-title">Student Enrollment</h5>
-                </div>
-                <div class="card-actions">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshStudentEnrollment()" title="Refresh">
-                        <i class="fa fa-refresh"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <!-- Enrollment Toolbar -->
-                <div class="enrollment-toolbar">
-                    <div class="toolbar-left">
-                        <div class="search-box">
-                            <input type="text" id="student-search" placeholder="Search students..." class="form-control form-control-sm">
-                            <i class="fa fa-search search-icon"></i>
-                        </div>
-                    </div>
-                    <div class="toolbar-right">
-                        <label class="switch-inline">
-                            <input type="checkbox" id="only-managers-toggle" onchange="filterStudents()">
-                            <span>Show Managers Only</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Loading State -->
-                <div id="enrollment-loading" class="loading-state" style="display: none;">
-                    <div class="loading-spinner"></div>
-                    <p>Loading students...</p>
-                </div>
-
-                <!-- Student Table -->
-                <div class="enrollment-table-wrapper">
-                    <table class="enrollment-table">
-                        <thead>
-                            <tr>
-                                <th class="avatar-col"></th>
-                                <th>Name</th>
-                                <th>Last Access</th>
-                                <th>Courses</th>
-                                <th class="actions-col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="student-table-body">
-                            <!-- Initial data from server -->
-                            {{#teacher_students}}
-                            <tr>
-                                <td class="avatar-col">
-                                    <div class="student-avatar">
-                                        <img src="{{avatar_url}}" alt="{{name}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="student-info">
-                                        <div class="student-name">{{name}}</div>
-                                        <div class="student-email">{{email}}</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="last-access">
-                                        <span class="access-time">{{last_access}}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="course-count">
-                                        <span class="badge badge-primary">{{course_count}}</span>
-                                    </div>
-                                </td>
-                                <td class="actions-col">
-                                    <a href="{{profile_url}}" class="btn btn-outline-primary btn-sm" title="View Profile">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {{/teacher_students}}
-                            {{^teacher_students}}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">
-                                    <i class="fa fa-users"></i> No students found
-                                </td>
-                            </tr>
-                            {{/teacher_students}}
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- No Data State -->
-                <div id="no-students-message" class="no-data-state" style="display: none;">
-                    <div class="no-data-icon">
+            
+            <!-- Total Students Card -->
+            <div class="stat-card students-card" id="students-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
                         <i class="fa fa-users"></i>
                     </div>
-                    <h6>No Students Found</h6>
-                    <p id="no-data-message-text">Enroll students in your courses to see them here.</p>
-                </div>
-
-                <!-- Pagination -->
-                <div id="enrollment-pagination" class="enrollment-pagination" style="display: none;">
-                    <div class="pagination-info">
-                        <span id="pagination-info-text">Showing 0 of 0 students</span>
+                    <div class="stat-refresh-btn" onclick="refreshStudentCount()">
+                        <i class="fa fa-refresh" id="students-refresh-icon"></i>
                     </div>
-                    <div class="pagination-controls">
-                        <button class="btn btn-sm btn-outline-secondary" id="prev-page" onclick="changePage(-1)">
-                            <i class="fa fa-chevron-left"></i>
-                        </button>
-                        <div id="page-numbers" class="page-numbers"></div>
-                        <button class="btn btn-sm btn-outline-secondary" id="next-page" onclick="changePage(1)">
-                            <i class="fa fa-chevron-right"></i>
-                        </button>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-number" id="total-students-count">{{total_students}}</div>
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-change negative">
+                        <i class="fa fa-arrow-down"></i> -1.34%
                     </div>
                 </div>
             </div>
+            
+            <!-- Assignments Card -->
+            <div class="stat-card assignments-card" id="assignments-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fa fa-tasks"></i>
+                    </div>
+                    <div class="stat-refresh-btn" onclick="refreshAssignmentCount()">
+                        <i class="fa fa-refresh" id="assignments-refresh-icon"></i>
+                    </div>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-number" id="pending-assignments-count">{{pending_assignments}}</div>
+                    <div class="stat-label">Total Assignments</div>
+                    <div class="stat-change positive">
+                        <i class="fa fa-arrow-up"></i> +5.67%
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upcoming Classes Card -->
+            <div class="stat-card classes-card" id="classes-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div class="stat-refresh-btn" onclick="refreshClassCount()">
+                        <i class="fa fa-refresh" id="classes-refresh-icon"></i>
+                    </div>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-number" id="upcoming-classes-count">{{upcoming_classes}}</div>
+                    <div class="stat-label">Upcoming Classes</div>
+                    <div class="stat-change positive">
+                        <i class="fa fa-arrow-up"></i> +2.45%
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Total Quizzes Card -->
+            <div class="stat-card quizzes-card" id="quizzes-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fa fa-question-circle"></i>
+                    </div>
+                    <div class="stat-refresh-btn" onclick="refreshQuizCount()">
+                        <i class="fa fa-refresh" id="quizzes-refresh-icon"></i>
+                    </div>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-number" id="total-quizzes-count">{{total_quizzes}}</div>
+                    <div class="stat-label">Total Quizzes</div>
+                    <div class="stat-change positive">
+                        <i class="fa fa-arrow-up"></i> +2.45%
+                    </div>
+                </div>
+            </div>
+            
+            {{/teacher_stats}}
         </div>
-    </div>
-    </div>
-    
-    <!-- Top Courses Section -->
-    <div class="col-md-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="header-content">
-                    <i class="fa fa-trophy header-icon"></i>
-                    <h5 class="card-title">Top Courses</h5>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Recent Student Activity -->
+            <div class="content-card activity-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-history"></i>
+                        <span>Recent Student Activity</span>
+                    </div>
+                    <button class="btn-refresh" onclick="location.reload()" title="Refresh Activity">
+                        <i class="fa fa-refresh"></i>
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div class="activity-feed">
+                        {{#recent_student_activity}}
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background-color: {{color}};">
+                                <i class="fa {{icon}}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-header">
+                                    <strong>{{student_name}}</strong>
+                                    <span class="activity-type-badge">{{activity_type}}</span>
+                                </div>
+                                <div class="activity-details">
+                                    {{activity_name}} <span class="text-muted">in</span> {{course_name}}
+                                </div>
+                                <div class="activity-time">
+                                    <i class="fa fa-clock-o"></i> {{time}}
+                                </div>
+                            </div>
+                        </div>
+                        {{/recent_student_activity}}
+                        {{^recent_student_activity}}
+                        <div class="empty-state">
+                            <i class="fa fa-inbox"></i>
+                            <p>No recent student activity</p>
+                        </div>
+                        {{/recent_student_activity}}
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="top-courses-list">
-                    {{#top_courses}}
-                    <div class="course-item">
-                        <div class="course-icon">
+
+            <!-- Course Overview -->
+            <div class="content-card course-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-graduation-cap"></i>
+                        <span>Course Overview</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="course-overview-list">
+                        {{#course_overview}}
+                        <div class="course-overview-item">
+                            <div class="course-info">
+                                <a href="{{url}}" class="course-link">
+                                    <div class="course-title">{{name}}</div>
+                                    <div class="course-shortname">{{shortname}}</div>
+                                </a>
+                            </div>
+                            <div class="course-stats">
+                                <div class="stat-item">
+                                    <i class="fa fa-users"></i>
+                                    <span>{{student_count}}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-tasks"></i>
+                                    <span>{{activity_count}}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-file-text"></i>
+                                    <span>{{assignment_count}}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fa fa-star"></i>
+                                    <span>{{quiz_count}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {{/course_overview}}
+                        {{^course_overview}}
+                        <div class="empty-state">
                             <i class="fa fa-book"></i>
+                            <p>No courses found</p>
                         </div>
-                        <div class="course-info">
-                            <div class="course-name">{{name}}</div>
-                            <div class="course-enrollment">{{enrollment_count}} students • {{element_count}} elements</div>
+                        {{/course_overview}}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Courses -->
+            <div class="content-card top-courses-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-trophy"></i>
+                        <span>Top Courses</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="top-courses-list">
+                        {{#top_courses}}
+                        <div class="course-item">
+                            <div class="course-icon">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="course-info">
+                                <div class="course-name">{{name}}</div>
+                                <div class="course-enrollment">{{enrollment_count}} students • {{element_count}} elements</div>
+                            </div>
                         </div>
+                        {{/top_courses}}
+                        {{^top_courses}}
+                        <div class="empty-state">
+                            <i class="fa fa-book"></i>
+                            <p>No course data available</p>
+                        </div>
+                        {{/top_courses}}
                     </div>
-                    {{/top_courses}}
-                    {{^top_courses}}
-                    <div class="no-data-message">
-                        <p>No course data available</p>
-                    </div>
-                    {{/top_courses}}
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-        <!-- Recent Courses and Students Section -->
-        <div class="row mt-3">
-    <div class="col-md-6">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="card-title">Recent Courses</h5>
-                <a href="{{config.wwwroot}}/course/index.php" class="btn btn-sm btn-primary">View All</a>
+        <!-- Secondary Content Grid -->
+        <div class="secondary-grid">
+            <!-- Student Enrollment -->
+            <div class="content-card enrollment-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-users"></i>
+                        <span>Student Enrollment</span>
+                    </div>
+                    <button class="btn-refresh" onclick="refreshStudentEnrollment()" title="Refresh">
+                        <i class="fa fa-refresh"></i>
+                    </button>
+                </div>
+                <div class="card-content">
+                    <!-- Enrollment Toolbar -->
+                    <div class="enrollment-toolbar">
+                        <div class="search-box">
+                            <input type="text" id="student-search" placeholder="Search students..." class="form-control">
+                            <i class="fa fa-search"></i>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="enrollment-loading" class="loading-state" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Loading students...</p>
+                    </div>
+
+                    <!-- Student Table -->
+                    <div class="enrollment-table-wrapper">
+                        <table class="enrollment-table">
+                            <thead>
+                                <tr>
+                                    <th class="avatar-col"></th>
+                                    <th>Name</th>
+                                    <th>Last Access</th>
+                                    <th>Courses</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body">
+                                {{#teacher_students}}
+                                <tr>
+                                    <td class="avatar-col">
+                                        <div class="student-avatar">
+                                            <img src="{{avatar_url}}" alt="{{name}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="student-info">
+                                            <div class="student-name">{{name}}</div>
+                                            <div class="student-email">{{email}}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="last-access">
+                                            <span class="access-time">{{last_access}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="course-count">
+                                            <span class="badge">{{course_count}}</span>
+                                        </div>
+                                    </td>
+                                    <td class="actions-col">
+                                        <a href="{{profile_url}}" class="btn-action" title="View Profile">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{/teacher_students}}
+                                {{^teacher_students}}
+                                <tr>
+                                    <td colspan="5" class="empty-state">
+                                        <i class="fa fa-users"></i>
+                                        <p>No students found</p>
+                                    </td>
+                                </tr>
+                                {{/teacher_students}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- No Data State -->
+                    <div id="no-students-message" class="no-data-state" style="display: none;">
+                        <div class="no-data-icon">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <h6>No Students Found</h6>
+                        <p id="no-data-message-text">Enroll students in your courses to see them here.</p>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="enrollment-pagination" class="enrollment-pagination" style="display: none;">
+                        <div class="pagination-info">
+                            <span id="pagination-info-text">Showing 0 of 0 students</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="btn-pagination" id="prev-page" onclick="changePage(-1)">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <div id="page-numbers" class="page-numbers"></div>
+                            <button class="btn-pagination" id="next-page" onclick="changePage(1)">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="courses-list">
-                    {{#teacher_courses}}
-                    <div class="course-item">
-                        <div class="course-info">
+        </div>
+
+        <!-- Additional Content Grid -->
+        <div class="additional-grid">
+            <!-- Recent Courses -->
+            <div class="content-card courses-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-book"></i>
+                        <span>Recent Courses</span>
+                    </div>
+                    <a href="{{config.wwwroot}}/course/index.php" class="btn-link">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="courses-list">
+                        {{#teacher_courses}}
+                        <div class="course-item">
                             <div class="course-icon">
                                 <i class="fa fa-book"></i>
                             </div>
@@ -557,38 +531,37 @@
                                     <span class="course-updated">Updated {{last_modified}}</span>
                                 </div>
                             </div>
+                            <div class="course-actions">
+                                <a href="{{url}}" class="btn-primary">View Course</a>
+                            </div>
                         </div>
-                        <div class="course-actions">
-                            <a href="{{url}}" class="btn btn-primary btn-sm">View Course</a>
+                        {{/teacher_courses}}
+                        {{^teacher_courses}}
+                        <div class="empty-state">
+                            <i class="fa fa-book"></i>
+                            <p>No courses found. Create your first course to get started!</p>
+                            <a href="{{config.wwwroot}}/course/edit.php" class="btn-primary">Create Course</a>
                         </div>
+                        {{/teacher_courses}}
                     </div>
-                    {{/teacher_courses}}
-                    
-                    {{^teacher_courses}}
-                    <div class="no-courses-message">
-                        <i class="fa fa-book"></i>
-                        <p>No courses found. Create your first course to get started!</p>
-                        <a href="{{config.wwwroot}}/course/edit.php" class="btn btn-primary">Create Course</a>
-                    </div>
-                    {{/teacher_courses}}
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="card-title">Recent Students</h5>
-                <a href="{{config.wwwroot}}/user/index.php" class="btn btn-sm btn-primary">View All</a>
-            </div>
-            <div class="card-body">
-                <div class="students-list">
-                    {{#teacher_students}}
-                    <div class="student-item">
-                        <div class="student-info">
-                            <div class="student-icon">
-                                <i class="fa fa-user"></i>
+
+            <!-- Recent Students -->
+            <div class="content-card students-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-users"></i>
+                        <span>Recent Students</span>
+                    </div>
+                    <a href="{{config.wwwroot}}/user/index.php" class="btn-link">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="students-list">
+                        {{#teacher_students}}
+                        <div class="student-item">
+                            <div class="student-avatar">
+                                <img src="{{avatar_url}}" alt="{{name}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
                             </div>
                             <div class="student-details">
                                 <div class="student-name">{{name}}</div>
@@ -598,38 +571,34 @@
                                     <span class="student-last-access">Last seen {{last_access}}</span>
                                 </div>
                             </div>
+                            <div class="student-actions">
+                                <a href="{{profile_url}}" class="btn-outline">View Profile</a>
+                            </div>
                         </div>
-                        <div class="student-actions">
-                            <a href="{{profile_url}}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                        {{/teacher_students}}
+                        {{^teacher_students}}
+                        <div class="empty-state">
+                            <i class="fa fa-users"></i>
+                            <p>No students found. Enroll students in your courses to see them here.</p>
                         </div>
+                        {{/teacher_students}}
                     </div>
-                    {{/teacher_students}}
-                    
-                    {{^teacher_students}}
-                    <div class="no-students-message">
-                        <i class="fa fa-users"></i>
-                        <p>No students found. Enroll students in your courses to see them here.</p>
-                    </div>
-                    {{/teacher_students}}
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-        <!-- Recent Assignments Section -->
-        <div class="row mt-3">
-    <div class="col-md-12">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="card-title">Recent Assignments</h5>
-                <a href="{{config.wwwroot}}/mod/assign/index.php" class="btn btn-sm btn-primary">View All</a>
-            </div>
-            <div class="card-body">
-                <div class="assignments-list">
-                    {{#teacher_assignments}}
-                    <div class="assignment-item">
-                        <div class="assignment-info">
+            <!-- Recent Assignments -->
+            <div class="content-card assignments-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-tasks"></i>
+                        <span>Recent Assignments</span>
+                    </div>
+                    <a href="{{config.wwwroot}}/mod/assign/index.php" class="btn-link">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="assignments-list">
+                        {{#teacher_assignments}}
+                        <div class="assignment-item">
                             <div class="assignment-icon">
                                 <i class="fa fa-tasks"></i>
                             </div>
@@ -642,119 +611,84 @@
                                     <span class="assignment-graded">{{graded_count}}{{^graded_count}}0{{/graded_count}} graded</span>
                                 </div>
                             </div>
+                            <div class="assignment-status">
+                                <span class="status-badge status-{{status}}{{^status}}pending{{/status}}">{{status}}{{^status}}pending{{/status}}</span>
+                                <a href="{{url}}{{^url}}#{{/url}}" class="btn-primary">Grade</a>
+                            </div>
                         </div>
-                        <div class="assignment-status">
-                            <span class="status-badge status-{{status}}{{^status}}pending{{/status}}">{{status}}{{^status}}pending{{/status}}</span>
-                            <a href="{{url}}{{^url}}#{{/url}}" class="btn btn-primary btn-sm">Grade</a>
+                        {{/teacher_assignments}}
+                        {{^teacher_assignments}}
+                        <div class="empty-state">
+                            <i class="fa fa-tasks"></i>
+                            <p>No assignments found. Create assignments in your courses to see them here.</p>
                         </div>
+                        {{/teacher_assignments}}
                     </div>
-                    {{/teacher_assignments}}
-                    
-                    {{^teacher_assignments}}
-                    <div class="no-assignments-message">
-                        <i class="fa fa-tasks"></i>
-                        <p>No assignments found. Create assignments in your courses to see them here.</p>
-                    </div>
-                    {{/teacher_assignments}}
-                    
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-        <!-- Student Feedback Section -->
-        <div class="row mt-3">
-    <div class="col-md-6">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="card-title">Student Feedback</h5>
-            </div>
-            <div class="card-body">
-                <div class="feedback-overview">
-                    <div class="rating-summary">
-                        <div class="rating-number">4.5</div>
-                        <div class="rating-stars">
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star-half-alt"></i>
-                        </div>
-                        <div class="rating-count">Based on 128 reviews</div>
+            <!-- Student Feedback -->
+            <div class="content-card feedback-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-star"></i>
+                        <span>Student Feedback</span>
                     </div>
-                    <div class="rating-breakdown">
-                        <div class="rating-bar">
-                            <span class="rating-label">5 stars</span>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="card-content">
+                    <div class="feedback-overview">
+                        <div class="rating-summary">
+                            <div class="rating-number">4.5</div>
+                            <div class="rating-stars">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-half-alt"></i>
                             </div>
-                            <span class="rating-percentage">65%</span>
+                            <div class="rating-count">Based on 128 reviews</div>
                         </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">4 stars</span>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="rating-breakdown">
+                            <div class="rating-bar">
+                                <span class="rating-label">5 stars</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <span class="rating-percentage">65%</span>
                             </div>
-                            <span class="rating-percentage">20%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">3 stars</span>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="rating-bar">
+                                <span class="rating-label">4 stars</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: 20%"></div>
+                                </div>
+                                <span class="rating-percentage">20%</span>
                             </div>
-                            <span class="rating-percentage">10%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">2 stars</span>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 3%" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="rating-bar">
+                                <span class="rating-label">3 stars</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: 10%"></div>
+                                </div>
+                                <span class="rating-percentage">10%</span>
                             </div>
-                            <span class="rating-percentage">3%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">1 star</span>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 2%" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="rating-bar">
+                                <span class="rating-label">2 stars</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: 3%"></div>
+                                </div>
+                                <span class="rating-percentage">3%</span>
                             </div>
-                            <span class="rating-percentage">2%</span>
+                            <div class="rating-bar">
+                                <span class="rating-label">1 star</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: 2%"></div>
+                                </div>
+                                <span class="rating-percentage">2%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="card-title">Recent Feedback</h5>
-            </div>
-            <div class="card-body">
-                <div class="feedback-list">
-                    {{#recent_feedback}}
-                    <div class="feedback-item">
-                        <div class="feedback-header">
-                            <div class="student-name">{{student_name}}</div>
-                            <div class="feedback-date">{{date}}</div>
-                        </div>
-                        <div class="feedback-rating">
-                            {{#stars}}<i class="fa fa-star"></i>{{/stars}}
-                            {{#empty_stars}}<i class="far fa-star"></i>{{/empty_stars}}
-                        </div>
-                        <div class="feedback-comment">{{comment}}</div>
-                    </div>
-                    {{/recent_feedback}}
-                    {{^recent_feedback}}
-                    <div class="no-feedback-message">
-                        <p>No feedback available yet.</p>
-                    </div>
-                    {{/recent_feedback}}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
     </div> <!-- End container-fluid -->
 </div> <!-- End teacher-main-content -->
@@ -1622,4 +1556,3 @@ function showNoDataMessage(message = null) {
     }
 }
 </script>
-</div> <!-- End teacher-dashboard-wrapper -->

@@ -1,0 +1,569 @@
+/* ========================================
+   STUDENTS PAGE STYLES - MODERN UI
+   ======================================== */
+
+.students-page-wrapper {
+    min-height: 100vh;
+    background: #f8fafc;
+    position: relative;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 20px 0.5rem 0.5rem; /* exactly ~20px top gap from viewport */
+}
+
+/* When rendered inside the teacher dashboard layout, avoid full-bleed width so it doesn't slide under the fixed sidebar */
+.teacher-main-content .students-page-wrapper {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Neutralize the default main container for this page to avoid empty top/bottom bars */
+.students-page #region-main, /* some themes use this id */
+.students-page [role="main"],
+.quizzes-page #region-main,
+.quizzes-page [role="main"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Also remove any inner spacing wrappers sometimes injected under role="main" */
+.students-page [role="main"] > .card, 
+.students-page [role="main"] > .container, 
+.students-page [role="main"] > .container-fluid,
+.quizzes-page [role="main"] > .card,
+.quizzes-page [role="main"] > .container,
+.quizzes-page [role="main"] > .container-fluid {
+    background: transparent;
+    box-shadow: none;
+    border: 0;
+}
+
+/* Collapse any common wrapper spacing that might add top/bottom gaps */
+.students-page .teacher-main-content,
+.students-page .teacher-dashboard-wrapper,
+.students-page #page-content,
+.students-page .page-content,
+.students-page #region-main-box,
+.students-page .main-inner,
+.quizzes-page .teacher-main-content,
+.quizzes-page .teacher-dashboard-wrapper,
+.quizzes-page #page-content,
+.quizzes-page .page-content,
+.quizzes-page #region-main-box,
+.quizzes-page .main-inner {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    border: 0 !important;
+}
+
+/* Hide Moodle's native secondary/tertiary nav bars on custom teacher pages */
+.quizzes-page .secondary-navigation,
+.quizzes-page .tertiary-navigation,
+.quizzes-page .moremenu,
+.quizzes-page .secondarynavigation {
+    display: none !important;
+}
+
+/* Page Header - Minimalistic */
+.students-page-header {
+    background: white;
+    color: #2d3748;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    position: relative; /* ensure ::after bar positions correctly */
+    margin-top: 0; /* no extra gap above header */
+}
+
+.students-page-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #2d3748;
+}
+
+.students-page-subtitle {
+    font-size: 0.95rem;
+    color: #718096;
+    margin: 0;
+}
+
+.students-page-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #bee3f8, #c6f6d5);
+}
+
+.course-selector {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.course-dropdown-wrapper {
+    position: relative;
+    max-width: 300px;
+}
+
+.course-dropdown-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.course-dropdown {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #2d3748;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+}
+
+.course-dropdown:hover {
+    border-color: #a0aec0;
+    box-shadow: 0 0 0 3px rgba(160, 174, 192, 0.1);
+}
+
+.course-dropdown:focus {
+    outline: none;
+    border-color: #90cdf4;
+    box-shadow: 0 0 0 3px rgba(144, 205, 244, 0.2);
+}
+
+/* Students Table Container - Minimalistic */
+.students-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Review table row status colors */
+.answer-correct {
+    background: #e6fffa; /* teal-50 */
+}
+.answer-wrong {
+    background: #ffe4e6; /* rose-100 */
+}
+.answer-partial {
+    background: #fff7ed; /* amber-50 */
+}
+
+.students-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #bee3f8, #c6f6d5);
+}
+
+/* Removed students-header styles as header is no longer used */
+
+/* Search and Filter Bar - Minimalistic */
+.students-controls {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #90cdf4;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(144, 205, 244, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e1e8ed;
+    background: white;
+    border-radius: 8px;
+    color: #495057;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #bee3f8;
+    color: #2d3748;
+    border-color: #90cdf4;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(190, 227, 248, 0.3);
+}
+
+/* Modern Table Styling */
+.students-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+    background: white;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.students-table thead {
+    background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
+    color: #2d3748;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.students-table thead th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+}
+
+.students-table thead th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.students-table thead th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.students-table thead th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(46, 204, 113, 0.3);
+}
+
+.students-table tbody tr {
+    border-bottom: 1px solid #f1f3f4;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.students-table tbody tr:hover {
+    background: linear-gradient(90deg, #f7fafc 0%, #ffffff 100%);
+    transform: scale(1.005);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    z-index: 1;
+}
+
+.students-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.students-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+}
+
+.students-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+}
+
+.students-table td {
+    padding: 1.25rem 1.5rem;
+    border: none;
+    vertical-align: middle;
+    color: #2d3748;
+}
+
+.students-table .student-name {
+    font-weight: 600;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #bee3f8 0%, #c6f6d5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    border: 2px solid #e2e8f0;
+}
+
+.students-table .student-email {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.students-table .last-access {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.last-access-never {
+    color: #f56565;
+    font-weight: 500;
+}
+
+.last-access-recent {
+    color: #48bb78;
+    font-weight: 500;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+    color: #90cdf4;
+}
+
+.empty-state-icon i {
+    font-size: 3rem;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+.empty-state-text {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f1f3f4;
+    border-top: 4px solid #90cdf4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .students-page-wrapper {
+        padding: 0.5rem;
+    }
+    
+    .students-page-header {
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .students-page-title {
+        font-size: 1.8rem;
+    }
+    
+    .students-container {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+    
+    .students-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .students-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        min-width: auto;
+    }
+    
+    .course-tabs {
+        flex-direction: column;
+    }
+    
+    .course-tab {
+        text-align: center;
+    }
+    
+    .students-table {
+        font-size: 0.85rem;
+    }
+    
+    .students-table th,
+    .students-table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    .student-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .students-table thead {
+        display: none;
+    }
+    
+    .students-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #e1e8ed;
+        border-radius: 8px;
+        padding: 1rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .students-table tbody td {
+        display: block;
+        padding: 0.5rem 0;
+        border: none;
+    }
+    
+    .students-table tbody td:before {
+        content: attr(data-label) ': ';
+        font-weight: 600;
+        color: #495057;
+        display: inline-block;
+        width: 100px;
+    }
+}
+
+/* Animation for smooth transitions */
+.students-table tbody tr {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom scrollbar for table wrapper */
+.students-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.students-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 4px;
+}
+
+.students-table-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #bee3f8, #c6f6d5);
+    border-radius: 4px;
+}
+
+.students-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #90cdf4, #9ae6b4);
+}

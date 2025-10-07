@@ -58,7 +58,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/my_courses.php" class="nav-link">
                             <i class="fa fa-book"></i>
                             <span>My Courses</span>
                         </a>
@@ -189,7 +189,8 @@
                     </h3>
                     <div class="elementary-courses-container">
                         {{#elementary_courses}}
-                        <div class="elementary-course-card">
+                        <div class="elementary-course-card enhanced" data-course-id="{{id}}">
+                            <!-- Course Header with Image -->
                             <div class="course-image-container">
                                 {{#courseimage}}
                                 <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
@@ -199,37 +200,127 @@
                                     <i class="fa fa-book"></i>
                                 </div>
                                 {{/courseimage}}
+                                
+                                <!-- Course Level Badge -->
                                 <div class="course-level-badge">{{categoryname}}</div>
+                                
+                                <!-- Course Status Indicator -->
+                                <div class="course-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
+                                    <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-play-circle{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
+                                </div>
                             </div>
+                            
+                            <!-- Course Content -->
                             <div class="course-content">
-                                <h4 class="course-title">{{fullname}}</h4>
+                                <!-- Course Title and Grade -->
+                                <div class="course-header">
+                                    <h4 class="course-title">{{fullname}}</h4>
+                                    <span class="course-grade">{{grade_level}}</span>
+                                </div>
+                                
+                                <!-- Course Summary -->
                                 <p class="course-summary">{{summary}}</p>
                                 
-                                <!-- Progress Bar -->
+                                <!-- Progress Section -->
                                 <div class="course-progress-section">
+                                    <div class="progress-header">
+                                        <span class="progress-label">Your Progress</span>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
                                     <div class="progress-bar-container">
                                         <div class="progress-bar">
                                             <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
                                         </div>
-                                        <span class="progress-percentage">{{progress_percentage}}%</span>
                                     </div>
                                 </div>
                                 
-                                <!-- Course Stats -->
-                                <div class="course-stats">
-                                    <div class="course-stat-item">
-                                        <i class="fa fa-book" style="color: black;"></i>
-                                        <span>{{completed_sections}}/{{total_sections}} lessons</span>
+                                <!-- Course Statistics -->
+                                <div class="course-stats-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        <div class="stat-info">
+                                            <div class="stat-number">{{completed_sections}}/{{total_sections}}</div>
+                                            <div class="stat-label">Lessons</div>
+                                        </div>
                                     </div>
-                                    <div class="course-stat-item">
-                                        <i class="fa fa-clock-o"></i>
-                                        <span>{{duration}}</span>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-tasks"></i>
+                                        </div>
+                                        <div class="stat-info">
+                                            <div class="stat-number">{{completed_activities}}/{{total_activities}}</div>
+                                            <div class="stat-label">Activities</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        <div class="stat-info">
+                                            <div class="stat-number">{{estimated_time}}</div>
+                                            <div class="stat-label">Minutes</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="stat-info">
+                                            <div class="stat-number">{{points_earned}}</div>
+                                            <div class="stat-label">Points</div>
+                                        </div>
                                     </div>
                                 </div>
+                                                                
+                                <!-- Course Actions -->
+                                <div class="course-actions">
+                                    {{#completed}}
+                                    <a href="{{courseurl}}" class="course-button completed">
+                                        <i class="fa fa-check"></i> Review Course
+                                    </a>
+                                    {{/completed}}
+                                    {{^completed}}
+                                    {{#in_progress}}
+                                    <a href="{{courseurl}}" class="course-button in-progress">
+                                        <i class="fa fa-play"></i> Continue Learning
+                                    </a>
+                                    {{/in_progress}}
+                                    {{^in_progress}}
+                                    <a href="{{courseurl}}" class="course-button not-started">
+                                        <i class="fa fa-play"></i> Start Course
+                                    </a>
+                                    {{/in_progress}}
+                                    {{/completed}}
+                                    
+                                    <!-- Course Details Button -->
+                                    <button class="course-details-btn" onclick="toggleCourseDetails({{id}})">
+                                        <i class="fa fa-info-circle"></i>
+                                    </button>
+                                </div>
                                 
-                                <a href="{{courseurl}}" class="course-button">
-                                    <i class="fa fa-play"></i> Continue Learning
-                                </a>
+                                <!-- Course Details Panel (Hidden by default) -->
+                                <div class="course-details-panel" id="details-{{id}}" style="display: none;">
+                                    <div class="details-content">
+                                        <h6>Course Details</h6>
+                                        <div class="detail-item">
+                                            <strong>Instructor:</strong> {{instructor_name}}
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Start Date:</strong> {{start_date}}
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Last Accessed:</strong> {{last_accessed}}
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Next Activity:</strong> {{next_activity}}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {{/elementary_courses}}
@@ -238,7 +329,7 @@
                     <!-- View All Courses Button -->
                     {{#show_view_all_button}}
                     <div class="text-center mt-3">
-                        <a href="{{{mycoursesurl}}}" class="btn btn-outline-primary view-all-courses-btn">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/my_courses.php" class="btn btn-outline-primary view-all-courses-btn">
                             <i class="fa fa-th-large"></i> View All Courses ({{total_courses_count}})
                         </a>
                     </div>
@@ -2274,10 +2365,76 @@
                     const insightsSection = document.querySelector('.learning-insights');
                     if (insightsSection) smoothScrollTo(insightsSection);
                     break;
-            }
         }
+    }
+});
+
+// Enhanced Course Cards Functionality
+function toggleCourseDetails(courseId) {
+    const detailsPanel = document.getElementById('details-' + courseId);
+    const detailsBtn = document.querySelector(`[onclick="toggleCourseDetails(${courseId})"]`);
+    
+    if (detailsPanel.style.display === 'none' || detailsPanel.style.display === '') {
+        detailsPanel.style.display = 'block';
+        detailsBtn.innerHTML = '<i class="fa fa-times"></i>';
+        detailsBtn.classList.add('active');
+    } else {
+        detailsPanel.style.display = 'none';
+        detailsBtn.innerHTML = '<i class="fa fa-info-circle"></i>';
+        detailsBtn.classList.remove('active');
+    }
+}
+
+// Course Card Animations and Interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to course cards
+    const courseCards = document.querySelectorAll('.elementary-course-card.enhanced');
+    
+    courseCards.forEach(card => {
+        // Add entrance animation
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, Math.random() * 300);
+        
+        // Add hover effects
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+        });
     });
-    </script>
+    
+    // Animate progress bars
+    const progressBars = document.querySelectorAll('.progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+    
+    // Add click animations to buttons
+    const courseButtons = document.querySelectorAll('.course-button');
+    courseButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    });
+});
+</script>
     
     {{#default}}
         <div class="default-dashboard">
