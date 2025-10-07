@@ -88,7 +88,11 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['teacher_stats'] = theme_remui_kids_get_teacher_dashboard_stats();
         $templatecontext['teacher_courses'] = theme_remui_kids_get_teacher_courses();
         $templatecontext['teacher_students'] = theme_remui_kids_get_teacher_students();
-        $templatecontext['teacher_assignments'] = theme_remui_kids_get_teacher_assignments();
+        
+        // New Advanced Analytics - Replace Recent Students and Recent Assignments
+        $templatecontext['class_performance'] = theme_remui_kids_get_class_performance_overview();
+        $templatecontext['student_insights'] = theme_remui_kids_get_student_insights();
+        $templatecontext['assignment_analytics'] = theme_remui_kids_get_assignment_analytics();
         
         // Top Courses (real data, with mock fallback for layout preview)
         $templatecontext['top_courses'] = theme_remui_kids_get_top_courses_by_enrollment(5);
@@ -337,6 +341,15 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
                 ['id' => 0, 'name' => 'Lab Report #2', 'course_name' => 'Science Basics', 'course_id' => 0, 'due_date' => 'Nov 18, 2025', 'submission_count' => 18, 'graded_count' => 10, 'status' => 'due_soon', 'url' => '#'],
                 ['id' => 0, 'name' => 'Unit Test', 'course_name' => 'Mathematics 101', 'course_id' => 0, 'due_date' => 'Nov 10, 2025', 'submission_count' => 22, 'graded_count' => 22, 'status' => 'overdue', 'url' => '#']
             ];
+        }
+
+        // Calendar Events (REAL Moodle data ONLY - NO mock fallback)
+        $templatecontext['calendar_events'] = theme_remui_kids_get_teacher_calendar();
+        
+        if (empty($templatecontext['calendar_events'])) {
+            error_log("No calendar events found in Moodle database");
+        } else {
+            error_log("Loaded " . count($templatecontext['calendar_events']) . " real calendar events from Moodle");
         }
 
         // Grades overview fallback

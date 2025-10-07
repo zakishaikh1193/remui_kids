@@ -567,82 +567,117 @@
                 </div>
             </div>
 
-            <!-- Recent Students -->
-            <div class="content-card students-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fa fa-users"></i>
-                        <span>Recent Students</span>
-                    </div>
-                    <a href="{{config.wwwroot}}/user/index.php" class="btn-link">View All</a>
+            <!-- Class Performance Overview -->
+            <div class="content-card performance-card-pro">
+                <div class="card-header-pro">
+                    <h3 class="card-title-pro">
+                        <i class="fa fa-chart-line"></i>
+                        Class Performance Overview
+                    </h3>
+                    <a href="{{config.wwwroot}}/grade/report/grader/index.php" class="btn-view-gradebook">
+                        View Gradebook
+                    </a>
                 </div>
-                <div class="card-content">
-                    <div class="students-list">
-                        {{#teacher_students}}
-                        <div class="student-item">
-                            <div class="student-avatar">
-                                <img src="{{avatar_url}}" alt="{{name}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                <div class="card-content-pro">
+                    <div class="metrics-grid-pro">
+                        {{#class_performance}}
+                        <div class="metric-box-pro">
+                            <div class="metric-icon-pro">
+                                <i class="fa {{icon}}"></i>
                             </div>
-                            <div class="student-details">
-                                <div class="student-name">{{name}}</div>
-                                <div class="student-email">{{email}}</div>
-                                <div class="student-meta">
-                                    <span class="student-courses">{{course_count}} courses</span>
-                                    <span class="student-last-access">Last seen {{last_access}}</span>
+                            <div class="metric-info-pro">
+                                <div class="metric-label-pro">{{metric}}</div>
+                                <div class="metric-value-pro">{{value}}</div>
+                                <div class="metric-trend-pro">
+                                    {{#trend}}
+                                    {{trend_label}}
+                                    {{/trend}}
+                                    {{^trend}}
+                                    {{trend_label}}
+                                    {{/trend}}
                                 </div>
                             </div>
-                            <div class="student-actions">
-                                <a href="{{profile_url}}" class="btn-outline">View Profile</a>
-                            </div>
                         </div>
-                        {{/teacher_students}}
-                        {{^teacher_students}}
-                        <div class="empty-state">
-                            <i class="fa fa-users"></i>
-                            <p>No students found. Enroll students in your courses to see them here.</p>
+                        {{/class_performance}}
+                        {{^class_performance}}
+                        <div class="empty-state-pro">
+                            <i class="fa fa-chart-line"></i>
+                            <p>No performance data available. Grade assignments to see analytics.</p>
                         </div>
-                        {{/teacher_students}}
+                        {{/class_performance}}
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Assignments -->
-            <div class="content-card assignments-card">
+            <!-- Assignment Analytics -->
+            <div class="content-card analytics-card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fa fa-tasks"></i>
-                        <span>Recent Assignments</span>
+                        <i class="fa fa-clipboard-list"></i>
+                        <span>Assignment Analytics</span>
                     </div>
                     <a href="{{config.wwwroot}}/mod/assign/index.php" class="btn-link">View All</a>
                 </div>
                 <div class="card-content">
-                    <div class="assignments-list">
-                        {{#teacher_assignments}}
-                        <div class="assignment-item">
-                            <div class="assignment-icon">
-                                <i class="fa fa-tasks"></i>
+                    <div class="analytics-list">
+                        {{#assignment_analytics}}
+                        <div class="analytics-item">
+                            <div class="analytics-header">
+                                <div class="analytics-title">
+                                    <h4>{{name}}</h4>
+                                    <span class="analytics-course">{{course_shortname}}</span>
+                                </div>
+                                <span class="analytics-status status-{{status_class}}">{{status}}</span>
                             </div>
-                            <div class="assignment-details">
-                                <div class="assignment-name">{{name}}{{^name}}No Name{{/name}}</div>
-                                <div class="assignment-course">{{course_name}}{{^course_name}}No Course{{/course_name}}</div>
-                                <div class="assignment-meta">
-                                    <span class="assignment-due">Due {{due_date}}{{^due_date}}No Date{{/due_date}}</span>
-                                    <span class="assignment-submissions">{{submission_count}}{{^submission_count}}0{{/submission_count}} submissions</span>
-                                    <span class="assignment-graded">{{graded_count}}{{^graded_count}}0{{/graded_count}} graded</span>
+                            <div class="analytics-stats">
+                                <div class="stat-group">
+                                    <div class="stat-item">
+                                        <i class="fa fa-users"></i>
+                                        <span>{{total_students}} students</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fa fa-paper-plane"></i>
+                                        <span>{{submitted_count}} submitted</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fa fa-check"></i>
+                                        <span>{{graded_count}} graded</span>
+                                    </div>
+                                </div>
+                                <div class="progress-group">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-label">
+                                            <span>Submission Rate: {{submission_rate}}%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{submission_rate}}%; background-color: #10b981;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-label">
+                                            <span>Grading Progress: {{grading_progress}}%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{grading_progress}}%; background-color: #3b82f6;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="analytics-actions">
+                                    <span class="avg-grade">Avg: {{avg_grade}}%</span>
+                                    {{#pending_grading}}
+                                    <span class="pending-badge">{{pending_grading}} pending</span>
+                                    {{/pending_grading}}
+                                    <a href="{{url}}" class="btn-primary">View Details</a>
                                 </div>
                             </div>
-                            <div class="assignment-status">
-                                <span class="status-badge status-{{status}}{{^status}}pending{{/status}}">{{status}}{{^status}}pending{{/status}}</span>
-                                <a href="{{url}}{{^url}}#{{/url}}" class="btn-primary">Grade</a>
-                            </div>
                         </div>
-                        {{/teacher_assignments}}
-                        {{^teacher_assignments}}
+                        {{/assignment_analytics}}
+                        {{^assignment_analytics}}
                         <div class="empty-state">
-                            <i class="fa fa-tasks"></i>
-                            <p>No assignments found. Create assignments in your courses to see them here.</p>
+                            <i class="fa fa-clipboard-list"></i>
+                            <p>No assignment analytics available. Create and grade assignments to see data.</p>
                         </div>
-                        {{/teacher_assignments}}
+                        {{/assignment_analytics}}
                     </div>
                 </div>
             </div>
@@ -752,6 +787,98 @@
                             <p>No questions available</p>
                         </div>
                         {{/student_questions}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Insights and Calendar Section -->
+        <div class="insights-calendar-grid">
+            <!-- Student Insights -->
+            <div class="content-card insights-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-lightbulb"></i>
+                        <span>Student Insights</span>
+                    </div>
+                    <a href="{{config.wwwroot}}/report/progress/index.php" class="btn-link">View Reports</a>
+                </div>
+                <div class="card-content">
+                    <div class="insights-list">
+                        {{#student_insights}}
+                        <div class="insight-item" onclick="window.location.href='{{config.wwwroot}}/theme/remui_kids/pages/student_overview.php?id={{id}}'" style="cursor: pointer;">
+                            <div class="insight-student">
+                                <img src="{{avatar_url}}" alt="{{student_name}}" class="insight-avatar" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                                <div class="insight-info">
+                                    <div class="insight-name">{{student_name}}</div>
+                                    <div class="insight-category {{category_class}}">{{category}}</div>
+                                </div>
+                            </div>
+                            <div class="insight-metrics">
+                                <div class="insight-grade">{{avg_grade}}%</div>
+                                <div class="insight-activities">{{completed_activities}} activities</div>
+                                <div class="insight-last-active">{{last_activity}}</div>
+                            </div>
+                            <div class="insight-message">
+                                <i class="fa fa-info-circle"></i>
+                                <span>{{insight}}</span>
+                            </div>
+                            <div class="insight-actions">
+                                <a href="{{profile_url}}" class="btn-outline">View Profile</a>
+                            </div>
+                        </div>
+                        {{/student_insights}}
+                        {{^student_insights}}
+                        <div class="empty-state">
+                            <i class="fa fa-lightbulb"></i>
+                            <p>No student insights available. Grade assignments to generate insights.</p>
+                        </div>
+                        {{/student_insights}}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Events -->
+            <div class="content-card calendar-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-calendar-alt"></i>
+                        <span>Upcoming Events</span>
+                    </div>
+                    <a href="{{config.wwwroot}}/calendar/view.php" class="btn-link">View Calendar</a>
+                </div>
+                <div class="card-content">
+                    <div class="calendar-list">
+                        {{#calendar_events}}
+                        <div class="calendar-event {{#is_urgent}}urgent{{/is_urgent}} {{#is_today}}today{{/is_today}}">
+                            <div class="event-date-box">
+                                <div class="month">{{month_name}}</div>
+                                <div class="day">{{day_num}}</div>
+                                <div class="weekday">{{day_name}}</div>
+                            </div>
+                            <div class="event-details">
+                                <h4 class="event-name">{{name}}</h4>
+                                <div class="event-meta">
+                                    <span class="event-type" style="background-color: {{event_color}};">
+                                        <i class="fa {{event_icon}}"></i>
+                                        {{event_type}}
+                                    </span>
+                                    <span class="event-course">{{course_name}}</span>
+                                </div>
+                                <p class="event-description">{{description}}</p>
+                                <div class="event-time">
+                                    <i class="fa fa-clock"></i>
+                                    {{event_time}} • {{time_until}}
+                                </div>
+                            </div>
+                        </div>
+                        {{/calendar_events}}
+                        {{^calendar_events}}
+                        <div class="empty-state">
+                            <i class="fa fa-calendar-alt"></i>
+                            <p>No upcoming events in the next 30 days</p>
+                        </div>
+                        {{/calendar_events}}
                     </div>
                 </div>
             </div>

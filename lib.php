@@ -4318,3 +4318,1038 @@ function theme_remui_kids_get_section_activities($course, $sectionnum) {
         ];
     }
 }
+
+/**
+ * Get teacher's attendance records
+ *
+ * @return array Array of attendance data
+ */
+function theme_remui_kids_get_teacher_attendance() {
+    global $DB, $USER, $CFG;
+    
+    try {
+        // Get courses the teacher teaches
+        $courses = enrol_get_my_courses($USER->id, 'fullname', 0, [], true);
+        
+        if (empty($courses)) {
+            return [];
+        }
+        
+        $attendance_data = [];
+        
+        // Check if attendance module is installed
+        $attendance_exists = $DB->record_exists('modules', ['name' => 'attendance']);
+        
+        if ($attendance_exists) {
+            foreach ($courses as $course) {
+                // Get course category (can represent grade/class)
+                $category = $DB->get_record('course_categories', ['id' => $course->category]);
+                $grade_class = $category ? $category->name : 'General';
+                
+                // Get attendance instances for this course
+                $sql = "SELECT att.id, att.name, att.course
+                        FROM {attendance} att
+                        WHERE att.course = :courseid";
+                
+                $attendances = $DB->get_records_sql($sql, ['courseid' => $course->id]);
+                
+                foreach ($attendances as $attendance) {
+                    // Get recent sessions with detailed statistics
+                    $sessions_sql = "SELECT ats.id, ats.sessdate, ats.duration, ats.description,
+                                           ats.groupid, ats.lasttaken
+                                    FROM {attendance_sessions} ats
+                                    WHERE ats.attendanceid = :attendanceid
+                                    AND ats.sessdate <= :now
+                                    ORDER BY ats.sessdate DESC
+                                    LIMIT 10";
+                    
+                    $sessions = $DB->get_records_sql($sessions_sql, [
+                        'attendanceid' => $attendance->id,
+                        'now' => time()
+                    ]);
+                    
+                    foreach ($sessions as $session) {
+                        // Get all students enrolled in the course
+                        $enrolled_students_sql = "SELECT COUNT(DISTINCT ue.userid) as total
+                                                 FROM {user_enrolments} ue
+                                                 JOIN {enrol} e ON ue.enrolid = e.id
+                                                 JOIN {user} u ON ue.userid = u.id
+                                                 WHERE e.courseid = :courseid
+                                                 AND ue.status = 0
+                                                 AND u.deleted = 0";
+                        
+                        $enrolled_result = $DB->get_record_sql($enrolled_students_sql, ['courseid' => $course->id]);
+                        $total_enrolled = $enrolled_result ? (int)$enrolled_result->total : 0;
+                        
+                        // Get attendance logs for this session
+                        $logs_sql = "SELECT atl.id, atl.studentid, atl.statusid, atl.remarks,
+                                           atst.acronym, atst.description as status_desc, atst.grade
+                                    FROM {attendance_log} atl
+                                    JOIN {attendance_statuses} atst ON atl.statusid = atst.id
+                                    WHERE atl.sessionid = :sessionid";
+                        
+                        $logs = $DB->get_records_sql($logs_sql, ['sessionid' => $session->id]);
+                        
+                        // Count different statuses
+                        $present_count = 0;
+                        $absent_count = 0;
+                        $late_count = 0;
+                        $excused_count = 0;
+                        
+                        foreach ($logs as $log) {
+                            switch (strtoupper($log->acronym)) {
+                                case 'P': // Present
+                                    $present_count++;
+                                    break;
+                                case 'A': // Absent
+                                    $absent_count++;
+                                    break;
+                                case 'L': // Late
+                                    $late_count++;
+                                    break;
+                                case 'E': // Excused
+                                    $excused_count++;
+                                    break;
+                            }
+                        }
+                        
+                        // Use enrolled students if no logs yet
+                        $total_students = max(count($logs), $total_enrolled);
+                        $total_students = $total_students > 0 ? $total_students : 1;
+                        
+                        // Calculate attendance rate
+                        $attendance_rate = round(($present_count / $total_students) * 100, 1);
+                        
+                        // Get group name if session is for a specific group
+                        $group_name = '';
+                        if ($session->groupid > 0) {
+                            $group = $DB->get_record('groups', ['id' => $session->groupid]);
+                            $group_name = $group ? $group->name : '';
+                        }
+                        
+                        $attendance_data[] = [
+                            'id' => $session->id,
+                            'course_id' => $course->id,
+                            'course_name' => $course->fullname,
+                            'course_shortname' => $course->shortname,
+                            'subject' => $course->fullname, // Subject name
+                            'grade_class' => $grade_class, // Grade/Class from category
+                            'group_name' => $group_name, // Specific class/group
+                            'session_name' => $attendance->name,
+                            'session_date' => date('M d, Y', $session->sessdate),
+                            'session_time' => date('h:i A', $session->sessdate),
+                            'session_timestamp' => $session->sessdate,
+                            'description' => $session->description ?: 'Regular session',
+                            'duration' => $session->duration ? round($session->duration / 60) . ' min' : 'N/A',
+                            'last_taken' => $session->lasttaken ? date('M d, Y h:i A', $session->lasttaken) : 'Not taken yet',
+                            'total_students' => $total_students,
+                            'total_enrolled' => $total_enrolled,
+                            'present_count' => $present_count,
+                            'absent_count' => $absent_count,
+                            'late_count' => $late_count,
+                            'excused_count' => $excused_count,
+                            'not_marked' => max(0, $total_enrolled - count($logs)),
+                            'attendance_rate' => $attendance_rate,
+                            'status_class' => $attendance_rate >= 80 ? 'excellent' : ($attendance_rate >= 60 ? 'good' : 'poor'),
+                            'url' => new moodle_url('/mod/attendance/view.php', ['id' => $attendance->id])
+                        ];
+                    }
+                }
+            }
+        }
+        
+        // If no attendance module data, try to get from logs
+        if (empty($attendance_data)) {
+            // Get attendance from course access logs as fallback
+            foreach ($courses as $course) {
+                $category = $DB->get_record('course_categories', ['id' => $course->category]);
+                $grade_class = $category ? $category->name : 'General';
+                
+                // Get recent course access by students
+                $access_sql = "SELECT DATE(FROM_UNIXTIME(l.timecreated)) as access_date,
+                                     COUNT(DISTINCT l.userid) as student_count
+                              FROM {logstore_standard_log} l
+                              JOIN {user_enrolments} ue ON l.userid = ue.userid
+                              JOIN {enrol} e ON ue.enrolid = e.id
+                              WHERE e.courseid = :courseid
+                              AND l.courseid = :courseid2
+                              AND l.action = 'viewed'
+                              AND l.timecreated > :since
+                              GROUP BY DATE(FROM_UNIXTIME(l.timecreated))
+                              ORDER BY l.timecreated DESC
+                              LIMIT 5";
+                
+                $accesses = $DB->get_records_sql($access_sql, [
+                    'courseid' => $course->id,
+                    'courseid2' => $course->id,
+                    'since' => time() - (30 * 24 * 60 * 60)
+                ]);
+                
+                // Get total enrolled students
+                $enrolled_sql = "SELECT COUNT(DISTINCT ue.userid) as total
+                                FROM {user_enrolments} ue
+                                JOIN {enrol} e ON ue.enrolid = e.id
+                                WHERE e.courseid = :courseid
+                                AND ue.status = 0";
+                
+                $enrolled_result = $DB->get_record_sql($enrolled_sql, ['courseid' => $course->id]);
+                $total_enrolled = $enrolled_result ? (int)$enrolled_result->total : 0;
+                
+                foreach ($accesses as $access) {
+                    $active_count = (int)$access->student_count;
+                    $total_students = max($active_count, $total_enrolled);
+                    $total_students = $total_students > 0 ? $total_students : 1;
+                    
+                    $attendance_rate = round(($active_count / $total_students) * 100, 1);
+                    
+                    $attendance_data[] = [
+                        'id' => 0,
+                        'course_id' => $course->id,
+                        'course_name' => $course->fullname,
+                        'course_shortname' => $course->shortname,
+                        'subject' => $course->fullname,
+                        'grade_class' => $grade_class,
+                        'group_name' => '',
+                        'session_name' => 'Course Access',
+                        'session_date' => date('M d, Y', strtotime($access->access_date)),
+                        'session_time' => '12:00 PM',
+                        'session_timestamp' => strtotime($access->access_date),
+                        'description' => 'Based on course access logs',
+                        'duration' => 'N/A',
+                        'last_taken' => 'Auto-tracked',
+                        'total_students' => $total_students,
+                        'total_enrolled' => $total_enrolled,
+                        'present_count' => $active_count,
+                        'absent_count' => max(0, $total_students - $active_count),
+                        'late_count' => 0,
+                        'excused_count' => 0,
+                        'not_marked' => 0,
+                        'attendance_rate' => $attendance_rate,
+                        'status_class' => $attendance_rate >= 80 ? 'excellent' : ($attendance_rate >= 60 ? 'good' : 'poor'),
+                        'url' => new moodle_url('/course/view.php', ['id' => $course->id])
+                    ];
+                }
+            }
+        }
+        
+        // Sort by date (most recent first)
+        usort($attendance_data, function($a, $b) {
+            return $b['session_timestamp'] - $a['session_timestamp'];
+        });
+        
+        // Return top 15 most recent
+        return array_slice($attendance_data, 0, 15);
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_teacher_attendance: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get teacher's upcoming calendar events
+ *
+ * @return array Array of calendar events
+ */
+function theme_remui_kids_get_teacher_calendar() {
+    global $DB, $USER, $CFG;
+    
+    try {
+        error_log("=== FETCHING CALENDAR EVENTS FOR TEACHER ID: " . $USER->id . " ===");
+        
+        // Get courses the teacher teaches
+        $courses = enrol_get_my_courses($USER->id, 'fullname', 0, [], true);
+        
+        if (empty($courses)) {
+            error_log("Teacher has NO courses - cannot fetch calendar events");
+            return [];
+        }
+        
+        error_log("Teacher has " . count($courses) . " courses");
+        foreach ($courses as $course) {
+            error_log("  - Course ID: " . $course->id . " - " . $course->fullname);
+        }
+        
+        $course_ids = array_keys($courses);
+        list($insql, $params) = $DB->get_in_or_equal($course_ids, SQL_PARAMS_NAMED);
+        
+        $now = time();
+        $next_30_days = $now + (30 * 24 * 60 * 60);
+        
+        $params['now'] = $now;
+        $params['future'] = $next_30_days;
+        $params['userid'] = $USER->id;
+        
+        error_log("Searching for events between " . date('Y-m-d', $now) . " and " . date('Y-m-d', $next_30_days));
+        
+        // Get calendar events from IOMAD/Moodle database
+        $sql = "SELECT e.id, e.name, e.description, e.eventtype, e.timestart, e.timeduration,
+                       e.courseid, c.fullname as course_name
+                FROM {event} e
+                LEFT JOIN {course} c ON e.courseid = c.id
+                WHERE (e.courseid $insql OR e.userid = :userid)
+                AND e.timestart BETWEEN :now AND :future
+                AND e.visible = 1
+                ORDER BY e.timestart ASC
+                LIMIT 15";
+        
+        error_log("Executing SQL query for calendar events...");
+        $events = $DB->get_records_sql($sql, $params);
+        
+        if (empty($events)) {
+            error_log("NO CALENDAR EVENTS FOUND in Moodle database for the next 30 days");
+            error_log("This means:");
+            error_log("  1. No assignments with due dates");
+            error_log("  2. No quiz close dates");
+            error_log("  3. No course events added to calendar");
+            error_log("  4. No personal events for this teacher");
+            return [];
+        }
+        
+        error_log("Found " . count($events) . " REAL calendar events from IOMAD/Moodle database:");
+        
+        $calendar_data = [];
+        
+        foreach ($events as $event) {
+            $event_date = date('Y-m-d', $event->timestart);
+            $event_time = date('h:i A', $event->timestart);
+            $day_name = date('l', $event->timestart);
+            $day_num = date('d', $event->timestart);
+            $month_name = date('M', $event->timestart);
+            
+            // Determine event type and icon
+            $event_type_info = [
+                'due' => ['icon' => 'fa-clipboard-check', 'color' => '#ef4444', 'label' => 'Assignment Due'],
+                'close' => ['icon' => 'fa-clock', 'color' => '#f59e0b', 'label' => 'Closes'],
+                'open' => ['icon' => 'fa-folder-open', 'color' => '#10b981', 'label' => 'Opens'],
+                'user' => ['icon' => 'fa-user', 'color' => '#6366f1', 'label' => 'Personal'],
+                'course' => ['icon' => 'fa-book', 'color' => '#3b82f6', 'label' => 'Course Event'],
+                'site' => ['icon' => 'fa-globe', 'color' => '#8b5cf6', 'label' => 'Site Event']
+            ];
+            
+            $type_key = $event->eventtype ?: 'course';
+            $type_info = $event_type_info[$type_key] ?? $event_type_info['course'];
+            
+            // Calculate time until event
+            $time_diff = $event->timestart - $now;
+            $days_until = floor($time_diff / (24 * 60 * 60));
+            $hours_until = floor($time_diff / (60 * 60));
+            
+            if ($days_until > 0) {
+                $time_until = $days_until . ' day' . ($days_until > 1 ? 's' : '');
+            } else if ($hours_until > 0) {
+                $time_until = $hours_until . ' hour' . ($hours_until > 1 ? 's' : '');
+            } else {
+                $time_until = 'Soon';
+            }
+            
+            $calendar_data[] = [
+                'id' => $event->id,
+                'name' => $event->name,
+                'description' => strip_tags($event->description),
+                'course_name' => $event->course_name ?: 'Personal',
+                'event_type' => $type_info['label'],
+                'event_icon' => $type_info['icon'],
+                'event_color' => $type_info['color'],
+                'event_date' => $event_date,
+                'event_time' => $event_time,
+                'day_name' => $day_name,
+                'day_num' => $day_num,
+                'month_name' => $month_name,
+                'time_until' => $time_until,
+                'is_today' => date('Y-m-d', $event->timestart) == date('Y-m-d', $now),
+                'is_urgent' => $days_until <= 2,
+                'timestamp' => $event->timestart
+            ];
+            
+            // Debug log each event
+            error_log("  Event #" . $event->id . ": " . $event->name . 
+                     " | Type: " . $type_info['label'] . 
+                     " | Course: " . ($event->course_name ?: 'Personal') . 
+                     " | Date: " . $event_date . " " . $event_time .
+                     " | Time until: " . $time_until);
+        }
+        
+        error_log("=== RETURNING " . count($calendar_data) . " REAL CALENDAR EVENTS ===");
+        return $calendar_data;
+        
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_teacher_calendar: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get per-student overview data for Student Overview page
+ * Returns structure with overall, counts, engagement, upcoming classes, courses, assignments, quizzes
+ */
+function theme_remui_kids_get_student_overview(int $studentid) {
+    global $DB, $USER;
+
+    try {
+        // Courses student is enrolled in
+        $courses = enrol_get_users_courses($studentid, true, ['id','fullname','shortname','visible','startdate']);
+        if (!is_array($courses)) {
+            $courses = [];
+        }
+
+        $courseids = array_map(function($c){ return $c->id; }, $courses);
+
+        $totalcourses = count($courseids);
+
+        // Completed courses (based on course_completions)
+        $completed = 0;
+        if (!empty($courseids)) {
+            list($insql, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+            $params['userid'] = $studentid;
+            $completed = (int)$DB->get_field_sql(
+                "SELECT COUNT(1) FROM {course_completions} cc WHERE cc.userid = :userid AND cc.timecompleted IS NOT NULL AND cc.course {$insql}",
+                $params
+            );
+        }
+
+        // Overall completion percent proxy
+        $overallpercent = ($totalcourses > 0) ? round(($completed / $totalcourses) * 100) : 0;
+
+        // Hours spent proxy: number of log entries / 120 (rough proxy) hours
+        $hours = 0;
+        if (!empty($courseids)) {
+            list($insqll, $lparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'c');
+            $lparams['userid'] = $studentid;
+            $logcount = (int)$DB->get_field_sql(
+                "SELECT COUNT(1) FROM {logstore_standard_log} l WHERE l.userid = :userid AND l.courseid {$insqll}",
+                $lparams
+            );
+            $hours = round($logcount / 120); // conservative proxy
+        }
+
+        // Engagement: live classes attended (fallback to 0), quiz attempts, assignments submitted
+        $quizattempts = 0; $assignmentsdone = 0; $livepercent = 0;
+        if (!empty($courseids)) {
+            list($cinsql, $cparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'q');
+            $cparams['userid'] = $studentid;
+            $quizattempts = (int)$DB->get_field_sql(
+                "SELECT COUNT(1) FROM {quiz_attempts} qa JOIN {quiz} q ON qa.quiz = q.id WHERE qa.userid = :userid AND q.course {$cinsql}",
+                $cparams
+            );
+            $assignmentsdone = (int)$DB->get_field_sql(
+                "SELECT COUNT(DISTINCT asub.assignment) FROM {assign_submission} asub JOIN {assign} a ON a.id = asub.assignment WHERE asub.userid = :userid AND a.course {$cinsql} AND asub.status = 'submitted'",
+                $cparams
+            );
+            // If attendance module exists, compute simple percent for last 30 days
+            if ($DB->record_exists('modules', ['name' => 'attendance'])) {
+                $since = time() - (30 * 24 * 60 * 60);
+                $attended = (int)$DB->get_field_sql(
+                    "SELECT COUNT(1) FROM {attendance_log} al JOIN {attendance_sessions} s ON s.id = al.sessionid WHERE al.studentid = :userid AND s.sessdate > :since",
+                    ['userid' => $studentid, 'since' => $since]
+                );
+                $sessions = (int)$DB->get_field_sql(
+                    "SELECT COUNT(1) FROM {attendance_sessions} s JOIN {attendance} a ON a.id = s.attendanceid WHERE s.sessdate > :since",
+                    ['since' => $since]
+                );
+                $livepercent = $sessions > 0 ? round(($attended / $sessions) * 100) : 0;
+            }
+        }
+
+        // Upcoming classes from calendar events (within 7 days)
+        $upcoming = [];
+        if (!empty($courseids)) {
+            list($einsql, $eparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+            $now = time();
+            $soon = $now + (7 * 24 * 60 * 60);
+            $eparams['now'] = $now; $eparams['soon'] = $soon;
+            $events = $DB->get_records_sql(
+                "SELECT e.*, c.fullname as coursename FROM {event} e LEFT JOIN {course} c ON c.id = e.courseid WHERE e.courseid {$einsql} AND e.timestart BETWEEN :now AND :soon AND e.visible = 1 ORDER BY e.timestart ASC LIMIT 6",
+                $eparams
+            );
+            foreach ($events as $ev) {
+                $upcoming[] = [
+                    'title' => $ev->name,
+                    'course' => $ev->coursename ?: 'Course',
+                    'date_label' => userdate($ev->timestart, '%d %b %Y, %I:%M %p'),
+                    'url' => new moodle_url('/calendar/view.php', ['view' => 'day', 'time' => $ev->timestart])
+                ];
+            }
+        }
+
+        // Courses table with progress and score proxies
+        $coursesout = [];
+        foreach ($courses as $c) {
+            // Progress proxy: completed module count / total modules with completion
+            $totalmods = (int)$DB->get_field_sql("SELECT COUNT(1) FROM {course_modules} cm WHERE cm.course = ? AND cm.completion = 1 AND cm.visible = 1", [$c->id]);
+            $completedmods = (int)$DB->get_field_sql(
+                "SELECT COUNT(DISTINCT cmc.coursemoduleid) FROM {course_modules_completion} cmc JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid WHERE cm.course = ? AND cmc.userid = ? AND cmc.completionstate = 1",
+                [$c->id, $studentid]
+            );
+            $progress = $totalmods > 0 ? round(($completedmods / $totalmods) * 100) : 0;
+            // Overall score proxy: average of graded items
+            $avg = (float)$DB->get_field_sql(
+                "SELECT AVG((gg.finalgrade/NULLIF(gi.grademax,0))*100) FROM {grade_grades} gg JOIN {grade_items} gi ON gi.id = gg.itemid WHERE gi.courseid = ? AND gg.userid = ? AND gg.finalgrade IS NOT NULL AND gi.grademax > 0",
+                [$c->id, $studentid]
+            );
+            $statuslabel = $progress >= 100 ? 'Completed' : ($progress > 0 ? 'In progress' : 'Not started');
+            $statusclass = $progress >= 100 ? 'completed' : ($progress > 0 ? 'inprogress' : 'notstarted');
+            $coursesout[] = [
+                'id' => $c->id,
+                'name' => $c->fullname,
+                'url' => new moodle_url('/course/view.php', ['id' => $c->id]),
+                'progress' => $progress,
+                'overall_score' => round($avg ?: 0),
+                'status_label' => $statuslabel,
+                'status_class' => $statusclass
+            ];
+        }
+
+        // Assignments (upcoming or due soon for student)
+        $assignsout = [];
+        if (!empty($courseids)) {
+            list($ainsql, $aparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+            $rows = $DB->get_records_sql(
+                "SELECT a.id, a.name, a.duedate, c.fullname coursename FROM {assign} a JOIN {course} c ON c.id = a.course WHERE a.course {$ainsql} ORDER BY a.duedate ASC LIMIT 6",
+                $aparams
+            );
+            foreach ($rows as $r) {
+                $assignsout[] = [
+                    'name' => $r->name,
+                    'course' => $r->coursename,
+                    'due' => $r->duedate ? userdate($r->duedate, '%d %b %Y, %I:%M %p') : 'No due date',
+                    'url' => new moodle_url('/mod/assign/index.php', ['id' => $r->id])
+                ];
+            }
+        }
+
+        // Quizzes pending (simple list)
+        $quizzesout = [];
+        if (!empty($courseids)) {
+            list($qinsql, $qparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+            $rows = $DB->get_records_sql(
+                "SELECT q.id, q.name, c.fullname coursename FROM {quiz} q JOIN {course} c ON c.id = q.course WHERE q.course {$qinsql} ORDER BY q.timeopen ASC LIMIT 6",
+                $qparams
+            );
+            foreach ($rows as $r) {
+                $quizzesout[] = [
+                    'name' => $r->name,
+                    'course' => $r->coursename,
+                    'meta' => 'Quiz',
+                    'url' => new moodle_url('/mod/quiz/view.php', ['id' => $r->id])
+                ];
+            }
+        }
+
+        return [
+            'overall' => ['percent' => $overallpercent],
+            'overview_counts' => [
+                'total_courses' => $totalcourses,
+                'completed_courses' => $completed,
+                'hours_spent' => $hours . 'h'
+            ],
+            'engagement' => [
+                'live_classes_percent' => $livepercent,
+                'quiz_attempts' => $quizattempts,
+                'assignments_done' => $assignmentsdone
+            ],
+            'upcoming_classes' => $upcoming,
+            'courses' => $coursesout,
+            'assignments' => $assignsout,
+            'quizzes' => $quizzesout,
+            'streak' => ['summary' => 'Engagement streak data unavailable']
+        ];
+
+    } catch (Exception $e) {
+        // Minimal safe defaults
+        return [
+            'overall' => ['percent' => 0],
+            'overview_counts' => ['total_courses' => 0, 'completed_courses' => 0, 'hours_spent' => '0h'],
+            'engagement' => ['live_classes_percent' => 0, 'quiz_attempts' => 0, 'assignments_done' => 0],
+            'upcoming_classes' => [],
+            'courses' => [],
+            'assignments' => [],
+            'quizzes' => [],
+            'streak' => ['summary' => '']
+        ];
+    }
+}
+
+/**
+ * Get comprehensive class performance overview with trends and analytics
+ *
+ * @return array Class performance data
+ */
+function theme_remui_kids_get_class_performance_overview() {
+    global $DB, $USER;
+    
+    try {
+        // Get teacher's courses
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid as courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $ids = array_map(function($r) { return $r->courseid; }, $courseids);
+        if (empty($ids)) {
+            return [];
+        }
+
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'c');
+
+        // Calculate overall class performance metrics
+        $performance = [];
+
+        // 1. Overall Average Grade
+        $avg_grade_sql = "SELECT AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg_grade
+                          FROM {grade_grades} gg
+                          JOIN {grade_items} gi ON gg.itemid = gi.id
+                          WHERE gi.courseid {$coursesql}
+                          AND gg.finalgrade IS NOT NULL
+                          AND gg.rawgrademax > 0";
+        $avg_grade = $DB->get_field_sql($avg_grade_sql, $courseparams) ?: 0;
+
+        // 2. Course Completion Rate
+        $completion_sql = "SELECT 
+                              COUNT(DISTINCT CASE WHEN cc.timecompleted IS NOT NULL THEN ue.userid END) as completed,
+                              COUNT(DISTINCT ue.userid) as total
+                           FROM {user_enrolments} ue
+                           JOIN {enrol} e ON ue.enrolid = e.id
+                           LEFT JOIN {course_completions} cc ON cc.userid = ue.userid AND cc.course = e.courseid
+                           WHERE e.courseid {$coursesql}";
+        $completion_data = $DB->get_record_sql($completion_sql, $courseparams);
+        $completion_rate = $completion_data->total > 0 ? round(($completion_data->completed / $completion_data->total) * 100, 1) : 0;
+
+        // 3. Engagement Score (based on recent activity)
+        $engagement_sql = "SELECT COUNT(DISTINCT l.userid) as active_students,
+                                  COUNT(DISTINCT ue.userid) as total_students
+                           FROM {user_enrolments} ue
+                           JOIN {enrol} e ON ue.enrolid = e.id
+                           LEFT JOIN {logstore_standard_log} l ON l.userid = ue.userid 
+                               AND l.courseid = e.courseid 
+                               AND l.timecreated > :active_since
+                           WHERE e.courseid {$coursesql}";
+        $courseparams['active_since'] = time() - (7 * 24 * 60 * 60); // Last 7 days
+        $engagement_data = $DB->get_record_sql($engagement_sql, $courseparams);
+        $engagement_score = $engagement_data->total_students > 0 ? 
+            round(($engagement_data->active_students / $engagement_data->total_students) * 100, 1) : 0;
+
+        // 4. Assignment Submission Rate
+        $assignment_sql = "SELECT 
+                              COUNT(DISTINCT CASE WHEN asub.status = 'submitted' THEN asub.id END) as submitted,
+                              COUNT(DISTINCT a.id) * COUNT(DISTINCT ue.userid) as total_expected
+                           FROM {assign} a
+                           JOIN {user_enrolments} ue ON ue.enrolid IN (
+                               SELECT e.id FROM {enrol} e WHERE e.courseid = a.course
+                           )
+                           LEFT JOIN {assign_submission} asub ON asub.assignment = a.id AND asub.userid = ue.userid
+                           WHERE a.course {$coursesql}";
+        $assignment_data = $DB->get_record_sql($assignment_sql, $courseparams);
+        $submission_rate = $assignment_data->total_expected > 0 ? 
+            round(($assignment_data->submitted / $assignment_data->total_expected) * 100, 1) : 0;
+
+        // 5. Performance Trends (last 30 days vs previous 30 days)
+        $now = time();
+        $last_30_start = $now - (30 * 24 * 60 * 60);
+        $prev_30_start = $now - (60 * 24 * 60 * 60);
+
+        // Current period average
+        $current_avg_sql = "SELECT AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg
+                            FROM {grade_grades} gg
+                            JOIN {grade_items} gi ON gg.itemid = gi.id
+                            WHERE gi.courseid {$coursesql}
+                            AND gg.timemodified >= :current_start
+                            AND gg.finalgrade IS NOT NULL
+                            AND gg.rawgrademax > 0";
+        $courseparams['current_start'] = $last_30_start;
+        $current_avg = $DB->get_field_sql($current_avg_sql, $courseparams) ?: 0;
+
+        // Previous period average
+        $prev_avg_sql = "SELECT AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg
+                         FROM {grade_grades} gg
+                         JOIN {grade_items} gi ON gg.itemid = gi.id
+                         WHERE gi.courseid {$coursesql}
+                         AND gg.timemodified >= :prev_start
+                         AND gg.timemodified < :prev_end
+                         AND gg.finalgrade IS NOT NULL
+                         AND gg.rawgrademax > 0";
+        $courseparams['prev_start'] = $prev_30_start;
+        $courseparams['prev_end'] = $last_30_start;
+        $prev_avg = $DB->get_field_sql($prev_avg_sql, $courseparams) ?: 0;
+
+        $grade_trend = $prev_avg > 0 ? round($current_avg - $prev_avg, 1) : 0;
+
+        // 6. Grade Distribution
+        $grade_dist_sql = "SELECT 
+                              COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 >= 90 THEN 1 END) as a_grade,
+                              COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 >= 80 AND (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 < 90 THEN 1 END) as b_grade,
+                              COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 >= 70 AND (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 < 80 THEN 1 END) as c_grade,
+                              COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 >= 60 AND (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 < 70 THEN 1 END) as d_grade,
+                              COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 < 60 THEN 1 END) as f_grade
+                           FROM {grade_grades} gg
+                           JOIN {grade_items} gi ON gg.itemid = gi.id
+                           WHERE gi.courseid {$coursesql}
+                           AND gg.finalgrade IS NOT NULL
+                           AND gg.rawgrademax > 0";
+        $grade_dist = $DB->get_record_sql($grade_dist_sql, $courseparams);
+
+        // 7. At-Risk Students (grade < 70% or no activity in 7 days)
+        $at_risk_sql = "SELECT COUNT(DISTINCT u.id) as at_risk_count
+                        FROM {user} u
+                        JOIN {user_enrolments} ue ON ue.userid = u.id
+                        JOIN {enrol} e ON ue.enrolid = e.id
+                        LEFT JOIN {grade_grades} gg ON gg.userid = u.id
+                        LEFT JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid = e.courseid
+                        LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = e.courseid AND l.timecreated > :inactive_since
+                        WHERE e.courseid {$coursesql}
+                        AND u.deleted = 0
+                        AND (
+                            (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 < 70
+                            OR l.id IS NULL
+                        )";
+        $courseparams['inactive_since'] = time() - (7 * 24 * 60 * 60);
+        $at_risk_count = $DB->get_field_sql($at_risk_sql, $courseparams) ?: 0;
+
+        return [[
+            'metric' => 'Average Class Grade',
+            'value' => round($avg_grade, 1) . '%',
+            'trend' => $grade_trend,
+            'trend_label' => $grade_trend > 0 ? '+' . $grade_trend . '%' : $grade_trend . '%',
+            'trend_positive' => $grade_trend >= 0,
+            'icon' => 'fa-chart-line',
+            'color' => '#3b82f6'
+        ], [
+            'metric' => 'Course Completion',
+            'value' => $completion_rate . '%',
+            'trend' => 0,
+            'trend_label' => $completion_data->completed . '/' . $completion_data->total . ' students',
+            'trend_positive' => true,
+            'icon' => 'fa-check-circle',
+            'color' => '#10b981'
+        ], [
+            'metric' => 'Student Engagement',
+            'value' => $engagement_score . '%',
+            'trend' => 0,
+            'trend_label' => $engagement_data->active_students . ' active (7 days)',
+            'trend_positive' => $engagement_score >= 70,
+            'icon' => 'fa-users',
+            'color' => '#8b5cf6'
+        ], [
+            'metric' => 'Assignment Submission',
+            'value' => $submission_rate . '%',
+            'trend' => 0,
+            'trend_label' => $assignment_data->submitted . ' submitted',
+            'trend_positive' => $submission_rate >= 75,
+            'icon' => 'fa-file-alt',
+            'color' => '#f59e0b'
+        ], [
+            'metric' => 'Grade Distribution',
+            'value' => 'A: ' . ($grade_dist->a_grade ?: 0) . ' | B: ' . ($grade_dist->b_grade ?: 0) . ' | C: ' . ($grade_dist->c_grade ?: 0),
+            'trend' => 0,
+            'trend_label' => 'D: ' . ($grade_dist->d_grade ?: 0) . ' | F: ' . ($grade_dist->f_grade ?: 0),
+            'trend_positive' => true,
+            'icon' => 'fa-chart-pie',
+            'color' => '#ec4899'
+        ], [
+            'metric' => 'At-Risk Students',
+            'value' => $at_risk_count,
+            'trend' => 0,
+            'trend_label' => 'Require attention',
+            'trend_positive' => $at_risk_count == 0,
+            'icon' => 'fa-exclamation-triangle',
+            'color' => '#ef4444'
+        ]];
+
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_class_performance_overview: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get detailed student insights with performance and engagement analytics
+ *
+ * @return array Student insights data
+ */
+function theme_remui_kids_get_student_insights() {
+    global $DB, $USER;
+    
+    try {
+        // Get teacher's courses
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid as courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $ids = array_map(function($r) { return $r->courseid; }, $courseids);
+        if (empty($ids)) {
+            return [];
+        }
+
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'c');
+
+        // Get top performers
+        $top_performers_sql = "SELECT u.id, u.firstname, u.lastname,
+                                      AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg_grade,
+                                      COUNT(DISTINCT cmc.coursemoduleid) as completed_activities,
+                                      MAX(l.timecreated) as last_activity
+                               FROM {user} u
+                               JOIN {user_enrolments} ue ON ue.userid = u.id
+                               JOIN {enrol} e ON ue.enrolid = e.id
+                               LEFT JOIN {grade_grades} gg ON gg.userid = u.id
+                               LEFT JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid = e.courseid
+                               LEFT JOIN {course_modules_completion} cmc ON cmc.userid = u.id
+                               LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = e.courseid
+                               WHERE e.courseid {$coursesql}
+                               AND u.deleted = 0
+                               AND gg.finalgrade IS NOT NULL
+                               AND gg.rawgrademax > 0
+                               GROUP BY u.id, u.firstname, u.lastname
+                               HAVING avg_grade >= 80
+                               ORDER BY avg_grade DESC
+                               LIMIT 5";
+        $top_performers = $DB->get_records_sql($top_performers_sql, $courseparams);
+
+        // Get struggling students
+        $struggling_sql = "SELECT u.id, u.firstname, u.lastname,
+                                  AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg_grade,
+                                  COUNT(DISTINCT cmc.coursemoduleid) as completed_activities,
+                                  MAX(l.timecreated) as last_activity
+                           FROM {user} u
+                           JOIN {user_enrolments} ue ON ue.userid = u.id
+                           JOIN {enrol} e ON ue.enrolid = e.id
+                           LEFT JOIN {grade_grades} gg ON gg.userid = u.id
+                           LEFT JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid = e.courseid
+                           LEFT JOIN {course_modules_completion} cmc ON cmc.userid = u.id
+                           LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = e.courseid
+                           WHERE e.courseid {$coursesql}
+                           AND u.deleted = 0
+                           AND gg.finalgrade IS NOT NULL
+                           AND gg.rawgrademax > 0
+                           GROUP BY u.id, u.firstname, u.lastname
+                           HAVING avg_grade < 70
+                           ORDER BY avg_grade ASC
+                           LIMIT 5";
+        $struggling_students = $DB->get_records_sql($struggling_sql, $courseparams);
+
+        // Get most engaged students (by activity count)
+        $most_engaged_sql = "SELECT u.id, u.firstname, u.lastname,
+                                    COUNT(DISTINCT l.id) as activity_count,
+                                    AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg_grade,
+                                    MAX(l.timecreated) as last_activity
+                             FROM {user} u
+                             JOIN {user_enrolments} ue ON ue.userid = u.id
+                             JOIN {enrol} e ON ue.enrolid = e.id
+                             LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = e.courseid AND l.timecreated > :active_since
+                             LEFT JOIN {grade_grades} gg ON gg.userid = u.id
+                             LEFT JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid = e.courseid
+                             WHERE e.courseid {$coursesql}
+                             AND u.deleted = 0
+                             GROUP BY u.id, u.firstname, u.lastname
+                             HAVING activity_count > 0
+                             ORDER BY activity_count DESC
+                             LIMIT 5";
+        $courseparams['active_since'] = time() - (7 * 24 * 60 * 60);
+        $most_engaged = $DB->get_records_sql($most_engaged_sql, $courseparams);
+
+        $insights = [];
+
+        // Format top performers
+        foreach ($top_performers as $student) {
+            $insights[] = [
+                'id' => $student->id,
+                'student_name' => $student->firstname . ' ' . $student->lastname,
+                'category' => 'Top Performer',
+                'category_class' => 'top-performer',
+                'avg_grade' => round($student->avg_grade, 1),
+                'completed_activities' => (int)$student->completed_activities,
+                'last_activity' => $student->last_activity ? userdate($student->last_activity, '%b %e, %Y') : 'Never',
+                'last_activity_timestamp' => $student->last_activity ?: 0,
+                'insight' => 'Excellent performance - ' . round($student->avg_grade, 1) . '% average',
+                'avatar_url' => (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out(),
+                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out()
+            ];
+        }
+
+        // Format struggling students
+        foreach ($struggling_students as $student) {
+            $insights[] = [
+                'id' => $student->id,
+                'student_name' => $student->firstname . ' ' . $student->lastname,
+                'category' => 'Needs Support',
+                'category_class' => 'needs-support',
+                'avg_grade' => round($student->avg_grade, 1),
+                'completed_activities' => (int)$student->completed_activities,
+                'last_activity' => $student->last_activity ? userdate($student->last_activity, '%b %e, %Y') : 'Never',
+                'last_activity_timestamp' => $student->last_activity ?: 0,
+                'insight' => 'Below 70% - requires attention',
+                'avatar_url' => (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out(),
+                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out()
+            ];
+        }
+
+        // Format most engaged
+        foreach ($most_engaged as $student) {
+            $insights[] = [
+                'id' => $student->id,
+                'student_name' => $student->firstname . ' ' . $student->lastname,
+                'category' => 'Highly Engaged',
+                'category_class' => 'highly-engaged',
+                'avg_grade' => round($student->avg_grade ?: 0, 1),
+                'completed_activities' => (int)$student->activity_count,
+                'last_activity' => $student->last_activity ? userdate($student->last_activity, '%b %e, %Y') : 'Never',
+                'last_activity_timestamp' => $student->last_activity ?: 0,
+                'insight' => $student->activity_count . ' activities in last 7 days',
+                'avatar_url' => (new moodle_url('/user/pix.php/' . $student->id . '/f1.jpg'))->out(),
+                'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out()
+            ];
+        }
+
+        // Sort by last activity (most recent first)
+        usort($insights, function($a, $b) {
+            return $b['last_activity_timestamp'] - $a['last_activity_timestamp'];
+        });
+
+        return array_slice($insights, 0, 10);
+
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_student_insights: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Get comprehensive assignment analytics
+ *
+ * @return array Assignment analytics data
+ */
+function theme_remui_kids_get_assignment_analytics() {
+    global $DB, $USER;
+    
+    try {
+        // Get teacher's courses
+        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
+        $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
+        if (empty($roleids)) {
+            return [];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
+        $params['userid'] = $USER->id;
+        $params['ctxlevel'] = CONTEXT_COURSE;
+
+        $courseids = $DB->get_records_sql(
+            "SELECT DISTINCT ctx.instanceid as courseid
+             FROM {role_assignments} ra
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             WHERE ra.userid = :userid
+             AND ctx.contextlevel = :ctxlevel
+             AND ra.roleid {$insql}",
+            $params
+        );
+
+        $ids = array_map(function($r) { return $r->courseid; }, $courseids);
+        if (empty($ids)) {
+            return [];
+        }
+
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'c');
+
+        // Get assignment statistics
+        $assignment_sql = "SELECT a.id, a.name, a.duedate, a.grade as maxgrade,
+                                  c.fullname as course_name, c.shortname,
+                                  COUNT(DISTINCT ue.userid) as total_students,
+                                  COUNT(DISTINCT CASE WHEN asub.status = 'submitted' THEN asub.userid END) as submitted_count,
+                                  COUNT(DISTINCT CASE WHEN ag.grade IS NOT NULL THEN ag.userid END) as graded_count,
+                                  AVG(CASE WHEN ag.grade IS NOT NULL THEN (ag.grade / NULLIF(a.grade, 0)) * 100 END) as avg_grade
+                           FROM {assign} a
+                           JOIN {course} c ON a.course = c.id
+                           JOIN {enrol} e ON e.courseid = c.id
+                           JOIN {user_enrolments} ue ON ue.enrolid = e.id
+                           LEFT JOIN {assign_submission} asub ON asub.assignment = a.id AND asub.userid = ue.userid
+                           LEFT JOIN {assign_grades} ag ON ag.assignment = a.id AND ag.userid = ue.userid
+                           WHERE c.id {$coursesql}
+                           GROUP BY a.id, a.name, a.duedate, a.grade, c.fullname, c.shortname
+                           ORDER BY a.duedate DESC
+                           LIMIT 10";
+
+        $assignments = $DB->get_records_sql($assignment_sql, $courseparams);
+
+        $analytics = [];
+        $now = time();
+
+        foreach ($assignments as $assign) {
+            $submission_rate = $assign->total_students > 0 ? 
+                round(($assign->submitted_count / $assign->total_students) * 100, 1) : 0;
+            
+            $grading_progress = $assign->submitted_count > 0 ? 
+                round(($assign->graded_count / $assign->submitted_count) * 100, 1) : 0;
+
+            // Determine status
+            $status = 'active';
+            $status_class = 'active';
+            if ($assign->duedate && $assign->duedate < $now) {
+                $status = 'overdue';
+                $status_class = 'overdue';
+            } else if ($assign->duedate && $assign->duedate < ($now + 86400)) {
+                $status = 'due-soon';
+                $status_class = 'due-soon';
+            }
+
+            if ($grading_progress == 100) {
+                $status = 'completed';
+                $status_class = 'completed';
+            }
+
+            $analytics[] = [
+                'id' => $assign->id,
+                'name' => $assign->name,
+                'course_name' => $assign->course_name,
+                'course_shortname' => $assign->shortname,
+                'due_date' => $assign->duedate ? userdate($assign->duedate, '%b %e, %Y') : 'No due date',
+                'due_timestamp' => $assign->duedate ?: 0,
+                'total_students' => (int)$assign->total_students,
+                'submitted_count' => (int)$assign->submitted_count,
+                'graded_count' => (int)$assign->graded_count,
+                'pending_grading' => (int)$assign->submitted_count - (int)$assign->graded_count,
+                'submission_rate' => $submission_rate,
+                'grading_progress' => $grading_progress,
+                'avg_grade' => round($assign->avg_grade ?: 0, 1),
+                'status' => $status,
+                'status_class' => $status_class,
+                'url' => (new moodle_url('/mod/assign/view.php', ['id' => $assign->id]))->out()
+            ];
+        }
+
+        return $analytics;
+
+    } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_assignment_analytics: " . $e->getMessage());
+        return [];
+    }
+}
