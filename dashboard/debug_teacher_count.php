@@ -70,7 +70,7 @@ try {
     echo "<h3>3. Looking for Teacher-like Roles</h3>";
     
     $teacher_like_roles = $DB->get_records_sql(
-        "SELECT * FROM {role} WHERE shortname LIKE '%teacher%' OR shortname LIKE '%instructor%' OR shortname LIKE '%trainer%' OR shortname LIKE '%educator%'",
+        "SELECT * FROM {role} WHERE shortname LIKE '%teacher%' OR shortname LIKE '%instructor%' OR shortname LIKE '%educator%'",
         []
     );
     

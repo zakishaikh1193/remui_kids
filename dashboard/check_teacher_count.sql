@@ -30,8 +30,7 @@ SELECT
     description
 FROM mdl_role 
 WHERE shortname LIKE '%teacher%' 
-   OR shortname LIKE '%instructor%' 
-   OR shortname LIKE '%trainer%' 
+   OR shortname LIKE '%instructor%'
    OR shortname LIKE '%educator%'
 ORDER BY shortname;
 

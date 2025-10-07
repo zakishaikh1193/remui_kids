@@ -304,7 +304,7 @@ function theme_remui_kids_get_course_header_data($course) {
     $courseimage = theme_remui_kids_get_course_image($course);
     
     // Get enrolled students count (users with 'trainee' role)
-    $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
+    $traineerole = $DB->get_record('role', ['shortname' => 'student']);
     $enrolledstudentscount = 0;
     if ($traineerole) {
         $enrolledstudentscount = $DB->count_records_sql(
@@ -318,7 +318,9 @@ function theme_remui_kids_get_course_header_data($course) {
     }
     
     // Get teachers count (users with 'teacher' or 'editingteacher' role)
-    $teacherroles = $DB->get_records_list('role', 'shortname', ['teacher', 'editingteacher']);
+    $teacherroles = $DB->count_records_sql(
+        "SELECT * FROM {role} WHERE shortname IN ('editingteacher', 'teacher')"
+    );
     $teacherscount = 0;
     $teacherslist = [];
     
@@ -1147,7 +1149,7 @@ function theme_remui_kids_get_admin_dashboard_stats() {
         // If no meaningful categories found, fall back to all visible categories
         if ($totalschools == 0) {
             $totalschools = $DB->count_records_sql(
-                "SELECT COUNT(*) FROM {course_categories} WHERE visible = 1 AND id > 1",
+                "SELECT COUNT(*) FROM {course_categories} WHERE visible = 1 AND id > 1 ",
                 []
             );
         }
@@ -1158,17 +1160,16 @@ function theme_remui_kids_get_admin_dashboard_stats() {
             []
         );
         
-        // Get total students - using trainee role for consistency with enrollment system
-        $traineerole = $DB->get_record('role', ['shortname' => 'trainee']);
+        // Get total students with 'student' role
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         $totalstudents = 0;
-        if ($traineerole) {
-
+        if ($studentrole) {
             $totalstudents = $DB->count_records_sql(
                 "SELECT COUNT(DISTINCT u.id) 
                  FROM {user} u 
                  JOIN {role_assignments} ra ON u.id = ra.userid 
                  JOIN {role} r ON ra.roleid = r.id 
-                 WHERE r.shortname = 'trainee'||'student' AND u.deleted = 0 AND u.suspended = 0"
+                 WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0"
             );
         }
         
@@ -1206,7 +1207,7 @@ function theme_remui_kids_get_admin_user_stats() {
         $totalusers = $DB->count_records('user', ['deleted' => 0]);
         
         // Get teachers count
-        $teacherrole = $DB->get_record('role', ['shortname' => 'teachers']);
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         $teachers = 0;
         if ($teacherrole) {
             $teachers = $DB->count_records_sql(
@@ -1219,17 +1220,16 @@ function theme_remui_kids_get_admin_user_stats() {
             );
         }
         
-        // Get students count - using trainee role for consistency with enrollment system
-        $traineerole = $DB->get_record('role', ['shortname' => 'trainee'||'student']);
+        // Get students count with 'student' role
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         $students = 0;
-        if ($traineerole) {
+        if ($studentrole) {
             $students = $DB->count_records_sql(
                 "SELECT COUNT(DISTINCT u.id) 
                  FROM {user} u 
                  JOIN {role_assignments} ra ON u.id = ra.userid 
                  JOIN {role} r ON ra.roleid = r.id 
-                 WHERE r.shortname = 'trainee' || 'student' AND u.deleted = 0"
-
+                 WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0"
             );
         }
         
@@ -1293,10 +1293,11 @@ function theme_remui_kids_get_admin_course_stats() {
     global $DB;
     
     try {
-        // Get total courses
-        //$totalcourses = $DB->count_records('course', ['visible' => 1]);
+        // Get total courses (exclude site course id=1 and only visible courses)
         $totalcourses = $DB->count_records_sql(
-            "SELECT COUNT(*) FROM {course} WHERE visible = 1 AND id > 1",
+            "SELECT COUNT(DISTINCT c.id)
+             FROM {course} c
+             WHERE c.visible = 1 AND c.id > 1",
             []
         );
         
@@ -1307,7 +1308,7 @@ function theme_remui_kids_get_admin_course_stats() {
         $avgrating = 0; // Will be implemented when rating system is available
         
         // Get categories count
-        $categories = $DB->count_records('course_categories', ['visible' => 1]);
+        $categories = $DB->count_records('course_categories', ['visible' => 1, 'parent' => 0]);
         
         return [
             'total_courses' => $totalcourses,
@@ -1322,6 +1323,228 @@ function theme_remui_kids_get_admin_course_stats() {
             'avg_rating' => 0,
             'categories' => 0
         ];
+    }
+}
+
+/**
+ * Get admin course categories with real statistics
+ *
+ * @return array Array containing course categories with real data
+ */
+function theme_remui_kids_get_admin_course_categories() {
+    global $DB;
+    
+    try {
+        // Fetch only MAIN categories (top-level): parent = 0, exclude system category id = 1
+        $all_categories = $DB->get_records_select(
+            'course_categories',
+            'visible = 1 AND parent = 0 AND id > 1',
+            [],
+            'sortorder ASC'
+        );
+        
+        $category_data = [];
+        foreach ($all_categories as $category) {
+            // Count courses under this MAIN category including all its subcategories
+            // We leverage the path column to include descendants: '/1/3' or '/1/3/8' etc.
+            $course_count = $DB->count_records_sql(
+                "SELECT COUNT(c.id)
+                 FROM {course} c
+                 JOIN {course_categories} sub ON sub.id = c.category
+                 WHERE c.visible = 1 AND c.id > 1
+                   AND (sub.id = ? OR sub.path LIKE ?)
+                ",
+                [$category->id, '%/' . $category->id . '/%']
+            );
+            
+            // Count distinct enrolled users across all courses under this MAIN category (and its subcategories)
+            $enrollment_count = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT ue.userid)
+                 FROM {course} c
+                 JOIN {course_categories} sub ON sub.id = c.category
+                 JOIN {enrol} e ON c.id = e.courseid
+                 JOIN {user_enrolments} ue ON e.id = ue.enrolid
+                 WHERE c.visible = 1 AND c.id > 1
+                   AND (sub.id = ? OR sub.path LIKE ?)
+                ",
+                [$category->id, '%/' . $category->id . '/%']
+            );
+            
+            $category_data[] = [
+                'id' => $category->id,
+                'name' => $category->name,
+                'description' => $category->description,
+                'course_count' => (int)$course_count,
+                'enrollment_count' => (int)$enrollment_count,
+                'completion_rate' => 0.0 // Simplified for now
+            ];
+        }
+        
+        return $category_data;
+        
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get admin student activity statistics
+ *
+ * @return array Array containing student activity statistics
+ */
+function theme_remui_kids_get_admin_student_activity_stats() {
+    global $DB;
+    
+    try {
+        // Get total students with 'student' role
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $total_students = 0;
+        if ($studentrole) {
+            $total_students = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0"
+            );
+        }
+        
+        // Get active students (logged in within last 30 days) with 'student' role
+        $active_students = 0;
+        if ($studentrole) {
+            $active_students = $DB->count_records_sql(
+                "SELECT COUNT(DISTINCT u.id) 
+                 FROM {user} u 
+                 JOIN {role_assignments} ra ON u.id = ra.userid 
+                 JOIN {role} r ON ra.roleid = r.id 
+                 JOIN {user_lastaccess} ul ON u.id = ul.userid 
+                 WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0 
+                 AND ul.timeaccess > ?",
+                [time() - (30 * 24 * 60 * 60)] // Last 30 days
+            );
+        }
+        
+        // Calculate average activity level based on course completions and logins
+        $avg_activity_level = 0;
+        if ($studentrole && $total_students > 0) {
+            // Get average course completions per student
+            $avg_completions = $DB->get_field_sql(
+                "SELECT AVG(completion_count) 
+                 FROM (
+                     SELECT COUNT(cmc.id) as completion_count
+                     FROM {user} u 
+                     JOIN {role_assignments} ra ON u.id = ra.userid 
+                     JOIN {role} r ON ra.roleid = r.id 
+                     JOIN {course_modules_completion} cmc ON u.id = cmc.userid
+                     WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0
+                     GROUP BY u.id
+                 ) as student_completions"
+            );
+            
+            // Get average logins per student in last 30 days
+            $avg_logins = $DB->get_field_sql(
+                "SELECT AVG(login_count) 
+                 FROM (
+                     SELECT COUNT(ul.id) as login_count
+                     FROM {user} u 
+                     JOIN {role_assignments} ra ON u.id = ra.userid 
+                     JOIN {role} r ON ra.roleid = r.id 
+                     JOIN {user_lastaccess} ul ON u.id = ul.userid 
+                     WHERE r.shortname = 'student' AND u.deleted = 0 AND u.suspended = 0 
+                     AND ul.timeaccess > ?
+                     GROUP BY u.id
+                 ) as student_logins",
+                [time() - (30 * 24 * 60 * 60)]
+            );
+            
+            // Calculate activity level (0-5 scale)
+            $completion_score = min(($avg_completions ?: 0) / 10, 3); // Max 3 points for completions
+            $login_score = min(($avg_logins ?: 0) / 5, 2); // Max 2 points for logins
+            $avg_activity_level = round($completion_score + $login_score, 1);
+        }
+        
+        return [
+            'total_students' => (int)$total_students,
+            'active_students' => (int)$active_students,
+            'avg_activity_level' => (float)$avg_activity_level
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'total_students' => 0,
+            'active_students' => 0,
+            'avg_activity_level' => 0.0
+        ];
+    }
+}
+
+/**
+ * Get recent student enrollments with activity snapshot
+ *
+ * Returns up to 5 most recently enrolled users (any enrol plugin), including:
+ * - name, role shortname
+ * - total courses enrolled
+ * - login count (from standard log)
+ * - active/inactive status based on last access in 30 days
+ */
+function theme_remui_kids_get_recent_student_enrollments(): array {
+    global $DB;
+
+    try {
+        // Pull recent enrolments and basic aggregates per user
+        $records = $DB->get_records_sql(
+            "SELECT 
+                u.id as userid,
+                u.firstname,
+                u.lastname,
+                COALESCE(r.shortname, 'student') as role_shortname,
+                MAX(ue.timecreated) as last_enrolled,
+                COUNT(DISTINCT CASE WHEN e.status = 0 AND ue.status = 0 THEN e.courseid END) as courses
+             FROM {user} u
+             JOIN {user_enrolments} ue ON ue.userid = u.id
+             JOIN {enrol} e ON e.id = ue.enrolid
+             LEFT JOIN {role_assignments} ra ON ra.userid = u.id
+             LEFT JOIN {role} r ON r.id = ra.roleid
+             WHERE u.deleted = 0
+             GROUP BY u.id, u.firstname, u.lastname, r.shortname
+             ORDER BY last_enrolled DESC",
+            [], 0, 5
+        );
+
+        $enrollments = [];
+        $now = time();
+        $activeThreshold = $now - (30 * 24 * 60 * 60);
+
+        foreach ($records as $rec) {
+            // Determine active status from user_lastaccess (any course)
+            $lastaccess = $DB->get_field_sql(
+                "SELECT MAX(ul.timeaccess) FROM {user_lastaccess} ul WHERE ul.userid = ?",
+                [$rec->userid]
+            );
+
+            $isactive = ($lastaccess && (int)$lastaccess > $activeThreshold);
+
+            // Count login events (standard log)
+            $logins = (int)$DB->get_field_sql(
+                "SELECT COUNT(1) FROM {logstore_standard_log} l 
+                 WHERE l.userid = ? AND l.eventname = ?",
+                [$rec->userid, '\\core\\event\\user_loggedin']
+            );
+
+            $enrollments[] = [
+                'name' => trim($rec->firstname . ' ' . $rec->lastname) ?: 'User ' . $rec->userid,
+                'role' => $rec->role_shortname ?: 'student',
+                'status' => $isactive ? 'Active' : 'Inactive',
+                'status_class' => $isactive ? 'active' : 'inactive',
+                'logins' => $logins,
+                'courses' => (int)$rec->courses,
+            ];
+        }
+
+        return $enrollments;
+
+    } catch (Exception $e) {
+        return [];
     }
 }
 

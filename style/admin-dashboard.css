@@ -353,3 +353,66 @@
 .admin-stats-activity-container .section-header p {
     margin: 4px 0 0 0;
 }
+
+/* View All button for enrollments */
+.admin-student-enrollments-section .section-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+}
+
+.admin-student-enrollments-section .section-header-left {
+    flex: 1 !important;
+}
+
+.admin-student-enrollments-section .section-header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    margin-top: 0 !important;
+}
+
+.admin-student-enrollments-section .section-header .view-all-btn {
+    margin-top: 0 !important;
+    align-self: flex-start !important;
+}
+
+.view-all-btn {
+    margin-left: auto;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6c757d;
+    text-decoration: none;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #f8d7da 0%, #d1ecf1 100%);
+    border: 1px solid #e2e3e5;
+    box-shadow: 0 4px 12px rgba(248, 215, 218, 0.4);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.view-all-btn .btn-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(600px circle at var(--x) var(--y), rgba(255,255,255,0.25), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.view-all-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(248, 215, 218, 0.6);
+    background: linear-gradient(135deg, #f1b0b7 0%, #bee5eb 100%);
+    color: #5a6c7d;
+    border-color: #d6d8db;
+}
+
+.view-all-btn:hover .btn-glow { opacity: 1; }
+
+.view-all-btn i { font-size: 13px; }

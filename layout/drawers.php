@@ -41,6 +41,9 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['admin_stats'] = theme_remui_kids_get_admin_dashboard_stats();
         $templatecontext['admin_user_stats'] = theme_remui_kids_get_admin_user_stats();
         $templatecontext['admin_course_stats'] = theme_remui_kids_get_admin_course_stats();
+        $templatecontext['admin_course_categories'] = theme_remui_kids_get_admin_course_categories();
+        $templatecontext['student_enrollments'] = theme_remui_kids_get_recent_student_enrollments();
+        $templatecontext['admin_student_activity_stats'] = theme_remui_kids_get_admin_student_activity_stats();
         $templatecontext['admin_recent_activity'] = theme_remui_kids_get_admin_recent_activity();
         
         // Must be called before rendering the template.

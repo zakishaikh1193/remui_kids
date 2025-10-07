@@ -8184,41 +8184,72 @@ body:has(.admin-sidebar-wrapper) {
         
         .section-header {
             margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
             
-            .section-title {
-                font-size: 24px;
-                font-weight: 700;
-                color: #2c3e50;
-                margin: 0 0 8px 0;
+            .section-header-left {
+                flex: 1;
+                
+                .section-title {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #2c3e50;
+                    margin: 0 0 8px 0;
+                }
+                
+                .section-subtitle {
+                    font-size: 14px;
+                    color: #7f8c8d;
+                    margin: 0;
+                    line-height: 1.4;
+                }
             }
             
-            .section-subtitle {
-                font-size: 14px;
-                color: #7f8c8d;
-                margin: 0 0 12px 0;
-                line-height: 1.4;
-            }
-            
-            .live-indicator {
+            .section-header-right {
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 15px;
+                margin-top: 0;
                 
-                .live-dot {
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
+                .live-indicator {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
                     
-                    &.purple {
-                        background-color: #9b59b6;
-                        animation: pulse 2s infinite;
+                    .live-dot {
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        
+                        &.purple {
+                            background-color: #d1b3e6;
+                            animation: pulse 2s infinite;
+                        }
+                    }
+                    
+                    .live-text {
+                        font-size: 12px;
+                        color: #d1b3e6;
+                        font-weight: 500;
                     }
                 }
                 
-                .live-text {
-                    font-size: 12px;
-                    color: #9b59b6;
-                    font-weight: 500;
+                .view-all-btn {
+                    margin-top: 0;
+                    align-self: flex-start;
+                    background: linear-gradient(135deg, #f8d7da 0%, #d1ecf1 100%) !important;
+                    color: #6c757d !important;
+                    border: 1px solid #e2e3e5 !important;
+                    box-shadow: 0 4px 12px rgba(248, 215, 218, 0.4) !important;
+                    
+                    &:hover {
+                        background: linear-gradient(135deg, #f1b0b7 0%, #bee5eb 100%) !important;
+                        color: #5a6c7d !important;
+                        border-color: #d6d8db !important;
+                        box-shadow: 0 8px 20px rgba(248, 215, 218, 0.6) !important;
+                    }
                 }
             }
         }
