@@ -16,7 +16,11 @@ try {
 
     // Get teacher course ids
     $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
-    $roleids = $teacherroles ? array_keys($teacherroles) : [];
+    if (!is_array($teacherroles)) {
+        error_log("Teacher roles query returned non-array: " . gettype($teacherroles));
+        $teacherroles = [];
+    }
+    $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
     if (empty($roleids)) {
         echo json_encode(['total' => 0, 'pages' => 0, 'page' => $page, 'students' => []]);
         exit;

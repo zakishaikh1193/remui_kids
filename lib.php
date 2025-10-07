@@ -324,7 +324,7 @@ function theme_remui_kids_get_course_header_data($course) {
     $teacherscount = 0;
     $teacherslist = [];
     
-    if (!empty($teacherroles)) {
+    if (!empty($teacherroles) && is_array($teacherroles)) {
         $teacherroleids = array_keys($teacherroles);
         $teacherscount = $DB->count_records_sql(
             "SELECT COUNT(DISTINCT u.id) 
@@ -1754,6 +1754,10 @@ function theme_remui_kids_get_calendar_week_data($userid) {
     
     // Get user's enrolled courses
     $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    if (!is_array($courses)) {
+        error_log("enrol_get_my_courses returned non-array: " . gettype($courses));
+        $courses = [];
+    }
     $courseids = (is_array($courses) && !empty($courses)) ? array_keys($courses) : [];
     
     // Get calendar events using Moodle's built-in function
@@ -1813,6 +1817,10 @@ function theme_remui_kids_get_upcoming_events($userid) {
     
     // Get user's enrolled courses
     $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
+    if (!is_array($courses)) {
+        error_log("enrol_get_my_courses returned non-array: " . gettype($courses));
+        $courses = [];
+    }
     $courseids = (is_array($courses) && !empty($courses)) ? array_keys($courses) : [];
     
     // Get calendar events using Moodle's built-in function
@@ -2592,9 +2600,29 @@ function theme_remui_kids_get_teacher_dashboard_stats() {
     global $DB, $USER;
 
     try {
+        // Check if database connection is valid
+        if (!$DB || !is_object($DB)) {
+            error_log("Database connection is invalid");
+            return [
+                'total_courses' => 0,
+                'total_students' => 0,
+                'pending_assignments' => 0,
+                'upcoming_classes' => 0,
+                'last_updated' => date('Y-m-d H:i:s')
+            ];
+        }
         // Determine teacher role ids
         $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
-        $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
+        if (!is_array($teacherroles)) {
+            error_log("Teacher roles query returned non-array: " . gettype($teacherroles));
+            $teacherroles = [];
+        }
+        try {
+            $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
+        } catch (Exception $e) {
+            error_log("Error in array_keys for teacher roles: " . $e->getMessage() . " - teacherroles type: " . gettype($teacherroles));
+            $roleids = [];
+        }
 
         if (empty($roleids)) {
             return [

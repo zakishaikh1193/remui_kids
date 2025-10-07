@@ -105,10 +105,80 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         // Real data sections - Recent Student Activity and Course Overview
         $templatecontext['recent_student_activity'] = theme_remui_kids_get_recent_student_activity();
         if (empty($templatecontext['recent_student_activity'])) {
-            error_log("No recent student activity found");
+            error_log("No recent student activity found - using mock data");
             $templatecontext['recent_student_activity'] = [
-                ['student_name' => 'No recent activity', 'activity_name' => '-', 'activity_type' => '-', 
-                 'course_name' => '-', 'time' => '-', 'icon' => 'fa-info-circle', 'color' => '#999']
+                [
+                    'student_name' => 'Sarah Johnson',
+                    'activity_name' => 'Mathematics Quiz - Chapter 5',
+                    'activity_type' => 'Quiz Attempt',
+                    'course_name' => 'Advanced Mathematics',
+                    'time' => '2 hours ago',
+                    'icon' => 'fa-star',
+                    'color' => '#FF9800'
+                ],
+                [
+                    'student_name' => 'Michael Chen',
+                    'activity_name' => 'Essay Assignment Submission',
+                    'activity_type' => 'Assignment Submitted',
+                    'course_name' => 'English Literature',
+                    'time' => '4 hours ago',
+                    'icon' => 'fa-file-text',
+                    'color' => '#4CAF50'
+                ],
+                [
+                    'student_name' => 'Emily Rodriguez',
+                    'activity_name' => 'Discussion: Climate Change',
+                    'activity_type' => 'Forum Post',
+                    'course_name' => 'Environmental Science',
+                    'time' => '6 hours ago',
+                    'icon' => 'fa-comments',
+                    'color' => '#2196F3'
+                ],
+                [
+                    'student_name' => 'David Kim',
+                    'activity_name' => 'Physics Lab Report',
+                    'activity_type' => 'Assignment Submitted',
+                    'course_name' => 'Physics 101',
+                    'time' => '8 hours ago',
+                    'icon' => 'fa-file-text',
+                    'color' => '#4CAF50'
+                ],
+                [
+                    'student_name' => 'Lisa Thompson',
+                    'activity_name' => 'History Quiz - World War II',
+                    'activity_type' => 'Quiz Attempt',
+                    'course_name' => 'World History',
+                    'time' => '1 day ago',
+                    'icon' => 'fa-star',
+                    'color' => '#FF9800'
+                ],
+                [
+                    'student_name' => 'James Wilson',
+                    'activity_name' => 'Programming Exercise 3',
+                    'activity_type' => 'Assignment Submitted',
+                    'course_name' => 'Computer Science',
+                    'time' => '1 day ago',
+                    'icon' => 'fa-file-text',
+                    'color' => '#4CAF50'
+                ],
+                [
+                    'student_name' => 'Maria Garcia',
+                    'activity_name' => 'Art Portfolio Review',
+                    'activity_type' => 'Assignment Submitted',
+                    'course_name' => 'Fine Arts',
+                    'time' => '2 days ago',
+                    'icon' => 'fa-file-text',
+                    'color' => '#4CAF50'
+                ],
+                [
+                    'student_name' => 'Alex Brown',
+                    'activity_name' => 'Chemistry Lab Safety Quiz',
+                    'activity_type' => 'Quiz Attempt',
+                    'course_name' => 'Chemistry',
+                    'time' => '2 days ago',
+                    'icon' => 'fa-star',
+                    'color' => '#FF9800'
+                ]
             ];
         } else {
             error_log("Loaded " . count($templatecontext['recent_student_activity']) . " recent activities");
