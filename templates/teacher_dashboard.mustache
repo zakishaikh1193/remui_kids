@@ -127,6 +127,19 @@
             </ul>
         </div>
 
+        <!-- QUESTIONS Section -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-category">QUESTIONS</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/pages/questions_unified.php" class="sidebar-link">
+                        <i class="fa fa-question-circle sidebar-icon"></i>
+                        <span class="sidebar-text">Questions Management</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
         <!-- REPORTS Section -->
         <div class="sidebar-section">
             <h3 class="sidebar-category">REPORTS</h3>
@@ -159,7 +172,7 @@
     <div class="container-fluid">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
-            <div class="header-content">
+            <div class="header-content title-chip">
                 <h1 class="dashboard-title">Dashboard</h1>
                 <p class="dashboard-subtitle">Teacher Overview</p>
             </div>
@@ -402,18 +415,33 @@
                         <i class="fa fa-users"></i>
                         <span>Student Enrollment</span>
                     </div>
-                    <button class="btn-refresh" onclick="refreshStudentEnrollment()" title="Refresh">
-                        <i class="fa fa-refresh"></i>
-                    </button>
+                    <div class="card-actions">
+                        <button class="btn-refresh" onclick="refreshStudentEnrollment()" title="Refresh">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                        <button class="btn-link" onclick="addNewStudent()" title="Add Student">
+                            <i class="fa fa-user-plus"></i>
+                        </button>
+                        <button class="btn-link" onclick="manageStudents()" title="Manage Students">
+                            <i class="fa fa-users-cog"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-content">
-                    <!-- Enrollment Toolbar -->
+                    <!-- Enhanced Enrollment Toolbar -->
                     <div class="enrollment-toolbar">
-                        <div class="search-box">
-                            <input type="text" id="student-search" placeholder="Search students..." class="form-control">
-                            <i class="fa fa-search"></i>
+                        <div class="toolbar-left">
+                            <div class="search-box">
+                                <input type="text" id="student-search" placeholder="Search students..." class="form-control">
+                                <i class="fa fa-search"></i>
+                            </div>
                         </div>
-                        
+                        <div class="toolbar-right">
+                            <label class="switch-inline">
+                                <input type="checkbox" id="only-managers-toggle" onchange="filterStudents()">
+                                <span class="switch-label">Only Managers</span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Loading State -->
@@ -422,15 +450,19 @@
                         <p>Loading students...</p>
                     </div>
 
-                    <!-- Student Table -->
+                    <!-- Enhanced Student Table -->
                     <div class="enrollment-table-wrapper">
                         <table class="enrollment-table">
                             <thead>
                                 <tr>
-                                    <th class="avatar-col"></th>
-                                    <th>Name</th>
+                                    <th class="avatar-col">User Pic</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
                                     <th>Last Access</th>
-                                    <th>Courses</th>
+                                    <th>Courses Not Yet Started</th>
+                                    <th>Courses In Progress</th>
+                                    <th>Enrolled Courses</th>
+                                    <th>Finished Courses</th>
                                     <th class="actions-col">Actions</th>
                                 </tr>
                             </thead>
@@ -439,14 +471,14 @@
                                 <tr>
                                     <td class="avatar-col">
                                         <div class="student-avatar">
-                                            <img src="{{avatar_url}}" alt="{{name}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                                            <img src="{{avatar_url}}" alt="{{firstname}} {{lastname}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="student-info">
-                                            <div class="student-name">{{name}}</div>
-                                            <div class="student-email">{{email}}</div>
-                                        </div>
+                                        <div class="student-name">{{firstname}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="student-name">{{lastname}}</div>
                                     </td>
                                     <td>
                                         <div class="last-access">
@@ -455,7 +487,22 @@
                                     </td>
                                     <td>
                                         <div class="course-count">
-                                            <span class="badge">{{course_count}}</span>
+                                            <span class="badge courses-not-started">{{courses_not_started}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="course-count">
+                                            <span class="badge courses-in-progress">{{courses_in_progress}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="course-count">
+                                            <span class="badge enrolled-courses">{{enrolled_courses}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="course-count">
+                                            <span class="badge finished-courses">{{finished_courses}}</span>
                                         </div>
                                     </td>
                                     <td class="actions-col">
@@ -467,7 +514,7 @@
                                 {{/teacher_students}}
                                 {{^teacher_students}}
                                 <tr>
-                                    <td colspan="5" class="empty-state">
+                                    <td colspan="9" class="empty-state">
                                         <i class="fa fa-users"></i>
                                         <p>No students found</p>
                                     </td>
@@ -486,16 +533,18 @@
                         <p id="no-data-message-text">Enroll students in your courses to see them here.</p>
                     </div>
 
-                    <!-- Pagination -->
+                    <!-- Enhanced Pagination -->
                     <div id="enrollment-pagination" class="enrollment-pagination" style="display: none;">
                         <div class="pagination-info">
                             <span id="pagination-info-text">Showing 0 of 0 students</span>
                         </div>
                         <div class="pagination-controls">
-                            <button class="btn-pagination" id="prev-page" onclick="changePage(-1)">
+                            <button class="btn-pagination" id="prev-page" onclick="changePage(-1)" disabled>
                                 <i class="fa fa-chevron-left"></i>
                             </button>
-                            <div id="page-numbers" class="page-numbers"></div>
+                            <div id="page-numbers" class="page-numbers">
+                                <!-- Page numbers will be dynamically generated -->
+                            </div>
                             <button class="btn-pagination" id="next-page" onclick="changePage(1)">
                                 <i class="fa fa-chevron-right"></i>
                             </button>
@@ -627,64 +676,96 @@
                 </div>
             </div>
 
-            <!-- Student Feedback -->
-            <div class="content-card feedback-card">
+            <!-- Student Questions -->
+            <div class="content-card questions-card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fa fa-star"></i>
-                        <span>Student Feedback</span>
+                        <i class="fa fa-question-circle"></i>
+                        <span>Student Questions</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-link" onclick="viewAllQuestions()" title="View All Questions">
+                            <i class="fa fa-list"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="feedback-overview">
-                        <div class="rating-summary">
-                            <div class="rating-number">4.5</div>
-                            <div class="rating-stars">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star-half-alt"></i>
-                            </div>
-                            <div class="rating-count">Based on 128 reviews</div>
+                    <!-- Question Filters -->
+                    <div class="questions-toolbar">
+                        <div class="filter-group">
+                            <label class="filter-label">Sort By:</label>
+                            <select id="question-sort" class="filter-select" onchange="filterQuestions()">
+                                <option value="latest">Latest</option>
+                                <option value="oldest">Oldest</option>
+                                <option value="most_replied">Most Replied</option>
+                                <option value="unanswered">Unanswered</option>
+                            </select>
                         </div>
-                        <div class="rating-breakdown">
-                            <div class="rating-bar">
-                                <span class="rating-label">5 stars</span>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: 65%"></div>
+                        <div class="filter-group">
+                            <label class="filter-label">Filter:</label>
+                            <select id="question-filter" class="filter-select" onchange="filterQuestions()">
+                                <option value="all">All</option>
+                                <option value="grade_9">Grade 9</option>
+                                <option value="grade_10">Grade 10</option>
+                                <option value="grade_11">Grade 11</option>
+                                <option value="grade_12">Grade 12</option>
+                                <option value="mathematics">Mathematics</option>
+                                <option value="science">Science</option>
+                                <option value="english">English</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Questions List -->
+                    <div class="questions-list">
+                        {{#student_questions}}
+                        <div class="question-item" data-grade="{{grade}}" data-course="{{course}}">
+                            <div class="question-header">
+                                <h4 class="question-title">{{title}}</h4>
+                                <div class="question-meta">
+                                    <span class="question-grade">{{grade}}</span>
+                                    <span class="question-course">{{course}}</span>
                                 </div>
-                                <span class="rating-percentage">65%</span>
                             </div>
-                            <div class="rating-bar">
-                                <span class="rating-label">4 stars</span>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: 20%"></div>
+                            <div class="question-content">
+                                <p class="question-text">{{content}}</p>
+                                <div class="question-student">
+                                    <span class="student-name">{{student_name}}</span>
+                                    <span class="question-date">{{date}}</span>
                                 </div>
-                                <span class="rating-percentage">20%</span>
                             </div>
-                            <div class="rating-bar">
-                                <span class="rating-label">3 stars</span>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: 10%"></div>
+                            <div class="question-status">
+                                <span class="status-badge {{status_class}}">{{status}}</span>
+                                <div class="question-stats">
+                                    <span class="upvotes">{{upvotes}} UPVOTES</span>
+                                    <span class="replies">{{replies}} REPLIES</span>
                                 </div>
-                                <span class="rating-percentage">10%</span>
                             </div>
-                            <div class="rating-bar">
-                                <span class="rating-label">2 stars</span>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: 3%"></div>
-                                </div>
-                                <span class="rating-percentage">3%</span>
-                            </div>
-                            <div class="rating-bar">
-                                <span class="rating-label">1 star</span>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: 2%"></div>
-                                </div>
-                                <span class="rating-percentage">2%</span>
+                            <div class="question-actions">
+                                <button class="btn-action" onclick="answerQuestion({{id}})" title="Answer">
+                                    <i class="fa fa-reply"></i>
+                                </button>
+                                <button class="btn-action" onclick="startVideoCall({{id}})" title="Video Call">
+                                    <i class="fa fa-video"></i>
+                                </button>
+                                <button class="btn-action" onclick="startAudioCall({{id}})" title="Audio Call">
+                                    <i class="fa fa-phone"></i>
+                                </button>
+                                <button class="btn-action" onclick="startChat({{id}})" title="Chat">
+                                    <i class="fa fa-comments"></i>
+                                </button>
+                                <button class="btn-action" onclick="groupCall({{id}})" title="Group Call">
+                                    <i class="fa fa-users"></i>
+                                </button>
                             </div>
                         </div>
+                        {{/student_questions}}
+                        {{^student_questions}}
+                        <div class="empty-state">
+                            <i class="fa fa-question-circle"></i>
+                            <p>No questions available</p>
+                        </div>
+                        {{/student_questions}}
                     </div>
                 </div>
             </div>
@@ -1529,6 +1610,95 @@ function filterStudents() {
 
 function refreshStudentEnrollment() {
     loadStudentEnrollment();
+}
+
+// New button functions
+function addNewStudent() {
+    // Redirect to user creation page or open modal
+    window.location.href = '{{config.wwwroot}}/user/editadvanced.php?id=-1';
+}
+
+function manageStudents() {
+    // Redirect to user management page
+    window.location.href = '{{config.wwwroot}}/admin/user.php';
+}
+
+// Questions System Functions
+function refreshQuestions() {
+    // Refresh questions data
+    console.log('Refreshing questions...');
+    // Add AJAX call to refresh questions
+}
+
+function viewAllQuestions() {
+    // Redirect to unified questions page
+    window.location.href = '{{config.wwwroot}}/theme/remui_kids/pages/questions_unified.php';
+}
+
+function createNewQuestion() {
+    // Redirect to unified questions page with create tab
+    window.location.href = '{{config.wwwroot}}/theme/remui_kids/pages/questions_unified.php?tab=create';
+}
+
+function filterQuestions() {
+    const sortBy = document.getElementById('question-sort').value;
+    const filter = document.getElementById('question-filter').value;
+    
+    console.log('Filtering questions:', { sortBy, filter });
+    
+    // Filter and sort questions
+    const questionItems = document.querySelectorAll('.question-item');
+    questionItems.forEach(item => {
+        const grade = item.dataset.grade;
+        const course = item.dataset.course;
+        
+        let show = true;
+        
+        if (filter !== 'all') {
+            if (filter.startsWith('grade_')) {
+                const filterGrade = filter.replace('grade_', 'Grade ');
+                show = grade === filterGrade;
+            } else {
+                show = course.toLowerCase().includes(filter.toLowerCase());
+            }
+        }
+        
+        item.style.display = show ? 'block' : 'none';
+    });
+}
+
+function answerQuestion(questionId) {
+    // Open answer modal or redirect to answer page
+    console.log('Answering question:', questionId);
+    window.location.href = `{{config.wwwroot}}/theme/remui_kids/pages/answer_question.php?id=${questionId}`;
+}
+
+function startVideoCall(questionId) {
+    // Start video call with student
+    console.log('Starting video call for question:', questionId);
+    // Implement video call functionality
+    alert('Video call feature will be implemented');
+}
+
+function startAudioCall(questionId) {
+    // Start audio call with student
+    console.log('Starting audio call for question:', questionId);
+    // Implement audio call functionality
+    alert('Audio call feature will be implemented');
+}
+
+function startChat(questionId) {
+    // Start chat with student
+    console.log('Starting chat for question:', questionId);
+    // Implement chat functionality
+    window.location.href = `{{config.wwwroot}}/theme/remui_kids/pages/chat.php?question=${questionId}`;
+}
+
+function groupCall(questionId) {
+    // Start group call for similar questions
+    console.log('Starting group call for question:', questionId);
+    // Implement group call functionality
+    alert('Group call feature will be implemented');
 }
 
 function refreshCharts() {

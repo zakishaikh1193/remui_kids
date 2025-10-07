@@ -1,5 +1,6 @@
 <?php
 require_once('../../../config.php');
+require_once($CFG->dirroot . '/theme/remui_kids/lib.php');
 require_login();
 header('Content-Type: application/json');
 
@@ -100,6 +101,12 @@ try {
             $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
         }
         
+        // Get course progress data for this student
+        $course_progress = get_student_course_progress($s->id, $ids);
+        
+        // Debug logging for course progress
+        error_log("AJAX - Student {$s->id} ({$s->firstname} {$s->lastname}) - Course Progress: " . json_encode($course_progress));
+        
         $out[] = [
             'id' => (int)$s->id,
             'first_name' => $s->firstname,
@@ -108,6 +115,10 @@ try {
             'email' => $s->email,
             'last_access' => $s->lastaccess ? userdate($s->lastaccess, '%b %e, %Y') : 'Never',
             'course_count' => (int)$s->course_count,
+            'courses_not_started' => $course_progress['not_started'],
+            'courses_in_progress' => $course_progress['in_progress'],
+            'enrolled_courses' => $course_progress['total_enrolled'],
+            'finished_courses' => $course_progress['completed'],
             'profile_url' => (new moodle_url('/user/profile.php', ['id' => $s->id]))->out(),
             'avatar_url' => $avatar_url
         ];

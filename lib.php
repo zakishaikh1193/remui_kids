@@ -2858,12 +2858,24 @@ function theme_remui_kids_get_teacher_students() {
                 $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
             }
 
+        // Get course progress data for each student
+        $course_progress = get_student_course_progress($student->id, $courseids);
+        
+        // Debug logging for course progress
+        error_log("Student {$student->id} ({$student->firstname} {$student->lastname}) - Course Progress: " . json_encode($course_progress));
+            
             $formatted_students[] = [
                 'id' => $student->id,
                 'name' => $student->firstname . ' ' . $student->lastname,
+                'firstname' => $student->firstname,
+                'lastname' => $student->lastname,
                 'email' => $student->email,
                 'course_count' => (int)$student->course_count,
-                'enrolled_courses' => $coursenames,
+                'courses_not_started' => $course_progress['not_started'],
+                'courses_in_progress' => $course_progress['in_progress'],
+                'enrolled_courses' => $course_progress['total_enrolled'],
+                'finished_courses' => $course_progress['completed'],
+                'enrolled_courses_list' => $coursenames,
                 'last_access' => $student->lastaccess ? date('M j, Y', $student->lastaccess) : 'Never',
                 'profile_url' => (new moodle_url('/user/profile.php', ['id' => $student->id]))->out(),
                 'avatar_url' => $avatar_url
@@ -3742,5 +3754,138 @@ function theme_remui_kids_get_course_overview() {
     } catch (Exception $e) {
         error_log("Error in theme_remui_kids_get_course_overview: " . $e->getMessage());
         return [];
+    }
+}
+
+/**
+ * Get student course progress data
+ *
+ * @param int $studentid Student ID
+ * @param array $courseids Array of course IDs
+ * @return array Course progress data
+ */
+function get_student_course_progress($studentid, $courseids) {
+    global $DB;
+    
+    if (empty($courseids)) {
+        return [
+            'not_started' => 0,
+            'in_progress' => 0,
+            'total_enrolled' => 0,
+            'completed' => 0
+        ];
+    }
+    
+    try {
+        // Get total enrolled courses for this student
+        $total_enrolled = count($courseids);
+        
+        // Get course completion data with more detailed information
+        list($insql, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'course');
+        $params['userid'] = $studentid;
+        
+        // Enhanced query to get course progress with activity completion
+        try {
+            $completion_data = $DB->get_records_sql(
+                "SELECT 
+                    c.id, 
+                    c.fullname, 
+                    c.startdate,
+                    c.enddate,
+                    cc.completionstate,
+                    cc.timecompleted,
+                    (SELECT COUNT(*) FROM {course_modules} cm 
+                     WHERE cm.course = c.id AND cm.completion = 1) as total_activities,
+                    (SELECT COUNT(*) FROM {course_modules_completion} cmc 
+                     JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id 
+                     WHERE cm.course = c.id AND cmc.userid = :userid AND cmc.completionstate = 1) as completed_activities
+                 FROM {course} c
+                 LEFT JOIN {course_completions} cc ON c.id = cc.course AND cc.userid = :userid
+                 WHERE c.id $insql",
+                $params
+            );
+        } catch (Exception $e) {
+            // Fallback to simpler query if the enhanced one fails
+            error_log("Enhanced query failed, using fallback: " . $e->getMessage());
+            $completion_data = $DB->get_records_sql(
+                "SELECT c.id, c.fullname, cc.completionstate
+                 FROM {course} c
+                 LEFT JOIN {course_completions} cc ON c.id = cc.course AND cc.userid = :userid
+                 WHERE c.id $insql",
+                $params
+            );
+        }
+        
+        $not_started = 0;
+        $in_progress = 0;
+        $completed = 0;
+        
+        foreach ($completion_data as $course) {
+            // Check if course has started (considering start date)
+            $course_started = true;
+            if ($course->startdate && $course->startdate > time()) {
+                $course_started = false;
+            }
+            
+            // Check if student has any activity in the course
+            try {
+                $has_activity = $DB->record_exists_sql(
+                    "SELECT 1 FROM {log} l 
+                     WHERE l.userid = :userid AND l.courseid = :courseid 
+                     AND l.timecreated > :starttime",
+                    [
+                        'userid' => $studentid,
+                        'courseid' => $course->id,
+                        'starttime' => $course->startdate ?: (time() - (365 * 24 * 60 * 60)) // 1 year ago if no start date
+                    ]
+                );
+            } catch (Exception $e) {
+                // Fallback: assume no activity if log table query fails
+                error_log("Activity check failed for student {$studentid}, course {$course->id}: " . $e->getMessage());
+                $has_activity = false;
+            }
+            
+            if (!$course_started || (!$has_activity && $course->completionstate === null)) {
+                // Course not started or student hasn't accessed it
+                $not_started++;
+            } elseif ($course->completionstate == 1) {
+                // Course completed
+                $completed++;
+            } elseif ($course->completionstate == 0 || $course->completionstate === null) {
+                // Course in progress (enrolled but not completed)
+                // Check if there's any activity to determine if truly in progress
+                if ($has_activity || ($course->completed_activities > 0)) {
+                    $in_progress++;
+                } else {
+                    $not_started++;
+                }
+            } else {
+                // Other completion states
+                $in_progress++;
+            }
+        }
+        
+        // Ensure totals add up correctly
+        $calculated_total = $not_started + $in_progress + $completed;
+        if ($calculated_total != $total_enrolled) {
+            // Adjust not_started to match total
+            $not_started = $total_enrolled - $in_progress - $completed;
+        }
+        
+        return [
+            'not_started' => max(0, $not_started),
+            'in_progress' => max(0, $in_progress),
+            'total_enrolled' => $total_enrolled,
+            'completed' => max(0, $completed)
+        ];
+        
+    } catch (Exception $e) {
+        error_log("Error in get_student_course_progress: " . $e->getMessage());
+        return [
+            'not_started' => 0,
+            'in_progress' => 0,
+            'total_enrolled' => 0,
+            'completed' => 0
+        ];
     }
 }

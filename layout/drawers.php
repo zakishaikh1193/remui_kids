@@ -184,6 +184,114 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
             error_log("Loaded " . count($templatecontext['recent_student_activity']) . " recent activities");
         }
 
+        // Student Questions System
+        $templatecontext['student_questions'] = [
+            [
+                'id' => 1,
+                'title' => 'What wrong in this code',
+                'content' => 'I am getting an error when trying to run this JavaScript function. Can someone help me understand what is wrong?',
+                'student_name' => 'Zaki',
+                'grade' => 'Grade 9',
+                'course' => 'Mathematics',
+                'date' => '14 Apr 2025',
+                'status' => 'MENTOR REPLIED',
+                'status_class' => 'mentor-replied',
+                'upvotes' => 0,
+                'replies' => 1
+            ],
+            [
+                'id' => 2,
+                'title' => 'What wrong in this code',
+                'content' => 'I have been working on this problem for hours but cannot figure out the solution. Please help!',
+                'student_name' => 'Zaki',
+                'grade' => 'Grade 10',
+                'course' => 'Science',
+                'date' => '28 Mar 2025',
+                'status' => 'MENTOR REPLIED',
+                'status_class' => 'mentor-replied',
+                'upvotes' => 0,
+                'replies' => 1
+            ],
+            [
+                'id' => 3,
+                'title' => 'What wrong in this code',
+                'content' => 'This is a follow-up question to my previous post. I still need help with the same issue.',
+                'student_name' => 'Zaki',
+                'grade' => 'Grade 11',
+                'course' => 'English',
+                'date' => '28 Mar 2025',
+                'status' => 'MENTOR REPLIED',
+                'status_class' => 'mentor-replied',
+                'upvotes' => 0,
+                'replies' => 1
+            ],
+            [
+                'id' => 4,
+                'title' => 'Some tests are not getting passed.',
+                'content' => 'I have written several test cases but some of them are failing. Can you help me debug this issue?',
+                'student_name' => 'Sujith',
+                'grade' => 'Grade 12',
+                'course' => 'Mathematics',
+                'date' => '19 Sep 2024',
+                'status' => 'Clarified',
+                'status_class' => 'clarified',
+                'upvotes' => 1,
+                'replies' => 1
+            ],
+            [
+                'id' => 5,
+                'title' => 'CheckBox',
+                'content' => 'I need help with implementing a checkbox functionality in my web application.',
+                'student_name' => 'Daveed',
+                'grade' => 'Grade 9',
+                'course' => 'Science',
+                'date' => '16 Dec 2023',
+                'status' => 'MENTOR REPLIED',
+                'status_class' => 'mentor-replied',
+                'upvotes' => 1,
+                'replies' => 3
+            ],
+            [
+                'id' => 6,
+                'title' => 'How to solve quadratic equations?',
+                'content' => 'I am struggling with the quadratic formula. Can someone explain it step by step?',
+                'student_name' => 'Emma Wilson',
+                'grade' => 'Grade 10',
+                'course' => 'Mathematics',
+                'date' => '2 days ago',
+                'status' => 'Pending',
+                'status_class' => 'pending',
+                'upvotes' => 0,
+                'replies' => 0
+            ],
+            [
+                'id' => 7,
+                'title' => 'Physics lab experiment help',
+                'content' => 'I need assistance with the pendulum experiment. The results are not matching the expected values.',
+                'student_name' => 'Ryan Chen',
+                'grade' => 'Grade 11',
+                'course' => 'Science',
+                'date' => '1 day ago',
+                'status' => 'MENTOR REPLIED',
+                'status_class' => 'mentor-replied',
+                'upvotes' => 2,
+                'replies' => 1
+            ],
+            [
+                'id' => 8,
+                'title' => 'Essay writing structure',
+                'content' => 'Can someone help me understand the proper structure for a persuasive essay?',
+                'student_name' => 'Sophia Martinez',
+                'grade' => 'Grade 12',
+                'course' => 'English',
+                'date' => '3 days ago',
+                'status' => 'Clarified',
+                'status_class' => 'clarified',
+                'upvotes' => 1,
+                'replies' => 2
+            ]
+        ];
+
         $templatecontext['course_overview'] = theme_remui_kids_get_course_overview();
         if (empty($templatecontext['course_overview'])) {
             error_log("No courses found for overview");
