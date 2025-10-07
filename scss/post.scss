@@ -3,8 +3,6 @@
 // The parent theme styles are automatically inherited
 
 // Import dropdown fixes
-@import 'dropdown_fixes';
-
 // Import enhanced course cards
 @import 'enhanced_course_cards';
 
@@ -626,12 +624,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-// Make dropdowns more rounded
-.dropdown-menu {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
+
 
 // Make pagination more rounded
 .pagination {
