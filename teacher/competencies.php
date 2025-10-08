@@ -161,9 +161,10 @@ echo '</select>';
 echo '</div>';
 echo '</div>';
 
-// If course selected, list competencies for that course
+// If course selected, show overview table for that course
 if ($currentcourseid) {
     $course = get_course($currentcourseid);
+    $coursecontext = context_course::instance($course->id);
     echo '<div class="students-container">';
 
     // Controls
@@ -174,36 +175,134 @@ if ($currentcourseid) {
     echo '</div>';
     echo '</div>';
 
-    // Fetch course competencies
-    $sql = "SELECT c.id, c.shortname, c.idnumber, c.description
-              FROM {competency_coursecomp} cc
-              JOIN {competency} c ON c.id = cc.competencyid
-             WHERE cc.courseid = ?
-          ORDER BY c.shortname ASC";
-    $comps = $DB->get_records_sql($sql, array($currentcourseid));
+    // Fetch frameworks that have competencies linked in this course
+    $frameworks = $DB->get_records_sql(
+        "SELECT DISTINCT f.id, f.shortname, f.idnumber
+           FROM {competency_coursecomp} cc
+           JOIN {competency} c ON c.id = cc.competencyid
+           JOIN {competency_framework} f ON f.id = c.competencyframeworkid
+          WHERE cc.courseid = ?
+       ORDER BY f.shortname ASC",
+        array($currentcourseid)
+    );
 
-    echo '<div class="students-table-wrapper">';
-    echo '<table class="students-table" id="compTable">';
-    echo '<thead><tr><th>Name</th><th>ID number</th><th>Description</th><th>Actions</th></tr></thead>';
-    echo '<tbody>';
-    if (empty($comps)) {
-        echo '<tr><td colspan="4">No competencies linked to this course yet.</td></tr>';
+    // Fetch all competencies for those frameworks that are linked to this course
+    $comps = $DB->get_records_sql(
+        "SELECT DISTINCT c.id, c.shortname, c.idnumber, c.parentid, c.competencyframeworkid AS frameworkid
+           FROM {competency_coursecomp} cc
+           JOIN {competency} c ON c.id = cc.competencyid
+          WHERE cc.courseid = ?
+       ORDER BY c.sortorder, c.shortname",
+        array($currentcourseid)
+    );
+
+    // Build hierarchy: framework -> parents -> children
+    $byframework = array();
+    foreach ($frameworks as $f) { $byframework[$f->id] = array('framework' => $f, 'nodes' => array(), 'children' => array()); }
+    foreach ($comps as $c) {
+        if (!isset($byframework[$c->frameworkid])) { continue; }
+        $byframework[$c->frameworkid]['nodes'][$c->id] = $c;
+        $byframework[$c->frameworkid]['children'][$c->parentid ?? 0][] = $c->id;
+    }
+
+    // Helper to count linked activities per competency
+    $hasmodulecomp = $DB->get_manager()->table_exists('competency_modulecomp');
+    $hasactivity = $DB->get_manager()->table_exists('competency_activity');
+    $countlinked = function(int $competencyid) use ($DB, $currentcourseid, $hasmodulecomp, $hasactivity): int {
+        if ($hasmodulecomp) {
+            return (int)$DB->get_field_sql(
+                "SELECT COUNT(1) FROM {competency_modulecomp} mc JOIN {course_modules} cm ON cm.id = mc.cmid WHERE mc.competencyid = ? AND cm.course = ?",
+                array($competencyid, $currentcourseid)
+            );
+        }
+        if ($hasactivity) {
+            return (int)$DB->get_field_sql(
+                "SELECT COUNT(1) FROM {competency_activity} ca JOIN {course_modules} cm ON cm.id = ca.cmid WHERE ca.competencyid = ? AND cm.course = ?",
+                array($competencyid, $currentcourseid)
+            );
+        }
+        return 0;
+    };
+
+    // Enrolled student count once
+    $students = get_enrolled_users($coursecontext, 'moodle/course:view');
+    $numstudents = count($students);
+
+    // Render tree
+    echo '<div id="compTree" class="comp-tree">';
+    if (empty($frameworks)) {
+        echo '<div class="empty-state">No competencies linked to this course yet.</div>';
     } else {
-        foreach ($comps as $c) {
-            $manageurl = new moodle_url('/admin/tool/lp/coursecompetencies.php', array('courseid' => $currentcourseid));
-            echo '<tr data-name="' . s(strtolower($c->shortname)) . ' ' . s(strtolower($c->idnumber)) . '">';
-            echo '<td class="student-name"><div class="student-avatar">CP</div>' . format_string($c->shortname) . '</td>';
-            echo '<td class="student-email">' . s($c->idnumber) . '</td>';
-            echo '<td>' . format_text($c->description, FORMAT_HTML) . '</td>';
-            echo '<td><a class="filter-btn" href="' . $manageurl->out() . '" target="_blank">Manage</a></td>';
-            echo '</tr>';
+        foreach ($byframework as $fwid => $bundle) {
+            $f = $bundle['framework'];
+            echo '<div class="tree-framework">';
+            echo '<div class="tree-header" onclick="toggleNode(this)"><span class="caret">▶</span> ' . format_string($f->shortname) . '</div>';
+            echo '<ul class="tree-level" style="display:none">';
+
+            // Render nodes recursively starting at parentid 0/null
+            $render = function($parentid, $bundle, $render) use ($countlinked, $numstudents, $currentcourseid) {
+                $children = $bundle['children'][$parentid ?? 0] ?? array();
+                foreach ($children as $cid) {
+                    $c = $bundle['nodes'][$cid];
+                    $linked = $countlinked($c->id);
+                    echo '<li class="tree-item">';
+                    $hasgrand = !empty($bundle['children'][$c->id]);
+                    echo '<div class="tree-row"' . ($hasgrand ? ' onclick="toggleNode(this)"' : '') . '>';
+                    if ($hasgrand) { echo '<span class="caret">▶</span> '; }
+                    echo '<span class="tree-name">' . format_string($c->shortname) . '</span>';
+                    echo '<span class="tree-meta">' . $linked . ' activities · ' . $numstudents . ' students</span>';
+                    echo '<span class="tree-actions">';
+                    echo '<a href="' . new moodle_url('/theme/remui_kids/teacher/competency_details.php', array('competencyid' => $c->id, 'courseid' => $currentcourseid)) . '" class="filter-btn" title="View Details"><i class="fa fa-info-circle"></i> Details</a>';
+                    echo '<a href="' . new moodle_url('/admin/tool/lp/coursecompetencies.php', array('courseid' => $currentcourseid)) . '" target="_blank" class="filter-btn" title="Manage Competency"><i class="fa fa-cog"></i> Manage</a>';
+                    echo '</span>';
+                    echo '</div>';
+                    if ($hasgrand) {
+                        echo '<ul class="tree-level" style="display:none">';
+                        $render($c->id, $bundle, $render);
+                        echo '</ul>';
+                    }
+                    echo '</li>';
+                }
+            };
+
+            // Render top-level competencies (both parentid = 0 and parentid = null)
+            $topLevelIds = array_merge(
+                $bundle['children'][0] ?? array(),
+                $bundle['children'][null] ?? array()
+            );
+            $topLevelIds = array_unique($topLevelIds); // Remove duplicates
+            
+            foreach ($topLevelIds as $cid) {
+                $c = $bundle['nodes'][$cid];
+                $linked = $countlinked($c->id);
+                echo '<li class="tree-item">';
+                $hasgrand = !empty($bundle['children'][$c->id]);
+                echo '<div class="tree-row"' . ($hasgrand ? ' onclick="toggleNode(this)"' : '') . '>';
+                if ($hasgrand) { echo '<span class="caret">▶</span> '; }
+                echo '<span class="tree-name">' . format_string($c->shortname) . '</span>';
+                echo '<span class="tree-meta">' . $linked . ' activities · ' . $numstudents . ' students</span>';
+                echo '<span class="tree-actions">';
+                echo '<a href="' . new moodle_url('/theme/remui_kids/teacher/competency_details.php', array('competencyid' => $c->id, 'courseid' => $currentcourseid)) . '" class="filter-btn" title="View Details"><i class="fa fa-info-circle"></i> Details</a>';
+                echo '<a href="' . new moodle_url('/admin/tool/lp/coursecompetencies.php', array('courseid' => $currentcourseid)) . '" target="_blank" class="filter-btn" title="Manage Competency"><i class="fa fa-cog"></i> Manage</a>';
+                echo '</span>';
+                echo '</div>';
+                if ($hasgrand) {
+                    echo '<ul class="tree-level" style="display:none">';
+                    $render($c->id, $bundle, $render);
+                    echo '</ul>';
+                }
+                echo '</li>';
+            }
+
+            echo '</ul>';
+            echo '</div>';
         }
     }
-    echo '</tbody></table>';
     echo '</div>';
 
     echo '</div>';
 }
+
 
 echo '</div>'; // students-page-wrapper
 echo '</div>'; // teacher-main-content
@@ -233,13 +332,62 @@ window.addEventListener("resize", function() {
 
 function filterComps() {
   const term = (document.getElementById("compSearch")?.value || "").toLowerCase();
-  const rows = document.querySelectorAll("#compTable tbody tr");
-  rows.forEach(r => {
-    if (!term) { r.style.display = ""; return; }
-    const bag = (r.getAttribute("data-name") || "").toLowerCase();
-    r.style.display = bag.includes(term) ? "" : "none";
+  const frameworks = document.querySelectorAll("#compTree .tree-framework");
+  
+  if (!term) {
+    // Show all items when search is empty
+    frameworks.forEach(fw => fw.style.display = "");
+    const items = document.querySelectorAll("#compTree .tree-item");
+    items.forEach(item => item.style.display = "");
+    return;
+  }
+  
+  frameworks.forEach(function(framework) {
+    const items = framework.querySelectorAll(".tree-item .tree-name");
+    let hasMatches = false;
+    
+    items.forEach(function(span) {
+      const row = span.closest(".tree-item");
+      const txt = span.textContent.toLowerCase();
+      const matches = txt.includes(term);
+      
+      if (matches) {
+        hasMatches = true;
+        row.style.display = "";
+        // Show parent framework
+        framework.style.display = "";
+        // Expand parent levels to show this item
+        let parent = row.closest(".tree-level");
+        while (parent && parent !== framework) {
+          parent.style.display = "block";
+          const parentRow = parent.previousElementSibling;
+          if (parentRow && parentRow.querySelector(".caret")) {
+            parentRow.querySelector(".caret").textContent = "▼";
+          }
+          parent = parent.closest(".tree-level");
+        }
+      } else {
+        row.style.display = "none";
+      }
+    });
+    
+    // Hide framework if no matches
+    if (!hasMatches) {
+      framework.style.display = "none";
+    }
   });
 }
+
+function toggleNode(el) {
+  const row = el.classList.contains("tree-row") ? el : el.nextElementSibling;
+  const list = el.classList.contains("tree-row") ? el.nextElementSibling : el.parentElement.querySelector(".tree-level");
+  if (!list) return;
+  const caret = (el.querySelector && el.querySelector(".caret")) || (el.previousElementSibling && el.previousElementSibling.querySelector && el.previousElementSibling.querySelector(".caret"));
+  const isOpen = list.style.display !== "none";
+  list.style.display = isOpen ? "none" : "block";
+  if (caret) caret.textContent = isOpen ? "▶" : "▼";
+}
+
 </script>';
 
 echo $OUTPUT->footer();
