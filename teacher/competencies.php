@@ -159,6 +159,24 @@ foreach ($teachercourses as $course) {
 }
 echo '</select>';
 echo '</div>';
+
+// View Toggle Button
+echo '<div class="view-toggle-wrapper">';
+echo '<label class="view-toggle-label">View:</label>';
+echo '<div class="view-toggle">';
+echo '<input type="radio" id="view-competency" name="view-type" value="competency" checked>';
+echo '<label for="view-competency" class="toggle-option">';
+echo '<i class="fa fa-sitemap"></i>';
+echo '<span>Competency First</span>';
+echo '</label>';
+echo '<input type="radio" id="view-student" name="view-type" value="student">';
+echo '<label for="view-student" class="toggle-option">';
+echo '<i class="fa fa-users"></i>';
+echo '<span>Student First</span>';
+echo '</label>';
+echo '</div>';
+echo '</div>';
+
 echo '</div>';
 
 // If course selected, show overview table for that course
@@ -174,6 +192,99 @@ if ($currentcourseid) {
     echo '<input type="text" id="compSearch" class="search-input" placeholder="Search competencies..." onkeyup="filterComps()">';
     echo '</div>';
     echo '</div>';
+
+    // Student First View Container
+    echo '<div id="studentFirstView" class="view-content" style="display: none;">';
+    
+    // Get enrolled students
+    $students = get_enrolled_users($coursecontext, '', 0, 'u.id, u.firstname, u.lastname, u.email', 'u.lastname, u.firstname');
+    
+    if (empty($students)) {
+        echo '<div class="empty-state">';
+        echo '<div class="empty-state-icon"><i class="fa fa-users"></i></div>';
+        echo '<div class="empty-state-title">No Students Enrolled</div>';
+        echo '<div class="empty-state-text">There are no enrolled students in this course.</div>';
+        echo '</div>';
+    } else {
+        // Get all competencies linked to this course for progress calculation
+        $linkedcompetencies = $DB->get_records_sql(
+            "SELECT DISTINCT cc.competencyid
+               FROM {competency_coursecomp} cc
+              WHERE cc.courseid = ?",
+            array($currentcourseid)
+        );
+        $totalcompetencies = count($linkedcompetencies);
+        
+        echo '<div class="students-table-wrapper">';
+        echo '<table class="students-table">';
+        echo '<thead>';
+        echo '<tr>';
+        echo '<th>Student</th>';
+        echo '<th>Email</th>';
+        echo '<th>Progress</th>';
+        echo '<th>Actions</th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody>';
+        
+        foreach ($students as $student) {
+            $fullname = $student->firstname . ' ' . $student->lastname;
+            $initials = strtoupper(substr($student->firstname, 0, 1) . substr($student->lastname, 0, 1));
+            
+            // Calculate student's competency progress
+            $proficientcount = 0;
+            foreach ($linkedcompetencies as $comp) {
+                $usercomp = $DB->get_record('competency_usercompcourse', array(
+                    'userid' => $student->id,
+                    'competencyid' => $comp->competencyid,
+                    'courseid' => $currentcourseid
+                ));
+                
+                // If not found in course table, check global table as fallback
+                if (!$usercomp) {
+                    $usercomp = $DB->get_record('competency_usercomp', array(
+                        'userid' => $student->id,
+                        'competencyid' => $comp->competencyid
+                    ));
+                }
+                
+                if ($usercomp && $usercomp->proficiency) {
+                    $proficientcount++;
+                }
+            }
+            
+            echo '<tr>';
+            echo '<td class="student-name">';
+            echo '<div class="student-avatar">' . $initials . '</div>';
+            echo '<span>' . s($fullname) . '</span>';
+            echo '</td>';
+            echo '<td class="student-email">' . s($student->email) . '</td>';
+            echo '<td class="progress-cell">';
+            echo '<div class="progress-info">';
+            echo '<span class="progress-text">' . $proficientcount . ' / ' . $totalcompetencies . '</span>';
+            echo '<div class="progress-bar">';
+            $percentage = $totalcompetencies > 0 ? ($proficientcount / $totalcompetencies) * 100 : 0;
+            echo '<div class="progress-fill" style="width: ' . round($percentage, 1) . '%"></div>';
+            echo '</div>';
+            echo '</div>';
+            echo '</td>';
+            echo '<td class="student-actions">';
+            echo '<a href="' . new moodle_url('/theme/remui_kids/teacher/student_competencies.php', array('userid' => $student->id, 'courseid' => $currentcourseid)) . '" class="filter-btn">';
+            echo '<i class="fa fa-sitemap"></i> View Competencies';
+            echo '</a>';
+            echo '</td>';
+            echo '</tr>';
+        }
+        
+        echo '</tbody>';
+        echo '</table>';
+        echo '</div>';
+    }
+    
+    echo '</div>'; // end studentFirstView
+
+    // Competency First View Container
+    echo '<div id="competencyFirstView" class="view-content">';
 
     // Fetch frameworks that have competencies linked in this course
     $frameworks = $DB->get_records_sql(
@@ -300,6 +411,7 @@ if ($currentcourseid) {
     }
     echo '</div>';
 
+    echo '</div>'; // end competencyFirstView
     echo '</div>';
 }
 
@@ -387,6 +499,48 @@ function toggleNode(el) {
   list.style.display = isOpen ? "none" : "block";
   if (caret) caret.textContent = isOpen ? "▶" : "▼";
 }
+
+// View toggle functionality
+function toggleView() {
+  const competencyView = document.getElementById("competencyFirstView");
+  const studentView = document.getElementById("studentFirstView");
+  const competencyRadio = document.getElementById("view-competency");
+  const studentRadio = document.getElementById("view-student");
+  
+  if (competencyRadio.checked) {
+    competencyView.style.display = "block";
+    studentView.style.display = "none";
+    // Update search placeholder
+    const searchInput = document.getElementById("compSearch");
+    if (searchInput) {
+      searchInput.placeholder = "Search competencies...";
+    }
+  } else if (studentRadio.checked) {
+    competencyView.style.display = "none";
+    studentView.style.display = "block";
+    // Update search placeholder
+    const searchInput = document.getElementById("compSearch");
+    if (searchInput) {
+      searchInput.placeholder = "Search students...";
+    }
+  }
+}
+
+// Add event listeners to radio buttons
+document.addEventListener("DOMContentLoaded", function() {
+  const competencyRadio = document.getElementById("view-competency");
+  const studentRadio = document.getElementById("view-student");
+  
+  if (competencyRadio) {
+    competencyRadio.addEventListener("change", toggleView);
+  }
+  if (studentRadio) {
+    studentRadio.addEventListener("change", toggleView);
+  }
+  
+  // Initialize view on page load
+  toggleView();
+});
 
 </script>';
 

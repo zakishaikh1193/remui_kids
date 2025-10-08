@@ -95,12 +95,65 @@ $competencyobj = new \core_competency\competency($competencyid);
 $scale = $competencyobj->get_scale();
 $scaleitems = $scale->scale_items;
 
-// Get user's competency status from course-specific table (what Moodle report uses)
-$usercompetency = $DB->get_record('competency_usercompcourse', array('userid' => $userid, 'competencyid' => $competencyid, 'courseid' => $courseid));
+// Get user's competency status using Moodle's competency API (same way we save it)
+try {
+    $usercompetencycourse = \core_competency\api::get_user_competency_in_course($courseid, $userid, $competencyid);
+    $usercompetency = null;
+    
+    if ($usercompetencycourse) {
+        // Convert the API object to a simple object for easier handling
+        $usercompetency = new stdClass();
+        $usercompetency->grade = $usercompetencycourse->get_grade();
+        $usercompetency->proficiency = $usercompetencycourse->get_proficiency();
+        $usercompetency->note = $usercompetencycourse->get_note();
+    }
+} catch (Exception $e) {
+    // Fallback to direct database query if API fails
+    $usercompetency = $DB->get_record('competency_usercompcourse', array('userid' => $userid, 'competencyid' => $competencyid, 'courseid' => $courseid));
+    
+    // If not found in course table, check global table as fallback
+    if (!$usercompetency) {
+        $usercompetency = $DB->get_record('competency_usercomp', array('userid' => $userid, 'competencyid' => $competencyid));
+    }
+}
 
-// If not found in course table, check global table as fallback
-if (!$usercompetency) {
-    $usercompetency = $DB->get_record('competency_usercomp', array('userid' => $userid, 'competencyid' => $competencyid));
+// Get competency evidence (notes) using direct database query
+$competencyevidence = array();
+if ($usercompetency) {
+    // Try to find evidence for the course-specific user competency first
+    $evidence = $DB->get_records('competency_evidence', array(
+        'usercompetencyid' => $usercompetency->id
+    ), 'timecreated DESC');
+    
+    // If no evidence found in course-specific table, check global user competency table
+    if (empty($evidence)) {
+        $global_usercompetency = $DB->get_record('competency_usercomp', array(
+            'userid' => $userid, 
+            'competencyid' => $competencyid
+        ));
+        
+        if ($global_usercompetency) {
+            $evidence = $DB->get_records('competency_evidence', array(
+                'usercompetencyid' => $global_usercompetency->id
+            ), 'timecreated DESC');
+        }
+    }
+    
+    // Process evidence records
+    foreach ($evidence as $ev) {
+        if (!empty($ev->note)) {
+            $competencyevidence[] = $ev;
+        }
+    }
+    
+    // If we found evidence with notes, use the most recent one
+    if (!empty($competencyevidence)) {
+        $latestevidence = $competencyevidence[0];
+        $usercompetency->note = $latestevidence->note;
+        $usercompetency->evidence_id = $latestevidence->id;
+        $usercompetency->evidence_timecreated = $latestevidence->timecreated;
+    }
+    
 }
 
 // Get linked activities for this competency
@@ -377,47 +430,145 @@ if (empty($linkedactivities)) {
 }
 echo '</div>';
 
-echo '<div class="competency-rating-section">';
+// Current Competency Rating Section
+echo '<div class="current-rating-section">';
+echo '<div class="rating-section-header">';
+echo '<h3><i class="fa fa-info-circle"></i> Current Competency Rating</h3>';
+echo '<button class="rate-competency-btn" onclick="toggleRatingForm()">';
+echo '<i class="fa fa-star"></i> Rate Competency';
+echo '</button>';
+echo '</div>';
+
+if ($usercompetency && $usercompetency->grade !== null) {
+    // Get the actual scale item label
+    $gradeindex = $usercompetency->grade - 1;
+    $currentrating = isset($scaleitems[$gradeindex]) ? $scaleitems[$gradeindex] : 'Unknown';
+    
+    // Determine status class and icon
+    $statusclass = 'status-not-competent';
+    $statusicon = 'fa-times-circle';
+    
+    if ($usercompetency->proficiency) {
+        $statusclass = 'status-competent';
+        $statusicon = 'fa-check-circle';
+    } elseif ($usercompetency->grade > 1) {
+        $statusclass = 'status-in-progress';
+        $statusicon = 'fa-clock';
+    }
+    
+    echo '<div class="current-rating-display">';
+    echo '<div class="rating-info">';
+    echo '<div class="rating-status">';
+    echo '<i class="fa ' . $statusicon . '"></i>';
+    echo '<span class="status-badge ' . $statusclass . '">' . s($currentrating) . '</span>';
+    echo '</div>';
+    
+    if (!empty($usercompetency->note)) {
+        // Get the user who added the note (from evidence record)
+        $note_author = null;
+        $note_date = null;
+        
+        if (isset($usercompetency->evidence_id)) {
+            $evidence_record = $DB->get_record('competency_evidence', array('id' => $usercompetency->evidence_id));
+            if ($evidence_record) {
+                $note_date = $evidence_record->timecreated;
+                $note_author = $DB->get_record('user', array('id' => $evidence_record->usermodified));
+            }
+        }
+        
+        echo '<div class="rating-notes">';
+        echo '<div class="notes-content">';
+        
+        // Show note metadata (who and when)
+        if ($note_author && $note_date) {
+            echo '<div class="note-metadata">';
+            echo '<div class="note-author">';
+            echo '<strong>' . s(fullname($note_author)) . '</strong>';
+            echo '</div>';
+            echo '<div class="note-date">';
+            echo userdate($note_date, get_string('strftimedatefullshort', 'langconfig') . ', ' . get_string('strftimetime', 'langconfig'));
+            echo '</div>';
+            echo '</div>';
+        }
+        
+        // Show the actual note content
+        echo '<div class="note-text">';
+        echo '<p>' . nl2br(s($usercompetency->note)) . '</p>';
+        echo '</div>';
+        
+        echo '</div>';
+        echo '</div>';
+        
+    } else {
+        echo '<div class="no-notes">';
+        echo '<i class="fa fa-comment-slash"></i>';
+        echo '<span>No notes added yet</span>';
+        echo '</div>';
+        
+    }
+    
+    echo '</div>';
+    echo '</div>';
+} else {
+    echo '<div class="no-rating">';
+    echo '<div class="no-rating-icon">';
+    echo '<i class="fa fa-star-o"></i>';
+    echo '</div>';
+    echo '<div class="no-rating-text">';
+    echo '<h4>Not Yet Rated</h4>';
+    echo '<p>This competency has not been rated yet. Use the form below to provide your assessment.</p>';
+    echo '</div>';
+    echo '</div>';
+}
+
+echo '</div>';
+
+echo '<div id="ratingModal" class="modal" style="display: none;">';
+echo '<div class="modal-content">';
+echo '<div class="modal-header">';
 echo '<h3><i class="fa fa-star"></i> Rate Competency</h3>';
+echo '<button class="modal-close" onclick="closeRatingModal()">&times;</button>';
+echo '</div>';
+echo '<div class="modal-body">';
 echo '<div class="rating-form">';
-echo '<form method="post" action="' . new moodle_url('/theme/remui_kids/teacher/save_competency_rating.php') . '">';
+echo '<form id="ratingForm" method="post" action="' . new moodle_url('/theme/remui_kids/teacher/save_competency_rating.php') . '">';
 echo '<input type="hidden" name="userid" value="' . $userid . '">';
 echo '<input type="hidden" name="competencyid" value="' . $competencyid . '">';
 echo '<input type="hidden" name="courseid" value="' . $courseid . '">';
 
 echo '<div class="rating-options">';
+echo '<label for="competency_grade">Select Competency Rating:</label>';
+echo '<select name="grade" id="competency_grade" class="rating-dropdown">';
 
 // Show actual scale items
 foreach ($scaleitems as $index => $scaleitem) {
     $value = $index + 1; // Scale values are 1-indexed
-    $checked = '';
+    $selected = '';
     
     if ($usercompetency && $usercompetency->grade == $value) {
-        $checked = ' checked';
+        $selected = ' selected';
     }
     
-    echo '<label class="rating-option">';
-    echo '<input type="radio" name="rating" value="' . $index . '"' . $checked . '>';
-    echo '<span class="rating-label">' . s($scaleitem) . '</span>';
-    echo '</label>';
+    echo '<option value="' . $value . '"' . $selected . '>' . s($scaleitem) . '</option>';
 }
 
+echo '</select>';
 echo '</div>';
 
 echo '<div class="rating-comment">';
 echo '<label for="comment">Comment (Optional):</label>';
-echo '<textarea name="comment" id="comment" rows="3" placeholder="Add a comment about this competency rating...">' . ($usercompetency ? s($usercompetency->note) : '') . '</textarea>';
+echo '<textarea name="comment" id="comment" rows="3" placeholder="Add a comment about this competency rating..."></textarea>';
 echo '</div>';
 
-echo '<div class="rating-actions">';
-echo '<button type="submit" class="btn btn-primary">';
+echo '</form>';
+echo '</div>';
+echo '</div>';
+echo '<div class="modal-footer">';
+echo '<button type="button" class="btn btn-secondary" onclick="closeRatingModal()">Cancel</button>';
+echo '<button type="submit" form="ratingForm" class="btn btn-primary">';
 echo '<i class="fa fa-save"></i> Save Rating';
 echo '</button>';
-echo '<a href="' . new moodle_url('/theme/remui_kids/teacher/competency_details.php', array('competencyid' => $competencyid, 'courseid' => $courseid)) . '" class="btn btn-secondary">';
-echo 'Cancel';
-echo '</a>';
 echo '</div>';
-echo '</form>';
 echo '</div>';
 echo '</div>';
 
@@ -431,6 +582,27 @@ function toggleTeacherSidebar() {
   const sidebar = document.querySelector(".teacher-sidebar");
   sidebar.classList.toggle("sidebar-open");
 }
+
+function toggleRatingForm() {
+  const modal = document.getElementById("ratingModal");
+  modal.style.display = "block";
+  document.body.style.overflow = "hidden"; // Prevent background scrolling
+}
+
+function closeRatingModal() {
+  const modal = document.getElementById("ratingModal");
+  modal.style.display = "none";
+  document.body.style.overflow = "auto"; // Restore scrolling
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  const modal = document.getElementById("ratingModal");
+  if (event.target === modal) {
+    closeRatingModal();
+  }
+}
+
 document.addEventListener("click", function(event) {
   const sidebar = document.querySelector(".teacher-sidebar");
   const toggleButton = document.querySelector(".sidebar-toggle");
@@ -439,6 +611,7 @@ document.addEventListener("click", function(event) {
     sidebar.classList.remove("sidebar-open");
   }
 });
+
 window.addEventListener("resize", function() {
   const sidebar = document.querySelector(".teacher-sidebar");
   if (!sidebar) return;
