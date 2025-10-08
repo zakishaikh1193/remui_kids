@@ -162,8 +162,23 @@ if ($courseid) {
     $course = get_course($courseid);
     $context = context_course::instance($course->id);
     
-    // Get all enrolled users with student role.
-    $enrolledusers = get_enrolled_users($context, 'moodle/course:isincompletionreports');
+    // Get only students (exclude admin, manager, teacher roles)
+    $enrolledusers = $DB->get_records_sql(
+        "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.lastaccess
+         FROM {user} u
+         JOIN {user_enrolments} ue ON ue.userid = u.id
+         JOIN {enrol} e ON e.id = ue.enrolid
+         WHERE e.courseid = ?
+         AND u.deleted = 0
+         AND u.id NOT IN (
+             SELECT DISTINCT ra.userid 
+             FROM {role_assignments} ra 
+             JOIN {role} r ON ra.roleid = r.id 
+             WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
+         )
+         ORDER BY u.lastname ASC, u.firstname ASC",
+        [$courseid]
+    );
     
     echo '<div class="students-container">';
     

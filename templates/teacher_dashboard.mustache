@@ -442,7 +442,7 @@
                                 <tr>
                                     <td class="avatar-col">
                                         <div class="student-avatar">
-                                            <img src="{{avatar_url}}" alt="{{firstname}} {{lastname}}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                            <img src="{{avatar_url}}" alt="{{firstname}} {{lastname}}" onerror="this.style.display='none'" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                                         </div>
                                     </td>
                                     <td>
@@ -574,8 +574,8 @@
                         <i class="fa fa-chart-line"></i>
                         Class Performance Overview
                     </h3>
-                    <a href="{{config.wwwroot}}/grade/report/grader/index.php" class="btn-view-gradebook">
-                        View Gradebook
+                    <a href="{{config.wwwroot}}/theme/remui_kids/pages/class_performance_overview.php" class="btn-view-gradebook">
+                        View All
                     </a>
                 </div>
                 <div class="card-content-pro">
@@ -808,7 +808,7 @@
                         {{#student_insights}}
                         <div class="insight-item" onclick="window.location.href='{{config.wwwroot}}/theme/remui_kids/pages/student_overview.php?id={{id}}'" style="cursor: pointer;">
                             <div class="insight-student">
-                                <img src="{{avatar_url}}" alt="{{student_name}}" class="insight-avatar" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                                <img src="{{avatar_url}}" alt="{{student_name}}" class="insight-avatar" onerror="this.style.display='none'">
                                 <div class="insight-info">
                                     <div class="insight-name">{{student_name}}</div>
                                     <div class="insight-category {{category_class}}">{{category}}</div>
@@ -1629,7 +1629,7 @@ function renderStudentTable(students) {
         row.innerHTML = `
             <td class="avatar-col">
                 <div class="student-avatar">
-                    <img src="${student.avatar_url}" alt="${student.name}" onerror="this.src='{{config.wwwroot}}/theme/image.php/remui_kids/core/164/f1'">
+                    <img src="${student.avatar_url}" alt="${student.name}" onerror="this.style.display='none'">
                 </div>
             </td>
             <td>
