@@ -55,6 +55,7 @@ $teachercourses = enrol_get_my_courses('id, fullname, shortname', 'visible DESC,
 echo $OUTPUT->header();
 
 // Teacher dashboard layout wrapper and sidebar (same as dashboard)
+echo '<div class="teacher-css-wrapper">';
 echo '<div class="teacher-dashboard-wrapper">';
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
 echo '    <i class="fa fa-bars"></i>';
@@ -275,7 +276,7 @@ echo '</div>'; // Close students-page-wrapper
 // Close main content and wrapper
 echo '</div>'; // End teacher-main-content
 echo '</div>'; // End teacher-dashboard-wrapper
-
+echo '</div>'; // End teacher-css-wrapper
 // Sidebar toggle script (reuse from dashboard template)
 echo '<script>
 function toggleTeacherSidebar() {

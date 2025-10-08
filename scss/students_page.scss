@@ -1,8 +1,11 @@
 /* ========================================
    STUDENTS PAGE STYLES - MODERN UI
    ======================================== */
+.teacher-css-wrapper {
+    margin-top: -150px !important;
+ 
 
-.students-page-wrapper {
+    .students-page-wrapper {
     min-height: 100vh;
     background: #f8fafc;
     position: relative;
@@ -3649,4 +3652,5 @@
         font-size: 0.85rem;
         padding: 0.6rem 1.25rem;
     }
+}
 }

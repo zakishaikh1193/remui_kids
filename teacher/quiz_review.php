@@ -24,7 +24,7 @@ $PAGE->add_body_class('quizzes-page');
 
 // Start output
 echo $OUTPUT->header();
-
+echo '<div class="teacher-css-wrapper">';
 echo '<div class="teacher-dashboard-wrapper">';
 // Mobile toggle
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
@@ -161,7 +161,7 @@ echo '</div>'; // students-container
 echo '</div>'; // students-page-wrapper
 echo '</div>'; // teacher-main-content
 echo '</div>'; // teacher-dashboard-wrapper
-
+echo '</div>'; // teacher-css-wrapper
 // Sidebar JS
 echo '<script>
 function toggleTeacherSidebar() {

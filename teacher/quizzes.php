@@ -47,7 +47,7 @@ $teachercourses = enrol_get_my_courses('id, fullname, shortname', 'visible DESC,
 
 // Output start.
 echo $OUTPUT->header();
-
+echo '<div class="teacher-css-wrapper">';
 // Layout wrapper and sidebar (same as students page).
 echo '<div class="teacher-dashboard-wrapper">';
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
@@ -282,7 +282,7 @@ if ($currentcourseid) {
 echo '</div>'; // students-page-wrapper
 echo '</div>'; // teacher-main-content
 echo '</div>'; // teacher-dashboard-wrapper
-
+echo '</div>'; // teacher-css-wrapper
 // Sidebar JS
 echo '<script>
 function toggleTeacherSidebar() {
