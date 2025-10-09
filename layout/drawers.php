@@ -589,8 +589,8 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     // Must be called before rendering the template.
     require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
     
-    // Render our clean dashboard template instead of the sidebar layout
-    echo $OUTPUT->render_from_template('theme_remui_kids/clean_dashboard', $templatecontext);
+    // Render our student dashboard template (handles elementary, middle, and high school)
+    echo $OUTPUT->render_from_template('theme_remui_kids/dashboard', $templatecontext);
     return; // Exit early to prevent normal rendering
 }
 
