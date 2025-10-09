@@ -334,6 +334,8 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['highschool_courses_sections'] = json_encode($coursesectionsdata);
         // Debug: Log the final JSON data
         error_log("Final high school courses sections JSON: " . $templatecontext['highschool_courses_sections']);
+
+        
         
         // Add active sections data (limit to 3 for Current Lessons section)
         $activesections = theme_remui_kids_get_highschool_active_sections($USER->id);
