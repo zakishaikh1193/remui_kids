@@ -29,6 +29,10 @@ try {
     // Build hierarchical structure
     $hierarchical_categories = [];
     foreach ($parent_categories as $parent) {
+        // Get courses directly under this parent category (no subcategory)
+        $direct_courses = $DB->get_records('course', ['category' => $parent->id, 'visible' => 1], 'fullname ASC');
+        $direct_course_count = count($direct_courses);
+        
         // Get subcategories for this parent
         $subcategories = $DB->get_records('course_categories', ['visible' => 1, 'parent' => $parent->id], 'name ASC');
         
@@ -36,10 +40,12 @@ try {
             'id' => $parent->id,
             'name' => $parent->name,
             'description' => $parent->description,
+            'direct_courses' => $direct_courses,
+            'direct_course_count' => $direct_course_count,
             'subcategories' => []
         ];
         
-        $total_courses = 0;
+        $total_courses = $direct_course_count; // Start with direct courses
         foreach ($subcategories as $subcategory) {
             // Get courses for this subcategory
             $courses = $DB->get_records('course', ['category' => $subcategory->id, 'visible' => 1], 'fullname ASC');
@@ -56,7 +62,11 @@ try {
         }
         
         $parent_data['total_courses'] = $total_courses;
-        $hierarchical_categories[] = $parent_data;
+        
+        // Only include parent categories that have courses (either direct or in subcategories)
+        if ($total_courses > 0) {
+            $hierarchical_categories[] = $parent_data;
+        }
     }
 } catch (Exception $e) {
     // Handle database errors
@@ -507,6 +517,54 @@ echo "<div id='session-status' style='position: fixed; top: 10px; right: 10px; b
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
+/* Direct Courses Section Styles */
+.direct-courses-section {
+    margin: 15px 10px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+    border-radius: 12px;
+    border: 1px solid #c3e6cb;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+}
+
+.direct-courses-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.direct-courses-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.direct-courses-title::before {
+    content: "📚";
+    font-size: 1.2rem;
+}
+
+.direct-courses-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.direct-courses-list {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .course-thumbnail {
     width: 80px;
     height: 80px;
@@ -852,6 +910,111 @@ echo "<div id='session-status' style='position: fixed; top: 10px; right: 10px; b
                     </div>
                 </div>
                 <div class="parent-category-content" id="parent-content-<?php echo $parent['id']; ?>">
+                    <?php if ($parent['direct_course_count'] > 0): ?>
+                        <!-- Direct Courses Section -->
+                        <div class="direct-courses-section">
+                            <div class="direct-courses-header">
+                                <h4 class="direct-courses-title">Direct Courses</h4>
+                                <span class="direct-courses-count"><?php echo $parent['direct_course_count']; ?> courses</span>
+                            </div>
+                            <div class="direct-courses-list">
+                                <?php foreach ($parent['direct_courses'] as $course): 
+                                    // Get course image - try multiple methods with detailed debugging
+                                    $courseimage = '';
+                                    $debug_info = '';
+                                    
+                                    // Method 1: Try using the theme function
+                                    try {
+                                        $courseimage = theme_remui_kids_get_course_image($course);
+                                        $debug_info .= 'Theme function returned: ' . $courseimage . ' | ';
+                                    } catch (Exception $e) {
+                                        $debug_info .= 'Theme function error: ' . $e->getMessage() . ' | ';
+                                    }
+                                    
+                                    // Method 2: Direct database query to check if files exist
+                                    try {
+                                        $coursecontext = context_course::instance($course->id);
+                                        $fs = get_file_storage();
+                                        $files = $fs->get_area_files($coursecontext->id, 'course', 'overviewfiles', 0, 'timemodified DESC', false);
+                                        $debug_info .= 'Files found: ' . count($files) . ' | ';
+                                        
+                                        if (!empty($files)) {
+                                            $file = reset($files);
+                                            $debug_info .= 'File: ' . $file->get_filename() . ' | ';
+                                            
+                                            // Try the exact method from lib.php line 698-705
+                                            $direct_image = moodle_url::make_pluginfile_url(
+                                                $coursecontext->id,
+                                                'course',
+                                                'overviewfiles',
+                                                null,
+                                                '/',
+                                                $file->get_filename()
+                                            )->out();
+                                            $debug_info .= 'Direct URL: ' . $direct_image . ' | ';
+                                            
+                                            // If theme function returned a default image, use direct instead
+                                            if (strpos($courseimage, 'freepik.com') !== false || 
+                                                strpos($courseimage, 'unsplash.com') !== false) {
+                                                $courseimage = $direct_image;
+                                            }
+                                        }
+                                    } catch (Exception $e) {
+                                        $debug_info .= 'Direct query error: ' . $e->getMessage() . ' | ';
+                                    }
+                                    
+                                    // Check if it's a default online image
+                                    $is_default_image = (strpos($courseimage, 'freepik.com') !== false || 
+                                                         strpos($courseimage, 'unsplash.com') !== false);
+                                    
+                                    // Keep the default images from theme function (Freepik/Unsplash)
+                                    // Don't replace with gradient - show the default images
+                                    if ($is_default_image) {
+                                        $debug_info .= 'Using default Freepik image | ';
+                                    }
+                                    
+                                    // If no course image found, use a default gradient based on course ID
+                                    if (empty($courseimage)) {
+                                        $gradient_colors = [
+                                            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                                            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                                            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                                            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                                            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                                            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                                            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
+                                        ];
+                                        $gradient_index = $course->id % count($gradient_colors);
+                                        $default_gradient = $gradient_colors[$gradient_index];
+                                    }
+                                ?>
+                                    <div class="course-card">
+                                        <div class="course-thumbnail" <?php if (empty($courseimage)): ?>style="background: <?php echo $default_gradient; ?>"<?php endif; ?>>
+                                            <?php if (!empty($courseimage)): ?>
+                                                <img src="<?php echo $courseimage; ?>" alt="<?php echo htmlspecialchars($course->fullname); ?>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <i class="fa fa-book" style="display: none;"></i>
+                                            <?php else: ?>
+                                            <i class="fa fa-book"></i>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="course-info">
+                                            <h4 class="course-title"><?php echo htmlspecialchars($course->fullname); ?></h4>
+                                            <p class="course-subtitle"><?php echo htmlspecialchars($course->shortname); ?></p>
+                                            <!-- Debug Info: <?php echo htmlspecialchars($debug_info); ?> -->
+                                            <!-- Final Image URL: <?php echo !empty($courseimage) ? htmlspecialchars($courseimage) : 'No image - using gradient'; ?> -->
+                                        </div>
+                                        <div class="course-actions">
+                                        <button class="manage-content-btn" onclick="viewCourse(<?php echo $course->id; ?>)">
+                                                Manage Content <i class="fa fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    
                     <?php foreach ($parent['subcategories'] as $subcategory): ?>
                         <div class="subcategory-item" data-subcategory-id="<?php echo $subcategory['id']; ?>">
                             <div class="subcategory-header" onclick="toggleSubcategory(<?php echo $subcategory['id']; ?>)">
@@ -969,7 +1132,7 @@ echo "<div id='session-status' style='position: fixed; top: 10px; right: 10px; b
                                 <p class="empty-text">No courses in this subcategory</p>
                             </div>
                         <?php endif; ?>
-                                </div>
+                    </div>
                             </div>
                         </div>
                     <?php endforeach; ?>

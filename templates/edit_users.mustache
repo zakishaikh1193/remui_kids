@@ -898,6 +898,11 @@ function displayUsers(users) {
         return;
     }
     
+    // Debug: Log the first user's suspended value
+    if (users.length > 0) {
+        console.log('First user suspended value:', users[0].suspended, 'Type:', typeof users[0].suspended);
+    }
+    
     tbody.innerHTML = users.map(user => `
         <tr>
             <td class="checkbox-column">
@@ -915,8 +920,8 @@ function displayUsers(users) {
                 <span class="role-badge">${user.role}</span>
             </td>
             <td>
-                <span class="status-badge ${user.suspended ? 'status-suspended' : 'status-active'}">
-                    ${user.suspended ? 'Suspended' : 'Active'}
+                <span class="status-badge ${user.suspended == 1 ? 'status-suspended' : 'status-active'}">
+                    ${user.suspended == 1 ? 'Suspended' : 'Active'}
                 </span>
             </td>
             <td>${user.last_access}</td>
@@ -1173,8 +1178,8 @@ function viewUserDetails(userId) {
                             </div>
                             <div class="detail-item">
                                 <label>Status:</label>
-                                <span class="status-badge ${user.suspended ? 'status-suspended' : 'status-active'}">
-                                    ${user.suspended ? 'Suspended' : 'Active'}
+                                <span class="status-badge ${user.suspended == 1 ? 'status-suspended' : 'status-active'}">
+                                    ${user.suspended == 1 ? 'Suspended' : 'Active'}
                                 </span>
                             </div>
                         </div>

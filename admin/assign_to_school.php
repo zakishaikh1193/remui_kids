@@ -21,7 +21,10 @@ if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case 'get_schools':
             try {
-                // Use course categories as schools with proper filtering (same as your working code)
+                // First check if company table exists
+                if (!$DB->get_manager()->table_exists('company')) {
+                    error_log('Company table does not exist, falling back to course categories');
+                    // Fallback to course categories if company table doesn't exist
                 $schools = $DB->get_records_sql(
                     "SELECT id, name 
                      FROM {course_categories} 
@@ -35,6 +38,18 @@ if (isset($_GET['action'])) {
                      ORDER BY name ASC",
                     []
                 );
+                } else {
+                    // Fetch schools from company table
+                    $schools = $DB->get_records_sql(
+                        "SELECT id, name 
+                         FROM {company} 
+                         ORDER BY name ASC",
+                        []
+                    );
+                }
+                
+                // Debug: Log the result
+                error_log('AJAX Schools fetched: ' . print_r($schools, true));
                 
                 // If no schools found, return empty array
                 if (empty($schools)) {
@@ -43,6 +58,7 @@ if (isset($_GET['action'])) {
                 
                 echo json_encode(['status' => 'success', 'schools' => array_values($schools)]);
             } catch (Exception $e) {
+                error_log('Error fetching schools: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to load schools: ' . $e->getMessage()]);
             }
             exit;
@@ -50,19 +66,49 @@ if (isset($_GET['action'])) {
         case 'get_school_courses':
             $school_id = intval($_GET['school_id']);
             try {
-                // Get courses that are already assigned to this school (category)
-                $courses = $DB->get_records_sql(
-                    "SELECT c.*, cc.name as category_name 
-                     FROM {course} c 
-                     LEFT JOIN {course_categories} cc ON c.category = cc.id 
-                     WHERE c.visible = 1 
-                     AND c.id > 1 
-                     AND c.category = ?
-                     ORDER BY c.fullname ASC",
-                    [$school_id]
-                );
+                // Check if company_course table exists
+                if (!$DB->get_manager()->table_exists('company_course')) {
+                    error_log('company_course table does not exist, falling back to course category lookup');
+                    
+                    // Fallback: Get courses from company's category
+                    $company = $DB->get_record('company', ['id' => $school_id]);
+                    if (!$company) {
+                        echo json_encode(['status' => 'error', 'message' => 'Company not found']);
+                        exit;
+                    }
+                    
+                    $category = $DB->get_record('course_categories', ['name' => $company->name]);
+                    if ($category) {
+                        $courses = $DB->get_records_sql(
+                            "SELECT c.*, cc.name as category_name 
+                             FROM {course} c 
+                             LEFT JOIN {course_categories} cc ON c.category = cc.id
+                             WHERE c.visible = 1 
+                             AND c.id > 1 
+                             AND c.category = ?
+                             ORDER BY c.fullname ASC",
+                            [$category->id]
+                        );
+                    } else {
+                        $courses = [];
+                    }
+                } else {
+                    // Get courses that are already assigned to this company/school
+                    $courses = $DB->get_records_sql(
+                        "SELECT c.*, comp.name as company_name 
+                         FROM {course} c 
+                         LEFT JOIN {company_course} cc ON c.id = cc.courseid
+                         LEFT JOIN {company} comp ON cc.companyid = comp.id
+                         WHERE c.visible = 1 
+                         AND c.id > 1 
+                         AND cc.companyid = ?
+                         ORDER BY c.fullname ASC",
+                        [$school_id]
+                    );
+                }
                 echo json_encode(['status' => 'success', 'courses' => array_values($courses)]);
             } catch (Exception $e) {
+                error_log('Error in get_school_courses: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to load school courses: ' . $e->getMessage()]);
             }
             exit;
@@ -70,19 +116,95 @@ if (isset($_GET['action'])) {
         case 'get_potential_courses':
             $school_id = intval($_GET['school_id']);
             try {
-                // Get courses that are NOT assigned to this school (available to assign)
-                $courses = $DB->get_records_sql(
-                    "SELECT c.*, cc.name as category_name 
-                     FROM {course} c 
-                     LEFT JOIN {course_categories} cc ON c.category = cc.id 
-                     WHERE c.visible = 1 
-                     AND c.id > 1 
-                     AND c.category != ?
-                     AND c.category > 1
-                     ORDER BY c.fullname ASC",
-                    [$school_id]
-                );
-                echo json_encode(['status' => 'success', 'courses' => array_values($courses)]);
+                // Check if company_course table exists
+                if (!$DB->get_manager()->table_exists('company_course')) {
+                    error_log('company_course table does not exist, falling back to course category lookup');
+                    
+                    // Fallback: Get courses that are NOT in the company's category
+                    $company = $DB->get_record('company', ['id' => $school_id]);
+                    if (!$company) {
+                        echo json_encode(['status' => 'error', 'message' => 'Company not found']);
+                        exit;
+                    }
+                    
+                    $category = $DB->get_record('course_categories', ['name' => $company->name]);
+                    $exclude_category_id = $category ? $category->id : 0;
+                    
+                    $courses = $DB->get_records_sql(
+                        "SELECT c.*, 
+                                cc.name as category_name,
+                                cc.id as category_id,
+                                cc.parent as category_parent,
+                                parent_cc.name as parent_category_name
+                         FROM {course} c 
+                         LEFT JOIN {course_categories} cc ON c.category = cc.id
+                         LEFT JOIN {course_categories} parent_cc ON cc.parent = parent_cc.id
+                         WHERE c.visible = 1 
+                         AND c.id > 1 
+                         AND c.category > 1
+                         AND c.category != ?
+                         ORDER BY parent_cc.name ASC, cc.name ASC, c.fullname ASC",
+                        [$exclude_category_id]
+                    );
+                } else {
+                    // Get courses that are NOT assigned to this company/school (available to assign)
+                    // with hierarchical category information
+                    $courses = $DB->get_records_sql(
+                        "SELECT c.*, 
+                                cc.name as category_name,
+                                cc.id as category_id,
+                                cc.parent as category_parent,
+                                parent_cc.name as parent_category_name
+                         FROM {course} c 
+                         LEFT JOIN {course_categories} cc ON c.category = cc.id
+                         LEFT JOIN {course_categories} parent_cc ON cc.parent = parent_cc.id
+                         LEFT JOIN {company_course} comp_course ON c.id = comp_course.courseid AND comp_course.companyid = ?
+                         WHERE c.visible = 1 
+                         AND c.id > 1 
+                         AND c.category > 1
+                         AND comp_course.courseid IS NULL
+                         ORDER BY parent_cc.name ASC, cc.name ASC, c.fullname ASC",
+                        [$school_id]
+                    );
+                }
+                
+                // Organize courses by category hierarchy
+                $hierarchical_courses = [];
+                foreach ($courses as $course) {
+                    $parent_id = $course->category_parent ?: $course->category_id;
+                    $parent_name = $course->parent_category_name ?: $course->category_name;
+                    
+                    if (!isset($hierarchical_courses[$parent_id])) {
+                        $hierarchical_courses[$parent_id] = [
+                            'parent_category' => [
+                                'id' => $parent_id,
+                                'name' => $parent_name
+                            ],
+                            'subcategories' => []
+                        ];
+                    }
+                    
+                    // If course is directly under parent category
+                    if ($course->category_parent == 0 || $course->category_parent == $parent_id) {
+                        if (!isset($hierarchical_courses[$parent_id]['direct_courses'])) {
+                            $hierarchical_courses[$parent_id]['direct_courses'] = [];
+                        }
+                        $hierarchical_courses[$parent_id]['direct_courses'][] = $course;
+                    } else {
+                        // Course is under a subcategory
+                        $subcategory_id = $course->category_id;
+                        if (!isset($hierarchical_courses[$parent_id]['subcategories'][$subcategory_id])) {
+                            $hierarchical_courses[$parent_id]['subcategories'][$subcategory_id] = [
+                                'id' => $subcategory_id,
+                                'name' => $course->category_name,
+                                'courses' => []
+                            ];
+                        }
+                        $hierarchical_courses[$parent_id]['subcategories'][$subcategory_id]['courses'][] = $course;
+                    }
+                }
+                
+                echo json_encode(['status' => 'success', 'courses' => array_values($hierarchical_courses)]);
             } catch (Exception $e) {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to load potential courses: ' . $e->getMessage()]);
             }
@@ -93,10 +215,43 @@ if (isset($_GET['action'])) {
             $course_id = intval($_POST['course_id']);
             
             try {
-                // Move course to the selected school category
+                // Check if company_course table exists
+                if (!$DB->get_manager()->table_exists('company_course')) {
+                    error_log('company_course table does not exist, falling back to course category assignment');
+                    
+                    // Fallback: Move course to the company's category (if company has a category)
+                    $company = $DB->get_record('company', ['id' => $school_id]);
+                    if (!$company) {
+                        echo json_encode(['status' => 'error', 'message' => 'Company not found']);
+                        exit;
+                    }
+                    
+                    // Check if company has a corresponding category
+                    $category = $DB->get_record('course_categories', ['name' => $company->name]);
+                    if (!$category) {
+                        // Create a category for this company
+                        $new_category = new stdClass();
+                        $new_category->name = $company->name;
+                        $new_category->description = 'Category for ' . $company->name;
+                        $new_category->parent = 0;
+                        $new_category->sortorder = 999;
+                        $new_category->visible = 1;
+                        $new_category->timecreated = time();
+                        $new_category->timemodified = time();
+                        
+                        $category_id = $DB->insert_record('course_categories', $new_category);
+                        if (!$category_id) {
+                            echo json_encode(['status' => 'error', 'message' => 'Failed to create category for company']);
+                            exit;
+                        }
+                    } else {
+                        $category_id = $category->id;
+                    }
+                    
+                    // Move course to company's category
                 $course = $DB->get_record('course', ['id' => $course_id]);
                 if ($course) {
-                    $course->category = $school_id;
+                        $course->category = $category_id;
                     $course->timemodified = time();
                     if ($DB->update_record('course', $course)) {
                         echo json_encode(['status' => 'success', 'message' => 'Course assigned successfully']);
@@ -105,8 +260,40 @@ if (isset($_GET['action'])) {
                     }
                 } else {
                     echo json_encode(['status' => 'error', 'message' => 'Course not found']);
+                    }
+                    exit;
+                }
+                
+                // Check if course is already assigned to this company
+                $existing = $DB->get_record('company_course', ['companyid' => $school_id, 'courseid' => $course_id]);
+                if ($existing) {
+                    error_log('Course ' . $course_id . ' is already assigned to company ' . $school_id);
+                    echo json_encode(['status' => 'error', 'message' => 'Course is already assigned to this school']);
+                    exit;
+                }
+                
+                // Debug: Log the assignment attempt
+                error_log('Attempting to assign course ' . $course_id . ' to company ' . $school_id);
+                
+                // Assign course to company
+                $company_course = new stdClass();
+                $company_course->companyid = $school_id;
+                $company_course->courseid = $course_id;
+                $company_course->departmentid = 0; // Default department, can be updated later
+                
+                // Debug: Log the data being inserted
+                error_log('Attempting to insert company_course record: ' . print_r($company_course, true));
+                
+                $result = $DB->insert_record('company_course', $company_course);
+                if ($result) {
+                    error_log('Successfully inserted company_course record with ID: ' . $result);
+                    echo json_encode(['status' => 'success', 'message' => 'Course assigned successfully']);
+                } else {
+                    error_log('Failed to insert company_course record');
+                    echo json_encode(['status' => 'error', 'message' => 'Failed to assign course - database insert failed']);
                 }
             } catch (Exception $e) {
+                error_log('Error in assign_course: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to assign course: ' . $e->getMessage()]);
             }
             exit;
@@ -116,42 +303,60 @@ if (isset($_GET['action'])) {
             $course_id = intval($_POST['course_id']);
             
             try {
-                // Move course to a default category (category 1 or first available category)
-                $course = $DB->get_record('course', ['id' => $course_id]);
-                if ($course) {
-                    // Find a default category to move the course to
-                    $default_category = $DB->get_record('course_categories', ['id' => 1]);
-                    if (!$default_category) {
-                        // If category 1 doesn't exist, get the first available category
-                        $default_category = $DB->get_record_sql(
-                            "SELECT * FROM {course_categories} WHERE visible = 1 ORDER BY id ASC LIMIT 1"
-                        );
+                // Check if company_course table exists
+                if (!$DB->get_manager()->table_exists('company_course')) {
+                    error_log('company_course table does not exist, falling back to course category unassignment');
+                    
+                    // Fallback: Move course to default category
+                    $company = $DB->get_record('company', ['id' => $school_id]);
+                    if (!$company) {
+                        echo json_encode(['status' => 'error', 'message' => 'Company not found']);
+                        exit;
                     }
                     
-                    if ($default_category) {
-                        $course->category = $default_category->id;
-                        $course->timemodified = time();
-                        if ($DB->update_record('course', $course)) {
-                            echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
+                    // Find the company's category
+                    $category = $DB->get_record('course_categories', ['name' => $company->name]);
+                    if ($category) {
+                        // Move course to default category (category 1)
+                        $course = $DB->get_record('course', ['id' => $course_id]);
+                        if ($course && $course->category == $category->id) {
+                            $course->category = 1; // Default category
+                            $course->timemodified = time();
+                            if ($DB->update_record('course', $course)) {
+                                echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
+                            } else {
+                                echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
+                            }
                         } else {
-                            echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
+                            echo json_encode(['status' => 'error', 'message' => 'Course was not assigned to this company']);
                         }
                     } else {
-                        echo json_encode(['status' => 'error', 'message' => 'No default category found']);
+                        echo json_encode(['status' => 'error', 'message' => 'Company category not found']);
                     }
+                    exit;
+                }
+                
+                // Remove course from company
+                $deleted = $DB->delete_records('company_course', ['companyid' => $school_id, 'courseid' => $course_id]);
+                if ($deleted) {
+                    echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
                 } else {
-                    echo json_encode(['status' => 'error', 'message' => 'Course not found']);
+                    echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course or course was not assigned']);
                 }
             } catch (Exception $e) {
+                error_log('Error in unassign_course: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course: ' . $e->getMessage()]);
             }
             exit;
     }
 }
 
-// Get all schools from database using the same logic as quick_school_count.php
+// Get all schools from company table
 try {
-    // Use course categories as schools with proper filtering (same as your working code)
+    // First check if company table exists
+    if (!$DB->get_manager()->table_exists('company')) {
+        error_log('Company table does not exist, falling back to course categories');
+        // Fallback to course categories if company table doesn't exist
     $schools = $DB->get_records_sql(
         "SELECT id, name 
          FROM {course_categories} 
@@ -165,12 +370,25 @@ try {
          ORDER BY name ASC",
         []
     );
+    } else {
+        // Fetch schools from company table
+        $schools = $DB->get_records_sql(
+            "SELECT id, name 
+             FROM {company} 
+             ORDER BY name ASC",
+            []
+        );
+    }
+    
+    // Debug: Log the result
+    error_log('Main schools fetched: ' . print_r($schools, true));
     
     // If no schools found, return empty array
     if (empty($schools)) {
         $schools = [];
     }
 } catch (Exception $e) {
+    error_log('Error in main schools fetch: ' . $e->getMessage());
     // If all fails, return empty array
     $schools = [];
 }
@@ -344,7 +562,7 @@ echo "<div class='admin-main-content'>";
 
 body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #fef7f7 0%, #f0f9ff 50%, #f0fdf4 100%);
+    background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e8f5e8 100%);
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -499,14 +717,14 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #e1bee7 0%, #f8bbd9 100%);
     min-height: 100vh;
 }
 
 .assign-header {
     text-align: center;
     margin-bottom: 40px;
-    color: white;
+    color: #4a148c;
     position: relative;
 }
 
@@ -514,19 +732,21 @@ body {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 4px rgba(74, 20, 140, 0.2);
     animation: titleGlow 2s ease-in-out infinite alternate;
+    color: #4a148c;
 }
 
 .assign-header p {
     font-size: 1.1rem;
-    opacity: 0.9;
+    opacity: 0.8;
     margin-bottom: 30px;
+    color: #4a148c;
 }
 
 @keyframes titleGlow {
-    from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
-    to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.6); }
+    from { text-shadow: 2px 2px 4px rgba(74, 20, 140, 0.2), 0 0 20px rgba(74, 20, 140, 0.3); }
+    to { text-shadow: 2px 2px 4px rgba(74, 20, 140, 0.2), 0 0 30px rgba(74, 20, 140, 0.6); }
 }
 
 /* School Selection */
@@ -761,8 +981,8 @@ body {
 }
 
 .action-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, #e1bee7 0%, #f8bbd9 100%);
+    color: #4a148c;
     border: none;
     padding: 15px 25px;
     border-radius: 50px;
@@ -770,7 +990,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(225, 190, 231, 0.3);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -780,7 +1000,7 @@ body {
 
 .action-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(225, 190, 231, 0.4);
 }
 
 .action-btn:disabled {
@@ -790,21 +1010,23 @@ body {
 }
 
 .action-btn.add {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+    color: #2e7d32;
+    box-shadow: 0 5px 15px rgba(200, 230, 201, 0.3);
 }
 
 .action-btn.add:hover {
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 8px 25px rgba(200, 230, 201, 0.4);
 }
 
 .action-btn.remove {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
+    color: #c62828;
+    box-shadow: 0 5px 15px rgba(255, 205, 210, 0.3);
 }
 
 .action-btn.remove:hover {
-    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+    box-shadow: 0 8px 25px rgba(255, 205, 210, 0.4);
 }
 
 /* Warning Section */
@@ -975,6 +1197,215 @@ body {
 
 .course-list::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+/* Hierarchical Course Structure - Pastel Colors */
+.category-group {
+    margin-bottom: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.category-header {
+    background: linear-gradient(135deg, #e1bee7 0%, #f8bbd9 100%);
+    color: #4a148c;
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e1bee7;
+}
+
+.category-header:hover {
+    background: linear-gradient(135deg, #ce93d8 0%, #f48fb1 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(225, 190, 231, 0.3);
+}
+
+.category-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #4a148c;
+}
+
+.category-count {
+    background: rgba(74, 20, 140, 0.1);
+    color: #4a148c;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid rgba(74, 20, 140, 0.2);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    color: #4a148c;
+}
+
+.category-content {
+    padding: 20px;
+    background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+}
+
+.direct-courses-section {
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid #81c784;
+    box-shadow: 0 2px 6px rgba(129, 199, 132, 0.2);
+}
+
+/* Subcategories Container */
+.subcategories-container {
+    margin-top: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e8eaf6 100%);
+    border-radius: 10px;
+    border: 1px solid #ce93d8;
+}
+
+.subcategories-header {
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #7b1fa2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ba68c8;
+}
+
+.subcategory-section {
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f4ff 100%);
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid #64b5f6;
+    box-shadow: 0 2px 6px rgba(100, 181, 246, 0.2);
+    transition: all 0.3s ease;
+}
+
+.subcategory-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(100, 181, 246, 0.3);
+}
+
+.subcategory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    margin: 0 0 15px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.subcategory-section .section-title {
+    color: #1565c0;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.subcategory-count {
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(100, 181, 246, 0.3);
+}
+
+.courses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Enhanced Course Item Styling */
+.course-item {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.course-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #64b5f6;
+}
+
+.course-info {
+    flex: 1;
+}
+
+.course-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.course-category {
+    font-size: 0.8rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.course-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+}
+
+.enrollment-badge, .warning-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.enrollment-badge {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.warning-badge {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+    color: #e65100;
+    border: 1px solid #ffb74d;
 }
 </style>
 
@@ -1167,6 +1598,107 @@ function renderCourses(containerId, courses, type) {
         return;
     }
     
+    // For potential courses, render hierarchical structure
+    if (type === 'potential' && courses[0] && courses[0].parent_category) {
+        container.innerHTML = courses.map(categoryGroup => {
+            if (!categoryGroup) return '';
+            
+            let html = `
+                <div class="category-group">
+                    <div class="category-header" onclick="toggleCategory('${categoryGroup.parent_category.id}')">
+                        <h4 class="category-title">
+                            <i class="fa fa-folder"></i>
+                            ${escapeHtml(categoryGroup.parent_category.name)}
+                        </h4>
+                        <span class="category-count">
+                            ${(categoryGroup.direct_courses ? categoryGroup.direct_courses.length : 0) + 
+                              Object.values(categoryGroup.subcategories || {}).reduce((total, sub) => total + (sub.courses ? sub.courses.length : 0), 0)} courses
+                        </span>
+                        <i class="fa fa-chevron-down toggle-icon" id="toggle-${categoryGroup.parent_category.id}"></i>
+                    </div>
+                    <div class="category-content" id="category-${categoryGroup.parent_category.id}" style="display: none;">
+            `;
+            
+            // Direct courses under parent category
+            if (categoryGroup.direct_courses && categoryGroup.direct_courses.length > 0) {
+                html += `
+                    <div class="direct-courses-section">
+                        <h5 class="section-title">
+                            <i class="fa fa-book"></i>
+                            Direct Courses (${categoryGroup.direct_courses.length})
+                        </h5>
+                        <div class="courses-list">
+                `;
+                categoryGroup.direct_courses.forEach(course => {
+                    html += `
+                        <div class="course-item" data-course-id="${course.id}" data-type="${type}">
+                            <div class="course-name">${escapeHtml(course.fullname || 'Unknown Course')}</div>
+                            <div class="course-category">${escapeHtml(course.category_name || 'Uncategorized')}</div>
+                            <div class="course-meta">
+                                <span class="enrollment-badge">${course.idnumber || 'No ID'}</span>
+                                ${course.id > 1 ? '<span class="warning-badge">Existing enrollments</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div></div>';
+            }
+            
+            // Subcategories
+            if (categoryGroup.subcategories && Object.keys(categoryGroup.subcategories).length > 0) {
+                html += `
+                    <div class="subcategories-container">
+                        <h5 class="subcategories-header">
+                            <i class="fa fa-sitemap"></i>
+                            Subcategories (${Object.keys(categoryGroup.subcategories).length})
+                        </h5>
+                `;
+                
+                Object.values(categoryGroup.subcategories).forEach(subcategory => {
+                    if (subcategory.courses && subcategory.courses.length > 0) {
+                        html += `
+                            <div class="subcategory-section">
+                                <div class="subcategory-header">
+                                    <h6 class="section-title">
+                                        <i class="fa fa-folder-open"></i>
+                                        ${escapeHtml(subcategory.name)}
+                                    </h6>
+                                    <span class="subcategory-count">${subcategory.courses.length} courses</span>
+                                </div>
+                                <div class="courses-list">
+                        `;
+                        subcategory.courses.forEach(course => {
+                            html += `
+                                <div class="course-item" data-course-id="${course.id}" data-type="${type}">
+                                    <div class="course-info">
+                                        <div class="course-name">${escapeHtml(course.fullname || 'Unknown Course')}</div>
+                                        <div class="course-category">
+                                            <i class="fa fa-tag"></i>
+                                            ${escapeHtml(course.category_name || 'Uncategorized')}
+                                        </div>
+                                    </div>
+                                    <div class="course-meta">
+                                        <span class="enrollment-badge">
+                                            <i class="fa fa-hashtag"></i>
+                                            ${course.idnumber || 'No ID'}
+                                        </span>
+                                        ${course.id > 1 ? '<span class="warning-badge"><i class="fa fa-users"></i> Existing enrollments</span>' : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div></div>';
+                    }
+                });
+                
+                html += '</div>'; // Close subcategories-container
+            }
+            
+            html += '</div></div>';
+            return html;
+        }).join('');
+    } else {
+        // For school courses, render simple list
     container.innerHTML = courses.map(course => {
         if (!course) return '';
         return `
@@ -1180,6 +1712,7 @@ function renderCourses(containerId, courses, type) {
             </div>
         `;
     }).join('');
+    }
     
     // Add click listeners
     container.querySelectorAll('.course-item').forEach(item => {
@@ -1327,6 +1860,25 @@ function filterCourses(type, searchTerm) {
 
 function updateCourseCount(elementId, count) {
     document.getElementById(elementId).textContent = count;
+}
+
+function toggleCategory(categoryId) {
+    const content = document.getElementById(`category-${categoryId}`);
+    const toggle = document.getElementById(`toggle-${categoryId}`);
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggle.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        toggle.style.transform = 'rotate(0deg)';
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function showLoading(containerId) {
