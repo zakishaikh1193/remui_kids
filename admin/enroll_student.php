@@ -81,7 +81,7 @@ echo $OUTPUT->header();
     /* Hide Moodle default page title and tabs on this page */
     .page-context-header, .secondary-navigation { display: none !important; }
     /* Remove theme's extra top/bottom spacing for this page */
-    #page.drawers .main-inner { margin-top: 0 !important; margin-bottom: 0 !important; margin-right: 0 !important; margin-left: 0 !important; }
+    .main-inner { margin-top: 0 !important; margin-bottom: 0 !important; margin-right: 0 !important; margin-left: 0 !important; }
     body {
         background: linear-gradient(135deg, #fef7f7 0%, #f0f9ff 50%, #f0fdf4 100%);
         min-height: 100vh;

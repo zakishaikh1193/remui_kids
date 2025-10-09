@@ -3159,29 +3159,34 @@ function theme_remui_kids_get_top_courses_by_enrollment($limit = 5) {
     global $DB, $USER;
 
     try {
-        // Get teacher course ids
-        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
-        $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
-        if (empty($roleids)) {
-            return [];
-        }
-
-        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
-        $params['userid'] = $USER->id;
-        $params['ctxlevel'] = CONTEXT_COURSE;
-
+        // Get teacher course ids - simplified approach
         $courseids = $DB->get_records_sql(
             "SELECT DISTINCT ctx.instanceid as courseid
              FROM {role_assignments} ra
              JOIN {context} ctx ON ra.contextid = ctx.id
+             JOIN {role} r ON ra.roleid = r.id
              WHERE ra.userid = :userid
              AND ctx.contextlevel = :ctxlevel
-             AND ra.roleid {$insql}",
-            $params
+             AND r.shortname IN ('editingteacher', 'teacher', 'manager')",
+            ['userid' => $USER->id, 'ctxlevel' => CONTEXT_COURSE]
         );
 
         $ids = array_map(function($r) { return $r->courseid; }, $courseids);
         if (empty($ids)) {
+            // Fallback: get any courses where user has any role
+            $courseids = $DB->get_records_sql(
+                "SELECT DISTINCT ctx.instanceid as courseid
+                 FROM {role_assignments} ra
+                 JOIN {context} ctx ON ra.contextid = ctx.id
+                 WHERE ra.userid = :userid
+                 AND ctx.contextlevel = :ctxlevel",
+                ['userid' => $USER->id, 'ctxlevel' => CONTEXT_COURSE]
+            );
+            $ids = array_map(function($r) { return $r->courseid; }, $courseids);
+        }
+
+        if (empty($ids)) {
+            error_log("No courses found for user {$USER->id} in top courses");
             return [];
         }
 
@@ -3235,8 +3240,33 @@ function theme_remui_kids_get_top_courses_by_enrollment($limit = 5) {
             ];
         }
 
+        error_log("Top courses debug - Found " . count($out) . " courses");
+        
+        // If no courses found, try to get any courses the user has access to
+        if (empty($out)) {
+            error_log("No courses with enrollment data found, trying basic course list");
+            $basic_sql = "SELECT c.id, c.fullname as name, c.shortname
+                         FROM {course} c
+                         WHERE c.id {$coursesql} AND c.visible = 1
+                         ORDER BY c.fullname ASC
+                         LIMIT :limit";
+            $courseparams['limit'] = $limit;
+            $basic_records = $DB->get_records_sql($basic_sql, $courseparams);
+            
+            foreach ($basic_records as $r) {
+                $out[] = [
+                    'id' => $r->id,
+                    'name' => $r->name,
+                    'enrollment_count' => 0, // No enrollment data available
+                    'element_count' => (int)$DB->get_field_sql("SELECT COUNT(*) FROM {course_modules} cm WHERE cm.course = ? AND cm.visible = 1 AND cm.deletioninprogress = 0", [$r->id]),
+                    'url' => (new moodle_url('/course/view.php', ['id' => $r->id]))->out()
+                ];
+            }
+        }
+        
         return $out;
     } catch (Exception $e) {
+        error_log("Error in theme_remui_kids_get_top_courses_by_enrollment: " . $e->getMessage());
         return [];
     }
 }
@@ -3716,35 +3746,40 @@ function theme_remui_kids_get_recent_student_activity() {
     global $DB, $USER;
 
     try {
-        // Get teacher course ids
-        $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
-        $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
-        if (empty($roleids)) {
-            return [];
-        }
-
-        list($insql, $params) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED, 'r');
-        $params['userid'] = $USER->id;
-        $params['ctxlevel'] = CONTEXT_COURSE;
-
+        // Get teacher course ids - simplified approach
         $courseids_records = $DB->get_records_sql(
             "SELECT DISTINCT ctx.instanceid as courseid
              FROM {role_assignments} ra
              JOIN {context} ctx ON ra.contextid = ctx.id
+             JOIN {role} r ON ra.roleid = r.id
              WHERE ra.userid = :userid
              AND ctx.contextlevel = :ctxlevel
-             AND ra.roleid {$insql}",
-            $params
+             AND r.shortname IN ('editingteacher', 'teacher', 'manager')",
+            ['userid' => $USER->id, 'ctxlevel' => CONTEXT_COURSE]
         );
 
         $courseids = array_map(function($r) { return $r->courseid; }, $courseids_records);
         if (empty($courseids)) {
+            // Fallback: try to get any courses where user has any role
+            $courseids_records = $DB->get_records_sql(
+                "SELECT DISTINCT ctx.instanceid as courseid
+                 FROM {role_assignments} ra
+                 JOIN {context} ctx ON ra.contextid = ctx.id
+                 WHERE ra.userid = :userid
+                 AND ctx.contextlevel = :ctxlevel",
+                ['userid' => $USER->id, 'ctxlevel' => CONTEXT_COURSE]
+            );
+            $courseids = array_map(function($r) { return $r->courseid; }, $courseids_records);
+        }
+
+        if (empty($courseids)) {
+            error_log("No courses found for user {$USER->id} in recent student activity");
             return [];
         }
 
         list($coursesql, $courseparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'c');
 
-        // Get recent quiz attempts - exclude admin/teacher roles
+        // Get recent quiz attempts - simplified query
         $quiz_sql = "SELECT qa.id, qa.userid, qa.quiz, qa.attempt, qa.timestart, qa.timefinish,
                             q.name as activity_name, c.id as courseid, c.shortname as course_name,
                             u.firstname, u.lastname, u.email,
@@ -3755,19 +3790,13 @@ function theme_remui_kids_get_recent_student_activity() {
                      JOIN {user} u ON qa.userid = u.id
                      WHERE c.id {$coursesql}
                      AND qa.timefinish > 0
-                     AND qa.timefinish > " . (time() - (30 * 24 * 60 * 60)) . "
-                     AND u.id NOT IN (
-                         SELECT DISTINCT ra.userid 
-                         FROM {role_assignments} ra 
-                         JOIN {role} r ON ra.roleid = r.id 
-                         WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
-                     )
+                     AND qa.timefinish > " . (time() - (7 * 24 * 60 * 60)) . "
                      ORDER BY qa.timefinish DESC
                      LIMIT 10";
 
         $quiz_attempts = $DB->get_records_sql($quiz_sql, $courseparams);
 
-        // Get recent assignment submissions - exclude admin/teacher roles
+        // Get recent assignment submissions - simplified query
         $assign_sql = "SELECT asub.id, asub.userid, asub.assignment, asub.timemodified,
                               a.name as activity_name, c.id as courseid, c.shortname as course_name,
                               u.firstname, u.lastname, u.email,
@@ -3778,19 +3807,13 @@ function theme_remui_kids_get_recent_student_activity() {
                        JOIN {user} u ON asub.userid = u.id
                        WHERE c.id {$coursesql}
                        AND asub.status = 'submitted'
-                       AND asub.timemodified > " . (time() - (30 * 24 * 60 * 60)) . "
-                       AND u.id NOT IN (
-                           SELECT DISTINCT ra.userid 
-                           FROM {role_assignments} ra 
-                           JOIN {role} r ON ra.roleid = r.id 
-                           WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
-                       )
+                       AND asub.timemodified > " . (time() - (7 * 24 * 60 * 60)) . "
                        ORDER BY asub.timemodified DESC
                        LIMIT 10";
 
         $assignments = $DB->get_records_sql($assign_sql, $courseparams);
 
-        // Get recent forum posts - exclude admin/teacher roles
+        // Get recent forum posts - simplified query
         $forum_sql = "SELECT fp.id, fp.userid, fp.discussion, fp.created, fp.modified,
                              fd.name as discussion_name, f.name as activity_name,
                              c.id as courseid, c.shortname as course_name,
@@ -3802,17 +3825,16 @@ function theme_remui_kids_get_recent_student_activity() {
                       JOIN {course} c ON f.course = c.id
                       JOIN {user} u ON fp.userid = u.id
                       WHERE c.id {$coursesql}
-                      AND fp.created > " . (time() - (30 * 24 * 60 * 60)) . "
-                      AND u.id NOT IN (
-                          SELECT DISTINCT ra.userid 
-                          FROM {role_assignments} ra 
-                          JOIN {role} r ON ra.roleid = r.id 
-                          WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
-                      )
+                      AND fp.created > " . (time() - (7 * 24 * 60 * 60)) . "
                       ORDER BY fp.created DESC
                       LIMIT 10";
 
         $forum_posts = $DB->get_records_sql($forum_sql, $courseparams);
+
+        // Log results for debugging
+        error_log("Recent activity debug - Quiz attempts: " . count($quiz_attempts));
+        error_log("Recent activity debug - Assignments: " . count($assignments));
+        error_log("Recent activity debug - Forum posts: " . count($forum_posts));
 
         // Combine and format all activities
         $activities = [];
@@ -3862,7 +3884,40 @@ function theme_remui_kids_get_recent_student_activity() {
         });
 
         // Return top 15
-        return array_slice($activities, 0, 15);
+        $result = array_slice($activities, 0, 15);
+        
+        // If no activities found, try to get any recent user activity from courses
+        if (empty($result) && !empty($courseids)) {
+            error_log("No specific activities found, trying general user activity");
+            $general_sql = "SELECT u.id, u.firstname, u.lastname, u.lastaccess, c.shortname as course_name
+                           FROM {user} u
+                           JOIN {role_assignments} ra ON u.id = ra.userid
+                           JOIN {context} ctx ON ra.contextid = ctx.id
+                           JOIN {course} c ON ctx.instanceid = c.id
+                           WHERE ctx.instanceid {$coursesql}
+                           AND ctx.contextlevel = " . CONTEXT_COURSE . "
+                           AND u.lastaccess > " . (time() - (7 * 24 * 60 * 60)) . "
+                           AND u.id != :userid
+                           ORDER BY u.lastaccess DESC
+                           LIMIT 10";
+            $courseparams['userid'] = $USER->id;
+            $recent_users = $DB->get_records_sql($general_sql, $courseparams);
+            
+            foreach ($recent_users as $user) {
+                $result[] = [
+                    'student_name' => $user->firstname . ' ' . $user->lastname,
+                    'activity_name' => 'Recent Activity',
+                    'activity_type' => 'User Activity',
+                    'course_name' => $user->course_name,
+                    'time' => userdate($user->lastaccess, '%b %e, %Y %H:%M'),
+                    'timestamp' => $user->lastaccess,
+                    'icon' => 'fa-user',
+                    'color' => '#2196F3'
+                ];
+            }
+        }
+        
+        return $result;
 
     } catch (Exception $e) {
         error_log("Error in theme_remui_kids_get_recent_student_activity: " . $e->getMessage());
