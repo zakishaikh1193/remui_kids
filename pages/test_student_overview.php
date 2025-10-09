@@ -39,4 +39,3 @@ echo html_writer::end_div();
 
 echo $OUTPUT->footer();
 ?>
-

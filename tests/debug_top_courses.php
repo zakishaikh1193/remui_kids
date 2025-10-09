@@ -45,6 +45,3 @@ if ($isteacher) {
     echo "<p>User is not a teacher, so no top courses data available.</p>";
 }
 ?>
-
-
-

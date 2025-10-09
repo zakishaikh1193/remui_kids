@@ -74,19 +74,194 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_student'])) {
 }
 
 echo $OUTPUT->header();
-
+ 
 // Add custom CSS for the enrollment page
-echo "<style>
+ echo <<<CSS
+<style>
+    /* Hide Moodle default page title and tabs on this page */
+    .page-context-header, .secondary-navigation { display: none !important; }
+    /* Remove theme's extra top/bottom spacing for this page */
+    #page.drawers .main-inner { margin-top: 0 !important; margin-bottom: 0 !important; margin-right: 0 !important; margin-left: 0 !important; }
     body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #fef7f7 0%, #f0f9ff 50%, #f0fdf4 100%);
         min-height: 100vh;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Admin Sidebar Navigation - Sticky on all pages */
+    .admin-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        z-index: 1000;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+    
+    .admin-sidebar .sidebar-content {
+        padding: 7rem 0 2rem 0;
+    }
+    
+    .admin-sidebar .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .admin-sidebar .sidebar-category {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        margin-top: 0;
+    }
+    
+    .admin-sidebar .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-sidebar .sidebar-item {
+        margin-bottom: 0.25rem;
+    }
+    
+    .admin-sidebar .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .admin-sidebar .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border-left-color: #667eea;
+    }
+    
+    .admin-sidebar .sidebar-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 1rem;
+        font-size: 1rem;
+        color: #6c757d;
+        text-align: center;
+    }
+    
+    .admin-sidebar .sidebar-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-link {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border-left-color: #1976d2;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-icon {
+        color: #1976d2;
+    }
+    
+    /* Scrollbar styling */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Main content area with sidebar - FLOW LAYOUT */
+    .admin-main-content {
+        position: relative;
+        margin-left: 280px;
+        /* sit to the right of fixed sidebar */
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: 0; /* header spacing handled inside container */
+        width: auto;
+        min-height: calc(100vh - 60px);
+        background-color: transparent;
+    }
+    
+    /* Mobile Toggle Button */
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .sidebar-toggle {
+            display: block !important;
+        }
+        
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .admin-sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+        
+        .admin-main-content {
+            position: relative;
+            margin-left: 0;
+            width: 100%;
+            height: auto;
+            min-height: calc(100vh - 60px);
+            padding-top: 80px;
+        }
+        
+        .enrollment-container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            margin-top: 60px;
+        }
+        
+        .page-header {
+            margin-top: 20px;
+        }
     }
     
     .enrollment-container {
-        max-width: 800px;
+        max-width: none;
+        width: 100%;
         margin: 0 auto;
-        padding: 20px;
+        box-sizing: border-box;
+        padding: 20px 20% 20px 20%; /* 20% left/right padding as requested */
+        padding-top: 20px; /* compact top spacing */
         animation: fadeInUp 0.8s ease-out;
     }
     
@@ -107,7 +282,7 @@ echo "<style>
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(10px);
         overflow: hidden;
-        margin-bottom: 30px;
+        margin: 0 0 16px 0; /* tighter spacing under header */
         animation: slideInDown 1s ease-out 0.2s both;
     }
     
@@ -123,7 +298,7 @@ echo "<style>
     }
     
     .header-background {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
         padding: 40px;
         text-align: center;
         position: relative;
@@ -147,29 +322,30 @@ echo "<style>
     }
     
     .breadcrumb {
-        color: rgba(255, 255, 255, 0.9);
+        color: #0369a1;
         font-size: 0.9rem;
         margin-bottom: 20px;
         position: relative;
         z-index: 1;
+        opacity: 0.8;
     }
     
     .breadcrumb a {
-        color: rgba(255, 255, 255, 0.8);
+        color: #0369a1;
         text-decoration: none;
         transition: color 0.3s ease;
     }
     
     .breadcrumb a:hover {
-        color: white;
+        color: #0284c7;
     }
     
     .page-title {
         font-size: 3rem;
         font-weight: 800;
-        color: white;
+        color: #0369a1;
         margin: 0;
-        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 2px 4px rgba(3, 105, 161, 0.2);
         position: relative;
         z-index: 1;
         animation: titleGlow 2s ease-in-out infinite alternate;
@@ -182,19 +358,80 @@ echo "<style>
     
     .page-subtitle {
         font-size: 1.3rem;
-        color: rgba(255, 255, 255, 0.9);
+        color: #0369a1;
         margin: 10px 0 0 0;
         position: relative;
         z-index: 1;
+        opacity: 0.8;
     }
     
-    .enrollment-form-container {
+    .field-section {
         background: rgba(255, 255, 255, 0.95);
-        border-radius: 25px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
         backdrop-filter: blur(10px);
-        overflow: hidden;
-        animation: slideInUp 1s ease-out 0.4s both;
+        margin: 0 0 20px 0;
+        padding: 20px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0369a1;
+        margin: 0 0 16px 0;
+    }
+    
+    .field-group {
+        margin-bottom: 16px;
+    }
+    
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .field-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+    
+    .field-label.optional::after {
+        content: " (Optional)";
+        color: #6b7280;
+        font-weight: 400;
+    }
+    
+    .field-select, .field-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        transition: border-color 0.2s ease;
+    }
+    
+    .field-select:focus, .field-input:focus {
+        outline: none;
+        border-color: #0369a1;
+        box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
+    }
+    
+    .action-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(10px);
+        margin: 0 0 20px 0;
+        padding: 20px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
     
     @keyframes slideInUp {
@@ -209,7 +446,7 @@ echo "<style>
     }
     
     .form-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
         padding: 30px;
         text-align: center;
         position: relative;
@@ -236,15 +473,16 @@ echo "<style>
     .form-title {
         font-size: 2rem;
         font-weight: 700;
-        color: white;
+        color: #166534;
         margin: 0;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 2px rgba(22, 101, 52, 0.2);
     }
     
     .form-subtitle {
         font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.9);
+        color: #166534;
         margin: 10px 0 0 0;
+        opacity: 0.8;
     }
     
     .form-content {
@@ -383,25 +621,25 @@ echo "<style>
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        color: #0369a1;
+        box-shadow: 0 8px 25px rgba(224, 242, 254, 0.4);
     }
     
     .btn-primary:hover {
         transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 15px 35px rgba(224, 242, 254, 0.6);
     }
     
     .btn-secondary {
-        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        color: white;
-        box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        color: #374151;
+        box-shadow: 0 8px 25px rgba(243, 244, 246, 0.4);
     }
     
     .btn-secondary:hover {
         transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(107, 114, 128, 0.4);
+        box-shadow: 0 15px 35px rgba(243, 244, 246, 0.6);
     }
     
     .btn:active {
@@ -497,8 +735,9 @@ echo "<style>
         .enrollment-container {
             padding: 10px;
         }
-    }
-</style>";
+}
+</style>
+CSS;
 
 // Floating background elements
 echo "<div class='floating-elements'>";
@@ -507,16 +746,157 @@ echo "<div class='floating-circle'></div>";
 echo "<div class='floating-circle'></div>";
 echo "</div>";
 
-echo "<div class='enrollment-container'>";
+// Admin Sidebar Navigation
+echo "<div class='admin-sidebar'>";
+echo "<div class='sidebar-content'>";
+echo "<!-- DASHBOARD Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>DASHBOARD</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/my/' class='sidebar-link'>";
+echo "<i class='fa fa-th-large sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Admin Dashboard</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/admin/search.php' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Site Administration</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Community</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item active'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Enrollments</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- TEACHERS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>TEACHERS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/teachers_list.php' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Teachers</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-medal sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Master Trainers</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- COURSES & PROGRAMS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
+echo "<i class='fa fa-book sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Courses & Programs</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Certifications</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Assessments</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-school sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Schools</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- INSIGHTS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>INSIGHTS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/local/edwiserreports/index.php' class='sidebar-link'>";
+echo "<i class='fa fa-chart-bar sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Analytics</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-chart-line sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Predictive Models</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-file-alt sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Reports</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-map sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Competencies Map</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- SETTINGS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>SETTINGS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>System Settings</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/users_management_dashboard.php' class='sidebar-link'>";
+echo "<i class='fa fa-user-friends sidebar-icon'></i>";
+echo "<span class='sidebar-text'>User Management</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Cohort Navigation</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+echo "</div>";
+echo "</div>";
+
+
+
+// Main content area with sidebar
 
 // Page Header
 echo "<div class='page-header'>";
 echo "<div class='header-background'>";
 echo "<div class='breadcrumb'>";
-echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
-echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/'>Administration</a> / ";
-echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php'>Enrollments</a> / ";
-echo "<span class='breadcrumb-item'>Enroll New Student</span>";
+
 echo "</div>";
 echo "<h1 class='page-title'>Enroll New Student</h1>";
 echo "<p class='page-subtitle'>Add a new student to a course with advanced options</p>";
@@ -531,32 +911,24 @@ if (isset($success_message)) {
     echo "</div>";
 }
 
-// Enrollment Form
-echo "<div class='enrollment-form-container'>";
-echo "<div class='form-header'>";
-echo "<h2 class='form-title'>Student Enrollment Form</h2>";
-echo "<p class='form-subtitle'>Fill in the details below to enroll a student in a course</p>";
-echo "</div>";
-
-echo "<div class='form-content'>";
-echo "<form method='POST' action=''>";
-
-// Student Selection
-echo "<div class='form-row'>";
-echo "<div class='form-group'>";
-echo "<label class='form-label' for='student_id'>Select Student</label>";
-echo "<select class='form-select' id='student_id' name='student_id' required>";
+// Student Selection Section
+echo "<div class='field-section'>";
+echo "<h3 class='section-title'>Select Student</h3>";
+echo "<div class='field-group'>";
+echo "<label class='field-label' for='student_id'>Student</label>";
+echo "<select class='field-select' id='student_id' name='student_id' required>";
 echo "<option value=''>Choose a student...</option>";
 
-// Get all students
+// Get all active users (students)
 $students = $DB->get_records_sql("
     SELECT DISTINCT u.id, u.firstname, u.lastname, u.email 
     FROM {user} u 
     JOIN {role_assignments} ra ON u.id = ra.userid 
     JOIN {role} r ON ra.roleid = r.id 
-    WHERE r.shortname = 'trainee'
+    WHERE r.shortname = 'student'
     AND u.deleted = 0 
     AND u.suspended = 0
+    AND u.id > 1
     ORDER BY u.firstname, u.lastname
 ");
 
@@ -566,11 +938,14 @@ foreach ($students as $student) {
 
 echo "</select>";
 echo "</div>";
+echo "</div>";
 
-// Course Selection
-echo "<div class='form-group'>";
-echo "<label class='form-label' for='course_id'>Select Course</label>";
-echo "<select class='form-select' id='course_id' name='course_id' required>";
+// Course Selection Section
+echo "<div class='field-section'>";
+echo "<h3 class='section-title'>Select Course</h3>";
+echo "<div class='field-group'>";
+echo "<label class='field-label' for='course_id'>Course</label>";
+echo "<select class='field-select' id='course_id' name='course_id' required>";
 echo "<option value=''>Choose a course...</option>";
 
 // Get all visible courses
@@ -583,11 +958,13 @@ echo "</select>";
 echo "</div>";
 echo "</div>";
 
-// Enrollment Method and Duration
-echo "<div class='form-row'>";
-echo "<div class='form-group'>";
-echo "<label class='form-label' for='enrollment_method'>Enrollment Method</label>";
-echo "<select class='form-select' id='enrollment_method' name='enrollment_method' required>";
+// Enrollment Settings Section
+echo "<div class='field-section'>";
+echo "<h3 class='section-title'>Enrollment Settings</h3>";
+echo "<div class='field-row'>";
+echo "<div class='field-group'>";
+echo "<label class='field-label' for='enrollment_method'>Method</label>";
+echo "<select class='field-select' id='enrollment_method' name='enrollment_method' required>";
 echo "<option value='manual'>Manual Enrollment</option>";
 echo "<option value='self'>Self Enrollment</option>";
 echo "<option value='cohort'>Cohort Enrollment</option>";
@@ -595,43 +972,66 @@ echo "<option value='guest'>Guest Access</option>";
 echo "</select>";
 echo "</div>";
 
-echo "<div class='form-group'>";
-echo "<label class='form-label optional' for='enrollment_duration'>Duration (Days)</label>";
-echo "<input type='number' class='form-input' id='enrollment_duration' name='enrollment_duration' placeholder='Leave empty for unlimited' min='1' max='3650'>";
+echo "<div class='field-group'>";
+echo "<label class='field-label optional' for='enrollment_duration'>Duration (Days)</label>";
+echo "<input type='number' class='field-input' id='enrollment_duration' name='enrollment_duration' placeholder='Leave empty for unlimited' min='1' max='3650'>";
 echo "</div>";
 echo "</div>";
 
-// Start and End Date
-echo "<div class='form-row'>";
-echo "<div class='form-group'>";
-echo "<label class='form-label' for='start_date'>Start Date</label>";
-echo "<input type='date' class='form-input' id='start_date' name='start_date' value='" . date('Y-m-d') . "' required>";
+echo "<div class='field-row'>";
+echo "<div class='field-group'>";
+echo "<label class='field-label' for='start_date'>Start Date</label>";
+echo "<input type='date' class='field-input' id='start_date' name='start_date' value='" . date('Y-m-d') . "' required>";
 echo "</div>";
 
-echo "<div class='form-group'>";
-echo "<label class='form-label optional' for='end_date'>End Date</label>";
-echo "<input type='date' class='form-input' id='end_date' name='end_date'>";
+echo "<div class='field-group'>";
+echo "<label class='field-label optional' for='end_date'>End Date</label>";
+echo "<input type='date' class='field-input' id='end_date' name='end_date'>";
+echo "</div>";
 echo "</div>";
 echo "</div>";
 
-// Form Actions
-echo "<div class='form-actions'>";
+// Action Buttons
+echo "<div class='action-section'>";
+echo "<form method='POST' action=''>";
 echo "<button type='submit' name='enroll_student' class='btn btn-primary'>";
 echo "<i class='fa fa-plus'></i> Enroll Student";
 echo "</button>";
+echo "</form>";
 echo "<a href='enrollments.php' class='btn btn-secondary'>";
 echo "<i class='fa fa-arrow-left'></i> Back to Enrollments";
 echo "</a>";
 echo "</div>";
 
-echo "</form>";
-echo "</div>";
-echo "</div>";
-
-echo "</div>"; // End enrollment-container
 
 // Add JavaScript for form enhancements
 echo "<script>
+// Sidebar toggle function
+function toggleSidebar() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    sidebar.classList.toggle('sidebar-open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.admin-sidebar');
+    const toggleButton = document.querySelector('.sidebar-toggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+            sidebar.classList.remove('sidebar-open');
+        }
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-calculate end date based on duration
     const durationInput = document.getElementById('enrollment_duration');
@@ -666,8 +1066,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add loading state to submit button
     form.addEventListener('submit', function() {
-        const submitBtn = document.querySelector('button[type=\"submit\"]');
-        submitBtn.innerHTML = '<i class=\"fa fa-spinner fa-spin\"></i> Enrolling...';
+        const submitBtn = document.querySelector('button[type=\\\"submit\\\"]');
+        submitBtn.innerHTML = '<i class=\\\"fa fa-spinner fa-spin\\\"></i> Enrolling...';
         submitBtn.disabled = true;
     });
 });

@@ -416,11 +416,25 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $templatecontext['user_cohort_id'] = $usercohortid;
     $templatecontext['student_name'] = $USER->firstname;
     $templatecontext['hello_message'] = "Hello " . $USER->firstname . "!";
-    $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
+    
+    // Set My Courses URL based on dashboard type
+    if ($dashboardtype === 'highschool') {
+        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/highschool_courses.php'))->out();
+        $templatecontext['assignmentsurl'] = (new moodle_url('/theme/remui_kids/highschool_assignments.php'))->out();
+        $templatecontext['profileurl'] = (new moodle_url('/theme/remui_kids/highschool_profile.php'))->out();
+        $templatecontext['messagesurl'] = (new moodle_url('/theme/remui_kids/highschool_messages.php'))->out();
+        $templatecontext['gradesurl'] = (new moodle_url('/theme/remui_kids/highschool_grades.php'))->out();
+        $templatecontext['calendarurl'] = (new moodle_url('/theme/remui_kids/highschool_calendar.php'))->out();
+    } else {
+        $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
+        $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
+        $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', array('id' => $USER->id)))->out();
+        $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
+        $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
+        $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
+    }
+    
     $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
-    $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
-    $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
-    $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
     $templatecontext['codeeditorurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 1]))->out(); // Adjust ID as needed
     $templatecontext['scratchurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 2]))->out(); // Adjust ID as needed
     $templatecontext['logouturl'] = (new moodle_url('/login/logout.php', ['sesskey' => sesskey()]))->out();
@@ -523,17 +537,6 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['total_courses_count'] = count($courses);
         $templatecontext['show_view_all_button'] = count($courses) > 3;
         
-        // Add course sections data for modal preview
-        $coursesectionsdata = [];
-        foreach ($courses as $course) {
-            $sectionsdata = theme_remui_kids_get_course_sections_for_modal($course['id']);
-            $coursesectionsdata[$course['id']] = $sectionsdata;
-            // Debug: Log the data for each course
-            error_log("High school course {$course['id']} ({$course['fullname']}) sections data: " . print_r($sectionsdata, true));
-        }
-        $templatecontext['highschool_courses_sections'] = json_encode($coursesectionsdata);
-        // Debug: Log the final JSON data
-        error_log("Final high school courses sections JSON: " . $templatecontext['highschool_courses_sections']);
         
         // Add active sections data (limit to 3 for Current Lessons section)
         $activesections = theme_remui_kids_get_highschool_active_sections($USER->id);

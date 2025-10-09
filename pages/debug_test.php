@@ -33,4 +33,3 @@ try {
     echo "Stack trace: " . $e->getTraceAsString();
 }
 ?>
-

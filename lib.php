@@ -32,12 +32,25 @@ defined('MOODLE_INTERNAL') || die();
 function theme_remui_kids_page_init($page) {
     global $PAGE;
     
-    // Load dropdown fixes on admin pages
+    // Only load dropdown fixes on admin pages and NON-EDIT course pages
     if (strpos($PAGE->url->get_path(), '/admin/') !== false || 
         strpos($PAGE->url->get_path(), '/theme/remui_kids/admin/') !== false) {
         
+        // Temporarily disabled to fix module loading issues
+        // $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
+        // $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+        
+        // Simple approach: Load basic dropdown fix without dependencies
+        $PAGE->requires->js('/theme/remui_kids/javascript/simple_dropdown_fix.js');
+    }
+    
+    // Load course-specific dropdown fixes ONLY for non-edit course pages
+    if ((strpos($PAGE->url->get_path(), '/course/view.php') !== false ||
+         strpos($PAGE->url->get_path(), '/course/') !== false) &&
+        !$PAGE->user_is_editing()) {
         $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
         $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+        $PAGE->requires->js_call_amd('theme_remui_kids/course_dropdown_fix', 'init');
     }
 }
 
@@ -318,7 +331,7 @@ function theme_remui_kids_get_course_header_data($course) {
     }
     
     // Get teachers count (users with 'teacher' or 'editingteacher' role)
-    $teacherroles = $DB->count_records_sql(
+    $teacherroles = $DB->get_records_sql(
         "SELECT * FROM {role} WHERE shortname IN ('editingteacher', 'teacher')"
     );
     $teacherscount = 0;
@@ -844,7 +857,9 @@ function theme_remui_kids_get_elementary_courses($userid) {
                 'last_accessed' => $last_accessed,
                 'next_activity' => $next_activity,
                 'instructor_name' => $instructor_name,
+                'start_date' => $start_date,
                 'grade_level' => 'Grade ' . rand(1, 3), // Mock grade level
+                'subject' => $course->categoryname ?: 'General',
                 'completed' => $progress >= 100,
                 'in_progress' => $progress > 0 && $progress < 100,
                 'recent_activities' => [
@@ -1760,11 +1775,7 @@ function theme_remui_kids_get_calendar_week_data($userid) {
     
     // Get user's enrolled courses
     $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
-    if (!is_array($courses)) {
-        error_log("enrol_get_my_courses returned non-array: " . gettype($courses));
-        $courses = [];
-    }
-    $courseids = (is_array($courses) && !empty($courses)) ? array_keys($courses) : [];
+    $courseids = is_array($courses) ? array_keys($courses) : [];
     
     // Get calendar events using Moodle's built-in function
     $events = calendar_get_events(
@@ -1823,11 +1834,7 @@ function theme_remui_kids_get_upcoming_events($userid) {
     
     // Get user's enrolled courses
     $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
-    if (!is_array($courses)) {
-        error_log("enrol_get_my_courses returned non-array: " . gettype($courses));
-        $courses = [];
-    }
-    $courseids = (is_array($courses) && !empty($courses)) ? array_keys($courses) : [];
+    $courseids = is_array($courses) ? array_keys($courses) : [];
     
     // Get calendar events using Moodle's built-in function
     $events = calendar_get_events(
@@ -2071,10 +2078,10 @@ function theme_remui_kids_get_highschool_dashboard_stats($userid) {
  * @return array Course data
  */
 function theme_remui_kids_get_highschool_courses($userid) {
-    global $DB;
+    global $DB, $CFG;
     
     $courses = $DB->get_records_sql(
-        "SELECT c.id, c.fullname, c.shortname, c.summary, c.startdate, c.enddate
+        "SELECT c.id, c.fullname, c.shortname, c.summary, c.startdate, c.enddate, c.category, c.timecreated
          FROM {course} c
          JOIN {enrol} e ON c.id = e.courseid
          JOIN {user_enrolments} ue ON e.id = ue.enrolid
@@ -2106,7 +2113,159 @@ function theme_remui_kids_get_highschool_courses($userid) {
             [$userid, $course->id]
         ) ?: 0;
         
-        $progress = $total_activities > 0 ? round(($completed_activities / $total_activities) * 100) : 0;
+        // Get course sections
+        $total_sections = $DB->get_field_sql(
+            "SELECT COUNT(*)
+             FROM {course_sections} cs
+             WHERE cs.course = ? 
+             AND cs.section > 0",
+            [$course->id]
+        ) ?: 1;
+        
+        $completed_sections = $DB->get_field_sql(
+            "SELECT COUNT(DISTINCT cs.section)
+             FROM {course_sections} cs
+             JOIN {course_modules} cm ON cs.course = cm.course
+             JOIN {course_modules_completion} cmc ON cm.id = cmc.coursemoduleid
+             WHERE cs.course = ? 
+             AND cs.section > 0
+             AND cmc.userid = ?
+             AND cmc.completionstate IN (1, 2)",
+            [$course->id, $userid]
+        ) ?: 0;
+        
+        $progress_percentage = $total_activities > 0 ? round(($completed_activities / $total_activities) * 100) : 0;
+        
+        // Get course category name
+        $categoryname = $DB->get_field('course_categories', 'name', ['id' => $course->category]) ?: 'General';
+        
+        // Get course image from files table (same approach as elementary dashboard)
+        $courseimage = '';
+        $coursecontext = context_course::instance($course->id);
+        
+        // Get course overview files (course images)
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($coursecontext->id, 'course', 'overviewfiles', 0, 'timemodified DESC', false);
+        
+        if (!empty($files)) {
+            $file = reset($files); // Get the first (most recent) file
+            if ($file->is_valid_image()) {
+                $courseimage = moodle_url::make_pluginfile_url(
+                    $coursecontext->id,
+                    'course',
+                    'overviewfiles',
+                    null,
+                    '/',
+                    $file->get_filename()
+                )->out();
+            }
+        }
+        
+        // If no course image found, use fallback images based on subject/category
+        if (empty($courseimage)) {
+            $subject = strtolower($categoryname);
+            $fallback_images = [
+                'mathematics' => [
+                    'https://img.freepik.com/free-photo/mathematics-formulas-written-blackboard_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/calculator-math-education-concept_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/student-solving-math-problem_1150-1016.jpg'
+                ],
+                'english' => [
+                    'https://img.freepik.com/free-photo/books-stack-with-copy-space_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/student-reading-book_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/writing-essay-concept_1150-1016.jpg'
+                ],
+                'science' => [
+                    'https://img.freepik.com/free-photo/science-laboratory-with-microscope_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/chemistry-experiment-concept_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/biology-lab-equipment_1150-1016.jpg'
+                ],
+                'history' => [
+                    'https://img.freepik.com/free-photo/historical-books-library_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/ancient-world-map_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/historical-documents_1150-1016.jpg'
+                ],
+                'art' => [
+                    'https://img.freepik.com/free-photo/art-supplies-paintbrushes_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/colorful-paint-palette_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/artist-painting-canvas_1150-1016.jpg'
+                ],
+                'music' => [
+                    'https://img.freepik.com/free-photo/musical-instruments-piano_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/music-notes-sheet_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/student-playing-guitar_1150-1016.jpg'
+                ],
+                'physical education' => [
+                    'https://img.freepik.com/free-photo/sports-equipment-gym_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/students-playing-basketball_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/fitness-training-concept_1150-1016.jpg'
+                ],
+                'computer' => [
+                    'https://img.freepik.com/free-photo/computer-programming-concept_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/coding-laptop-screen_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/technology-education-concept_1150-1016.jpg'
+                ],
+                'default' => [
+                    'https://img.freepik.com/free-photo/students-studying-together_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/education-learning-concept_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/classroom-learning-environment_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/student-with-books-backpack_1150-1016.jpg',
+                    'https://img.freepik.com/free-photo/teacher-explaining-lesson_1150-1016.jpg'
+                ]
+            ];
+            
+            // Determine which category of images to use
+            $image_category = 'default';
+            foreach ($fallback_images as $key => $images) {
+                if (strpos($subject, $key) !== false) {
+                    $image_category = $key;
+                    break;
+                }
+            }
+            
+            // Select a random image from the appropriate category
+            $courseimage = $fallback_images[$image_category][array_rand($fallback_images[$image_category])];
+        }
+        
+        // Get instructor name (first teacher found)
+        $instructor_name = $DB->get_field_sql(
+            "SELECT CONCAT(u.firstname, ' ', u.lastname)
+             FROM {user} u
+             JOIN {role_assignments} ra ON u.id = ra.userid
+             JOIN {context} ctx ON ra.contextid = ctx.id
+             JOIN {role} r ON ra.roleid = r.id
+             WHERE ctx.instanceid = ? 
+             AND ctx.contextlevel = 50
+             AND r.shortname IN ('editingteacher', 'teacher')
+             LIMIT 1",
+            [$course->id]
+        ) ?: 'Instructor';
+        
+        // Get last accessed time
+        $last_accessed = $DB->get_field('user_lastaccess', 'timeaccess', ['userid' => $userid, 'courseid' => $course->id]);
+        $last_accessed_formatted = $last_accessed ? date('M j, Y', $last_accessed) : 'Never';
+        
+        // Determine course status
+        $completed = $progress_percentage >= 100;
+        $in_progress = $progress_percentage > 0 && $progress_percentage < 100;
+        
+        // Estimate time (mock calculation based on activities)
+        $estimated_time = $total_activities * 15; // 15 minutes per activity
+        
+        // Points earned (mock calculation)
+        $points_earned = $completed_activities * 10; // 10 points per completed activity
+        
+        // Grade level (extract from course name or use default)
+        $grade_level = 'Grade 11'; // Default for high school
+        if (preg_match('/grade\s*(\d+)/i', $course->fullname, $matches)) {
+            $grade_level = 'Grade ' . $matches[1];
+        }
+        
+        // Subject (extract from course name or category)
+        $subject = $categoryname;
+        if (preg_match('/(math|english|science|history|art|music|pe|computer)/i', $course->fullname, $matches)) {
+            $subject = ucfirst($matches[1]);
+        }
         
         $coursedata[] = [
             'id' => $course->id,
@@ -2115,8 +2274,24 @@ function theme_remui_kids_get_highschool_courses($userid) {
             'summary' => $course->summary,
             'startdate' => $course->startdate,
             'enddate' => $course->enddate,
-            'progress' => $progress,
-            'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out()
+            'progress' => $progress_percentage,
+            'progress_percentage' => $progress_percentage,
+            'courseurl' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out(),
+            'completed_sections' => $completed_sections,
+            'total_sections' => $total_sections,
+            'completed_activities' => $completed_activities,
+            'total_activities' => $total_activities,
+            'estimated_time' => $estimated_time,
+            'points_earned' => $points_earned,
+            'instructor_name' => $instructor_name,
+            'start_date' => date('M j, Y', $course->startdate),
+            'last_accessed' => $last_accessed_formatted,
+            'completed' => $completed,
+            'in_progress' => $in_progress,
+            'categoryname' => $categoryname,
+            'grade_level' => $grade_level,
+            'subject' => $subject,
+            'courseimage' => $courseimage
         ];
     }
     

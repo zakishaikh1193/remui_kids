@@ -322,6 +322,9 @@ echo '<div class="teacher-main-content">';
 // Full Screen Dashboard Layout with Integrated Profile
 echo html_writer::start_div('', ['style' => 'min-height: 100vh; background: #f8fafc; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 0; margin: 0; width: 100%; overflow-x: hidden;']);
 
+// Include Moodle header for navigation bar
+echo $OUTPUT->header();
+
 
 // Full Width Dashboard Content
 echo html_writer::start_div('', ['style' => 'max-width: 1400px; margin: 0 auto; padding: 24px;']);
@@ -596,7 +599,6 @@ echo html_writer::start_div('', ['style' => 'background: white; border-radius: 1
 // Data indicator dot (green for real data)
 echo html_writer::start_div('', ['style' => 'position: absolute; top: 12px; right: 12px; width: 12px; height: 12px; border-radius: 50%; background: #10b981; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);']);
 echo html_writer::end_div();
-
 // Total courses metric
 echo html_writer::start_div('', ['style' => 'display: flex; align-items: center; gap: 16px;']);
 echo html_writer::start_div('', ['style' => 'width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; background: #10b981;']);

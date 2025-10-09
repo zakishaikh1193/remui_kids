@@ -55,8 +55,12 @@ class core_renderer extends \theme_remui\output\core_renderer {
         if (strpos($PAGE->url->get_path(), '/admin/') !== false || 
             strpos($PAGE->url->get_path(), '/theme/remui_kids/admin/') !== false) {
             
-            $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
-            $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+            // Temporarily disabled to fix module loading issues
+            // $PAGE->requires->js_call_amd('theme_remui_kids/admin_dropdown_fix', 'init');
+            // $PAGE->requires->js_call_amd('theme_remui_kids/bootstrap_compatibility', 'init');
+            
+            // Simple approach: Load basic dropdown fix without dependencies
+            $PAGE->requires->js('/theme/remui_kids/javascript/simple_dropdown_fix.js');
         }
     }
 

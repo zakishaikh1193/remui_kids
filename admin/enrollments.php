@@ -10,8 +10,7 @@ global $DB, $CFG, $OUTPUT, $PAGE;
 $PAGE->set_url('/theme/remui_kids/admin/enrollments.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Enrolments Management');
-$PAGE->set_heading('Enrolments Management');
-$PAGE->set_pagelayout('admin');
+
 
 // Check if user has admin capabilities
 require_capability('moodle/site:config', context_system::instance());
@@ -157,7 +156,7 @@ echo "<style>
     
     body {
         font-family: 'Inter', sans-serif;
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #fef7f7 0%, #f0f9ff 50%, #f0fdf4 100%);
         min-height: 100vh;
         overflow-x: hidden;
     }
@@ -336,10 +335,22 @@ echo "<style>
     }
     
     .header-background {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        height: 200px;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        height: 120px;
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .header-content {
+        position: relative;
+        z-index: 2;
+        color: #0369a1;
     }
     
     .header-background::before {
@@ -406,20 +417,16 @@ echo "<style>
     }
     
     .page-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 800;
-        color: #2d3748;
-        margin-bottom: 10px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #0369a1;
+        margin-bottom: 8px;
         animation: fadeInUp 1s ease-out 0.3s both;
     }
     
     .btn-enroll {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
+        background: #dcfce7;
+        color: #166534;
         border: none;
         padding: 15px 30px;
         border-radius: 12px;
@@ -427,7 +434,7 @@ echo "<style>
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 4px 12px rgba(220, 252, 231, 0.4);
         display: flex;
         align-items: center;
         gap: 10px;
@@ -436,9 +443,9 @@ echo "<style>
     }
     
     .btn-enroll:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4);
-        background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(220, 252, 231, 0.6);
+        background: #bbf7d0;
     }
     
     .btn-enroll:active {
@@ -470,8 +477,8 @@ echo "<style>
     
     .form-group select:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #0369a1;
+        box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
     }
     
     .form-group select:hover {
@@ -490,11 +497,12 @@ echo "<style>
     }
     
     .page-subtitle {
-        font-size: 1.2rem;
-        color: #4a5568;
-        margin-bottom: 30px;
+        font-size: 1.3rem;
+        color: #0369a1;
+        margin: 0;
         font-weight: 500;
         animation: fadeInUp 1s ease-out 0.4s both;
+        opacity: 0.9;
     }
     
     .stats-grid {
@@ -528,21 +536,52 @@ echo "<style>
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
     }
     
     .stat-icon {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #e0f2fe;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: #0369a1;
         font-size: 1.5rem;
         margin: 0 auto 20px;
-        animation: bounce 2s infinite;
+       
+    }
+    
+    /* Pastel color variations for different stat types */
+    .stat-card:nth-child(1) .stat-icon {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+    
+    .stat-card:nth-child(2) .stat-icon {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .stat-card:nth-child(3) .stat-icon {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+    
+    .stat-card:nth-child(4) .stat-icon {
+        background: #fed7aa;
+        color: #ea580c;
+    }
+    
+    .stat-card:nth-child(5) .stat-icon {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+    
+    .stat-card:nth-child(6) .stat-icon {
+        background: #fce7f3;
+        color: #be185d;
     }
     
     @keyframes bounce {
@@ -608,8 +647,8 @@ echo "<style>
     
     .filter-input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #0369a1;
+        box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
     }
     
     .filter-select {
@@ -624,8 +663,8 @@ echo "<style>
     
     .filter-select:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #0369a1;
+        box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
     }
     
     .btn {
@@ -644,9 +683,9 @@ echo "<style>
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        background: #e0f2fe;
+        color: #0369a1;
+        box-shadow: 0 4px 15px rgba(224, 242, 254, 0.4);
     }
     
     .btn-primary:hover {
@@ -686,8 +725,8 @@ echo "<style>
     }
     
     .enrollments-table th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: #e0f2fe;
+        color: #0369a1;
         padding: 20px 16px;
         text-align: left;
         font-weight: 600;
@@ -716,8 +755,8 @@ echo "<style>
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: #e0f2fe;
+        color: #0369a1;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -748,18 +787,18 @@ echo "<style>
     }
     
     .status-active {
-        background: #d4edda;
-        color: #155724;
+        background: #dcfce7;
+        color: #166534;
     }
     
     .status-suspended {
-        background: #f8d7da;
-        color: #721c24;
+        background: #fef2f2;
+        color: #991b1b;
     }
     
     .status-completed {
-        background: #d1ecf1;
-        color: #0c5460;
+        background: #e0f2fe;
+        color: #0369a1;
     }
     
     .action-buttons {
@@ -774,21 +813,21 @@ echo "<style>
     }
     
     .btn-success {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+        background: #dcfce7;
+        color: #166534;
+        box-shadow: 0 2px 8px rgba(220, 252, 231, 0.4);
     }
     
     .btn-danger {
-        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+        background: #fef2f2;
+        color: #dc2626;
+        box-shadow: 0 2px 8px rgba(254, 242, 242, 0.4);
     }
     
     .btn-info {
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+        background: #e0f2fe;
+        color: #0369a1;
+        box-shadow: 0 2px 8px rgba(224, 242, 254, 0.4);
     }
     
     .no-enrollments {
@@ -1210,24 +1249,20 @@ echo "</div>";
 
 // Main content area with sidebar
 echo "<div class='admin-main-content'>";
-echo "<div class='enrollments-container'>";
 
 // Page Header
 echo "<div class='page-header'>";
 echo "<div class='header-background'>";
 echo "<div class='breadcrumb'>";
-echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
-echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/'>Administration</a> / ";
-echo "<span class='breadcrumb-item'>Enrolments Management</span>";
-echo "</div>";
-echo "</div>";
 
-echo "<div class='page-content'>";
-echo "<div class='page-title-section'>";
-echo "<div class='title-content'>";
+echo "</div>";
+echo "<div class='header-content'>";
 echo "<h1 class='page-title'>Enrollments Management</h1>";
 echo "<p class='page-subtitle'>Manage and view all course enrollments in your system</p>";
 echo "</div>";
+echo "</div>";
+echo "<br>";
+echo "<div class='page-title-section'>";
 echo "<div class='title-actions'>";
 echo "<a href='enroll_student.php' class='btn btn-primary btn-enroll'>";
 echo "<i class='fa fa-plus'></i> Enroll Student";
@@ -1436,9 +1471,6 @@ try {
     echo "</div>";
 }
 
-echo "</div>"; // End page-content
-echo "</div>"; // End page-header
-echo "</div>"; // End enrollments-container
 echo "</div>"; // End admin-main-content
 
 // Confirmation Modal

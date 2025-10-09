@@ -1081,7 +1081,7 @@ echo "<div class='admin-main-content'>";
         <h2 class="section-title">Course Management</h2>
         <div class="management-grid-container">
                 <div class="management-grid" id="managementGrid">
-                    <div class="management-card" onclick="window.location.href='course_categories.php'">
+                    <div class="management-card" onclick="window.location.href = WWWROOT + '/course/management.php';">
                         <div class="card-icon create-icon">
                             <i class="fa fa-plus"></i>
                         </div>
@@ -1270,12 +1270,15 @@ function selectCourseForContent(courseId) {
 }
 
 function viewAllCourses() {
-    // Redirect to course management page
-    window.location.href = WWWROOT + '/course/management.php';
+    // Redirect to view all courses page
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/view_all_courses.php';
 }
 
 
-
+function viewCourse(courseId) {
+    // Redirect to view all courses page
+    window.location.href = WWWROOT + '/course/view.php?id=' + courseId;
+}
 
 function showMessage(message, type) {
     const messageDiv = document.createElement('div');
