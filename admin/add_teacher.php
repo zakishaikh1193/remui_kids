@@ -70,25 +70,11 @@ if ($_POST) {
 
 echo $OUTPUT->header();
 
-// Add custom CSS with animations
-echo "<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    body {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 20px;
-    }
-    
+// Add custom CSS with pastel green theme and sidebar
+echo "<style>";
+echo "
     .add-container {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
@@ -110,8 +96,8 @@ echo "<style>
     }
     
     .add-header {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: white;
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: black;
         padding: 40px;
         text-align: center;
         position: relative;
@@ -177,7 +163,7 @@ echo "<style>
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
+        background: #fce7f3;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -208,9 +194,9 @@ echo "<style>
     .form-section {
         margin-bottom: 40px;
         padding: 30px;
-        background: #f8fafc;
+        background: #dcfce7;
         border-radius: 15px;
-        border-left: 4px solid #48bb78;
+        border-left: 4px solid #166534;
         animation: slideInLeft 0.8s ease-out;
     }
     
@@ -228,7 +214,7 @@ echo "<style>
     .section-title {
         font-size: 1.3rem;
         font-weight: 600;
-        color: #2d3748;
+        color: #166534;
         margin-bottom: 20px;
         display: flex;
         align-items: center;
@@ -260,7 +246,7 @@ echo "<style>
     .form-control {
         width: 100%;
         padding: 15px 20px;
-        border: 2px solid #e2e8f0;
+        border: 2px solid #dcfce7;
         border-radius: 12px;
         font-size: 1rem;
         transition: all 0.3s ease;
@@ -269,13 +255,13 @@ echo "<style>
     
     .form-control:focus {
         outline: none;
-        border-color: #48bb78;
-        box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+        border-color: #166534;
+        box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
         transform: translateY(-2px);
     }
     
     .form-control:hover {
-        border-color: #cbd5e0;
+        border-color: #bbf7d0;
     }
     
     .password-strength {
@@ -311,24 +297,24 @@ echo "<style>
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        background: linear-gradient(135deg, #166534 0%, #15803d 100%);
         color: white;
-        box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        box-shadow: 0 4px 15px rgba(22, 101, 52, 0.3);
     }
     
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        box-shadow: 0 8px 25px rgba(22, 101, 52, 0.4);
     }
     
     .btn-secondary {
-        background: #f7fafc;
-        color: #4a5568;
-        border: 2px solid #e2e8f0;
+        background: #dcfce7;
+        color: #166534;
+        border: 2px solid #bbf7d0;
     }
     
     .btn-secondary:hover {
-        background: #edf2f7;
+        background: #bbf7d0;
         transform: translateY(-2px);
     }
     
@@ -488,123 +474,271 @@ echo "<style>
             max-width: 300px;
         }
     }
-</style>";
-
-// Floating background elements
-echo "<div class='floating-elements'>";
-echo "<div class='floating-circle'></div>";
-echo "<div class='floating-circle'></div>";
-echo "<div class='floating-circle'></div>";
-echo "<div class='floating-circle'></div>";
-echo "</div>";
-
-echo "<div class='add-container'>";
-echo "<div class='add-header'>";
-echo "<div class='breadcrumb'>";
-echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
-echo "<a href='teachers_list.php'>Teachers</a> / ";
-echo "<span class='breadcrumb-item'>Add New Teacher</span>";
-echo "</div>";
-
-echo "<div class='teacher-icon'>";
-echo "<i class='fa fa-user-plus'></i>";
-echo "</div>";
-
-echo "<h1 class='add-title'>Add New Teacher</h1>";
-echo "<p class='add-subtitle'>Create a new teacher account with full access</p>";
-echo "</div>";
-
-echo "<div class='add-form'>";
-
-// Progress indicator
-echo "<div class='progress-indicator'>";
-echo "<div class='progress-step active'>1</div>";
-echo "<div class='progress-step'>2</div>";
-echo "<div class='progress-step'>3</div>";
-echo "</div>";
-
-// Show success/error messages
-if (isset($success_message)) {
-    echo "<div class='alert alert-success'>";
-    echo "<i class='fa fa-check-circle'></i> $success_message";
+";
+echo "</style>";
+    
+    // Floating background elements
+    echo "<div class='floating-elements'>";
+    echo "<div class='floating-circle'></div>";
+    echo "<div class='floating-circle'></div>";
+    echo "<div class='floating-circle'></div>";
+    echo "<div class='floating-circle'></div>";
     echo "</div>";
-}
 
-if (isset($error_message)) {
-    echo "<div class='alert alert-error'>";
-    echo "<i class='fa fa-exclamation-circle'></i> $error_message";
+    // Admin Sidebar Navigation (copied from courses.php)
+    echo "<div class='admin-sidebar'>";
+    echo "<div class='sidebar-content'>";
+    echo "<!-- DASHBOARD Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>DASHBOARD</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/my/' class='sidebar-link'>";
+    echo "<i class='fa fa-th-large sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Admin Dashboard</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/admin/search.php' class='sidebar-link'>";
+    echo "<i class='fa fa-cog sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Site Administration</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-users sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Community</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php' class='sidebar-link'>";
+    echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Enrollments</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
     echo "</div>";
-}
 
-echo "<form method='POST' action=''>";
+    echo "<!-- TEACHERS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>TEACHERS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item active'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/teachers_list.php' class='sidebar-link'>";
+    echo "<i class='fa fa-users sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Teachers</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-medal sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Master Trainers</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
 
-// Personal Information Section
-echo "<div class='form-section'>";
-echo "<h3 class='section-title'>";
-echo "<i class='fa fa-user'></i> Personal Information";
-echo "</h3>";
-echo "<div class='form-row'>";
-echo "<div class='form-group'>";
-echo "<label class='form-label'>First Name</label>";
-echo "<input type='text' class='form-control' name='firstname' value='" . (isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : '') . "' required>";
-echo "</div>";
-echo "<div class='form-group'>";
-echo "<label class='form-label'>Last Name</label>";
-echo "<input type='text' class='form-control' name='lastname' value='" . (isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : '') . "' required>";
-echo "</div>";
-echo "</div>";
-echo "</div>";
+    echo "<!-- COURSES & PROGRAMS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
+    echo "<i class='fa fa-book sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Courses & Programs</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Certifications</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Assessments</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-school sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Schools</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
 
-// Account Information Section
-echo "<div class='form-section'>";
-echo "<h3 class='section-title'>";
-echo "<i class='fa fa-key'></i> Account Information";
-echo "</h3>";
-echo "<div class='form-row'>";
-echo "<div class='form-group'>";
-echo "<label class='form-label'>Username</label>";
-echo "<input type='text' class='form-control' name='username' value='" . (isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '') . "' required>";
-echo "</div>";
-echo "<div class='form-group'>";
-echo "<label class='form-label'>Email Address</label>";
-echo "<input type='email' class='form-control' name='email' value='" . (isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '') . "' required>";
-echo "</div>";
-echo "</div>";
-echo "</div>";
+    echo "<!-- INSIGHTS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>INSIGHTS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/local/edwiserreports/index.php' class='sidebar-link'>";
+    echo "<i class='fa fa-chart-bar sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Analytics</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-chart-line sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Predictive Models</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-file-alt sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Reports</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-map sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Competencies Map</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
 
-// Security Section
-echo "<div class='form-section'>";
-echo "<h3 class='section-title'>";
-echo "<i class='fa fa-shield-alt'></i> Security";
-echo "</h3>";
-echo "<div class='form-row'>";
-echo "<div class='form-group'>";
-echo "<label class='form-label'>Password</label>";
-echo "<input type='password' class='form-control' name='password' id='password' required>";
-echo "<div class='password-strength' id='password-strength'></div>";
-echo "</div>";
-echo "<div class='form-group'>";
-echo "<label class='form-label'>Confirm Password</label>";
-echo "<input type='password' class='form-control' name='confirm_password' required>";
-echo "</div>";
-echo "</div>";
-echo "</div>";
+    echo "<!-- SETTINGS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>SETTINGS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-cog sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>System Settings</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/users_management_dashboard.php' class='sidebar-link'>";
+    echo "<i class='fa fa-user-friends sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>User Management</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-users-cog sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Cohort Navigation</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
 
-echo "<div class='button-group'>";
-echo "<button type='submit' class='btn btn-primary'>";
-echo "<i class='fa fa-user-plus'></i> Create Teacher";
-echo "</button>";
-echo "<a href='teachers_list.php' class='btn btn-secondary'>";
-echo "<i class='fa fa-arrow-left'></i> Back to Teachers";
-echo "</a>";
-echo "</div>";
+    // Main content area with sidebar
+    echo "<div class='admin-main-content'>";
 
-echo "</form>";
-echo "</div>";
-echo "</div>";
+   
 
-// Password strength checker
-echo "<script>
+    echo "<div class='add-container'>";
+    echo "<div class='add-header'>";
+    echo "<div class='breadcrumb'>";
+    echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
+    echo "<a href='teachers_list.php'>Teachers</a> / ";
+    echo "<span class='breadcrumb-item'>Add New Teacher</span>";
+    echo "</div>";
+
+    echo "<div class='teacher-icon'>";
+    echo "<i class='fa fa-user-plus'></i>";
+    echo "</div>";
+
+    echo "<h1 class='add-title'>Add New Teacher</h1>";
+    echo "<p class='add-subtitle'>Create a new teacher account with full access</p>";
+    echo "</div>";
+
+    echo "<div class='add-form'>";
+
+    // Progress indicator
+    echo "<div class='progress-indicator'>";
+    echo "<div class='progress-step active'>1</div>";
+    echo "<div class='progress-step'>2</div>";
+    echo "<div class='progress-step'>3</div>";
+    echo "</div>";
+
+    // Show success/error messages
+    if (isset($success_message)) {
+        echo "<div class='alert alert-success'>";
+        echo "<i class='fa fa-check-circle'></i> $success_message";
+        echo "</div>";
+    }
+
+    if (isset($error_message)) {
+        echo "<div class='alert alert-error'>";
+        echo "<i class='fa fa-exclamation-circle'></i> $error_message";
+        echo "</div>";
+    }
+
+    echo "<form method='POST' action=''>";
+
+    // Personal Information Section
+    echo "<div class='form-section'>";
+    echo "<h3 class='section-title'>";
+    echo "<i class='fa fa-user'></i> Personal Information";
+    echo "</h3>";
+    echo "<div class='form-row'>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>First Name</label>";
+    echo "<input type='text' class='form-control' name='firstname' value='" . (isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : '') . "' required>";
+    echo "</div>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Last Name</label>";
+    echo "<input type='text' class='form-control' name='lastname' value='" . (isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : '') . "' required>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    // Account Information Section
+    echo "<div class='form-section'>";
+    echo "<h3 class='section-title'>";
+    echo "<i class='fa fa-key'></i> Account Information";
+    echo "</h3>";
+    echo "<div class='form-row'>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Username</label>";
+    echo "<input type='text' class='form-control' name='username' value='" . (isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '') . "' required>";
+    echo "</div>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Email Address</label>";
+    echo "<input type='email' class='form-control' name='email' value='" . (isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '') . "' required>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    // Security Section
+    echo "<div class='form-section'>";
+    echo "<h3 class='section-title'>";
+    echo "<i class='fa fa-shield-alt'></i> Security";
+    echo "</h3>";
+    echo "<div class='form-row'>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Password</label>";
+    echo "<input type='password' class='form-control' name='password' id='password' required>";
+    echo "<div class='password-strength' id='password-strength'></div>";
+    echo "</div>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Confirm Password</label>";
+    echo "<input type='password' class='form-control' name='confirm_password' required>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    echo "<div class='button-group'>";
+    echo "<button type='submit' class='btn btn-primary'>";
+    echo "<i class='fa fa-user-plus'></i> Create Teacher";
+    echo "</button>";
+    echo "<a href='teachers_list.php' class='btn btn-secondary'>";
+    echo "<i class='fa fa-arrow-left'></i> Back to Teachers";
+    echo "</a>";
+    echo "</div>";
+
+    echo "</form>";
+    echo "</div>";
+    echo "</div>";
+
+    // Password strength checker
+    echo "<script>
 document.getElementById('password').addEventListener('input', function() {
     const password = this.value;
     const strengthDiv = document.getElementById('password-strength');
@@ -638,5 +772,39 @@ document.getElementById('password').addEventListener('input', function() {
 });
 </script>";
 
-echo $OUTPUT->footer();
-?>
+    // Add JavaScript for sidebar toggle
+    echo <<<JS
+<script>
+// Sidebar toggle function
+function toggleSidebar() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    sidebar.classList.toggle('sidebar-open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.admin-sidebar');
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove('sidebar-open');
+        }
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
+</script>
+JS;
+
+    // Close admin-main-content div
+    echo "</div>";
+
+    echo $OUTPUT->footer();
+    ?>

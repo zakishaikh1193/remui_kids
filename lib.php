@@ -367,7 +367,7 @@ function theme_remui_kids_get_course_header_data($course) {
     }
     
     // Get teachers count (users with 'teacher' or 'editingteacher' role)
-    $teacherroles = $DB->count_records_sql(
+    $teacherroles = $DB->get_records_sql(
         "SELECT * FROM {role} WHERE shortname IN ('editingteacher', 'teacher')"
     );
     $teacherscount = 0;
@@ -1710,7 +1710,7 @@ function theme_remui_kids_get_calendar_week_data($userid) {
     
     // Get user's enrolled courses
     $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
-    $courseids = array_keys($courses);
+    $courseids = is_array($courses) ? array_keys($courses) : [];
     
     // Get calendar events using Moodle's built-in function
     $events = calendar_get_events(
@@ -1769,7 +1769,7 @@ function theme_remui_kids_get_upcoming_events($userid) {
     
     // Get user's enrolled courses
     $courses = enrol_get_my_courses(['id', 'fullname'], 'fullname ASC');
-    $courseids = array_keys($courses);
+    $courseids = is_array($courses) ? array_keys($courses) : [];
     
     // Get calendar events using Moodle's built-in function
     $events = calendar_get_events(

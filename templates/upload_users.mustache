@@ -1,3 +1,5 @@
+{{> theme_remui_kids/admin_shared_styles }}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,13 +22,13 @@
         }
 
         .upload-container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
+            
         }
 
         @keyframes fadeIn {
@@ -35,7 +37,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg,rgb(250, 201, 201),rgb(248, 216, 231));
             color: white;
             padding: 30px;
             text-align: center;
@@ -51,7 +53,7 @@
             width: 200%;
             height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
+           
         }
 
         @keyframes float {
@@ -64,7 +66,7 @@
             margin-bottom: 10px;
             position: relative;
             z-index: 1;
-            animation: titleGlow 2s ease-in-out infinite alternate;
+            
         }
 
         @keyframes titleGlow {
@@ -89,7 +91,7 @@
             padding: 25px;
             margin-bottom: 30px;
             border: 2px solid #e3f2fd;
-            animation: slideInDown 0.8s ease-out 0.1s both;
+           
         }
 
         .form-row {
@@ -152,7 +154,7 @@
             padding: 30px;
             margin-bottom: 30px;
             border: 2px solid #e3f2fd;
-            animation: slideInDown 0.8s ease-out 0.2s both;
+           
         }
 
         @keyframes slideInDown {
@@ -195,7 +197,7 @@
             font-size: 4rem;
             color: #667eea;
             margin-bottom: 20px;
-            animation: bounce 2s infinite;
+           
         }
 
         @keyframes bounce {
@@ -225,7 +227,7 @@
             padding: 25px;
             margin-bottom: 30px;
             border: 2px solid #ffeaa7;
-            animation: slideInLeft 0.8s ease-out 0.4s both;
+           
         }
 
         @keyframes slideInLeft {
@@ -274,7 +276,7 @@
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 2px solid #f0f0f0;
-            animation: slideInRight 0.8s ease-out 0.6s both;
+           
             display: none;
         }
 
@@ -429,7 +431,7 @@
             padding: 30px;
             text-align: center;
             border: 2px solid #c3e6cb;
-            animation: slideInUp 0.8s ease-out 0.8s both;
+           
         }
 
         @keyframes slideInUp {
@@ -510,7 +512,7 @@
             border-radius: 50%;
             width: 30px;
             height: 30px;
-            animation: spin 1s linear infinite;
+            
             margin: 0 auto 10px;
         }
 
@@ -528,7 +530,7 @@
             color: white;
             font-weight: 600;
             z-index: 1000;
-            animation: slideInRight 0.3s ease-out;
+            
         }
 
         .message.success {

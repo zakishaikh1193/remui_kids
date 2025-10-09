@@ -147,6 +147,12 @@
     margin-bottom: 40px;
 }
 
+/* Reduce Course Categories section width */
+.admin-stats-activity-container .col-md-6:first-child {
+    flex: 0 0 40%;
+    max-width: 40%;
+}
+
 /* Course Categories Section */
 .course-categories-section {
     margin-top: 30px;
@@ -159,10 +165,35 @@
     margin-bottom: 20px;
 }
 
-.categories-list {
+.course-categories-section .categories-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    max-height: 350px !important; /* Increased height to show more items */
+    overflow-y: auto !important;
+    padding-right: 8px; /* Space for scrollbar */
+    scrollbar-width: thin; /* Firefox scrollbar */
+    scrollbar-color: #c1c1c1 #f1f1f1; /* Firefox scrollbar colors */
+    border: 1px solid #e0e0e0; /* Visual indicator for debugging */
+}
+
+/* Custom scrollbar styling for categories list */
+.course-categories-section .categories-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 .category-item {
@@ -387,12 +418,11 @@
     padding: 8px 14px;
     font-size: 14px;
     font-weight: 600;
-    color: #6c757d;
+    color: #ffffff;
     text-decoration: none;
     border-radius: 9999px;
-    background: linear-gradient(135deg, #f8d7da 0%, #d1ecf1 100%);
-    border: 1px solid #e2e3e5;
-    box-shadow: 0 4px 12px rgba(248, 215, 218, 0.4);
+    background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+    box-shadow: 0 6px 14px rgba(99, 102, 241, 0.35);
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -407,12 +437,29 @@
 
 .view-all-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(248, 215, 218, 0.6);
-    background: linear-gradient(135deg, #f1b0b7 0%, #bee5eb 100%);
-    color: #5a6c7d;
-    border-color: #d6d8db;
+    box-shadow: 0 10px 22px rgba(99, 102, 241, 0.45);
 }
 
 .view-all-btn:hover .btn-glow { opacity: 1; }
 
 .view-all-btn i { font-size: 13px; }
+
+/* Subsection header styling for course categories */
+.subsection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.subsection-header .subsection-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.subsection-header .view-all-btn {
+    margin-left: auto;
+    margin-top: 0;
+}
