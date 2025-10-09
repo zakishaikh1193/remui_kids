@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language strings for theme_remui_kids
+ * Language strings for RemUI Kids theme
  *
  * @package    theme_remui_kids
  * @copyright  2025 Kodeit
@@ -24,53 +24,61 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['choosereadme'] = 'RemUI Kids is a child-friendly theme based on RemUI. It features bright colors, playful fonts, and an engaging interface designed specifically for school children.';
-$string['configtitle'] = 'RemUI Kids Settings';
-$string['customcss'] = 'Custom CSS';
-$string['customcssdesc'] = 'Any CSS you enter here will be added to every page allowing your to easily customise this theme.';
-$string['footertext'] = 'Footer text';
-$string['footertextdesc'] = 'Customise the footer text for this theme.';
-$string['invert'] = 'Invert navbar';
-$string['invertdesc'] = 'Swaps text and background for the navbar at the top of the page between black and white.';
-$string['logo'] = 'Logo';
-$string['logodesc'] = 'Please upload your custom logo here if you want to add it to the header.';
 $string['pluginname'] = 'RemUI Kids';
-$string['preset'] = 'Theme preset';
-$string['preset_desc'] = 'Pick a preset to broadly change the look of the theme.';
-$string['presetfiles'] = 'Additional theme preset files';
-$string['presetfiles_desc'] = 'Preset files can be used to dramatically alter the appearance of the theme. See <a href=https://docs.moodle.org/dev/Boost_Presets>Boost presets</a> for information on creating and sharing your own preset files, and see the <a href=http://moodle.net/boost>Presets repository</a> for presets that others have shared.';
-$string['rawscss'] = 'Raw SCSS';
-$string['rawscssdesc'] = 'Use this field to provide SCSS or CSS code which will be injected at the end of the style sheet.';
-$string['rawscsspre'] = 'Raw initial SCSS';
-$string['rawscsspre_desc'] = 'In this field you can provide initialising SCSS code, it will be injected before everything else. Most of the time you will use this setting to define variables.';
-$string['region-side-pre'] = 'Right';
-$string['sitetitle'] = 'Site title';
-$string['totop'] = 'Go to top';
-$string['brandcolor'] = 'Brand colour';
-$string['brandcolor_desc'] = 'The accent colour.';
-$string['brandcolorsecondary'] = 'Secondary brand colour';
-$string['brandcolorsecondary_desc'] = 'The secondary accent colour.';
-$string['brandcolortertiary'] = 'Tertiary brand colour';
-$string['brandcolortertiary_desc'] = 'The tertiary accent colour.';
-$string['generalsettings'] = 'General settings';
-$string['advancedsettings'] = 'Advanced settings';
-$string['backgroundimage'] = 'Background image';
-$string['backgroundimage_desc'] = 'The image to display as a background of the site. The background image you upload here will override the background image in your theme preset files.';
-$string['favicon'] = 'Favicon';
-$string['favicon_desc'] = 'Change the favicon of the site. A .png or .ico file which is 16x16 or 32x32 pixels will work best.';
-$string['scsspre'] = 'SCSS pre';
-$string['scsspre_desc'] = 'This SCSS code is injected before the rest of the SCSS.';
-$string['scss'] = 'SCSS';
-$string['scss_desc'] = 'This SCSS code is injected after the rest of the SCSS.';
-$string['googleanalytics'] = 'Google Analytics Code';
-$string['googleanalyticsdesc'] = 'Enter your Google Analytics tracking code (e.g., UA-XXXXX-X)';
+$string['configtitle'] = 'RemUI Kids settings';
+$string['choosereadme'] = 'RemUI Kids is a child-friendly theme for Moodle.';
 
-// Teacher section strings
-$string['teacher_students'] = 'My Students';
-$string['enrolled_students'] = 'Enrolled Students';
-$string['noteachingcourses'] = 'You are not teaching any courses.';
-$string['nostudentsenrolled'] = 'No students are currently enrolled in this course.';
-$string['fullname'] = 'Full Name';
-$string['email'] = 'Email';
-$string['lastaccess'] = 'Last Access';
-$string['never'] = 'Never';
+// Student Questions Integration
+$string['new_question_from_student'] = 'New question from {$a->student} in {$a->course}';
+$string['question_message_content'] = 'Student: {$a->student}
+Question: {$a->question}
+Course: {$a->course}
+Time: {$a->time}
+
+Please respond to this question through the Questions Management system.';
+
+// Questions Management
+$string['questions_management'] = 'Questions Management';
+$string['all_questions'] = 'All Questions';
+$string['create_question'] = 'Create Question';
+$string['chat'] = 'Chat';
+$string['group_calls'] = 'Group Calls';
+$string['student_questions'] = 'Student Questions';
+$string['view_all_questions'] = 'View All Questions';
+$string['new_question'] = 'New Question';
+$string['refresh_questions'] = 'Refresh Questions';
+$string['sort_by'] = 'Sort By';
+$string['filter'] = 'Filter';
+$string['answer_question'] = 'Answer Question';
+$string['start_video_call'] = 'Start Video Call';
+$string['start_audio_call'] = 'Start Audio Call';
+$string['start_chat'] = 'Start Chat';
+$string['group_call'] = 'Group Call';
+$string['question_pending'] = 'Pending';
+$string['question_mentor_replied'] = 'Mentor Replied';
+$string['question_clarified'] = 'Clarified';
+$string['upvotes'] = 'Upvotes';
+$string['replies'] = 'Replies';
+
+// Messaging Integration
+$string['message_question'] = 'Question via Message';
+$string['forum_question'] = 'Question via Forum';
+$string['integrated_questions'] = 'Integrated Questions';
+$string['messaging_questions'] = 'Messaging Questions';
+$string['forum_questions'] = 'Forum Questions';
+
+// Course Progress
+$string['courses_not_started'] = 'Courses Not Started';
+$string['courses_in_progress'] = 'Courses In Progress';
+$string['enrolled_courses'] = 'Enrolled Courses';
+$string['finished_courses'] = 'Finished Courses';
+
+// Dashboard
+$string['dashboard'] = 'Dashboard';
+$string['teacher_overview'] = 'Teacher Overview';
+$string['student_enrollment'] = 'Student Enrollment';
+$string['recent_assignments'] = 'Recent Assignments';
+$string['recent_student_activity'] = 'Recent Student Activity';
+$string['course_overview'] = 'Course Overview';
+$string['top_courses'] = 'Top Courses';
+$string['student_questions'] = 'Student Questions';
