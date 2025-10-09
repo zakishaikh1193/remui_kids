@@ -1308,17 +1308,6 @@
             });
     }
 
-    // Add test button for debugging
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add a test button for debugging (remove this in production)
-        const testButton = document.createElement('button');
-        testButton.textContent = 'Test AJAX';
-        testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;';
-        testButton.onclick = testAjaxEndpoint;
-        document.body.appendChild(testButton);
-        
-        console.log('Dashboard loaded, AJAX functions available');
-    });
     </script>
     {{/middle}}
 
