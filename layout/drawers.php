@@ -310,7 +310,7 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
             error_log("No courses found for overview");
             $templatecontext['course_overview'] = [
                 ['id' => 0, 'name' => 'No courses yet', 'shortname' => '-', 'student_count' => 0, 
-                 'activity_count' => 0, 'assignment_count' => 0, 'quiz_count' => 0, 'url' => '#']
+                 'activity_count' => 0, 'assignment_count' => 0, 'url' => '#']
             ];
         } else {
             error_log("Loaded " . count($templatecontext['course_overview']) . " courses for overview");

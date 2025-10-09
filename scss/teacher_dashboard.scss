@@ -427,9 +427,6 @@
     border-left: 4px solid #7209b7;
 }
 
-.teacher-stat-card.quizzes-card {
-    border-left: 4px solid #f59e0b;
-}
 
 .teacher-stat-card .stat-icon-container {
     position: absolute;
@@ -460,9 +457,6 @@
     background: #7209b7;
 }
 
-.teacher-stat-card.quizzes-card .stat-icon-container {
-    background: #f59e0b;
-}
 
 .teacher-stat-card .stat-icon {
     font-size: 1.2rem;
@@ -1502,7 +1496,6 @@
 .students-card { box-shadow: 0 0 0 3px rgba(255,99,132,0.04) inset; }
 .assignments-card { box-shadow: 0 0 0 3px rgba(255,206,86,0.08) inset; }
 .classes-card { box-shadow: 0 0 0 3px rgba(75,192,192,0.06) inset; }
-.quizzes-card { box-shadow: 0 0 0 3px rgba(245,158,11,0.08) inset; }
 
 .enrollment-table thead th {
     color: #5B6CFF;
@@ -2665,10 +2658,6 @@
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
-.quizzes-card .stat-icon {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-}
 
 .progress-card .stat-icon {
     background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c084fc 100%);
@@ -2746,10 +2735,6 @@
     --card-accent-light: #059669;
 }
 
-.quizzes-card {
-    --card-accent: #f59e0b;
-    --card-accent-light: #d97706;
-}
 
 .stat-card-header {
     display: flex;
@@ -3013,7 +2998,6 @@
 .content-card.students-card .card-title i { color: #f43f5e; }
 .content-card.assignments-card .card-title i { color: #3b82f6; }
 .content-card.classes-card .card-title i { color: #10b981; }
-.content-card.quizzes-card .card-title i { color: #f59e0b; }
 .content-card.activity-card .card-title i { color: #0ea5e9; }
 .content-card.course-card .card-title i { color: #6366f1; }
 .content-card.questions-card .card-title i { color: #7c3aed; }

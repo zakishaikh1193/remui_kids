@@ -2687,15 +2687,11 @@ function theme_remui_kids_get_teacher_dashboard_stats() {
         // Upcoming classes: courses modified in last 24 hours
         $upcoming_classes = $DB->count_records_select('course', "id {$coursesql} AND timemodified > :since", array_merge($courseparams, ['since' => (time() - 86400)]));
 
-        // Total quizzes in teacher's courses
-        $total_quizzes = $DB->count_records_select('quiz', "course {$coursesql}", $courseparams);
-
         return [
             'total_courses' => $total_courses,
             'total_students' => $total_students,
             'pending_assignments' => $pending_assignments,
             'upcoming_classes' => $upcoming_classes,
-            'total_quizzes' => $total_quizzes,
             'last_updated' => date('Y-m-d H:i:s')
         ];
 
@@ -2705,7 +2701,6 @@ function theme_remui_kids_get_teacher_dashboard_stats() {
             'total_students' => 0,
             'pending_assignments' => 0,
             'upcoming_classes' => 0,
-            'total_quizzes' => 0,
             'last_updated' => date('Y-m-d H:i:s')
         ];
     }
@@ -3755,7 +3750,7 @@ function theme_remui_kids_get_course_overview() {
                         JOIN {modules} m ON cm.module = m.id
                         WHERE cm.course = c.id
                         AND m.name = 'quiz'
-                        AND cm.visible = 1) as quiz_count
+                        AND cm.visible = 1) as activity_count
                 FROM {course} c
                 WHERE c.id {$coursesql}
                 ORDER BY c.shortname ASC";
@@ -3771,7 +3766,6 @@ function theme_remui_kids_get_course_overview() {
                 'student_count' => (int)$course->student_count,
                 'activity_count' => (int)$course->activity_count,
                 'assignment_count' => (int)$course->assignment_count,
-                'quiz_count' => (int)$course->quiz_count,
                 'url' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out()
             ];
         }
@@ -4772,7 +4766,6 @@ function theme_remui_kids_get_exact_student_dashboard(int $studentid) {
             'engagement' => [
                 'live_classes_percent' => min(100, max(0, round(($quizattempts / max(30, 1)) * 100))),
                 'quiz_attempts' => $quizattempts,
-                'total_quizzes' => 30,
                 'assignments_done' => $assignmentsdone,
                 'total_assignments' => 15
             ],
@@ -4804,7 +4797,7 @@ function theme_remui_kids_get_exact_student_dashboard(int $studentid) {
         return [
             'overall' => ['percent' => 80],
             'overview_counts' => ['total_courses' => 5, 'completed_courses' => 1, 'hours_spent' => '112h'],
-            'engagement' => ['live_classes_percent' => 70, 'quiz_attempts' => 20, 'total_quizzes' => 30, 'assignments_done' => 10, 'total_assignments' => 15],
+            'engagement' => ['live_classes_percent' => 70, 'quiz_attempts' => 20, 'assignments_done' => 10, 'total_assignments' => 15],
             'upcoming_classes' => [],
             'courses' => [],
             'streak' => [
