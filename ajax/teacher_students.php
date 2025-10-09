@@ -1,6 +1,5 @@
 <?php
 require_once('../../../config.php');
-require_once($CFG->dirroot . '/theme/remui_kids/lib.php');
 require_login();
 header('Content-Type: application/json');
 
@@ -17,11 +16,7 @@ try {
 
     // Get teacher course ids
     $teacherroles = $DB->get_records_select('role', "shortname IN ('editingteacher','teacher')");
-    if (!is_array($teacherroles)) {
-        error_log("Teacher roles query returned non-array: " . gettype($teacherroles));
-        $teacherroles = [];
-    }
-    $roleids = (is_array($teacherroles) && !empty($teacherroles)) ? array_keys($teacherroles) : [];
+    $roleids = $teacherroles ? array_keys($teacherroles) : [];
     if (empty($roleids)) {
         echo json_encode(['total' => 0, 'pages' => 0, 'page' => $page, 'students' => []]);
         exit;
@@ -98,14 +93,8 @@ try {
         
         // Alternative approach using gravatar or default
         if (empty($avatar_url)) {
-            $avatar_url = (new moodle_url('/user/pix.php/0/f1'))->out();
+            $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
         }
-        
-        // Get course progress data for this student
-        $course_progress = get_student_course_progress($s->id, $ids);
-        
-        // Debug logging for course progress
-        error_log("AJAX - Student {$s->id} ({$s->firstname} {$s->lastname}) - Course Progress: " . json_encode($course_progress));
         
         $out[] = [
             'id' => (int)$s->id,
@@ -115,10 +104,6 @@ try {
             'email' => $s->email,
             'last_access' => $s->lastaccess ? userdate($s->lastaccess, '%b %e, %Y') : 'Never',
             'course_count' => (int)$s->course_count,
-            'courses_not_started' => $course_progress['not_started'],
-            'courses_in_progress' => $course_progress['in_progress'],
-            'enrolled_courses' => $course_progress['total_enrolled'],
-            'finished_courses' => $course_progress['completed'],
             'profile_url' => (new moodle_url('/user/profile.php', ['id' => $s->id]))->out(),
             'avatar_url' => $avatar_url
         ];

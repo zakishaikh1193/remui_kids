@@ -58,6 +58,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/my_courses.php" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{{gradesurl}}}" class="nav-link">
                             <i class="fa fa-chart-line"></i>
                             <span>My Grades</span>
@@ -73,6 +79,18 @@
                         <a href="{{{messagesurl}}}" class="nav-link">
                             <i class="fa fa-envelope"></i>
                             <span>Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{codeeditorurl}}}" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{scratchurl}}}" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span>Scratch Emulator</span>
                         </a>
                     </li>
                 </ul>
@@ -542,8 +560,7 @@
                         </div>
                         <div class="courses-static-grid">
                             {{#middle_courses}}
-                            <div class="enhanced-course-card" data-course-id="{{id}}">
-                                <!-- Course Header with Image -->
+                            <div class="middle-course-card">
                                 <div class="course-image-container">
                                     {{#courseimage}}
                                     <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
@@ -553,129 +570,37 @@
                                         <i class="fa fa-book"></i>
                                     </div>
                                     {{/courseimage}}
-                                    
-                                    <!-- Course Level Badge -->
-                                    <div class="course-level-badge">{{categoryname}}</div>
-                                    
-                                    <!-- Course Status Indicator -->
-                                    <div class="course-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
-                                        <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-play-circle{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
-                                    </div>
+                                    <div class="course-level-badge">Beginner</div>
                                 </div>
                                 
-                                <!-- Course Content -->
                                 <div class="course-content">
-                                    <!-- Course Title and Grade -->
-                                    <div class="course-header">
-                                        <h4 class="course-title">{{fullname}}</h4>
-                                        <span class="course-grade">{{grade_level}}</span>
-                                    </div>
-                                    
-                                    <!-- Course Summary -->
+                                    <h4 class="course-title">{{fullname}}</h4>
                                     <p class="course-summary">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
                                     
-                                    <!-- Progress Section -->
+                                    <!-- Progress Bar -->
                                     <div class="course-progress-section">
-                                        <div class="progress-header">
-                                            <span class="progress-label">Your Progress</span>
-                                            <span class="progress-percentage">{{progress_percentage}}%</span>
-                                        </div>
-                                        <div class="progress-bar-container">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
-                                            </div>
+                                        <div class="progress-label">Progress {{progress_percentage}}%</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Course Statistics -->
-                                    <div class="course-stats-grid">
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fa fa-book"></i>
-                                            </div>
-                                            <div class="stat-info">
-                                                <div class="stat-number">{{completed_sections}}/{{total_sections}}</div>
-                                                <div class="stat-label">LESSONS</div>
-                                            </div>
+                                    <!-- Course Stats -->
+                                    <div class="course-stats">
+                                        <div class="course-stat-item">
+                                            <span>{{total_sections}}/{{total_sections}} lessons</span>
                                         </div>
-                                        
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fa fa-tasks"></i>
-                                            </div>
-                                            <div class="stat-info">
-                                                <div class="stat-number">{{completed_activities}}/{{total_activities}}</div>
-                                                <div class="stat-label">ACTIVITIES</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fa fa-clock-o"></i>
-                                            </div>
-                                            <div class="stat-info">
-                                                <div class="stat-number">{{estimated_time}}</div>
-                                                <div class="stat-label">MINUTES</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="stat-item">
-                                            <div class="stat-icon">
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <div class="stat-info">
-                                                <div class="stat-number">{{points_earned}}</div>
-                                                <div class="stat-label">POINTS</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                                                            
-                                    <!-- Course Actions -->
-                                    <div class="course-actions">
-                                        {{#completed}}
-                                        <a href="{{courseurl}}" class="course-button completed">
-                                            <i class="fa fa-check"></i> Review Course
-                                        </a>
-                                        {{/completed}}
-                                        {{^completed}}
-                                        {{#in_progress}}
-                                        <a href="{{courseurl}}" class="course-button in-progress">
+                                    <div class="course-status">not started</div>
+                                    
+                                    <div class="course-buttons">
+                                        <a href="{{courseurl}}" class="course-button primary">
                                             <i class="fa fa-play"></i> Continue Learning
                                         </a>
-                                        {{/in_progress}}
-                                        {{^in_progress}}
-                                        <a href="{{courseurl}}" class="course-button not-started">
-                                            <i class="fa fa-play"></i> Start Course
-                                        </a>
-                                        {{/in_progress}}
-                                        {{/completed}}
-                                        
-                                        <!-- Course Details Button -->
-                                        <button class="course-details-btn" onclick="toggleCourseDetails({{id}})">
-                                            <i class="fa fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <!-- Course Details Panel (Hidden by default) -->
-                                    <div class="course-details-panel" id="details-{{id}}" style="display: none;">
-                                        <div class="details-content">
-                                            <h6>Course Details</h6>
-                                            <div class="detail-item">
-                                                <strong>Instructor:</strong> {{instructor_name}}
+
+                                                <button class="course-button secondary preview-btn" onclick="openPreviewModal({{id}}, '{{fullname}}')">
+                                                    <i class="fa fa-eye"></i> Preview
+                                                </button>
                                             </div>
-                                            <div class="detail-item">
-                                                <strong>Start Date:</strong> {{start_date}}
-                                            </div>
-                                            <div class="detail-item">
-                                                <strong>Last Accessed:</strong> {{last_accessed}}
-                                            </div>
-                                            <div class="detail-item">
-                                                <strong>Subject:</strong> {{subject}}
-                                            </div>
-                                            <div class="detail-item">
-                                                <strong>Course Code:</strong> {{shortname}}
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1313,481 +1238,53 @@
 
     
     {{#highschool}}
-    <style>
-        /* Enhanced High School Course Cards */
-        .enhanced-course-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-        .enhanced-course-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .course-image-container {
-            position: relative;
-            height: 120px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-        }
-        
-        .course-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        
-        .enhanced-course-card:hover .course-image {
-            transform: scale(1.05);
-        }
-        
-        /* Fallback for missing images */
-        .course-image-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-        }
-        
-        .course-level-badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: rgba(255, 255, 255, 0.9);
-            color: #4CAF50;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-        }
-        
-        .course-status-indicator {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            background: rgba(0, 0, 0, 0.3);
-        }
-        
-        .course-status-indicator.completed {
-            background: #10b981;
-        }
-        
-        .course-status-indicator.in-progress {
-            background: #f59e0b;
-        }
-        
-        .course-status-indicator.not-started {
-            background: #6b7280;
-        }
-        
-        .course-content {
-            padding: 1rem;
-        }
-        
-        .course-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.75rem;
-        }
-        
-        .course-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1a202c;
-            margin: 0;
-            flex: 1;
-        }
-        
-        .course-grade {
-            background: #FF6B35;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-left: 1rem;
-        }
-        
-        .course-summary {
-            color: #718096;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .course-progress-section {
-            margin-bottom: 1rem;
-        }
-        
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        .progress-label {
-            font-size: 0.85rem;
-            color: #4a5568;
-            font-weight: 600;
-        }
-        
-        .progress-percentage {
-            font-size: 0.85rem;
-            color: #10b981;
-            font-weight: 700;
-        }
-        
-        .progress-bar-container {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 100%;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-            transition: width 0.3s ease;
-        }
-        
-        .course-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #f8fafc;
-            padding: 0.5rem;
-            border-radius: 6px;
-        }
-        
-        .stat-item .stat-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.8rem;
-        }
-        
-        .stat-item:nth-child(1) .stat-icon { background: #667eea; }
-        .stat-item:nth-child(2) .stat-icon { background: #f59e0b; }
-        .stat-item:nth-child(3) .stat-icon { background: #10b981; }
-        .stat-item:nth-child(4) .stat-icon { background: #ef4444; }
-        
-        .stat-info {
-            flex: 1;
-        }
-        
-        .stat-number {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #1a202c;
-            line-height: 1;
-        }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            color: #718096;
-            margin-top: 0.2rem;
-            font-weight: 600;
-        }
-        
-        .course-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-        
-        .course-button {
-            flex: 1;
-            padding: 0.6rem 0.8rem;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            font-size: 0.9rem;
-        }
-        
-        .course-button.completed {
-            background: #10b981;
-            color: white;
-        }
-        
-        .course-button.in-progress {
-            background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
-            color: white;
-        }
-        
-        .course-button.not-started {
-            background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
-            color: white;
-        }
-        
-        .course-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .course-details-btn {
-            width: 36px;
-            height: 36px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            background: white;
-            color: #718096;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
-        
-        .course-details-btn:hover {
-            background: #f8fafc;
-            border-color: #cbd5e0;
-            color: #4a5568;
-        }
-        
-        .course-details-panel {
-            border-top: 1px solid #e2e8f0;
-            padding: 0.75rem 1rem;
-            background: #f8fafc;
-        }
-        
-        .details-content h6 {
-            color: #1a202c;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.4rem;
-            font-size: 0.85rem;
-        }
-        
-        .detail-item strong {
-            color: #4a5568;
-        }
-        
-        /* Course Grid Layout */
-        .courses-static-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-            padding: 0;
-            margin: 0;
-        }
-        
-        @media (max-width: 768px) {
-            .courses-static-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .course-stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .course-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .course-grade {
-                margin-left: 0;
-                margin-top: 0.5rem;
-            }
-        }
-    </style>
-        <!-- Enhanced Student Sidebar -->
-        <div class="student-sidebar enhanced-sidebar">
+        <!-- Student Sidebar -->
+        <div class="student-sidebar">
             <nav class="sidebar-nav">
-                
-                <!-- DASHBOARD Section -->
-                <div class="nav-section">
-                    <div class="section-title">DASHBOARD</div>
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="{{{dashboardurl}}}" class="nav-link active">
-                                <i class="fa fa-th-large"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fa fa-users"></i>
-                                <span>Community</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- COURSES Section -->
-                <div class="nav-section">
-                    <div class="section-title">COURSES</div>
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="{{{mycoursesurl}}}" class="nav-link">
-                                <i class="fa fa-book-open"></i>
-                                <span>My Courses</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{{assignmentsurl}}}" class="nav-link">
-                                <i class="fa fa-clipboard-list"></i>
-                                <span>Assignments</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- PROGRESS Section -->
-                <div class="nav-section">
-                    <div class="section-title">PROGRESS</div>
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="{{{gradesurl}}}" class="nav-link">
-                                <i class="fa fa-chart-bar"></i>
-                                <span>My Grades</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fa fa-chart-line"></i>
-                                <span>Progress Tracking</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- RESOURCES Section -->
-                <div class="nav-section">
-                    <div class="section-title">RESOURCES</div>
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fa fa-calendar"></i>
-                                <span>Calendar</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{{messagesurl}}}" class="nav-link">
-                                <i class="fa fa-comments"></i>
-                                <span>Messages</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- SETTINGS Section -->
-                <div class="nav-section">
-                    <div class="section-title">SETTINGS</div>
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="{{{profileurl}}}" class="nav-link">
-                                <i class="fa fa-cog"></i>
-                                <span>Profile Settings</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- QUICK ACTIONS Section -->
-                <div class="nav-section quick-actions">
-                    <div class="section-title">QUICK ACTIONS</div>
-                    <div class="quick-action-buttons">
-                        <div class="quick-action-btn purple">
-                            <div class="action-icon">
-                                <i class="fa fa-code"></i>
-                            </div>
-                            <div class="action-content">
-                                <div class="action-title">Code Emulators</div>
-                                <div class="action-desc">Practice coding in virtual environment</div>
-                            </div>
-                        </div>
-                        
-                        <div class="quick-action-btn blue">
-                            <div class="action-icon">
-                                <i class="fa fa-book"></i>
-                            </div>
-                            <div class="action-content">
-                                <div class="action-title">E-books</div>
-                                <div class="action-desc">Access digital learning materials</div>
-                            </div>
-                        </div>
-                        
-                        <div class="quick-action-btn green">
-                            <div class="action-icon">
-                                <i class="fa fa-comments"></i>
-                            </div>
-                            <div class="action-content">
-                                <div class="action-title">Ask Teacher</div>
-                                <div class="action-desc">Get help from your instructor</div>
-                            </div>
-                        </div>
-                        
-                        <div class="quick-action-btn orange">
-                            <div class="action-icon">
-                                <i class="fa fa-robot"></i>
-                            </div>
-                            <div class="action-content">
-                                <div class="action-title">KODEIT AI Buddy</div>
-                                <div class="action-desc">Get instant coding help</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{dashboardurl}}}" class="nav-link active">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                            <i class="fa fa-book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{gradesurl}}}" class="nav-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>My Grades</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{assignmentsurl}}}" class="nav-link">
+                            <i class="fa fa-tasks"></i>
+                            <span>Assignments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{messagesurl}}}" class="nav-link">
+                            <i class="fa fa-envelope"></i>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{codeeditorurl}}}" class="nav-link">
+                            <i class="fa fa-code"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{scratchurl}}}" class="nav-link">
+                            <i class="fa fa-puzzle-piece"></i>
+                            <span>Scratch Emulator</span>
+                        </a>
+                    </li>
+                </ul>
             </nav>
             
             <!-- Sidebar Footer -->
@@ -1802,13 +1299,17 @@
                     </div>
                 </div>
                 <div class="sidebar-actions">
+                    <a href="{{{profileurl}}}" class="action-btn profile-btn">
+                        <i class="fa fa-user-circle"></i>
+                        <span>Profile</span>
+                    </a>
                     <a href="{{{logouturl}}}" class="action-btn logout-btn">
                         <i class="fa fa-sign-out"></i>
                         <span>Logout</span>
                     </a>
                 </div>
             </div>
-        </div>
+                                </div>
 
         <div class="highschool-dashboard">
 
@@ -1891,8 +1392,7 @@
                             </div>
                             <div class="courses-static-grid">
                                 {{#highschool_courses}}
-                                <div class="enhanced-course-card" data-course-id="{{id}}">
-                                    <!-- Course Header with Image -->
+                                <div class="middle-course-card">
                                     <div class="course-image-container">
                                         {{#courseimage}}
                                         <img src="{{courseimage}}" alt="{{fullname}}" class="course-image">
@@ -1902,129 +1402,36 @@
                                             <i class="fa fa-book"></i>
                                         </div>
                                         {{/courseimage}}
-                                        
-                                        <!-- Course Level Badge -->
-                                        <div class="course-level-badge">{{categoryname}}</div>
-                                        
-                                        <!-- Course Status Indicator -->
-                                        <div class="course-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
-                                            <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-play-circle{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
-                                        </div>
+                                        <div class="course-level-badge">Beginner</div>
                                     </div>
                                     
-                                    <!-- Course Content -->
                                     <div class="course-content">
-                                        <!-- Course Title and Grade -->
-                                        <div class="course-header">
-                                            <h4 class="course-title">{{fullname}}</h4>
-                                            <span class="course-grade">{{grade_level}}</span>
-                                        </div>
-                                        
-                                        <!-- Course Summary -->
+                                        <h4 class="course-title">{{fullname}}</h4>
                                         <p class="course-summary">{{#summary}}{{summary}}{{/summary}}{{^summary}}No description available{{/summary}}</p>
                                         
-                                        <!-- Progress Section -->
+                                        <!-- Progress Bar -->
                                         <div class="course-progress-section">
-                                            <div class="progress-header">
-                                                <span class="progress-label">Your Progress</span>
-                                                <span class="progress-percentage">{{progress_percentage}}%</span>
-                                            </div>
-                                            <div class="progress-bar-container">
-                                                <div class="progress-bar">
-                                                    <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
-                                                </div>
+                                            <div class="progress-label">Progress {{progress}}%</div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: {{progress}}%"></div>
                                             </div>
                                         </div>
                                         
-                                        <!-- Course Statistics -->
-                                        <div class="course-stats-grid">
-                                            <div class="stat-item">
-                                                <div class="stat-icon">
-                                                    <i class="fa fa-book"></i>
-                                                </div>
-                                                <div class="stat-info">
-                                                    <div class="stat-number">{{completed_sections}}/{{total_sections}}</div>
-                                                    <div class="stat-label">LESSONS</div>
-                                                </div>
+                                        <!-- Course Stats -->
+                                        <div class="course-stats">
+                                            <div class="course-stat-item">
+                                                <span>{{total_sections}}/{{total_sections}} lessons</span>
                                             </div>
-                                            
-                                            <div class="stat-item">
-                                                <div class="stat-icon">
-                                                    <i class="fa fa-tasks"></i>
-                                                </div>
-                                                <div class="stat-info">
-                                                    <div class="stat-number">{{completed_activities}}/{{total_activities}}</div>
-                                                    <div class="stat-label">ACTIVITIES</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="stat-item">
-                                                <div class="stat-icon">
-                                                    <i class="fa fa-clock-o"></i>
-                                                </div>
-                                                <div class="stat-info">
-                                                    <div class="stat-number">{{estimated_time}}</div>
-                                                    <div class="stat-label">MINUTES</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="stat-item">
-                                                <div class="stat-icon">
-                                                    <i class="fa fa-star"></i>
-                                                </div>
-                                                <div class="stat-info">
-                                                    <div class="stat-number">{{points_earned}}</div>
-                                                    <div class="stat-label">POINTS</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                                                        
-                                        <!-- Course Actions -->
-                                        <div class="course-actions">
-                                            {{#completed}}
-                                            <a href="{{courseurl}}" class="course-button completed">
-                                                <i class="fa fa-check"></i> Review Course
-                                            </a>
-                                            {{/completed}}
-                                            {{^completed}}
-                                            {{#in_progress}}
-                                            <a href="{{courseurl}}" class="course-button in-progress">
+                                        <div class="course-status">not started</div>
+                                        
+                                        <div class="course-buttons">
+                                            <a href="{{courseurl}}" class="course-button primary">
                                                 <i class="fa fa-play"></i> Continue Learning
                                             </a>
-                                            {{/in_progress}}
-                                            {{^in_progress}}
-                                            <a href="{{courseurl}}" class="course-button not-started">
-                                                <i class="fa fa-play"></i> Start Course
-                                            </a>
-                                            {{/in_progress}}
-                                            {{/completed}}
-                                            
-                                            <!-- Course Details Button -->
-                                            <button class="course-details-btn" onclick="toggleCourseDetails({{id}})">
-                                                <i class="fa fa-info-circle"></i>
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Course Details Panel (Hidden by default) -->
-                                        <div class="course-details-panel" id="details-{{id}}" style="display: none;">
-                                            <div class="details-content">
-                                                <h6>Course Details</h6>
-                                                <div class="detail-item">
-                                                    <strong>Instructor:</strong> {{instructor_name}}
+                                                    <button class="course-button secondary preview-btn" data-course="{{fullname}}" data-courseid="{{id}}">
+                                                        <i class="fa fa-eye"></i> Preview
+                                                    </button>
                                                 </div>
-                                                <div class="detail-item">
-                                                    <strong>Start Date:</strong> {{start_date}}
-                                                </div>
-                                                <div class="detail-item">
-                                                    <strong>Last Accessed:</strong> {{last_accessed}}
-                                                </div>
-                                                <div class="detail-item">
-                                                    <strong>Subject:</strong> {{subject}}
-                                                </div>
-                                                <div class="detail-item">
-                                                    <strong>Course Code:</strong> {{shortname}}
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2208,6 +1615,58 @@
             </div>
         </div>
             
+            <!-- Course Preview Modal -->
+            <div id="highschoolCoursePreviewModal" class="preview-modal">
+                <div class="modal-overlay" onclick="closePreviewModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="modalCourseTitle">Course Preview</h3>
+                        <button class="modal-close" onclick="closePreviewModal()">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="course-sections-list" id="courseSectionsList">
+                            <!-- Sections will be loaded here -->
+                        </div>
+                        
+                        <div class="insight-card study-stats">
+                            <div class="insight-header">
+                                <h3><i class="fa fa-lightbulb-o"></i> Study Insights</h3>
+                            </div>
+                            <div class="insight-content">
+                                <div class="study-stat">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <h4>Peak Study Time</h4>
+                                        <p>You're most productive between 2-4 PM</p>
+                                    </div>
+                                </div>
+                                <div class="study-stat">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-book"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <h4>Strongest Subject</h4>
+                                        <p>Mathematics - 95% average</p>
+                                    </div>
+                                </div>
+                                <div class="study-stat">
+                                    <div class="stat-icon">
+                                        <i class="fa fa-target"></i>
+                                    </div>
+                                    <div class="stat-details">
+                                        <h4>Goal Progress</h4>
+                                        <p>On track to complete 5 courses this semester</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             
         </div>
@@ -2216,160 +1675,6 @@
      <!-- High School Dashboard JavaScript -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize enhanced sidebar for high school
-        const enhancedSidebar = document.querySelector('.enhanced-sidebar');
-        if (enhancedSidebar) {
-            document.body.classList.add('has-student-sidebar', 'has-enhanced-sidebar');
-            console.log('Enhanced sidebar initialized for high school dashboard');
-        }
-        
-        // Initialize enhanced dropdown functionality
-        initializeEnhancedDropdowns();
-        
-        // Initialize sticky navbar with scroll effects
-        initializeStickyNavbar();
-    
-    // Enhanced dropdown functionality
-    function initializeEnhancedDropdowns() {
-        console.log('Initializing enhanced dropdowns...');
-        
-        // Find all dropdown toggles
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle, .user-avatar, [data-toggle="dropdown"]');
-        
-        dropdownToggles.forEach(toggle => {
-            // Add click event listener
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const dropdown = this.closest('.dropdown');
-                const menu = dropdown ? dropdown.querySelector('.dropdown-menu') : null;
-                
-                if (menu) {
-                    // Close all other dropdowns
-                    document.querySelectorAll('.dropdown-menu.show').forEach(openMenu => {
-                        if (openMenu !== menu) {
-                            openMenu.classList.remove('show');
-                            openMenu.style.display = 'none';
-                        }
-                    });
-                    
-                    // Toggle current dropdown
-                    const isOpen = menu.classList.contains('show');
-                    
-                    if (isOpen) {
-                        menu.classList.remove('show');
-                        menu.style.display = 'none';
-                    } else {
-                        menu.classList.add('show');
-                        menu.style.display = 'block';
-                        
-                        // Position dropdown properly
-                        positionDropdown(menu, this);
-                    }
-                }
-            });
-            
-            // Add hover effects
-            toggle.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.05)';
-            });
-            
-            toggle.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1)';
-            });
-        });
-        
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.dropdown')) {
-                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
-                    menu.classList.remove('show');
-                    menu.style.display = 'none';
-                });
-            }
-        });
-        
-        // Add smooth animations to dropdown items
-        const dropdownItems = document.querySelectorAll('.dropdown-item');
-        dropdownItems.forEach((item, index) => {
-            item.style.animationDelay = `${index * 0.05}s`;
-            item.classList.add('dropdown-item-animated');
-        });
-    }
-    
-    // Position dropdown properly
-    function positionDropdown(menu, toggle) {
-        const rect = toggle.getBoundingClientRect();
-        const menuRect = menu.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Reset positioning
-        menu.style.top = '';
-        menu.style.left = '';
-        menu.style.right = '';
-        menu.style.bottom = '';
-        
-        // Position horizontally
-        if (rect.right + menuRect.width > viewportWidth) {
-            menu.style.right = '0';
-        } else {
-            menu.style.left = '0';
-        }
-        
-        // Position vertically
-        if (rect.bottom + menuRect.height > viewportHeight) {
-            menu.style.bottom = '100%';
-            menu.style.top = 'auto';
-        } else {
-            menu.style.top = '100%';
-            menu.style.bottom = 'auto';
-        }
-    }
-    
-    // Initialize sticky navbar functionality
-    function initializeStickyNavbar() {
-        console.log('Initializing sticky navbar...');
-        
-        const navbar = document.querySelector('.navbar, .top-navbar, .header-nav');
-        if (!navbar) return;
-        
-        let lastScrollTop = 0;
-        const scrollThreshold = 50;
-        
-        // Add scroll event listener
-        window.addEventListener('scroll', function() {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // Add/remove scrolled class based on scroll position
-            if (scrollTop > scrollThreshold) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-            
-            // Optional: Hide/show navbar on scroll (uncomment if desired)
-            /*
-            if (scrollTop > lastScrollTop && scrollTop > 100) {
-                // Scrolling down - hide navbar
-                navbar.style.transform = 'translateY(-100%)';
-            } else {
-                // Scrolling up - show navbar
-                navbar.style.transform = 'translateY(0)';
-            }
-            */
-            
-            lastScrollTop = scrollTop;
-        });
-        
-        // Ensure navbar is visible on page load
-        navbar.style.transform = 'translateY(0)';
-        navbar.style.transition = 'transform 0.3s ease, box-shadow 0.2s ease, background 0.2s ease';
-        
-        console.log('Sticky navbar initialized successfully');
-    }
-        
         // Initialize all components
         initializeProgressRings();
         initializeInteractiveElements();
@@ -2914,6 +2219,20 @@
     
     // Modal functionality - moved to jQuery require block below
     
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('highschoolCoursePreviewModal');
+        if (e.target === modal) {
+            closePreviewModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+        }
+     });
      
     function initializeAnimations() {
         // Add entrance animations
@@ -3188,8 +2507,177 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 
+// Global functions that need to be accessible from onclick attributes
+function openPreviewModal(courseId, courseName) {
+    console.log('Global openPreviewModal called with:', courseId, courseName);
+    
+    const modal = document.getElementById('highschoolCoursePreviewModal');
+    const modalTitle = document.getElementById('modalCourseTitle');
+    const sectionsList = document.getElementById('courseSectionsList');
+    
+    if (!modal || !modalTitle || !sectionsList) {
+        console.error('Modal elements not found');
+        return;
+    }
+    
+    // Set modal title
+    modalTitle.textContent = courseName + ' - Course Sections';
+    
+    // Show loading state
+    sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+    
+    // Show modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Load course sections
+    loadCourseSections(courseId, sectionsList);
+}
 
+function closePreviewModal() {
+    const modal = document.getElementById('highschoolCoursePreviewModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
 
+function loadCourseSections(courseId, container) {
+    console.log('loadCourseSections called with courseId:', courseId);
+    
+    // Get course sections data from PHP
+    var coursesSectionsData = {};
+    try {
+        var rawData = '{{{highschool_courses_sections}}}';
+        console.log('Raw highschool_courses_sections data:', rawData);
+        // Clean the JSON data by removing problematic characters
+        rawData = rawData.replace(/&amp;/g, '&');
+        rawData = rawData.replace(/&lt;/g, '<');
+        rawData = rawData.replace(/&gt;/g, '>');
+        rawData = rawData.replace(/&quot;/g, '"');
+        rawData = rawData.replace(/&#x27;/g, "'");
+        coursesSectionsData = JSON.parse(rawData);
+        console.log('High school course sections data loaded:', coursesSectionsData);
+        console.log('Available course IDs:', Object.keys(coursesSectionsData));
+    } catch (e) {
+        console.error('Error parsing high school course sections data:', e);
+        console.log('Raw data:', '{{{highschool_courses_sections}}}');
+    }
+    
+    // Clear loading state
+    if (container) {
+        container.innerHTML = '';
+    }
+    
+    // Try both string and number keys
+    var sectionsData = coursesSectionsData[courseId] || coursesSectionsData[String(courseId)] || coursesSectionsData[Number(courseId)];
+    console.log('Sections data for course:', sectionsData);
+    console.log('CourseId type:', typeof courseId, 'Value:', courseId);
+    
+    if (!sectionsData || !sectionsData.sections || sectionsData.sections.length === 0) {
+        console.log('No sections data available for course ID:', courseId);
+        console.log('Available course IDs in data:', Object.keys(coursesSectionsData));
+        if (container) {
+            container.innerHTML = '<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>';
+        }
+        return;
+    }
+    
+    var sectionsHtml = '';
+    
+    // Add sections to the modal with tree view
+    sectionsData.sections.forEach(function(section, index) {
+        var progressBar = '';
+        if (section.total_activities > 0) {
+            var progressPercent = section.progress;
+            progressBar = '<div class="section-progress"><div class="progress-bar"><div class="progress-fill" style="width: ' + progressPercent + '%"></div></div><span class="progress-text">' + section.completed_activities + '/' + section.total_activities + ' activities</span></div>';
+        }
+        
+        // Activities list (initially hidden)
+        var activitiesList = '';
+        if (section.activities && section.activities.length > 0) {
+            activitiesList = '<div class="section-activities collapsed" id="highschool-activities-' + index + '">';
+            activitiesList += '<div class="activities-header"><span class="activities-count">' + section.activities.length + ' activities</span></div>';
+            activitiesList += '<ul class="activities-list">';
+            
+            section.activities.forEach(function(activity) {
+                var statusIcon = activity.iscompleted ? 'fa-check-circle' : 'fa-circle-o';
+                var activityType = activity.modname || 'activity';
+                var activityIcon = getActivityIcon(activityType);
+                
+                activitiesList += '<li class="activity-item ' + (activity.iscompleted ? 'completed' : 'pending') + '">';
+                activitiesList += '<div class="activity-icon"><i class="fa ' + activityIcon + '"></i></div>';
+                activitiesList += '<div class="activity-details">';
+                activitiesList += '<div class="activity-name">' + activity.name + '</div>';
+                activitiesList += '<div class="activity-type">' + activityType.charAt(0).toUpperCase() + activityType.slice(1) + '</div>';
+                activitiesList += '</div>';
+                activitiesList += '<div class="activity-status"><i class="fa ' + statusIcon + '"></i></div>';
+                activitiesList += '</li>';
+            });
+            
+            activitiesList += '</ul></div>';
+        }
+        
+        sectionsHtml += '<div class="section-item">';
+        sectionsHtml += '<div class="section-header" onclick="toggleActivities(\'highschool-activities-' + index + '\')">';
+        sectionsHtml += '<div class="section-info">';
+        sectionsHtml += '<h4 class="section-name">' + section.name + '</h4>';
+        sectionsHtml += '<p class="section-description">' + (section.summary || 'No description available') + '</p>';
+        sectionsHtml += '</div>';
+        sectionsHtml += '<div class="section-meta">';
+        sectionsHtml += '<span class="section-activities-count">' + section.total_activities + ' activities</span>';
+        if (section.activities && section.activities.length > 0) {
+            sectionsHtml += '<i class="fa fa-chevron-down toggle-icon"></i>';
+        }
+        sectionsHtml += '</div>';
+        sectionsHtml += '</div>';
+        sectionsHtml += progressBar;
+        sectionsHtml += activitiesList;
+        sectionsHtml += '</div>';
+    });
+    
+    if (container) {
+        container.innerHTML = sectionsHtml;
+    }
+}
+
+function getActivityIcon(activityType) {
+    var icons = {
+        'assign': 'fa-file-text-o',
+        'quiz': 'fa-question-circle',
+        'lesson': 'fa-book',
+        'forum': 'fa-comments',
+        'resource': 'fa-file-o',
+        'url': 'fa-external-link',
+        'page': 'fa-file-text',
+        'folder': 'fa-folder',
+        'label': 'fa-tag'
+    };
+    return icons[activityType] || 'fa-circle';
+}
+
+function toggleActivities(activitiesId) {
+    var activitiesDiv = document.getElementById(activitiesId);
+    if (activitiesDiv) {
+        var toggleIcon = activitiesDiv.previousElementSibling.querySelector('.toggle-icon');
+        
+        if (activitiesDiv.classList.contains('collapsed')) {
+            activitiesDiv.classList.remove('collapsed');
+            activitiesDiv.classList.add('expanded');
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-chevron-down');
+                toggleIcon.classList.add('fa-chevron-up');
+            }
+        } else {
+            activitiesDiv.classList.remove('expanded');
+            activitiesDiv.classList.add('collapsed');
+            if (toggleIcon) {
+                toggleIcon.classList.remove('fa-chevron-up');
+                toggleIcon.classList.add('fa-chevron-down');
+            }
+        }
+    }
+}
 
 require(['jquery'], function($) {
     $(document).ready(function() {
@@ -3210,6 +2698,20 @@ require(['jquery'], function($) {
             console.log('Raw data:', '{{{middle_courses_sections}}}');
         }
         
+        // Handle Preview button clicks for high school dashboard
+        $('.highschool-dashboard .preview-btn').on('click', function(e) {
+            e.preventDefault();
+            console.log('High school preview button clicked');
+            
+            // Get course data from attributes
+            var courseName = $(this).data('course');
+            var courseId = $(this).data('courseid');
+            
+            console.log('High school course name:', courseName, 'Course ID:', courseId);
+            
+            // Call the modal function
+            openPreviewModal(courseId, courseName);
+        });
         
         // Handle Preview button clicks for middle school dashboard
         $('.middle-dashboard .preview-btn').on('click', function(e) {

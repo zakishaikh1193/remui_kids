@@ -114,5 +114,3 @@ echo "<p>If all tests show ✅, the student courses page should be working corre
 echo "<p><a href='{$courses_url->out()}'>Click here to test the student courses page</a></p>";
 ?>
 
-
-
