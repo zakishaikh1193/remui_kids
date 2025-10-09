@@ -461,7 +461,7 @@ echo $OUTPUT->header();
         
         body.has-student-sidebar .highschool-assignments-page,
         body.has-enhanced-sidebar .highschool-assignments-page {
-            margin-left: 280px;
+            margin-left: 20px;
         }
         
         body.has-student-sidebar #page-wrapper,
