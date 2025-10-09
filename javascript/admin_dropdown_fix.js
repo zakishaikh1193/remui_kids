@@ -3,10 +3,10 @@
  * Fixes dropdown functionality issues in the admin dashboard
  */
 
-(function($) {
+define(['jquery'], function($) {
     'use strict';
 
-    var adminDropdownFix = {
+    return {
         init: function() {
             // Initialize dropdowns after DOM is ready
             $(document).ready(function() {
@@ -107,7 +107,7 @@
                     'appearance': 'none',
                     '-webkit-appearance': 'none',
                     '-moz-appearance': 'none',
-                    'background-image': 'url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 4 5\'%3E%3Cpath fill=\'%23666\' d=\'m2 0-2 2h4zm0 5 2-2h-4z\'%3E%3C/path%3E%3C/svg%3E")',
+                    'background-image': 'url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 4 5\'%3E%3Cpath fill=\'%23666\' d=\'m2 0-2 2h4zm0 5 2-2h-4z\'/%3E%3C/svg%3E")',
                     'background-repeat': 'no-repeat',
                     'background-position': 'right 0.75rem center',
                     'background-size': '16px 12px',
@@ -116,8 +116,4 @@
             });
         }
     };
-
-    // Call the init function to start the dropdown fix process
-    adminDropdownFix.init();
-
-})(jQuery);
+});
