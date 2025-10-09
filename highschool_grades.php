@@ -396,7 +396,8 @@ echo $OUTPUT->header();
             background: #f8fafc;
             min-height: 100vh;
             margin-left: 280px;
-            padding-left: 2rem;
+            padding: 0;
+            width: calc(100% - 280px);
         }
         
         .grades-main-content {
@@ -404,10 +405,10 @@ echo $OUTPUT->header();
             width: 100%;
         }
         
-        /* Remove all padding for full-width feel */
+        /* Container fluid padding */
         .container-fluid {
-            padding-left: 0;
-            padding-right: 0;
+            padding-left: 2rem;
+            padding-right: 2rem;
         }
         
         /* Remove all padding from main content */
@@ -454,7 +455,7 @@ echo $OUTPUT->header();
         
         body.has-student-sidebar .highschool-grades-page,
         body.has-enhanced-sidebar .highschool-grades-page {
-            margin-left: 280px;
+            margin-left: 20px;
         }
         
         body.has-student-sidebar #page-wrapper,
@@ -505,9 +506,9 @@ echo $OUTPUT->header();
             color: white;
             padding: 2rem 0;
             margin-bottom: 1.5rem;
-            margin-left: -2rem;
+            margin-left: 0;
             margin-right: 0;
-            width: calc(100% + 2rem);
+            width: 100%;
         }
         
         .grades-page-header .page-title {
@@ -687,12 +688,12 @@ echo $OUTPUT->header();
             
             .highschool-grades-page {
                 margin-left: 0 !important;
-                padding-left: 1rem !important;
+                padding: 0 !important;
             }
             
             .grades-page-header {
-                margin-left: -1rem !important;
-                width: calc(100% + 1rem) !important;
+                margin-left: 0 !important;
+                width: 100% !important;
             }
             
             body.has-student-sidebar #page,
@@ -706,12 +707,12 @@ echo $OUTPUT->header();
                 font-size: 1.8rem;
             }
             .grades-main-content {
-                padding: 0.5rem;
+                padding: 0;
             }
             
             .container-fluid {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
             }
         }
 </style>
@@ -871,29 +872,28 @@ echo $OUTPUT->header();
 </div>
 
 <div class="highschool-grades-page">
-    <div class="grades-main-content">
-        <!-- Page Header -->
-        <div class="grades-page-header">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="page-title">
-                            <i class="fa fa-chart-bar me-3"></i>
-                            My Grades - <?php echo $template_data['user_grade']; ?>
-                        </h1>
-                        <p>Track your academic progress and performance.</p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <a href="<?php echo $template_data['dashboard_url']; ?>" class="btn btn-outline-light">
-                            <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
-                        </a>
-                    </div>
+    <!-- Page Header -->
+    <div class="grades-page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title">
+                        <i class="fa fa-chart-bar me-3"></i>
+                        My Grades - <?php echo $template_data['user_grade']; ?>
+                    </h1>
+                    <p>Track your academic progress and performance.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="<?php echo $template_data['dashboard_url']; ?>" class="btn btn-outline-light">
+                        <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Grade Statistics -->
-        <div class="container-fluid">
+    <!-- Grade Statistics -->
+    <div class="container-fluid">
             <div class="row g-2 mb-4">
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
@@ -971,7 +971,6 @@ echo $OUTPUT->header();
             </div>
             <?php endif; ?>
         </div>
-    </div>
 </div>
 
 <script>
