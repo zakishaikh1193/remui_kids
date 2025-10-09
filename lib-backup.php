@@ -1421,7 +1421,7 @@ function theme_remui_kids_get_course_sections_for_modal($courseid) {
                         'modname' => $module->modname,
                         'url' => (new moodle_url('/mod/' . $module->modname . '/view.php', ['id' => $module->id]))->out(),
                         'iscompleted' => $iscompleted,
-                        'icon' => '/theme/image.php/remui_kids/' . $module->modname . '/1/icon'
+                        'icon' => '/pix/' . $module->modname . '/icon'
                     ];
                 }
             }
