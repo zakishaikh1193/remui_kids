@@ -30,6 +30,12 @@ require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
 // Check if this is a dashboard page and use our custom dashboard
 if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
+    // Moodle requires main_content() to be called in layout files
+    // For custom dashboards, we call it but don't use the output
+    ob_start();
+    echo $OUTPUT->main_content();
+    ob_end_clean(); // Discard the default dashboard output
+    
     // Check if user is admin first
     $isadmin = is_siteadmin($USER) || has_capability('moodle/site:config', context_system::instance(), $USER);
     
