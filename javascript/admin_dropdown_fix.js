@@ -17,6 +17,7 @@
         }
     }
 
+
     // Initialize when jQuery is available
     waitForJQuery(function($) {
         $(document).ready(function() {
@@ -126,3 +127,4 @@
     });
 
 })();
+
