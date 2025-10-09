@@ -31,5 +31,3 @@ $plugin->component = 'theme_remui_kids';
 $plugin->dependencies = array(
     'theme_remui' => 2025072400,
 );
-
-

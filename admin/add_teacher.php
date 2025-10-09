@@ -1,69 +1,212 @@
 <?php
-/**
- * Add Teacher Page - Beautiful animated page for adding new teachers
- */
-
 require_once('../../../config.php');
-global $DB, $CFG, $OUTPUT, $PAGE;
+require_login();
 
-// Set up the page
+global $USER, $DB, $CFG, $OUTPUT;
+
+// Check if user is company manager
+$companymanagerrole = $DB->get_record('role', ['shortname' => 'companymanager']);
+if (!$companymanagerrole) {
+    redirect(new moodle_url('/theme/remui_kids/school_manager_dashboard.php'), 'Company manager role not found!', null, \core\output\notification::NOTIFY_ERROR);
+}
+
+$context = context_system::instance();
+$is_company_manager = user_has_role_assignment($USER->id, $companymanagerrole->id, $context->id);
+
+if (!$is_company_manager) {
+    redirect(new moodle_url('/theme/remui_kids/school_manager_dashboard.php'), 'You must be a company manager to access this page!', null, \core\output\notification::NOTIFY_ERROR);
+}
+
+// Get company info
+$company_info = null;
+if ($DB->get_manager()->table_exists('company') && $DB->get_manager()->table_exists('company_users')) {
+    $company_info = $DB->get_record_sql(
+        "SELECT c.*, u.firstname, u.lastname, u.email
+         FROM {company} c
+         JOIN {company_users} cu ON c.id = cu.companyid
+         JOIN {user} u ON cu.userid = u.id
+         WHERE cu.userid = ? AND cu.managertype = 1",
+        [$USER->id]
+    );
+}
+
+if (!$company_info) {
+    redirect(new moodle_url('/theme/remui_kids/school_manager_dashboard.php'), 'No company information found!', null, \core\output\notification::NOTIFY_ERROR);
+}
+
+$PAGE->set_context($context);
 $PAGE->set_url('/theme/remui_kids/admin/add_teacher.php');
-$PAGE->set_context(context_system::instance());
-$PAGE->set_title('Add New Teacher');
-$PAGE->set_heading('Add New Teacher');
-$PAGE->set_pagelayout('admin');
-
-// Check if user has admin capabilities
-require_capability('moodle/site:config', context_system::instance());
+$PAGE->set_title('Add Teacher - ' . $company_info->name);
+$PAGE->set_heading('Add Teacher');
 
 // Handle form submission
-if ($_POST) {
-    $firstname = trim($_POST['firstname']);
-    $lastname = trim($_POST['lastname']);
-    $email = trim($_POST['email']);
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
-    $confirm_password = trim($_POST['confirm_password']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
     
-    $error_message = '';
+    // Validate required fields
+    $required_fields = ['username', 'firstname', 'lastname', 'email'];
+    $errors = [];
     
-    if (!$firstname || !$lastname || !$email || !$username || !$password) {
-        $error_message = "All fields are required.";
-    } elseif ($password !== $confirm_password) {
-        $error_message = "Passwords do not match.";
-    } elseif (strlen($password) < 6) {
-        $error_message = "Password must be at least 6 characters long.";
-    } elseif ($DB->record_exists('user', ['username' => $username])) {
-        $error_message = "Username already exists. Please choose a different username.";
-    } elseif ($DB->record_exists('user', ['email' => $email])) {
-        $error_message = "Email already exists. Please use a different email address.";
-    } else {
-        // Create new user
-        $user = new stdClass();
-        $user->username = $username;
-        $user->firstname = $firstname;
-        $user->lastname = $lastname;
-        $user->email = $email;
-        $user->password = password_hash($password, PASSWORD_DEFAULT);
-        $user->confirmed = 1;
-        $user->mnethostid = 1;
-        $user->timecreated = time();
-        $user->timemodified = time();
-        
-        $userid = $DB->insert_record('user', $user);
-        
-        if ($userid) {
-            // Assign teachers role
-            $teacherrole = $DB->get_record('role', ['shortname' => 'teachers']);
-            if ($teacherrole) {
-                $context = context_system::instance();
-                role_assign($teacherrole->id, $userid, $context->id);
+    foreach ($required_fields as $field) {
+        if (empty($_POST[$field])) {
+            $errors[] = ucfirst($field) . ' is required.';
+        }
+    }
+    
+    // Validate email format
+    if (!empty($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Please enter a valid email address.';
+    }
+    
+    // Check if username already exists
+    if (!empty($_POST['username']) && $DB->record_exists('user', ['username' => $_POST['username']])) {
+        $errors[] = 'Username already exists. Please choose a different username.';
+    }
+    
+    // Check if email already exists
+    if (!empty($_POST['email']) && $DB->record_exists('user', ['email' => $_POST['email']])) {
+        $errors[] = 'Email already exists. Please use a different email address.';
+    }
+    
+    // Validate password
+    if (empty($_POST['password']) || strlen($_POST['password']) < 6) {
+        $errors[] = 'Password must be at least 6 characters long.';
+    }
+    
+    if (empty($errors)) {
+        try {
+            // Use Moodle's built-in user creation function for better reliability
+            $user_data = new stdClass();
+            $user_data->username = trim($_POST['username']);
+            $user_data->password = $_POST['password']; // Will be hashed by create_user
+            $user_data->firstname = trim($_POST['firstname']);
+            $user_data->lastname = trim($_POST['lastname']);
+            $user_data->email = trim($_POST['email']);
+            $user_data->city = !empty($_POST['city']) ? trim($_POST['city']) : '';
+            $user_data->country = !empty($_POST['country']) ? $_POST['country'] : '';
+            $user_data->phone1 = !empty($_POST['phone']) ? trim($_POST['phone']) : '';
+            $user_data->description = !empty($_POST['description']) ? trim($_POST['description']) : '';
+            $user_data->auth = 'manual';
+            $user_data->confirmed = 1;
+            $user_data->mnethostid = $CFG->mnet_localhost_id;
+            
+            // Debug: Log the user data being created
+            error_log('Creating user with Moodle function: ' . $user_data->username);
+            
+            // Use Moodle's user creation function
+            $user_id = user_create_user($user_data);
+            
+            if (!$user_id) {
+                // Fallback: Try direct insertion with minimal required fields
+                error_log('user_create_user failed, trying direct insertion');
+                
+                $minimal_user = new stdClass();
+                $minimal_user->username = trim($_POST['username']);
+                $minimal_user->password = hash_internal_user_password($_POST['password']);
+                $minimal_user->firstname = trim($_POST['firstname']);
+                $minimal_user->lastname = trim($_POST['lastname']);
+                $minimal_user->email = trim($_POST['email']);
+                $minimal_user->auth = 'manual';
+                $minimal_user->confirmed = 1;
+                $minimal_user->mnethostid = $CFG->mnet_localhost_id;
+                $minimal_user->timecreated = time();
+                $minimal_user->timemodified = time();
+                $minimal_user->firstaccess = 0;
+                $minimal_user->lastaccess = 0;
+                $minimal_user->suspended = 0;
+                $minimal_user->deleted = 0;
+                
+                $user_id = $DB->insert_record('user', $minimal_user);
+                
+                if ($user_id) {
+                    // Update with additional fields
+                    $update_user = new stdClass();
+                    $update_user->id = $user_id;
+                    $update_user->city = !empty($_POST['city']) ? trim($_POST['city']) : '';
+                    $update_user->country = !empty($_POST['country']) ? $_POST['country'] : '';
+                    $update_user->phone1 = !empty($_POST['phone']) ? trim($_POST['phone']) : '';
+                    $update_user->description = !empty($_POST['description']) ? trim($_POST['description']) : '';
+                    
+                    $DB->update_record('user', $update_user);
+                    error_log('User created via direct insertion: ' . $user_id);
+                }
             }
-            $success_message = "Teacher created successfully! Redirecting to teachers list...";
-            // Redirect after 2 seconds
-            echo "<script>setTimeout(function(){ window.location.href = 'teachers_list.php'; }, 2000);</script>";
-        } else {
-            $error_message = "Failed to create teacher. Please try again.";
+            
+            if ($user_id) {
+                // Assign teacher role
+                $teacher_role = $DB->get_record('role', ['shortname' => 'teacher']);
+                if ($teacher_role) {
+                    role_assign($teacher_role->id, $user_id, $context->id);
+                }
+                
+                // Add user to company
+                $company_user = new stdClass();
+                $company_user->userid = $user_id;
+                $company_user->companyid = $company_info->id;
+                $company_user->managertype = 0; // Regular user, not manager
+                $company_user->timecreated = time();
+                $company_user->timemodified = time();
+                
+                $DB->insert_record('company_users', $company_user);
+                
+                // Store grade information if provided
+                if (!empty($_POST['grade'])) {
+                    // Try to find or create a custom field for grade
+                    $grade_field = $DB->get_record('user_info_field', ['shortname' => 'grade']);
+                    if (!$grade_field) {
+                        // Create grade field if it doesn't exist
+                        $grade_field = new stdClass();
+                        $grade_field->shortname = 'grade';
+                        $grade_field->name = 'Grade';
+                        $grade_field->datatype = 'text';
+                        $grade_field->description = 'Teacher Grade Level';
+                        $grade_field->required = 0;
+                        $grade_field->locked = 0;
+                        $grade_field->visible = 1;
+                        $grade_field->forceunique = 0;
+                        $grade_field->signup = 0;
+                        $grade_field->defaultdata = '';
+                        $grade_field->param1 = '';
+                        $grade_field->param2 = '';
+                        $grade_field->param3 = '';
+                        $grade_field->param4 = '';
+                        $grade_field->param5 = '';
+                        
+                        $grade_field_id = $DB->insert_record('user_info_field', $grade_field);
+                        $grade_field->id = $grade_field_id;
+                    }
+                    
+                    // Add grade data for user
+                    $grade_data = new stdClass();
+                    $grade_data->userid = $user_id;
+                    $grade_data->fieldid = $grade_field->id;
+                    $grade_data->data = $_POST['grade'];
+                    
+                    $DB->insert_record('user_info_data', $grade_data);
+                }
+                
+                // Redirect back with success message
+                redirect(new moodle_url('/theme/remui_kids/school_manager_dashboard.php'), 
+                    'Teacher "' . $new_user->firstname . ' ' . $new_user->lastname . '" has been successfully added!', 
+                    null, \core\output\notification::NOTIFY_SUCCESS);
+            } else {
+                $errors[] = 'Failed to create user account.';
+            }
+            
+        } catch (Exception $e) {
+            // Log the full error for debugging
+            error_log('Error creating teacher: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+            
+            $errors[] = 'Error creating teacher: ' . $e->getMessage();
+            
+            // Add more specific error information
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $errors[] = 'Username or email already exists. Please choose different values.';
+            } elseif (strpos($e->getMessage(), 'Data too long') !== false) {
+                $errors[] = 'One or more fields contain data that is too long.';
+            } elseif (strpos($e->getMessage(), 'Incorrect string value') !== false) {
+                $errors[] = 'Invalid characters in one or more fields.';
+            }
         }
     }
 }
@@ -76,23 +219,6 @@ echo "
     .add-container {
         max-width: 1200px;
         margin: 0 auto;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-        overflow: hidden;
-        animation: slideInUp 0.8s ease-out;
-    }
-    
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .add-header {
@@ -165,30 +291,18 @@ echo "
         border-radius: 50%;
         background: #fce7f3;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        margin: 20px auto;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        animation: bounce 2s infinite;
-        position: relative;
-        z-index: 1;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
     }
-    
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-        40% { transform: translateY(-10px); }
-        60% { transform: translateY(-5px); }
-    }
-    
-    .add-form {
-        padding: 40px;
-        animation: fadeIn 1s ease-out 0.7s both;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+
+    .compact-header h1.page-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
     }
     
     .form-section {
@@ -199,16 +313,11 @@ echo "
         border-left: 4px solid #166534;
         animation: slideInLeft 0.8s ease-out;
     }
-    
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+
+    .back-btn:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
     }
     
     .section-title {
@@ -220,30 +329,38 @@ echo "
         align-items: center;
         gap: 10px;
     }
-    
-    .form-row {
+
+    .compact-form .form-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
-    
-    .form-group {
-        position: relative;
-        margin-bottom: 25px;
+
+    .compact-form .form-group {
+        margin-bottom: 0;
     }
-    
-    .form-label {
+
+    .compact-form .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .compact-form .form-label {
         display: block;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.375rem;
+        font-size: 0.875rem;
     }
-    
-    .form-control {
+
+    .compact-form .form-label.required::after {
+        content: ' *';
+        color: #dc3545;
+    }
+
+    .compact-form .form-input,
+    .compact-form .form-select,
+    .compact-form .form-textarea {
         width: 100%;
         padding: 15px 20px;
         border: 2px solid #dcfce7;
@@ -252,8 +369,10 @@ echo "
         transition: all 0.3s ease;
         background: white;
     }
-    
-    .form-control:focus {
+
+    .compact-form .form-input:focus,
+    .compact-form .form-select:focus,
+    .compact-form .form-textarea:focus {
         outline: none;
         border-color: #166534;
         box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
@@ -268,27 +387,16 @@ echo "
         margin-top: 5px;
         font-size: 0.85rem;
     }
-    
-    .strength-weak { color: #e53e3e; }
-    .strength-medium { color: #ed8936; }
-    .strength-strong { color: #48bb78; }
-    
-    .button-group {
+
+    .compact-form-actions {
         display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-top: 40px;
+        gap: 0.75rem;
+        justify-content: flex-start;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
     }
-    
-    .btn {
-        padding: 15px 30px;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
+
+    .compact-form .btn {
         display: inline-flex;
         align-items: center;
         gap: 10px;
@@ -323,150 +431,64 @@ echo "
         border-radius: 12px;
         margin-bottom: 30px;
         font-weight: 500;
-        animation: slideInDown 0.5s ease-out;
-    }
-    
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .alert-success {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: white;
-    }
-    
-    .alert-error {
-        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-        color: white;
-    }
-    
-    .breadcrumb {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 15px 30px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        backdrop-filter: blur(10px);
-    }
-    
-    .breadcrumb a {
-        color: rgba(255, 255, 255, 0.8);
         text-decoration: none;
-        transition: color 0.3s ease;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
     }
-    
-    .breadcrumb a:hover {
+
+    .compact-form .btn-primary {
+        background: #007cba;
         color: white;
     }
     
-    .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.9);
+    .compact-form .btn-primary:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
     }
-    
-    .floating-elements {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    .floating-circle {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        animation: float 6s ease-in-out infinite;
-    }
-    
-    .floating-circle:nth-child(1) {
-        width: 100px;
-        height: 100px;
-        top: 15%;
-        left: 15%;
-        animation-delay: 0s;
-    }
-    
-    .floating-circle:nth-child(2) {
-        width: 80px;
-        height: 80px;
-        top: 70%;
-        right: 15%;
-        animation-delay: 2s;
-    }
-    
-    .floating-circle:nth-child(3) {
-        width: 60px;
-        height: 60px;
-        bottom: 25%;
-        left: 25%;
-        animation-delay: 4s;
-    }
-    
-    .floating-circle:nth-child(4) {
-        width: 120px;
-        height: 120px;
-        top: 40%;
-        right: 30%;
-        animation-delay: 1s;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
-    }
-    
-    .progress-indicator {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 30px;
-    }
-    
-    .progress-step {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #e2e8f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 10px;
-        font-weight: bold;
-        color: #a0aec0;
-        transition: all 0.3s ease;
-    }
-    
-    .progress-step.active {
-        background: #48bb78;
-        color: white;
-        transform: scale(1.1);
-    }
-    
-    .progress-step.completed {
-        background: #38a169;
+
+    .compact-form .btn-secondary {
+        background: #6c757d;
         color: white;
     }
     
+    .compact-form .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+    }
+
+    .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .alert-error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+    }
+
+    .alert h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+    }
+
+    .alert ul {
+        margin: 0;
+        padding-left: 1.25rem;
+    }
+
+    .alert li {
+        margin-bottom: 0.25rem;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-        .form-row {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        
-        .add-title {
-            font-size: 2rem;
-        }
-        
-        .button-group {
+        .compact-header {
             flex-direction: column;
-            align-items: center;
+            gap: 0.75rem;
+            align-items: flex-start;
         }
         
         .btn {
@@ -767,10 +789,7 @@ document.getElementById('password').addEventListener('input', function() {
         message = 'Strong password';
         strengthDiv.className = 'password-strength strength-strong';
     }
-    
-    strengthDiv.textContent = message;
-});
-</script>";
+</style>
 
     // Add JavaScript for sidebar toggle
     echo <<<JS

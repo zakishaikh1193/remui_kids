@@ -1144,6 +1144,11 @@
 
 {{> theme_remui/common_end}}
 
+{{#js}}
+// JavaScript modules are now loaded directly via lib.php
+// No AMD require calls needed
+{{/js}}
+
 <script>
 function toggleSidebar() {
     const sidebar = document.querySelector('.admin-sidebar');
