@@ -312,7 +312,6 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['achievements'] = theme_remui_kids_get_achievements_data($USER->id);
         $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     }
-    
     // Add Grade 8-12 specific statistics and courses for high school students
     if ($dashboardtype === 'highschool') {
         $templatecontext['highschool_stats'] = theme_remui_kids_get_highschool_dashboard_stats($USER->id);
