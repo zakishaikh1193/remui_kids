@@ -14,3 +14,4 @@ echo '<p>If you can see this, the basic page structure is working.</p>';
 echo '<p><a href="class_performance_overview.php">Go to Class Performance Overview</a></p>';
 echo $OUTPUT->footer();
 ?>
+

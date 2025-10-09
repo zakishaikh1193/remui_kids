@@ -5330,6 +5330,296 @@ function theme_remui_kids_get_class_performance_overview() {
 }
 
 /**
+ * Get class performance data for Class Performance Overview page
+ *
+ * @param int $courseid Course ID
+ * @return array Array containing class performance data
+ */
+function theme_remui_kids_get_class_performance_data($courseid) {
+    global $DB, $USER;
+    
+    try {
+        $context = context_course::instance($courseid);
+        
+        // Get enrolled students (exclude admin/teacher roles)
+        $students = $DB->get_records_sql(
+            "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.lastaccess
+             FROM {user} u
+             JOIN {user_enrolments} ue ON ue.userid = u.id
+             JOIN {enrol} e ON e.id = ue.enrolid
+             WHERE e.courseid = ?
+             AND u.deleted = 0
+             AND u.id NOT IN (
+                 SELECT DISTINCT ra.userid 
+                 FROM {role_assignments} ra 
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
+             )
+             ORDER BY u.lastname ASC, u.firstname ASC",
+            [$courseid]
+        );
+        
+        $student_count = count($students);
+        
+        // Calculate attendance rate (students who accessed course in last 30 days)
+        $attendance_threshold = time() - (30 * 24 * 60 * 60);
+        $active_students = 0;
+        foreach ($students as $student) {
+            if ($student->lastaccess && $student->lastaccess > $attendance_threshold) {
+                $active_students++;
+            }
+        }
+        $attendance_rate = $student_count > 0 ? round(($active_students / $student_count) * 100, 1) : 0;
+        
+        // Get average exam/assignment grades
+        $avg_grade = $DB->get_field_sql(
+            "SELECT AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100)
+             FROM {grade_grades} gg
+             JOIN {grade_items} gi ON gi.id = gg.itemid
+             WHERE gi.courseid = ?
+             AND gi.itemtype = 'mod'
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND gg.userid IN (
+                 SELECT DISTINCT ue.userid
+                 FROM {user_enrolments} ue
+                 JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE e.courseid = ?
+             )",
+            [$courseid, $courseid]
+        );
+        $avg_grade = $avg_grade ? round($avg_grade, 1) : 0;
+        
+        // Get student count by grade (using course categories as grades)
+        $grade_distribution = $DB->get_records_sql(
+            "SELECT cc.name as grade_name, COUNT(DISTINCT ue.userid) as student_count
+             FROM {course_categories} cc
+             LEFT JOIN {course} c ON c.category = cc.id
+             LEFT JOIN {enrol} e ON e.courseid = c.id
+             LEFT JOIN {user_enrolments} ue ON ue.enrolid = e.id
+             LEFT JOIN {user} u ON u.id = ue.userid
+             WHERE c.id = ?
+             AND u.deleted = 0
+             AND u.id NOT IN (
+                 SELECT DISTINCT ra.userid 
+                 FROM {role_assignments} ra 
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
+             )
+             GROUP BY cc.id, cc.name
+             ORDER BY cc.name",
+            [$courseid]
+        );
+        
+        // Get top performers
+        $top_performers = $DB->get_records_sql(
+            "SELECT u.id, u.firstname, u.lastname,
+                    AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg_grade,
+                    COUNT(DISTINCT cmc.coursemoduleid) as completed_activities
+             FROM {user} u
+             JOIN {user_enrolments} ue ON ue.userid = u.id
+             JOIN {enrol} e ON e.id = ue.enrolid
+             LEFT JOIN {grade_grades} gg ON gg.userid = u.id
+             LEFT JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid = e.courseid
+             LEFT JOIN {course_modules_completion} cmc ON cmc.userid = u.id
+             WHERE e.courseid = ?
+             AND u.deleted = 0
+             AND u.id NOT IN (
+                 SELECT DISTINCT ra.userid 
+                 FROM {role_assignments} ra 
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
+             )
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             GROUP BY u.id, u.firstname, u.lastname
+             HAVING avg_grade >= 70
+             ORDER BY avg_grade DESC
+             LIMIT 4",
+            [$courseid]
+        );
+        
+        // Get examination results by subject
+        $exam_results = $DB->get_records_sql(
+            "SELECT m.name as module_name,
+                    COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 >= 70 THEN 1 END) as pass_count,
+                    COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 BETWEEN 50 AND 69 THEN 1 END) as average_count,
+                    COUNT(CASE WHEN (gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100 < 50 THEN 1 END) as fail_count,
+                    COUNT(*) as total_count
+             FROM {grade_items} gi
+             JOIN {modules} m ON m.id = gi.itemmodule
+             JOIN {grade_grades} gg ON gg.itemid = gi.id
+             WHERE gi.courseid = ?
+             AND gi.itemtype = 'mod'
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND gg.userid IN (
+                 SELECT DISTINCT ue.userid
+                 FROM {user_enrolments} ue
+                 JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE e.courseid = ?
+             )
+             GROUP BY m.id, m.name
+             ORDER BY m.name",
+            [$courseid, $courseid]
+        );
+        
+        // Get average scores by subject
+        $subject_averages = $DB->get_records_sql(
+            "SELECT m.name as subject_name,
+                    AVG((gg.finalgrade / NULLIF(gg.rawgrademax, 0)) * 100) as avg_score
+             FROM {grade_items} gi
+             JOIN {modules} m ON m.id = gi.itemmodule
+             JOIN {grade_grades} gg ON gg.itemid = gi.id
+             WHERE gi.courseid = ?
+             AND gi.itemtype = 'mod'
+             AND gg.finalgrade IS NOT NULL
+             AND gg.rawgrademax > 0
+             AND gg.userid IN (
+                 SELECT DISTINCT ue.userid
+                 FROM {user_enrolments} ue
+                 JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE e.courseid = ?
+             )
+             GROUP BY m.id, m.name
+             ORDER BY avg_score DESC
+             LIMIT 3",
+            [$courseid, $courseid]
+        );
+        
+        // Get course statistics
+        $course_stats = $DB->get_record_sql(
+            "SELECT 
+                COUNT(DISTINCT cm.id) as total_activities,
+                COUNT(DISTINCT CASE WHEN cmc.completionstate = 1 THEN cmc.coursemoduleid END) as completed_activities,
+                COUNT(DISTINCT CASE WHEN gg.finalgrade IS NOT NULL THEN gg.userid END) as students_with_grades
+             FROM {course_modules} cm
+             LEFT JOIN {course_modules_completion} cmc ON cmc.coursemoduleid = cm.id
+             LEFT JOIN {grade_items} gi ON gi.courseid = cm.course AND gi.itemmodule = cm.modname
+             LEFT JOIN {grade_grades} gg ON gg.itemid = gi.id
+             WHERE cm.course = ?",
+            [$courseid]
+        );
+        
+        // Get recent activity trends
+        $activity_trends = $DB->get_records_sql(
+            "SELECT 
+                DATE(FROM_UNIXTIME(timecreated)) as activity_date,
+                COUNT(*) as activity_count
+             FROM {logstore_standard_log}
+             WHERE courseid = ?
+             AND timecreated > ?
+             AND userid IN (
+                 SELECT DISTINCT ue.userid
+                 FROM {user_enrolments} ue
+                 JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE e.courseid = ?
+             )
+             GROUP BY DATE(FROM_UNIXTIME(timecreated))
+             ORDER BY activity_date DESC
+             LIMIT 7",
+            [$courseid, time() - (7 * 24 * 60 * 60), $courseid]
+        );
+        
+        // Get assignment and quiz statistics
+        $assignment_stats = $DB->get_records_sql(
+            "SELECT 
+                a.name,
+                COUNT(DISTINCT asub.userid) as submissions,
+                AVG(asub.grade) as avg_grade,
+                MAX(asub.grade) as max_grade,
+                MIN(asub.grade) as min_grade
+             FROM {assign} a
+             LEFT JOIN {assign_submission} asub ON asub.assignment = a.id AND asub.status = 'submitted'
+             WHERE a.course = ?
+             GROUP BY a.id, a.name
+             ORDER BY a.duedate DESC
+             LIMIT 5",
+            [$courseid]
+        );
+        
+        // Get quiz statistics
+        $quiz_stats = $DB->get_records_sql(
+            "SELECT 
+                q.name,
+                COUNT(DISTINCT qa.userid) as attempts,
+                AVG(qa.sumgrades) as avg_score,
+                MAX(qa.sumgrades) as max_score,
+                MIN(qa.sumgrades) as min_score
+             FROM {quiz} q
+             LEFT JOIN {quiz_attempts} qa ON qa.quiz = q.id AND qa.state = 'finished'
+             WHERE q.course = ?
+             GROUP BY q.id, q.name
+             ORDER BY q.timeopen DESC
+             LIMIT 5",
+            [$courseid]
+        );
+        
+        // Get student engagement metrics
+        $engagement_metrics = $DB->get_records_sql(
+            "SELECT 
+                u.id,
+                u.firstname,
+                u.lastname,
+                COUNT(DISTINCT l.id) as log_entries,
+                COUNT(DISTINCT cmc.coursemoduleid) as completed_modules,
+                MAX(l.timecreated) as last_activity
+             FROM {user} u
+             JOIN {user_enrolments} ue ON ue.userid = u.id
+             JOIN {enrol} e ON e.id = ue.enrolid
+             LEFT JOIN {logstore_standard_log} l ON l.userid = u.id AND l.courseid = e.courseid
+             LEFT JOIN {course_modules_completion} cmc ON cmc.userid = u.id
+             WHERE e.courseid = ?
+             AND u.deleted = 0
+             AND u.id NOT IN (
+                 SELECT DISTINCT ra.userid 
+                 FROM {role_assignments} ra 
+                 JOIN {role} r ON ra.roleid = r.id 
+                 WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
+             )
+             GROUP BY u.id, u.firstname, u.lastname
+             ORDER BY log_entries DESC, completed_modules DESC
+             LIMIT 10",
+            [$courseid]
+        );
+        
+        return [
+            'student_count' => $student_count,
+            'attendance_rate' => $attendance_rate,
+            'avg_grade' => $avg_grade,
+            'grade_distribution' => $grade_distribution,
+            'top_performers' => $top_performers,
+            'exam_results' => $exam_results,
+            'subject_averages' => $subject_averages,
+            'students' => array_slice($students, 0, 3),
+            'course_stats' => $course_stats,
+            'activity_trends' => $activity_trends,
+            'assignment_stats' => $assignment_stats,
+            'quiz_stats' => $quiz_stats,
+            'engagement_metrics' => $engagement_metrics
+        ];
+        
+    } catch (Exception $e) {
+        error_log("Error fetching class performance data: " . $e->getMessage());
+        return [
+            'student_count' => 0,
+            'attendance_rate' => 0,
+            'avg_grade' => 0,
+            'grade_distribution' => [],
+            'top_performers' => [],
+            'exam_results' => [],
+            'subject_averages' => [],
+            'students' => [],
+            'course_stats' => (object)['total_activities' => 0, 'completed_activities' => 0, 'students_with_grades' => 0],
+            'activity_trends' => [],
+            'assignment_stats' => [],
+            'quiz_stats' => [],
+            'engagement_metrics' => []
+        ];
+    }
+}
+
+/**
  * Get detailed student insights with performance and engagement analytics
  *
  * @return array Student insights data

@@ -16,7 +16,6 @@ echo '<div style="max-width: 1200px; margin: 0 auto;">';
 
 // Header
 echo '<div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 20px; border-radius: 12px; margin-bottom: 24px;">';
-echo '<h1 style="margin: 0; font-size: 24px;">Jasper Elite School</h1>';
 echo '<p style="margin: 5px 0 0 0; opacity: 0.9;">Student Performance Dashboard</p>';
 echo '</div>';
 
@@ -91,3 +90,4 @@ echo '</div>';
 
 echo $OUTPUT->footer();
 ?>
+
