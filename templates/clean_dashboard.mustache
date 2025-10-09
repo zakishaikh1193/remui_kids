@@ -1,0 +1,131 @@
+{{!
+    Clean Dashboard Template for remui_kids theme
+    
+    This template provides a clean, centered layout matching the first image design:
+    - Clean header with title
+    - Centered white card with learning categories
+    - No sidebar navigation
+    - Minimal, focused design
+}}
+
+{{> theme_remui_kids/common_start}}
+
+{{#custom_dashboard}}
+
+<div class="clean-dashboard-wrapper">
+    
+    <!-- Clean Header -->
+    <div class="clean-dashboard-header">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    <h1 class="clean-dashboard-title">Kodeit Digital Learning</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <div class="learning-categories-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="categories-title">
+                                <h2 class="mb-0">Learning Categories</h2>
+                            </div>
+                            <div class="expand-all-link">
+                                <a href="#" class="expand-all-btn">Expand all</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="learning-categories">
+                            <div class="category-item">
+                                <div class="category-icon">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">Foundation</h3>
+                                    <p class="category-description">Build your learning foundation with basic concepts and fundamentals.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="category-item">
+                                <div class="category-icon">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">Intermediate</h3>
+                                    <p class="category-description">Advance your skills with intermediate level content and exercises.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="category-item">
+                                <div class="category-icon">
+                                    <i class="fa fa-arrow-right"></i>
+                                </div>
+                                <div class="category-content">
+                                    <h3 class="category-title">Advanced</h3>
+                                    <p class="category-description">Master advanced concepts and tackle complex challenges.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional content can be added here -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                {{#dashboard_type}}
+                    {{#elementary}}
+                        <!-- Elementary specific content -->
+                        <div class="elementary-content">
+                            {{#elementary_courses}}
+                                <div class="course-card">
+                                    <h4>{{name}}</h4>
+                                    <p>{{description}}</p>
+                                </div>
+                            {{/elementary_courses}}
+                        </div>
+                    {{/elementary}}
+                    
+                    {{#middle}}
+                        <!-- Middle school specific content -->
+                        <div class="middle-content">
+                            {{#middle_courses}}
+                                <div class="course-card">
+                                    <h4>{{name}}</h4>
+                                    <p>{{description}}</p>
+                                </div>
+                            {{/middle_courses}}
+                        </div>
+                    {{/middle}}
+                    
+                    {{#highschool}}
+                        <!-- High school specific content -->
+                        <div class="highschool-content">
+                            {{#highschool_courses}}
+                                <div class="course-card">
+                                    <h4>{{name}}</h4>
+                                    <p>{{description}}</p>
+                                </div>
+                            {{/highschool_courses}}
+                        </div>
+                    {{/highschool}}
+                {{/dashboard_type}}
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{{/custom_dashboard}}
+
+{{> theme_remui_kids/common_end}}
