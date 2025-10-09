@@ -9224,14 +9224,14 @@ body:has(.admin-sidebar-wrapper) {
                         border-radius: 50%;
                         
                         &.purple {
-                            background-color: #d1b3e6;
+                            background-color: #9b59b6;
                             animation: pulse 2s infinite;
                         }
                     }
                     
                     .live-text {
                         font-size: 12px;
-                        color: #d1b3e6;
+                        color: #9b59b6;
                         font-weight: 500;
                     }
                 }
@@ -9239,17 +9239,6 @@ body:has(.admin-sidebar-wrapper) {
                 .view-all-btn {
                     margin-top: 0;
                     align-self: flex-start;
-                    background: linear-gradient(135deg, #f8d7da 0%, #d1ecf1 100%) !important;
-                    color: #6c757d !important;
-                    border: 1px solid #e2e3e5 !important;
-                    box-shadow: 0 4px 12px rgba(248, 215, 218, 0.4) !important;
-                    
-                    &:hover {
-                        background: linear-gradient(135deg, #f1b0b7 0%, #bee5eb 100%) !important;
-                        color: #5a6c7d !important;
-                        border-color: #d6d8db !important;
-                        box-shadow: 0 8px 20px rgba(248, 215, 218, 0.6) !important;
-                    }
                 }
             }
         }

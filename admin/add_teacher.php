@@ -213,169 +213,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
 
 echo $OUTPUT->header();
 
-// School Manager Sidebar Navigation
-$sidebarcontext = [
-    'company_name' => $company_info ? $company_info->name : 'School Dashboard',
-    'company_logo_url' => $company_info && isset($company_info->logo_filename) 
-        ? $CFG->wwwroot . '/theme/remui_kids/get_company_logo.php?id=' . $company_info->id 
-        : null,
-    'has_logo' => $company_info && isset($company_info->logo_filename),
-    'user_info' => [
-        'fullname' => fullname($USER),
-        'email' => $USER->email,
-        'id' => $USER->id
-    ],
-    'config' => [
-        'wwwroot' => $CFG->wwwroot
-    ],
-    'teachers_active' => true,
-    'sesskey' => sesskey()
-];
-
-echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_sidebar', $sidebarcontext);
-
-?>
-
-<!-- Main Content Area -->
-<div class="school-manager-main-content">
-    <div class="add-teacher-container">
-        
-        <!-- Compact Header -->
-        <div class="compact-header">
-            <h1 class="page-title">Add New Teacher</h1>
-            <a href="<?php echo $CFG->wwwroot; ?>/theme/remui_kids/school_manager_dashboard.php" class="back-btn">
-                <i class="fa fa-arrow-left"></i> Back
-            </a>
-        </div>
-
-        <!-- Compact Form Container -->
-        <div class="compact-form-container">
-            
-            <?php if (!empty($errors)): ?>
-                <div class="alert alert-error">
-                    <h4>Please fix the following errors:</h4>
-                    <ul>
-                        <?php foreach ($errors as $error): ?>
-                            <li><?php echo htmlspecialchars($error); ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
-            <form method="POST" class="compact-form">
-                <div class="form-row">
-                    
-                    <!-- Basic Information -->
-                    <div class="form-group">
-                        <label for="username" class="form-label required">Username</label>
-                        <input type="text" id="username" name="username" class="form-input" 
-                               value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" 
-                               placeholder="Enter username" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label required">Password</label>
-                        <input type="password" id="password" name="password" class="form-input" 
-                               placeholder="Enter password" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="firstname" class="form-label required">First Name</label>
-                        <input type="text" id="firstname" name="firstname" class="form-input" 
-                               value="<?php echo isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : ''; ?>" 
-                               placeholder="Enter first name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="lastname" class="form-label required">Last Name</label>
-                        <input type="text" id="lastname" name="lastname" class="form-input" 
-                               value="<?php echo isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : ''; ?>" 
-                               placeholder="Enter last name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email" class="form-label required">Email</label>
-                        <input type="email" id="email" name="email" class="form-input" 
-                               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" 
-                               placeholder="Enter email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone" class="form-label">Phone</label>
-                        <input type="tel" id="phone" name="phone" class="form-input" 
-                               value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>" 
-                               placeholder="Enter phone">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="city" class="form-label">City</label>
-                        <input type="text" id="city" name="city" class="form-input" 
-                               value="<?php echo isset($_POST['city']) ? htmlspecialchars($_POST['city']) : ''; ?>" 
-                               placeholder="Enter city">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="country" class="form-label">Country</label>
-                        <select id="country" name="country" class="form-select">
-                            <option value="">Select Country</option>
-                            <option value="SA" <?php echo (isset($_POST['country']) && $_POST['country'] == 'SA') ? 'selected' : ''; ?>>Saudi Arabia</option>
-                            <option value="AE" <?php echo (isset($_POST['country']) && $_POST['country'] == 'AE') ? 'selected' : ''; ?>>UAE</option>
-                            <option value="QA" <?php echo (isset($_POST['country']) && $_POST['country'] == 'QA') ? 'selected' : ''; ?>>Qatar</option>
-                            <option value="KW" <?php echo (isset($_POST['country']) && $_POST['country'] == 'KW') ? 'selected' : ''; ?>>Kuwait</option>
-                            <option value="OM" <?php echo (isset($_POST['country']) && $_POST['country'] == 'OM') ? 'selected' : ''; ?>>Oman</option>
-                            <option value="BH" <?php echo (isset($_POST['country']) && $_POST['country'] == 'BH') ? 'selected' : ''; ?>>Bahrain</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="grade" class="form-label">Grade Level</label>
-                        <select id="grade" name="grade" class="form-select">
-                            <option value="">Select Grade</option>
-                            <option value="Grade 1" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 1') ? 'selected' : ''; ?>>Grade 1</option>
-                            <option value="Grade 2" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 2') ? 'selected' : ''; ?>>Grade 2</option>
-                            <option value="Grade 3" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 3') ? 'selected' : ''; ?>>Grade 3</option>
-                            <option value="Grade 4" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 4') ? 'selected' : ''; ?>>Grade 4</option>
-                            <option value="Grade 5" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 5') ? 'selected' : ''; ?>>Grade 5</option>
-                            <option value="Grade 6" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 6') ? 'selected' : ''; ?>>Grade 6</option>
-                            <option value="Grade 7" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 7') ? 'selected' : ''; ?>>Grade 7</option>
-                            <option value="Grade 8" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 8') ? 'selected' : ''; ?>>Grade 8</option>
-                            <option value="Grade 9" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 9') ? 'selected' : ''; ?>>Grade 9</option>
-                            <option value="Grade 10" <?php echo (isset($_POST['grade']) && $_POST['grade'] == 'Grade 10') ? 'selected' : ''; ?>>Grade 10</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="description" class="form-label">Notes</label>
-                        <textarea id="description" name="description" class="form-textarea" rows="3" 
-                                  placeholder="Additional notes about this teacher"><?php echo isset($_POST['description']) ? htmlspecialchars($_POST['description']) : ''; ?></textarea>
-                    </div>
-
-                </div>
-
-                <!-- Compact Form Actions -->
-                <div class="compact-form-actions">
-                    <button type="submit" name="submit_teacher" class="btn btn-primary">
-                        <i class="fa fa-user-plus"></i> Add Teacher
-                    </button>
-                    <a href="<?php echo $CFG->wwwroot; ?>/theme/remui_kids/school_manager_dashboard.php" class="btn btn-secondary">
-                        Cancel
-                    </a>
-                </div>
-
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Compact Styles -->
-<style>
-    .add-teacher-container {
-        padding: 1rem;
+// Add custom CSS with pastel green theme and sidebar
+echo "<style>";
+echo "
+    .add-container {
         max-width: 1200px;
         margin: 0 auto;
     }
-
-    .compact-header {
+    
+    .add-header {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: black;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .add-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .add-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 1;
+        animation: fadeInDown 1s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .add-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out 0.5s both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .teacher-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #fce7f3;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -390,18 +304,14 @@ echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_sidebar', $s
         color: #2c3e50;
         margin: 0;
     }
-
-    .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 0.375rem;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
+    
+    .form-section {
+        margin-bottom: 40px;
+        padding: 30px;
+        background: #dcfce7;
+        border-radius: 15px;
+        border-left: 4px solid #166534;
+        animation: slideInLeft 0.8s ease-out;
     }
 
     .back-btn:hover {
@@ -409,13 +319,15 @@ echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_sidebar', $s
         color: white;
         text-decoration: none;
     }
-
-    .compact-form-container {
-        background: white;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e9ecef;
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #166534;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .compact-form .form-row {
@@ -450,24 +362,30 @@ echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_sidebar', $s
     .compact-form .form-select,
     .compact-form .form-textarea {
         width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        padding: 15px 20px;
+        border: 2px solid #dcfce7;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
     }
 
     .compact-form .form-input:focus,
     .compact-form .form-select:focus,
     .compact-form .form-textarea:focus {
         outline: none;
-        border-color: #007cba;
-        box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+        border-color: #166534;
+        box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
+        transform: translateY(-2px);
     }
-
-    .compact-form .form-textarea {
-        resize: vertical;
-        min-height: 80px;
+    
+    .form-control:hover {
+        border-color: #bbf7d0;
+    }
+    
+    .password-strength {
+        margin-top: 5px;
+        font-size: 0.85rem;
     }
 
     .compact-form-actions {
@@ -481,11 +399,37 @@ echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_sidebar', $s
     .compact-form .btn {
         display: inline-flex;
         align-items: center;
-        gap: 0.375rem;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
+        gap: 10px;
+        min-width: 150px;
+        justify-content: center;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(22, 101, 52, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(22, 101, 52, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #dcfce7;
+        color: #166534;
+        border: 2px solid #bbf7d0;
+    }
+    
+    .btn-secondary:hover {
+        background: #bbf7d0;
+        transform: translateY(-2px);
+    }
+    
+    .alert {
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
         font-weight: 500;
         text-decoration: none;
         cursor: pointer;
@@ -546,17 +490,340 @@ echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_sidebar', $s
             gap: 0.75rem;
             align-items: flex-start;
         }
-
-        .compact-form .form-row {
-            grid-template-columns: 1fr;
+        
+        .btn {
+            width: 100%;
+            max-width: 300px;
         }
+    }
+";
+echo "</style>";
+    
+    // Floating background elements
+    echo "<div class='floating-elements'>";
+    echo "<div class='floating-circle'></div>";
+    echo "<div class='floating-circle'></div>";
+    echo "<div class='floating-circle'></div>";
+    echo "<div class='floating-circle'></div>";
+    echo "</div>";
 
-        .compact-form-actions {
-            flex-direction: column;
-        }
+    // Admin Sidebar Navigation (copied from courses.php)
+    echo "<div class='admin-sidebar'>";
+    echo "<div class='sidebar-content'>";
+    echo "<!-- DASHBOARD Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>DASHBOARD</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/my/' class='sidebar-link'>";
+    echo "<i class='fa fa-th-large sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Admin Dashboard</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/admin/search.php' class='sidebar-link'>";
+    echo "<i class='fa fa-cog sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Site Administration</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-users sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Community</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php' class='sidebar-link'>";
+    echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Enrollments</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
+
+    echo "<!-- TEACHERS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>TEACHERS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item active'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/teachers_list.php' class='sidebar-link'>";
+    echo "<i class='fa fa-users sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Teachers</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-medal sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Master Trainers</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
+
+    echo "<!-- COURSES & PROGRAMS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
+    echo "<i class='fa fa-book sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Courses & Programs</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Certifications</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Assessments</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-school sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Schools</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
+
+    echo "<!-- INSIGHTS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>INSIGHTS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/local/edwiserreports/index.php' class='sidebar-link'>";
+    echo "<i class='fa fa-chart-bar sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Analytics</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-chart-line sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Predictive Models</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-file-alt sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Reports</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-map sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Competencies Map</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
+
+    echo "<!-- SETTINGS Section -->";
+    echo "<div class='sidebar-section'>";
+    echo "<h3 class='sidebar-category'>SETTINGS</h3>";
+    echo "<ul class='sidebar-menu'>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-cog sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>System Settings</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/users_management_dashboard.php' class='sidebar-link'>";
+    echo "<i class='fa fa-user-friends sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>User Management</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li class='sidebar-item'>";
+    echo "<a href='#' class='sidebar-link'>";
+    echo "<i class='fa fa-users-cog sidebar-icon'></i>";
+    echo "<span class='sidebar-text'>Cohort Navigation</span>";
+    echo "</a>";
+    echo "</li>";
+    echo "</ul>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    // Main content area with sidebar
+    echo "<div class='admin-main-content'>";
+
+   
+
+    echo "<div class='add-container'>";
+    echo "<div class='add-header'>";
+    echo "<div class='breadcrumb'>";
+    echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
+    echo "<a href='teachers_list.php'>Teachers</a> / ";
+    echo "<span class='breadcrumb-item'>Add New Teacher</span>";
+    echo "</div>";
+
+    echo "<div class='teacher-icon'>";
+    echo "<i class='fa fa-user-plus'></i>";
+    echo "</div>";
+
+    echo "<h1 class='add-title'>Add New Teacher</h1>";
+    echo "<p class='add-subtitle'>Create a new teacher account with full access</p>";
+    echo "</div>";
+
+    echo "<div class='add-form'>";
+
+    // Progress indicator
+    echo "<div class='progress-indicator'>";
+    echo "<div class='progress-step active'>1</div>";
+    echo "<div class='progress-step'>2</div>";
+    echo "<div class='progress-step'>3</div>";
+    echo "</div>";
+
+    // Show success/error messages
+    if (isset($success_message)) {
+        echo "<div class='alert alert-success'>";
+        echo "<i class='fa fa-check-circle'></i> $success_message";
+        echo "</div>";
+    }
+
+    if (isset($error_message)) {
+        echo "<div class='alert alert-error'>";
+        echo "<i class='fa fa-exclamation-circle'></i> $error_message";
+        echo "</div>";
+    }
+
+    echo "<form method='POST' action=''>";
+
+    // Personal Information Section
+    echo "<div class='form-section'>";
+    echo "<h3 class='section-title'>";
+    echo "<i class='fa fa-user'></i> Personal Information";
+    echo "</h3>";
+    echo "<div class='form-row'>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>First Name</label>";
+    echo "<input type='text' class='form-control' name='firstname' value='" . (isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : '') . "' required>";
+    echo "</div>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Last Name</label>";
+    echo "<input type='text' class='form-control' name='lastname' value='" . (isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : '') . "' required>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    // Account Information Section
+    echo "<div class='form-section'>";
+    echo "<h3 class='section-title'>";
+    echo "<i class='fa fa-key'></i> Account Information";
+    echo "</h3>";
+    echo "<div class='form-row'>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Username</label>";
+    echo "<input type='text' class='form-control' name='username' value='" . (isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '') . "' required>";
+    echo "</div>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Email Address</label>";
+    echo "<input type='email' class='form-control' name='email' value='" . (isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '') . "' required>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    // Security Section
+    echo "<div class='form-section'>";
+    echo "<h3 class='section-title'>";
+    echo "<i class='fa fa-shield-alt'></i> Security";
+    echo "</h3>";
+    echo "<div class='form-row'>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Password</label>";
+    echo "<input type='password' class='form-control' name='password' id='password' required>";
+    echo "<div class='password-strength' id='password-strength'></div>";
+    echo "</div>";
+    echo "<div class='form-group'>";
+    echo "<label class='form-label'>Confirm Password</label>";
+    echo "<input type='password' class='form-control' name='confirm_password' required>";
+    echo "</div>";
+    echo "</div>";
+    echo "</div>";
+
+    echo "<div class='button-group'>";
+    echo "<button type='submit' class='btn btn-primary'>";
+    echo "<i class='fa fa-user-plus'></i> Create Teacher";
+    echo "</button>";
+    echo "<a href='teachers_list.php' class='btn btn-secondary'>";
+    echo "<i class='fa fa-arrow-left'></i> Back to Teachers";
+    echo "</a>";
+    echo "</div>";
+
+    echo "</form>";
+    echo "</div>";
+    echo "</div>";
+
+    // Password strength checker
+    echo "<script>
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthDiv = document.getElementById('password-strength');
+    
+    if (password.length === 0) {
+        strengthDiv.textContent = '';
+        return;
+    }
+    
+    let strength = 0;
+    let message = '';
+    
+    if (password.length >= 6) strength++;
+    if (password.match(/[a-z]/)) strength++;
+    if (password.match(/[A-Z]/)) strength++;
+    if (password.match(/[0-9]/)) strength++;
+    if (password.match(/[^a-zA-Z0-9]/)) strength++;
+    
+    if (strength < 2) {
+        message = 'Weak password';
+        strengthDiv.className = 'password-strength strength-weak';
+    } else if (strength < 4) {
+        message = 'Medium strength';
+        strengthDiv.className = 'password-strength strength-medium';
+    } else {
+        message = 'Strong password';
+        strengthDiv.className = 'password-strength strength-strong';
     }
 </style>
 
-<?php
-echo $OUTPUT->footer();
-?>
+    // Add JavaScript for sidebar toggle
+    echo <<<JS
+<script>
+// Sidebar toggle function
+function toggleSidebar() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    sidebar.classList.toggle('sidebar-open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.admin-sidebar');
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove('sidebar-open');
+        }
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
+</script>
+JS;
+
+    // Close admin-main-content div
+    echo "</div>";
+
+    echo $OUTPUT->footer();
+    ?>
