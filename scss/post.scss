@@ -1,10 +1,6 @@
 // Kids-friendly theme customizations
 // This file contains all the custom styles for the child theme
 // The parent theme styles are automatically inherited
-
-// Import dropdown fixes
-@import 'dropdown_fixes';
-
 // Import enhanced course cards
 @import 'enhanced_course_cards';
 
@@ -535,6 +531,31 @@
 // KIDS-FRIENDLY GLOBAL STYLES
 // ========================================
 
+// CRITICAL: Exclude ALL custom styles from edit mode
+// Edit mode should be handled entirely by the parent theme
+body.editing,
+body.editing *,
+#page-course-view.editing,
+#page-course-view.editing * {
+    // Reset all our custom transforms and effects in edit mode
+    transform: none !important;
+    transition: none !important;
+}
+
+// Specifically target course edit mode elements
+body.editing .course-content,
+body.editing .activity-item,
+body.editing .section,
+body.editing .activity,
+body.editing .mod-indent,
+body.editing .activityinstance,
+body.editing .dropdown,
+body.editing .dropdown-menu,
+body.editing .dropdown-toggle {
+    transform: none !important;
+    transition: none !important;
+}
+
 // Override some parent theme colors with kids-friendly ones
 :root {
     --primary-color: #FF6B35;
@@ -545,8 +566,8 @@
     --danger-color: #DDA0DD;
 }
 
-// Make buttons more rounded and playful
-.btn {
+// Make buttons more rounded and playful - EXCLUDE EDIT MODE
+body:not(.editing) .btn {
     border-radius: 1rem !important;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -557,8 +578,8 @@
     }
 }
 
-// Make cards more rounded
-.card {
+// Make cards more rounded - EXCLUDE EDIT MODE
+body:not(.editing) .card {
     border-radius: 1rem !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
@@ -569,8 +590,8 @@
     }
 }
 
-// Make form elements more rounded
-.form-control {
+// Make form elements more rounded - EXCLUDE EDIT MODE
+body:not(.editing) .form-control {
     border-radius: 0.75rem !important;
 }
 
@@ -626,12 +647,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-// Make dropdowns more rounded
-.dropdown-menu {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
+
 
 // Make pagination more rounded
 .pagination {
@@ -6134,23 +6150,931 @@ body.custom-dashboard-page.has-student-sidebar {
 
 
 // ========================================
+// NAVBAR Z-INDEX FIX - ENSURE NAVBAR STAYS ABOVE SIDEBAR
+// ========================================
+
+// Global navbar z-index fix
+.navbar,
+.top-navbar,
+.header-nav,
+.navbar-nav,
+.nav-drawer,
+#nav-drawer,
+.dropdown-menu,
+.nav-item .dropdown-menu {
+    z-index: 1055 !important;
+}
+
+.navbar .dropdown-menu,
+.nav-item .dropdown-menu,
+.nav-dropdown {
+    z-index: 1060 !important;
+}
+
+// Global navbar positioning fix
+.navbar,
+.top-navbar,
+.header-nav {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1055 !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.2s ease !important;
+}
+
+// Enhanced sticky navbar for Grade 9-12 dashboard
+body.has-enhanced-sidebar {
+    .navbar,
+    .top-navbar,
+    .header-nav {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        z-index: 1055 !important;
+        background: #ffffff !important;
+        backdrop-filter: blur(10px) !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.2s ease !important;
+        
+        // Add subtle animation when scrolling
+        &.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+        }
+    }
+    
+    // Adjust body padding to account for fixed navbar
+    body {
+        padding-top: 60px !important;
+    }
+    
+    // Ensure sidebar accounts for fixed navbar
+    .student-sidebar {
+        top: 60px !important;
+        height: calc(100vh - 60px) !important;
+    }
+    
+    // Adjust main content to account for fixed navbar
+    #page {
+        padding-top: 60px !important;
+        margin-top: 0 !important;
+    }
+    
+    .main-content,
+    .page-content,
+    .content-area {
+        padding-top: 60px !important;
+        margin-top: 0 !important;
+    }
+    
+    // Ensure dropdowns work properly with fixed navbar
+    .dropdown-menu {
+        z-index: 1070 !important;
+    }
+    
+    // Mobile navbar adjustments
+    @media (max-width: 768px) {
+        .navbar,
+        .top-navbar,
+        .header-nav {
+            height: 60px !important;
+        }
+        
+        .student-sidebar {
+            top: 60px !important;
+        }
+    }
+}
+
+// Additional sticky navbar styles for all themes
+.navbar.sticky,
+.top-navbar.sticky,
+.header-nav.sticky {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 1055 !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.2s ease !important;
+}
+
+// ========================================
+// STUDENT COURSES PAGE - SIDEBAR LAYOUT
+// ========================================
+
+.student-courses-page {
+    position: relative;
+    
+    // Ensure sidebar is always visible
+    .student-sidebar {
+        position: fixed !important;
+        top: 70px !important;
+        left: 0 !important;
+        width: 280px !important;
+        height: calc(100vh - 70px) !important;
+        background: #ffffff !important;
+        z-index: 1040 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1) !important;
+        border-right: 2px solid #e8eaf0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        transition: transform 0.3s ease !important;
+        
+        // Always visible on desktop
+        @media (min-width: 769px) {
+            transform: translateX(0) !important;
+            display: flex !important;
+        }
+        
+        // Navigation styling
+        .sidebar-nav {
+            flex: 1;
+            padding: 2.5rem 0 1rem 0;
+            
+            .nav-list {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                
+                .nav-item {
+                    margin: 0.5rem 0;
+                    
+                    .nav-link {
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        padding: 0.875rem 1.5rem;
+                        color: #666666;
+                        text-decoration: none;
+                        transition: all 0.2s ease;
+                        position: relative;
+                        font-weight: 500;
+                        margin: 0.25rem 1rem;
+                        border-radius: 8px;
+                        
+                        i {
+                            font-size: 1.2rem;
+                            width: 20px;
+                            text-align: center;
+                            transition: all 0.2s ease;
+                            color: #888888;
+                        }
+                        
+                        span {
+                            font-size: 0.95rem;
+                            transition: all 0.2s ease;
+                        }
+                        
+                        &:hover {
+                            background: #f8f9fa;
+                            color: #333333;
+                            
+                            i {
+                                color: #7dc1f8;
+                            }
+                        }
+                        
+                        &.active {
+                            background: linear-gradient(90deg, #7dc1f8b4 0%,#ffffffb4 70% , #ffffffb4 100%);
+                            color: #333333;
+                            
+                            &::before {
+                                content: '';
+                                position: absolute;
+                                left: 0;
+                                top: 0;
+                                bottom: 0;
+                                width: 3px;
+                                background: #5e7af8;
+                                border-radius: 0 2px 2px 0;
+                            }
+                            
+                            i {
+                                color: #333333;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Footer styling
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            background: #fafafa;
+            
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 0.875rem;
+                margin-bottom: 1rem;
+                
+                .user-avatar {
+                    i {
+                        font-size: 2.2rem;
+                        color: #666666;
+                    }
+                }
+                
+                .user-details {
+                    display: flex;
+                    flex-direction: column;
+                    
+                    .user-name {
+                        color: #333333;
+                        font-weight: 600;
+                        font-size: 0.95rem;
+                    }
+                    
+                    .user-role {
+                        color: #888888;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                    }
+                }
+            }
+            
+            .sidebar-actions {
+                display: flex;
+                gap: 0.5rem;
+                
+                .action-btn {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    padding: 0.5rem;
+                    border-radius: 0.5rem;
+                    text-decoration: none;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    
+                    &.profile-btn {
+                        background: #E2E8F0;
+                        color: #4A5568;
+                        
+                        &:hover {
+                            background: #CBD5E0;
+                            color: #2D3748;
+                        }
+                    }
+                    
+                    &.logout-btn {
+                        background: #FED7D7;
+                        color: #C53030;
+                        
+                        &:hover {
+                            background: #FEB2B2;
+                            color: #9C1C1C;
+                        }
+                    }
+                    
+                    i {
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Content area adjustments
+    .courses-content-area {
+        margin-left: 280px;
+        padding: 2rem;
+        min-height: calc(100vh - 70px);
+        background: #f8fafc;
+        transition: margin-left 0.1s ease;
+        
+        // Page header styling
+        .courses-page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin: -2rem -2rem 2rem -2rem;
+            border-radius: 0 0 20px 20px;
+            
+            .page-title {
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                
+                i {
+                    margin-right: 0.75rem;
+                }
+            }
+            
+            .page-subtitle {
+                font-size: 1.1rem;
+                opacity: 0.9;
+                margin-bottom: 0;
+            }
+            
+            .btn {
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: white;
+                
+                &:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                    border-color: rgba(255, 255, 255, 0.5);
+                    color: white;
+                }
+            }
+        }
+    }
+}
+
+// Mobile responsiveness for student courses page
+@media (max-width: 768px) {
+    .student-courses-page {
+        .student-sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .courses-content-area {
+            margin-left: 0;
+            padding: 1rem;
+        }
+        
+        // Show sidebar toggle button on mobile
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 80px;
+            left: 1rem;
+            z-index: 1060;
+            background: #4ECDC4;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 10px rgba(78, 205, 196, 0.3);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            
+            &:hover {
+                background: #45B7D1;
+                transform: scale(1.05);
+            }
+        }
+        
+        // When sidebar is open on mobile
+        &.sidebar-open {
+            .student-sidebar {
+                transform: translateX(0);
+            }
+        }
+    }
+}
+
+// Remove any default page padding/margin
+body.has-enhanced-sidebar {
+    #page-content,
+    #page-content-wrapper,
+    .page-content {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+}
+
+// ========================================
+// ENHANCED DROPDOWN UI - GRADE 9-12 DASHBOARD
+// ========================================
+
+// Enhanced dropdown menu styling
+.dropdown-menu,
+.nav-item .dropdown-menu,
+.user-menu .dropdown-menu,
+.profile-dropdown .dropdown-menu {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    padding: 0.5rem 0 !important;
+    margin-top: 0.5rem !important;
+    min-width: 200px !important;
+    z-index: 1070 !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: all 0.2s ease !important;
+    
+    // Enhanced dropdown items
+    .dropdown-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        padding: 0.75rem 1.25rem !important;
+        color: #374151 !important;
+        text-decoration: none !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        transition: all 0.2s ease !important;
+        border: none !important;
+        background: transparent !important;
+        width: 100% !important;
+        text-align: left !important;
+        
+        // Icons styling
+        i {
+            font-size: 1rem !important;
+            width: 20px !important;
+            text-align: center !important;
+            color: #6b7280 !important;
+            transition: color 0.2s ease !important;
+        }
+        
+        // Hover effects
+        &:hover {
+            background: #f8fafc !important;
+            color: #1f2937 !important;
+            transform: translateX(4px) !important;
+            
+            i {
+                color: #3b82f6 !important;
+            }
+        }
+        
+        // Active state
+        &:active,
+        &.active {
+            background: #dbeafe !important;
+            color: #1e40af !important;
+            
+            i {
+                color: #3b82f6 !important;
+            }
+        }
+        
+        // Special styling for logout
+        &.logout-item {
+            border-top: 1px solid #e5e7eb !important;
+            margin-top: 0.5rem !important;
+            padding-top: 0.75rem !important;
+            
+            &:hover {
+                background: #fef2f2 !important;
+                color: #dc2626 !important;
+                
+                i {
+                    color: #dc2626 !important;
+                }
+            }
+        }
+    }
+    
+    // Dropdown divider
+    .dropdown-divider {
+        height: 1px !important;
+        background: #e5e7eb !important;
+        margin: 0.5rem 0 !important;
+    }
+}
+
+// Enhanced navbar dropdown positioning
+.navbar-nav .dropdown {
+    position: relative !important;
+    
+    .dropdown-toggle {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0.5rem 0.75rem !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        color: #374151 !important;
+        
+        &:hover {
+            background: #f3f4f6 !important;
+        }
+        
+        &::after {
+            border: none !important;
+            font-family: "Font Awesome 5 Free" !important;
+            font-weight: 900 !important;
+            content: "\f107" !important;
+            margin-left: 0.5rem !important;
+            transition: transform 0.2s ease !important;
+        }
+        
+        &[aria-expanded="true"]::after {
+            transform: rotate(180deg) !important;
+        }
+    }
+}
+
+// User avatar dropdown enhancement
+.user-avatar-dropdown {
+    position: relative !important;
+    
+    .user-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        border: 2px solid #e5e7eb !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #f3f4f6 !important;
+        color: #6b7280 !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        
+        &:hover {
+            border-color: #3b82f6 !important;
+            background: #dbeafe !important;
+            color: #1e40af !important;
+            transform: scale(1.05) !important;
+        }
+    }
+}
+
+// Mobile dropdown improvements
+@media (max-width: 768px) {
+    .dropdown-menu {
+        position: fixed !important;
+        top: 70px !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        width: auto !important;
+        max-width: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+}
+
+// Dark mode support for dropdowns
+@media (prefers-color-scheme: dark) {
+    .dropdown-menu {
+        background: #1f2937 !important;
+        border-color: #374151 !important;
+        
+        .dropdown-item {
+            color: #d1d5db !important;
+            
+            &:hover {
+                background: #374151 !important;
+                color: #f9fafb !important;
+            }
+        }
+    }
+}
+
+// Dropdown animations
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes dropdownItemSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.dropdown-menu.show {
+    animation: dropdownSlideIn 0.2s ease-out !important;
+}
+
+.dropdown-item-animated {
+    animation: dropdownItemSlideIn 0.3s ease-out forwards !important;
+    opacity: 0;
+}
+
+// Enhanced dropdown arrow animation
+.dropdown-toggle::after {
+    transition: transform 0.2s ease !important;
+}
+
+.dropdown-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg) !important;
+}
+
+// Improved dropdown positioning
+.dropdown {
+    position: relative !important;
+    
+    .dropdown-menu {
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: auto !important;
+        z-index: 1070 !important;
+        display: none !important;
+        
+        &.show {
+            display: block !important;
+        }
+    }
+}
+
+// User avatar specific enhancements
+.user-avatar-dropdown {
+    .dropdown-menu {
+        min-width: 180px !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+}
+
+// ========================================
 // STUDENT SIDEBAR - FOR ALL STUDENT COHORTS
 // ========================================
 
 .student-sidebar {
     position: fixed;
-    top: 60px;
+    top: 70px; /* Adjusted to sit properly below navbar */
     left: 0;
     width: 280px;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 70px);
     background: #ffffff;
-    z-index: 1040;
+    z-index: 1000; /* Lower than navbar to ensure navbar stays on top */
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.08);
-    border-right: 1px solid #f0f0f0;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+    border-right: 2px solid #e8eaf0;
     overflow-y: auto;
+    overflow-x: hidden;
     transition: transform 0.3s ease;
+    
+    // Enhanced sidebar specific styles
+    &.enhanced-sidebar {
+        width: 320px; /* Wider for enhanced layout */
+        background: #f8fafc;
+        
+        .sidebar-nav {
+            padding: 1.5rem 0;
+            
+            .nav-section {
+                margin-bottom: 2rem;
+                
+                .section-title {
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 0.75rem;
+                    padding: 0 1.5rem;
+                }
+                
+                .nav-list {
+                    .nav-item {
+                        margin: 0.25rem 0;
+                        
+                        .nav-link {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.875rem;
+                            padding: 0.75rem 1.5rem;
+                            color: #475569;
+                            text-decoration: none;
+                            transition: all 0.2s ease;
+                            font-weight: 500;
+                            border-radius: 0;
+                            
+                            i {
+                                font-size: 1.1rem;
+                                width: 20px;
+                                text-align: center;
+                                color: #64748b;
+                            }
+                            
+                            span {
+                                font-size: 0.9rem;
+                            }
+                            
+                            &:hover {
+                                background: #e2e8f0;
+                                color: #334155;
+                                
+                                i {
+                                    color: #3b82f6;
+                                }
+                            }
+                            
+                            &.active {
+                                background: #dbeafe;
+                                color: #1e40af;
+                                border-right: 3px solid #3b82f6;
+                                
+                                i {
+                                    color: #3b82f6;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Quick Actions Section
+            .quick-actions {
+                .quick-action-buttons {
+                    padding: 0 1rem;
+                    
+                    .quick-action-btn {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.875rem;
+                        padding: 0.875rem;
+                        margin-bottom: 0.75rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        border: none;
+                        width: 100%;
+                        
+                        .action-icon {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.1rem;
+                            color: white;
+                            flex-shrink: 0;
+                        }
+                        
+                        .action-content {
+                            flex: 1;
+                            
+                            .action-title {
+                                font-weight: 600;
+                                font-size: 0.875rem;
+                                margin-bottom: 0.25rem;
+                                color: #1e293b;
+                            }
+                            
+                            .action-desc {
+                                font-size: 0.75rem;
+                                color: #64748b;
+                                line-height: 1.3;
+                            }
+                        }
+                        
+                        // Color variants
+                        &.purple {
+                            background: #f3f4f6;
+                            
+                            .action-icon {
+                                background: #8b5cf6;
+                            }
+                            
+                            &:hover {
+                                background: #e5e7eb;
+                                transform: translateY(-1px);
+                            }
+                        }
+                        
+                        &.blue {
+                            background: #f3f4f6;
+                            
+                            .action-icon {
+                                background: #3b82f6;
+                            }
+                            
+                            &:hover {
+                                background: #e5e7eb;
+                                transform: translateY(-1px);
+                            }
+                        }
+                        
+                        &.green {
+                            background: #f3f4f6;
+                            
+                            .action-icon {
+                                background: #10b981;
+                            }
+                            
+                            &:hover {
+                                background: #e5e7eb;
+                                transform: translateY(-1px);
+                            }
+                        }
+                        
+                        &.orange {
+                            background: #f3f4f6;
+                            
+                            .action-icon {
+                                background: #f59e0b;
+                            }
+                            
+                            &:hover {
+                                background: #e5e7eb;
+                                transform: translateY(-1px);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Enhanced footer
+        .sidebar-footer {
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 1.25rem 1.5rem;
+            
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 0.875rem;
+                margin-bottom: 1rem;
+                
+                .user-avatar {
+                    width: 40px;
+                    height: 40px;
+                    background: #e2e8f0;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    
+                    i {
+                        font-size: 1.25rem;
+                        color: #64748b;
+                    }
+                }
+                
+                .user-details {
+                    .user-name {
+                        font-weight: 600;
+                        color: #1e293b;
+                        font-size: 0.875rem;
+                    }
+                    
+                    .user-role {
+                        color: #64748b;
+                        font-size: 0.75rem;
+                    }
+                }
+            }
+            
+            .sidebar-actions {
+                .action-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    padding: 0.75rem;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    
+                    &.logout-btn {
+                        background: #fee2e2;
+                        color: #dc2626;
+                        
+                        &:hover {
+                            background: #fecaca;
+                        }
+                    }
+                    
+                    i {
+                        font-size: 0.875rem;
+                    }
+                }
+            }
+        }
+    }
     
     // Always visible on desktop
     @media (min-width: 769px) {
@@ -6326,11 +7250,87 @@ body.has-student-sidebar {
         transition: margin-left 0.1s ease;
     }
     
+    // Enhanced sidebar content shifting
+    &.has-enhanced-sidebar {
+        #page {
+            margin-left: 320px;
+            padding-top: 0 !important; /* Remove top padding */
+        }
+        
+        .main-content,
+        .page-content,
+        .content-area {
+            margin-left: 320px;
+            padding-top: 0 !important; /* Remove top padding */
+        }
+        
+        // Remove padding from dashboard content
+        .highschool-dashboard,
+        .analytics-dashboard,
+        .dashboard-metrics {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        // Remove padding from custom dashboard header
+        .custom-dashboard-header {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        
+        // Remove any top spacing from page wrapper
+        .page-wrapper,
+        .page-content-wrapper,
+        .dashboard-wrapper {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+        
+        // Ensure dashboard starts right below navbar
+        .custom_dashboard {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        
+        // Remove spacing from any container elements
+        .container,
+        .container-fluid {
+            padding-top: 0 !important;
+        }
+        
+        // Specific high school dashboard fixes
+        .highschool-dashboard {
+            position: relative;
+            top: 0 !important;
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        
+        // Remove any default spacing from the main dashboard container
+        .custom_dashboard > .highschool-dashboard {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+    }
+    
     // Ensure top navbar stays on top
     .navbar,
     .top-navbar,
-    .header-nav {
-        z-index: 1050 !important;
+    .header-nav,
+    .navbar-nav,
+    .nav-drawer,
+    #nav-drawer,
+    .dropdown-menu,
+    .nav-item .dropdown-menu {
+        z-index: 1055 !important;
+        position: relative !important;
+    }
+    
+    // Ensure navbar dropdowns appear above sidebar
+    .navbar .dropdown-menu,
+    .nav-item .dropdown-menu,
+    .nav-dropdown {
+        z-index: 1060 !important;
     }
 }
 
@@ -6357,7 +7357,7 @@ body.has-student-sidebar {
 // Toggle button for mobile
 .student-sidebar-toggle {
     position: fixed;
-    top: 70px;
+    top: 80px; /* Adjusted to align with new sidebar position */
     left: 1rem;
     z-index: 1060;
     background: #4ECDC4;

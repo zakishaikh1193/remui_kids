@@ -43,4 +43,3 @@ try {
 
 echo $OUTPUT->footer();
 ?>
-

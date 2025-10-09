@@ -105,4 +105,3 @@ try {
 
 echo $OUTPUT->footer();
 ?>
-
