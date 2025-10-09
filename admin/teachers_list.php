@@ -992,7 +992,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = rows[i];
                 const name = row.cells[0].textContent.toLowerCase();
                 const email = row.cells[2].textContent.toLowerCase();
-                const status = row.cells[3].textContent.toLowerCase();
+                const status = row.cells[4].textContent.toLowerCase(); // Fixed: Status is in column 4, not 3
                 
                 const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
                 const matchesStatus = statusValue === 'all' || 

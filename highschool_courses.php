@@ -608,13 +608,13 @@ echo $OUTPUT->header();
         .student-sidebar {
             position: fixed;
             left: 0;
-            top: 60px; /* Position below Moodle navigation bar */
+            top: 0;
             width: 280px;
-            height: calc(100vh - 60px); /* Adjust height to account for nav bar */
+            height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             overflow-y: auto;
-            z-index: 999; /* Lower than navigation bar */
+            z-index: 1000;
             padding: 2rem 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
@@ -775,9 +775,8 @@ echo $OUTPUT->header();
         .highschool-courses-page {
             position: relative;
             background: #f8fafc;
-            min-height: calc(100vh - 60px); /* Account for navigation bar */
-            margin-left: 280px; /* Account for sidebar */
-            margin-top: 60px; /* Account for navigation bar */
+            min-height: 100vh;
+            
             padding: 0;
             width: calc(100% - 280px);
         }
@@ -1245,9 +1244,7 @@ echo $OUTPUT->header();
             
             .highschool-courses-page {
                 margin-left: 0 !important;
-                margin-top: 60px !important; /* Account for navigation bar on mobile */
                 padding: 0 !important;
-                min-height: calc(100vh - 60px) !important; /* Account for navigation bar */
             }
             
             .courses-page-header {

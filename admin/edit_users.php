@@ -54,7 +54,7 @@ if (isset($_GET['action'])) {
                 
                 // Get users with role information
                 $users = $DB->get_records_sql(
-                    "SELECT u.*, 
+                    "SELECT u.id, u.username, u.email, u.firstname, u.lastname, u.suspended, u.timecreated,
                             r.shortname as role_shortname,
                             r.name as role_name,
                             MAX(ul.timeaccess) as last_access,
@@ -65,7 +65,7 @@ if (isset($_GET['action'])) {
                      LEFT JOIN {user_lastaccess} ul ON u.id = ul.userid
                      LEFT JOIN {user_enrolments} ue ON u.id = ue.userid
                      WHERE {$where_clause}
-                     GROUP BY u.id, r.shortname, r.name
+                     GROUP BY u.id, u.username, u.email, u.firstname, u.lastname, u.suspended, u.timecreated, r.shortname, r.name
                      ORDER BY u.{$sort_by} {$sort_order}
                      LIMIT {$per_page} OFFSET {$offset}",
                     array_merge([$context->id], $params)
@@ -93,7 +93,7 @@ if (isset($_GET['action'])) {
                         'fullname' => fullname($user),
                         'role' => $user->role_name ?? 'No Role',
                         'role_shortname' => $user->role_shortname ?? '',
-                        'suspended' => $user->suspended,
+                        'suspended' => (int)$user->suspended, // Ensure it's an integer
                         'last_access' => $user->last_access ? date('M j, Y g:i A', $user->last_access) : 'Never',
                         'enrollment_count' => $user->enrollment_count,
                         'timecreated' => date('M j, Y', $user->timecreated)
