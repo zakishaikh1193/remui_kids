@@ -911,6 +911,9 @@ if (isset($success_message)) {
     echo "</div>";
 }
 
+// Start the form
+echo "<form method='POST' action=''>";
+
 // Student Selection Section
 echo "<div class='field-section'>";
 echo "<h3 class='section-title'>Select Student</h3>";
@@ -993,7 +996,6 @@ echo "</div>";
 
 // Action Buttons
 echo "<div class='action-section'>";
-echo "<form method='POST' action=''>";
 echo "<button type='submit' name='enroll_student' class='btn btn-primary'>";
 echo "<i class='fa fa-plus'></i> Enroll Student";
 echo "</button>";

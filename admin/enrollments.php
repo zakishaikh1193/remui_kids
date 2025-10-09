@@ -51,7 +51,7 @@ if (isset($_GET['action'])) {
                 FROM {user} u 
                 JOIN {role_assignments} ra ON u.id = ra.userid 
                 JOIN {role} r ON ra.roleid = r.id 
-                WHERE r.shortname = 'trainee' 
+                WHERE r.shortname = 'student' 
                 AND u.deleted = 0 
                 AND u.suspended = 0
                 ORDER BY u.firstname, u.lastname
