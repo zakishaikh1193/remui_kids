@@ -1,0 +1,601 @@
+{{!
+    School Manager Dashboard Template
+    Main dashboard interface for school managers/company managers
+}}
+
+<div class="school-dashboard-container">
+    <!-- Welcome Header -->
+    <div class="dashboard-header">
+        <div class="welcome-section">
+            <h1 class="dashboard-title">Welcome to {{company_name}}</h1>
+            <p class="dashboard-subtitle">School Manager Dashboard - {{user_info.fullname}}</p>
+            <p class="dashboard-date">{{#str}}today{{/str}}: {{current_date}}</p>
+        </div>
+        <div class="dashboard-actions">
+            <button class="btn btn-primary" onclick="refreshStats()">
+                <i class="fa fa-sync-alt"></i> Refresh Stats
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <!-- Total Teachers Card -->
+        <div class="stat-card teachers-card">
+            <div class="stat-icon">
+                <i class="fa fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number" id="total-teachers">{{total_teachers}}</h3>
+                <p class="stat-label">Total Teachers</p>
+                <div class="stat-trend">
+                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-text">Active</span>
+                </div>
+            </div>
+            <div class="stat-action">
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/teachers_list.php" class="stat-link">
+                    <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Enrolled Teachers Card -->
+        <div class="stat-card students-card">
+            <div class="stat-icon">
+                <i class="fa fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number" id="enrolled-teachers">{{enrolled_teachers}}</h3>
+                <p class="stat-label">Enrolled Teachers</p>
+                <div class="stat-trend">
+                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-text">Active</span>
+                </div>
+            </div>
+            <div class="stat-action">
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/teachers_list.php" class="stat-link">
+                    <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Courses Card -->
+        <div class="stat-card courses-card">
+            <div class="stat-icon">
+                <i class="fa fa-book"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number" id="total-courses">{{total_courses}}</h3>
+                <p class="stat-label">Available Courses</p>
+                <div class="stat-trend">
+                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-text">Active</span>
+                </div>
+            </div>
+            <div class="stat-action">
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/courses.php" class="stat-link">
+                    <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Enrollments Card -->
+        <div class="stat-card enrollments-card">
+            <div class="stat-icon">
+                <i class="fa fa-user-plus"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number" id="active-enrollments">{{active_enrollments}}</h3>
+                <p class="stat-label">Active Enrollments</p>
+                <div class="stat-trend">
+                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-text">Current</span>
+                </div>
+            </div>
+            <div class="stat-action">
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/enrollments.php" class="stat-link">
+                    <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fa fa-user-plus"></i>
+                </div>
+                <h3 class="action-title">Add Teacher</h3>
+                <p class="action-description">Add new teachers to your school</p>
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/add_teacher.php" class="action-btn">
+                    Add Teacher
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fa fa-chalkboard-teacher"></i>
+                </div>
+                <h3 class="action-title">Enroll Teacher</h3>
+                <p class="action-description">Add teachers to your school</p>
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/add_teacher.php" class="action-btn">
+                    Enroll Teacher
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fa fa-book"></i>
+                </div>
+                <h3 class="action-title">View Courses</h3>
+                <p class="action-description">View and manage available courses</p>
+                <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/view_courses.php" class="action-btn">
+                    View Courses
+                </a>
+            </div>
+
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fa fa-chart-bar"></i>
+                </div>
+                <h3 class="action-title">View Reports</h3>
+                <p class="action-description">Access detailed analytics and reports</p>
+                <a href="{{{config.wwwroot}}}/local/edwiserreports/index.php" class="action-btn">
+                    View Reports
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="recent-activity-section">
+        <h2 class="section-title">Recent Activity</h2>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fa fa-user-plus text-success"></i>
+                </div>
+                <div class="activity-content">
+                    <h4 class="activity-title">New Teacher Added</h4>
+                    <p class="activity-description">A new teacher has been added to the system</p>
+                    <span class="activity-time">2 hours ago</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fa fa-chalkboard-teacher text-info"></i>
+                </div>
+                <div class="activity-content">
+                    <h4 class="activity-title">Teacher Enrolled</h4>
+                    <p class="activity-description">New teacher added to Mathematics department</p>
+                    <span class="activity-time">4 hours ago</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fa fa-book text-warning"></i>
+                </div>
+                <div class="activity-content">
+                    <h4 class="activity-title">Course Updated</h4>
+                    <p class="activity-description">Science course content has been updated</p>
+                    <span class="activity-time">6 hours ago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Styles -->
+<style>
+    .school-dashboard-container {
+        padding: 2rem 1rem;
+        max-width: none;
+        margin: 0;
+        width: 100%;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .welcome-section h1.dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-section .dashboard-subtitle {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+
+    .welcome-section .dashboard-date {
+        font-size: 0.9rem;
+        color: #adb5bd;
+    }
+
+    .dashboard-actions .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        width: 100%;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card.teachers-card {
+        border-left: 4px solid #667eea;
+    }
+
+    .stat-card.students-card {
+        border: 2px solid transparent;
+        background: linear-gradient(white, white) padding-box,
+                    linear-gradient(135deg, #f093fb 0%, #4facfe 100%) border-box;
+    }
+
+    .stat-card.courses-card {
+        border-left: 4px solid #4facfe;
+    }
+
+    .stat-card.enrollments-card {
+        border-left: 4px solid #43e97b;
+    }
+
+    .stat-card .stat-icon {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .teachers-card .stat-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .students-card .stat-icon {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        color: white;
+    }
+
+    .courses-card .stat-icon {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    .enrollments-card .stat-icon {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+    }
+
+    .stat-content h3.stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-content .stat-label {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+
+    .stat-trend {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stat-trend .trend-up {
+        color: #28a745;
+        font-size: 0.9rem;
+    }
+
+    .stat-trend .trend-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .stat-action {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .stat-action .stat-link {
+        color: #6c757d;
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+    }
+
+    .stat-action .stat-link:hover {
+        color: #667eea;
+    }
+
+    .quick-actions-section, .recent-activity-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-card .action-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .action-card h3.action-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .action-card .action-description {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .activity-list {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+        width: 100%;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .activity-content h4.activity-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .activity-content .activity-description {
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+    .activity-time {
+        font-size: 0.85rem;
+        color: #adb5bd;
+    }
+
+    /* Full width layout */
+    .dashboard-header {
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .stats-grid {
+        padding: 0 1rem;
+    }
+
+    .quick-actions-section {
+        padding: 0 1rem;
+    }
+
+    .recent-activity-section {
+        padding: 0 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .school-dashboard-container {
+            padding: 1rem;
+        }
+
+        .dashboard-header {
+            flex-direction: column;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        .welcome-section h1.dashboard-title {
+            font-size: 2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            padding: 0 1rem;
+        }
+
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- JavaScript for Dashboard -->
+<script>
+    function refreshStats() {
+        const btn = document.querySelector('.dashboard-actions .btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Refreshing...';
+        btn.disabled = true;
+
+        fetch('?action=get_dashboard_stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('total-teachers').textContent = data.total_teachers;
+                    document.getElementById('enrolled-teachers').textContent = data.enrolled_teachers;
+                    document.getElementById('total-courses').textContent = data.total_courses;
+                    document.getElementById('active-enrollments').textContent = data.active_enrollments;
+                    
+                    // Show success message
+                    showNotification('Stats refreshed successfully!', 'success');
+                } else {
+                    showNotification('Failed to refresh stats: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error refreshing stats: ' + error.message, 'error');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            ${type === 'success' ? 'background: #28a745;' : 'background: #dc3545;'}
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // Add CSS for notifications
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>

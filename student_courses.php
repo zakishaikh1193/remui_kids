@@ -10,15 +10,12 @@ require_login();
 // Get current user
 global $USER, $DB, $OUTPUT, $PAGE;
 
-// Get view parameter (my_courses or all_courses)
-$view = optional_param('view', 'my_courses', PARAM_ALPHA);
-
 // Set page context
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_url('/theme/remui_kids/student_courses.php', array('view' => $view));
-$PAGE->set_title($view === 'all_courses' ? 'All Courses' : 'My Courses');
-$PAGE->set_heading($view === 'all_courses' ? 'All Courses' : 'My Courses');
+$PAGE->set_url('/theme/remui_kids/student_courses.php');
+$PAGE->set_title('My Courses');
+$PAGE->set_heading('My Courses');
 
 // Check if user is a student (has student role)
 $user_roles = get_user_roles($context, $USER->id);
@@ -79,100 +76,52 @@ $grade_course_patterns = array(
     )
 );
 
+// Get all courses the user is enrolled in
+$enrolled_courses = enrol_get_users_courses($USER->id, true, array('id', 'fullname', 'shortname', 'summary', 'category'));
+
 // Get category names for better filtering
 $categories = $DB->get_records('course_categories', null, '', 'id,name');
 
-// Determine which courses to fetch based on view
-if ($view === 'all_courses') {
-    // Get all visible courses from categories matching the student's grade level
-    $all_courses = $DB->get_records('course', array('visible' => 1), '', 'id,fullname,shortname,summary,category');
+// Filter courses based on grade level
+foreach ($enrolled_courses as $course) {
+    if ($course->id == 1) continue; // Skip site course
     
-    // Filter courses by grade-specific categories
-    foreach ($all_courses as $course) {
-        if ($course->id == 1) continue; // Skip site course
-        
-        $course_name = strtolower($course->fullname);
-        $course_summary = strtolower($course->summary);
-        $course_category = isset($categories[$course->category]) ? strtolower($categories[$course->category]->name) : '';
-        
-        $matches_grade = false;
-        
-        // Check patterns in course name and summary
-        foreach ($grade_course_patterns[$user_grade]['patterns'] as $pattern) {
-            if (strpos($course_name, $pattern) !== false || strpos($course_summary, $pattern) !== false) {
+    $course_name = strtolower($course->fullname);
+    $course_summary = strtolower($course->summary);
+    $course_category = isset($categories[$course->category]) ? strtolower($categories[$course->category]->name) : '';
+    
+    $matches_grade = false;
+    
+    // Check patterns in course name and summary
+    foreach ($grade_course_patterns[$user_grade]['patterns'] as $pattern) {
+        if (strpos($course_name, $pattern) !== false || strpos($course_summary, $pattern) !== false) {
+            $matches_grade = true;
+            break;
+        }
+    }
+    
+    // Check category name
+    if (!$matches_grade) {
+        foreach ($grade_course_patterns[$user_grade]['categories'] as $category_pattern) {
+            if (strpos($course_category, strtolower($category_pattern)) !== false) {
                 $matches_grade = true;
                 break;
             }
         }
-        
-        // Check category name
-        if (!$matches_grade) {
-            foreach ($grade_course_patterns[$user_grade]['categories'] as $category_pattern) {
-                if (strpos($course_category, strtolower($category_pattern)) !== false) {
-                    $matches_grade = true;
-                    break;
-                }
-            }
-        }
-        
-        if ($matches_grade) {
-            $grade_courses[] = $course;
-        }
-    }
-} else {
-    // Get only courses the user is enrolled in (My Courses view)
-    $enrolled_courses = enrol_get_users_courses($USER->id, true, array('id', 'fullname', 'shortname', 'summary', 'category'));
-    
-    // Filter courses based on grade level
-    foreach ($enrolled_courses as $course) {
-        if ($course->id == 1) continue; // Skip site course
-        
-        $course_name = strtolower($course->fullname);
-        $course_summary = strtolower($course->summary);
-        $course_category = isset($categories[$course->category]) ? strtolower($categories[$course->category]->name) : '';
-        
-        $matches_grade = false;
-        
-        // Check patterns in course name and summary
-        foreach ($grade_course_patterns[$user_grade]['patterns'] as $pattern) {
-            if (strpos($course_name, $pattern) !== false || strpos($course_summary, $pattern) !== false) {
-                $matches_grade = true;
-                break;
-            }
-        }
-        
-        // Check category name
-        if (!$matches_grade) {
-            foreach ($grade_course_patterns[$user_grade]['categories'] as $category_pattern) {
-                if (strpos($course_category, strtolower($category_pattern)) !== false) {
-                    $matches_grade = true;
-                    break;
-                }
-            }
-        }
-        
-        if ($matches_grade) {
-            $grade_courses[] = $course;
-        }
     }
     
-    // If no grade-specific courses found, show all enrolled courses for elementary students
-    if (empty($grade_courses) && in_array($user_grade, array('Grade 1', 'Grade 2', 'Grade 3'))) {
-        // Filter out system courses and show only user-enrolled courses
-        foreach ($enrolled_courses as $course) {
-            if ($course->id != 1 && $course->visible) {
-                $grade_courses[] = $course;
-            }
-        }
+    if ($matches_grade) {
+        $grade_courses[] = $course;
     }
 }
 
-// Get user's enrolled course IDs for checking enrollment status
-$user_enrolled_course_ids = array();
-if ($view === 'all_courses') {
-    $enrolled_courses_check = enrol_get_users_courses($USER->id, true, array('id'));
-    foreach ($enrolled_courses_check as $enrolled_course) {
-        $user_enrolled_course_ids[] = $enrolled_course->id;
+// If no grade-specific courses found, show all enrolled courses for elementary students
+if (empty($grade_courses) && in_array($user_grade, array('Grade 1', 'Grade 2', 'Grade 3'))) {
+    // Filter out system courses and show only user-enrolled courses
+    foreach ($enrolled_courses as $course) {
+        if ($course->id != 1 && $course->visible) {
+            $grade_courses[] = $course;
+        }
     }
 }
 
@@ -180,9 +129,6 @@ if ($view === 'all_courses') {
 $courses_data = array();
 foreach ($grade_courses as $course) {
     if ($course->id == 1) continue; // Skip site course
-    
-    // Check if user is enrolled (important for "All Courses" view)
-    $is_enrolled = ($view === 'my_courses') || in_array($course->id, $user_enrolled_course_ids);
     
     // Get course image
     $course_image = '';
@@ -208,28 +154,15 @@ foreach ($grade_courses as $course) {
         $course_image = $OUTPUT->image_url('default_course', 'theme');
     }
     
-    // Get course progress (only if enrolled)
+    // Get course progress
     $progress = 0;
-    if ($is_enrolled) {
-        $completion = new completion_info($course);
-        if ($completion->is_enabled()) {
-            $progress = (int) \core_completion\progress::get_course_progress_percentage($course, $USER->id);
-        }
+    $completion = new completion_info($course);
+    if ($completion->is_enabled()) {
+        $progress = (int) \core_completion\progress::get_course_progress_percentage($course, $USER->id);
     }
-    
-    // Determine if course is in progress or completed
-    $in_progress = $is_enrolled && $progress > 0 && $progress < 100;
-    $completed = $is_enrolled && $progress >= 100;
     
     // Get course URL
     $course_url = new moodle_url('/course/view.php', array('id' => $course->id));
-    
-    // Get enroll URL if not enrolled
-    $enroll_url = '';
-    if (!$is_enrolled) {
-        // Try to find guest/self enrolment
-        $enroll_url = new moodle_url('/enrol/index.php', array('id' => $course->id));
-    }
     
     $courses_data[] = array(
         'id' => $course->id,
@@ -238,13 +171,8 @@ foreach ($grade_courses as $course) {
         'summary' => format_text($course->summary, FORMAT_HTML),
         'image' => $course_image,
         'url' => $course_url->out(),
-        'enroll_url' => $enroll_url ? $enroll_url->out() : '',
         'progress' => $progress,
-        'grade_level' => $user_grade,
-        'is_enrolled' => $is_enrolled,
-        'in_progress' => $in_progress,
-        'completed' => $completed,
-        'not_enrolled' => !$is_enrolled
+        'grade_level' => $user_grade
     );
 }
 
@@ -256,12 +184,11 @@ $template_data = array(
     'user_name' => fullname($USER),
     'dashboard_url' => new moodle_url('/my/'),
     'current_url' => $PAGE->url->out(),
-    'view' => $view,
-    'is_my_courses' => ($view === 'my_courses'),
-    'is_all_courses' => ($view === 'all_courses'),
-    'my_courses_url' => new moodle_url('/theme/remui_kids/student_courses.php', array('view' => 'my_courses')),
-    'all_courses_url' => new moodle_url('/theme/remui_kids/student_courses.php', array('view' => 'all_courses')),
-    'page_title' => ($view === 'all_courses' ? 'All Courses' : 'My Courses')
+    'grades_url' => new moodle_url('/grade/report/overview/index.php'),
+    'assignments_url' => new moodle_url('/mod/assign/index.php'),
+    'messages_url' => new moodle_url('/message/index.php'),
+    'profile_url' => new moodle_url('/user/profile.php', array('id' => $USER->id)),
+    'logout_url' => new moodle_url('/login/logout.php', array('sesskey' => sesskey()))
 );
 
 // Render the page
