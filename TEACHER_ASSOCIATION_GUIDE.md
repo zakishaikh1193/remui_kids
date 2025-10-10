@@ -94,3 +94,4 @@ After successful association:
 - **Course Assignment**: Teachers can be assigned to specific courses
 - **Reporting**: Accurate reports and analytics for your school
 
+

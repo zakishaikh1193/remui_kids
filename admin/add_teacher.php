@@ -74,6 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
     
     if (empty($errors)) {
         try {
+            // Start transaction for data integrity
+            $transaction = $DB->start_delegated_transaction();
+            
             // Use Moodle's built-in user creation function for better reliability
             $user_data = new stdClass();
             $user_data->username = trim($_POST['username']);
@@ -93,49 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
             error_log('Creating user with Moodle function: ' . $user_data->username);
             
             // Use Moodle's user creation function
-            $user_id = user_create_user($user_data);
-            
-            if (!$user_id) {
-                // Fallback: Try direct insertion with minimal required fields
-                error_log('user_create_user failed, trying direct insertion');
-                
-                $minimal_user = new stdClass();
-                $minimal_user->username = trim($_POST['username']);
-                $minimal_user->password = hash_internal_user_password($_POST['password']);
-                $minimal_user->firstname = trim($_POST['firstname']);
-                $minimal_user->lastname = trim($_POST['lastname']);
-                $minimal_user->email = trim($_POST['email']);
-                $minimal_user->auth = 'manual';
-                $minimal_user->confirmed = 1;
-                $minimal_user->mnethostid = $CFG->mnet_localhost_id;
-                $minimal_user->timecreated = time();
-                $minimal_user->timemodified = time();
-                $minimal_user->firstaccess = 0;
-                $minimal_user->lastaccess = 0;
-                $minimal_user->suspended = 0;
-                $minimal_user->deleted = 0;
-                
-                $user_id = $DB->insert_record('user', $minimal_user);
-                
-                if ($user_id) {
-                    // Update with additional fields
-                    $update_user = new stdClass();
-                    $update_user->id = $user_id;
-                    $update_user->city = !empty($_POST['city']) ? trim($_POST['city']) : '';
-                    $update_user->country = !empty($_POST['country']) ? $_POST['country'] : '';
-                    $update_user->phone1 = !empty($_POST['phone']) ? trim($_POST['phone']) : '';
-                    $update_user->description = !empty($_POST['description']) ? trim($_POST['description']) : '';
-                    
-                    $DB->update_record('user', $update_user);
-                    error_log('User created via direct insertion: ' . $user_id);
-                }
-            }
+            $user_id = user_create_user($user_data, true, true);
             
             if ($user_id) {
                 // Assign teacher role
                 $teacher_role = $DB->get_record('role', ['shortname' => 'teacher']);
                 if ($teacher_role) {
                     role_assign($teacher_role->id, $user_id, $context->id);
+                    error_log('Teacher role assigned to user: ' . $user_id);
                 }
                 
                 // Add user to company
@@ -147,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
                 $company_user->timemodified = time();
                 
                 $DB->insert_record('company_users', $company_user);
+                error_log('User added to company: ' . $company_info->id);
                 
                 // Store grade information if provided
                 if (!empty($_POST['grade'])) {
@@ -159,40 +128,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
                         $grade_field->name = 'Grade';
                         $grade_field->datatype = 'text';
                         $grade_field->description = 'Teacher Grade Level';
+                        $grade_field->descriptionformat = FORMAT_HTML;
+                        $grade_field->categoryid = 1;
+                        $grade_field->sortorder = 1;
                         $grade_field->required = 0;
                         $grade_field->locked = 0;
                         $grade_field->visible = 1;
                         $grade_field->forceunique = 0;
                         $grade_field->signup = 0;
                         $grade_field->defaultdata = '';
-                        $grade_field->param1 = '';
-                        $grade_field->param2 = '';
-                        $grade_field->param3 = '';
+                        $grade_field->defaultdataformat = FORMAT_HTML;
+                        $grade_field->param1 = '30';
+                        $grade_field->param2 = '2048';
+                        $grade_field->param3 = '0';
                         $grade_field->param4 = '';
                         $grade_field->param5 = '';
                         
                         $grade_field_id = $DB->insert_record('user_info_field', $grade_field);
                         $grade_field->id = $grade_field_id;
+                        error_log('Grade field created: ' . $grade_field_id);
                     }
                     
-                    // Add grade data for user
-                    $grade_data = new stdClass();
-                    $grade_data->userid = $user_id;
-                    $grade_data->fieldid = $grade_field->id;
-                    $grade_data->data = $_POST['grade'];
+                    // Check if grade data already exists
+                    $existing_grade = $DB->get_record('user_info_data', [
+                        'userid' => $user_id,
+                        'fieldid' => $grade_field->id
+                    ]);
                     
-                    $DB->insert_record('user_info_data', $grade_data);
+                    if ($existing_grade) {
+                        // Update existing grade
+                        $existing_grade->data = $_POST['grade'];
+                        $existing_grade->dataformat = FORMAT_HTML;
+                        $DB->update_record('user_info_data', $existing_grade);
+                    } else {
+                        // Add new grade data for user
+                        $grade_data = new stdClass();
+                        $grade_data->userid = $user_id;
+                        $grade_data->fieldid = $grade_field->id;
+                        $grade_data->data = $_POST['grade'];
+                        $grade_data->dataformat = FORMAT_HTML;
+                        
+                        $DB->insert_record('user_info_data', $grade_data);
+                        error_log('Grade data added for user: ' . $user_id);
+                    }
                 }
+                
+                // Get the created user for success message
+                $created_user = $DB->get_record('user', ['id' => $user_id], 'id, firstname, lastname, email');
+                
+                // Commit transaction
+                $transaction->allow_commit();
                 
                 // Redirect back with success message
                 redirect(new moodle_url('/theme/remui_kids/school_manager_dashboard.php'), 
-                    'Teacher "' . $new_user->firstname . ' ' . $new_user->lastname . '" has been successfully added!', 
+                    'Teacher "' . $created_user->firstname . ' ' . $created_user->lastname . '" has been successfully added!', 
                     null, \core\output\notification::NOTIFY_SUCCESS);
             } else {
                 $errors[] = 'Failed to create user account.';
             }
             
         } catch (Exception $e) {
+            // Rollback transaction if it exists
+            if (isset($transaction) && !$transaction->is_disposed()) {
+                $transaction->rollback($e);
+            }
+            
             // Log the full error for debugging
             error_log('Error creating teacher: ' . $e->getMessage());
             error_log('Stack trace: ' . $e->getTraceAsString());
@@ -206,6 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
                 $errors[] = 'One or more fields contain data that is too long.';
             } elseif (strpos($e->getMessage(), 'Incorrect string value') !== false) {
                 $errors[] = 'Invalid characters in one or more fields.';
+            } elseif (strpos($e->getMessage(), 'required') !== false) {
+                $errors[] = 'Missing required fields. Please fill in all required information.';
             }
         }
     }

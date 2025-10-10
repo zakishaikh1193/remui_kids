@@ -4,34 +4,20 @@
 }}
 
 <div class="school-dashboard-container">
-    <!-- Welcome Header -->
-    <div class="dashboard-header">
-        <div class="welcome-section">
-            <h1 class="dashboard-title">Welcome to {{company_name}}</h1>
-            <p class="dashboard-subtitle">School Manager Dashboard - {{user_info.fullname}}</p>
-            <p class="dashboard-date">{{#str}}today{{/str}}: {{current_date}}</p>
-        </div>
-        <div class="dashboard-actions">
-            <button class="btn btn-primary" onclick="refreshStats()">
-                <i class="fa fa-sync-alt"></i> Refresh Stats
-            </button>
-        </div>
-    </div>
-
     <!-- Statistics Cards -->
     <div class="stats-grid">
         <!-- Total Teachers Card -->
         <div class="stat-card teachers-card">
-            <div class="stat-icon">
-                <i class="fa fa-chalkboard-teacher"></i>
-            </div>
             <div class="stat-content">
                 <h3 class="stat-number" id="total-teachers">{{total_teachers}}</h3>
-                <p class="stat-label">Total Teachers</p>
+                <p class="stat-label">TOTAL TEACHERS</p>
                 <div class="stat-trend">
-                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-arrow">↑</span>
                     <span class="trend-text">Active</span>
                 </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fa fa-chalkboard-teacher"></i>
             </div>
             <div class="stat-action">
                 <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/teachers_list.php" class="stat-link">
@@ -42,16 +28,16 @@
 
         <!-- Enrolled Teachers Card -->
         <div class="stat-card students-card">
-            <div class="stat-icon">
-                <i class="fa fa-chalkboard-teacher"></i>
-            </div>
             <div class="stat-content">
                 <h3 class="stat-number" id="enrolled-teachers">{{enrolled_teachers}}</h3>
-                <p class="stat-label">Enrolled Teachers</p>
+                <p class="stat-label">ENROLLED TEACHERS</p>
                 <div class="stat-trend">
-                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-arrow">↑</span>
                     <span class="trend-text">Active</span>
                 </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fa fa-chalkboard-teacher"></i>
             </div>
             <div class="stat-action">
                 <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/teachers_list.php" class="stat-link">
@@ -62,16 +48,16 @@
 
         <!-- Courses Card -->
         <div class="stat-card courses-card">
-            <div class="stat-icon">
-                <i class="fa fa-book"></i>
-            </div>
             <div class="stat-content">
                 <h3 class="stat-number" id="total-courses">{{total_courses}}</h3>
-                <p class="stat-label">Available Courses</p>
+                <p class="stat-label">AVAILABLE COURSES</p>
                 <div class="stat-trend">
-                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-arrow">↑</span>
                     <span class="trend-text">Active</span>
                 </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fa fa-file-alt"></i>
             </div>
             <div class="stat-action">
                 <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/courses.php" class="stat-link">
@@ -82,16 +68,16 @@
 
         <!-- Enrollments Card -->
         <div class="stat-card enrollments-card">
-            <div class="stat-icon">
-                <i class="fa fa-user-plus"></i>
-            </div>
             <div class="stat-content">
                 <h3 class="stat-number" id="active-enrollments">{{active_enrollments}}</h3>
-                <p class="stat-label">Active Enrollments</p>
+                <p class="stat-label">ACTIVE ENROLLMENTS</p>
                 <div class="stat-trend">
-                    <i class="fa fa-arrow-up trend-up"></i>
+                    <span class="trend-arrow">↑</span>
                     <span class="trend-text">Current</span>
                 </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fa fa-user-plus"></i>
             </div>
             <div class="stat-action">
                 <a href="{{{config.wwwroot}}}/theme/remui_kids/admin/enrollments.php" class="stat-link">
@@ -129,7 +115,7 @@
 
             <div class="action-card">
                 <div class="action-icon">
-                    <i class="fa fa-book"></i>
+                    <i class="fa fa-file-alt"></i>
                 </div>
                 <h3 class="action-title">View Courses</h3>
                 <p class="action-description">View and manage available courses</p>
@@ -194,99 +180,112 @@
 <!-- Dashboard Styles -->
 <style>
     .school-dashboard-container {
-        padding: 2rem 1rem;
+        padding: 1.5rem;
         max-width: none;
         margin: 0;
         width: 100%;
-    }
-
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
-        border-bottom: 2px solid #e9ecef;
-    }
-
-    .welcome-section h1.dashboard-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-    }
-
-    .welcome-section .dashboard-subtitle {
-        font-size: 1.1rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-    }
-
-    .welcome-section .dashboard-date {
-        font-size: 0.9rem;
-        color: #adb5bd;
-    }
-
-    .dashboard-actions .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
+        height: 100%;
+        overflow: visible;
     }
 
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1.5rem;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
         width: 100%;
     }
 
     .stat-card {
         background: white;
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border: 1px solid #e9ecef;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 140px;
+        border-top: 4px solid transparent;
     }
 
     .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     }
 
     .stat-card.teachers-card {
-        border-left: 4px solid #667eea;
+        border-top-color: #667eea;
     }
 
     .stat-card.students-card {
-        border: 2px solid transparent;
-        background: linear-gradient(white, white) padding-box,
-                    linear-gradient(135deg, #f093fb 0%, #4facfe 100%) border-box;
+        border-top-color: #f093fb;
     }
 
     .stat-card.courses-card {
-        border-left: 4px solid #4facfe;
+        border-top-color: #4facfe;
     }
 
     .stat-card.enrollments-card {
-        border-left: 4px solid #43e97b;
+        border-top-color: #43e97b;
     }
 
-    .stat-card .stat-icon {
+    .stat-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .stat-content h3.stat-number {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-content .stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .stat-trend {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .stat-trend .trend-arrow {
+        color: #28a745;
+        font-size: 0.875rem;
+        font-weight: bold;
+    }
+
+    .stat-trend .trend-text {
+        font-size: 0.75rem;
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .stat-icon {
         position: absolute;
-        top: 1.5rem;
-        right: 1.5rem;
-        width: 60px;
-        height: 60px;
+        top: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         color: white;
     }
 
@@ -295,8 +294,7 @@
     }
 
     .students-card .stat-icon {
-        background: linear-gradient(135deg, #ff9a9e, #fecfef);
-        color: white;
+        background: linear-gradient(135deg, #f093fb, #fecfef);
     }
 
     .courses-card .stat-icon {
@@ -307,44 +305,15 @@
         background: linear-gradient(135deg, #43e97b, #38f9d7);
     }
 
-    .stat-content h3.stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-    }
-
-    .stat-content .stat-label {
-        font-size: 1rem;
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
-
-    .stat-trend {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .stat-trend .trend-up {
-        color: #28a745;
-        font-size: 0.9rem;
-    }
-
-    .stat-trend .trend-text {
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
-
     .stat-action {
         position: absolute;
-        bottom: 1.5rem;
-        right: 1.5rem;
+        bottom: 1rem;
+        right: 1rem;
     }
 
     .stat-action .stat-link {
         color: #6c757d;
-        font-size: 1.2rem;
+        font-size: 1rem;
         transition: color 0.3s ease;
     }
 
@@ -353,7 +322,7 @@
     }
 
     .quick-actions-section, .recent-activity-section {
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
 
     .section-title {
@@ -373,53 +342,62 @@
     .action-card {
         background: white;
         border-radius: 1rem;
-        padding: 2rem;
+        padding: 1.5rem;
         text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border: 1px solid #e9ecef;
         transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
     }
 
     .action-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     }
 
     .action-card .action-icon {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea, #764ba2);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2rem;
+        margin: 0 auto 1rem;
+        font-size: 1.75rem;
         color: white;
+        margin-bottom: 1rem;
     }
 
     .action-card h3.action-title {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
     }
 
     .action-card .action-description {
         color: #6c757d;
-        margin-bottom: 1.5rem;
-        line-height: 1.5;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        font-size: 0.9rem;
     }
 
     .action-btn {
         display: inline-block;
-        padding: 0.75rem 1.5rem;
+        padding: 0.6rem 1.25rem;
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
         text-decoration: none;
         border-radius: 0.5rem;
         font-weight: 600;
+        font-size: 0.9rem;
         transition: all 0.3s ease;
+        margin-top: auto;
     }
 
     .action-btn:hover {
@@ -524,78 +502,4 @@
     }
 </style>
 
-<!-- JavaScript for Dashboard -->
-<script>
-    function refreshStats() {
-        const btn = document.querySelector('.dashboard-actions .btn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Refreshing...';
-        btn.disabled = true;
-
-        fetch('?action=get_dashboard_stats')
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    document.getElementById('total-teachers').textContent = data.total_teachers;
-                    document.getElementById('enrolled-teachers').textContent = data.enrolled_teachers;
-                    document.getElementById('total-courses').textContent = data.total_courses;
-                    document.getElementById('active-enrollments').textContent = data.active_enrollments;
-                    
-                    // Show success message
-                    showNotification('Stats refreshed successfully!', 'success');
-                } else {
-                    showNotification('Failed to refresh stats: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showNotification('Error refreshing stats: ' + error.message, 'error');
-            })
-            .finally(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
-    }
-
-    function showNotification(message, type) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            ${type === 'success' ? 'background: #28a745;' : 'background: #dc3545;'}
-        `;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
-
-    // Add CSS for notifications
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-</script>
+<!-- Dashboard is now clean without header -->
