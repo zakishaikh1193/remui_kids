@@ -382,16 +382,16 @@ if (isset($_GET['action'])) {
                         $course = $DB->get_record('course', ['id' => $course_id]);
                         if ($course && $course->category == $category->id) {
                             $course->category = 1; // Default category
-                            $course->timemodified = time();
-                            if ($DB->update_record('course', $course)) {
-                                echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
-                            } else {
-                                echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
-                            }
+                        $course->timemodified = time();
+                        if ($DB->update_record('course', $course)) {
+                            echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
                         } else {
-                            echo json_encode(['status' => 'error', 'message' => 'Course was not assigned to this company']);
+                            echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
                         }
                     } else {
+                            echo json_encode(['status' => 'error', 'message' => 'Course was not assigned to this company']);
+                    }
+                } else {
                         echo json_encode(['status' => 'error', 'message' => 'Company category not found']);
                     }
                     exit;
@@ -666,7 +666,7 @@ echo "<div class='sidebar-section'>";
 echo "<h3 class='sidebar-category'>SETTINGS</h3>";
 echo "<ul class='sidebar-menu'>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-cog sidebar-icon'></i>";
 echo "<span class='sidebar-text'>System Settings</span>";
 echo "</a>";
@@ -2267,3 +2267,4 @@ window.addEventListener('resize', function() {
 echo "</div>"; // End admin-main-content
 echo $OUTPUT->footer();
 ?>
+
