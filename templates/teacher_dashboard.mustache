@@ -119,6 +119,12 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/teacher/competencies.php" class="sidebar-link">
+                        <i class="fa fa-sitemap sidebar-icon"></i>
+                        <span class="sidebar-text">Competencies</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="{{config.wwwroot}}/grade/report/grader/index.php" class="sidebar-link">
                         <i class="fa fa-star sidebar-icon"></i>
                         <span class="sidebar-text">Grading</span>
@@ -240,19 +246,7 @@
                 </div>
             </div>
             
-            <!-- Total Quizzes Card -->
-            <div class="stat-card quizzes-card" id="quizzes-card">
-                <div class="stat-card-header">
-                    <div class="stat-icon">
-                        <i class="fa fa-question-circle"></i>
-                    </div>
-                    
-                </div>
-                <div class="stat-card-content">
-                    <div class="stat-number" id="total-quizzes-count">{{total_quizzes}}</div>
-                    <div class="stat-label">TOTAL QUIZZES</div>
-                </div>
-            </div>
+            
             
             {{/teacher_stats}}
         </div>
@@ -574,8 +568,8 @@
                         <i class="fa fa-chart-line"></i>
                         Class Performance Overview
                     </h3>
-                    <a href="{{config.wwwroot}}/grade/report/grader/index.php" class="btn-view-gradebook">
-                        View Gradebook
+                    <a href="{{config.wwwroot}}/theme/remui_kids/pages/class_performance_overview.php" class="btn-view-gradebook">
+                        View All
                     </a>
                 </div>
                 <div class="card-content-pro">
@@ -805,6 +799,7 @@
                 </div>
                 <div class="card-content">
                     <div class="insights-list">
+                    
                         {{#student_insights}}
                         <div class="insight-item" onclick="window.location.href='{{config.wwwroot}}/theme/remui_kids/pages/student_overview.php?id={{id}}'" style="cursor: pointer;">
                             <div class="insight-student">

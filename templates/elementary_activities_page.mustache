@@ -1,0 +1,1007 @@
+{{!
+    Custom Elementary Activities Page Template for remui_kids theme
+    Specifically designed for Grade 1-3 students
+}}
+
+{{> theme_remui_kids/common_start}}
+
+<style>
+/* Enhanced Elementary Sidebar Styles */
+.enhanced-elementary-sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%) !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.enhanced-elementary-sidebar .sidebar-nav {
+    padding: 1.5rem 0 !important;
+}
+
+.enhanced-elementary-sidebar .nav-section {
+    margin-bottom: 2rem !important;
+}
+
+.enhanced-elementary-sidebar .section-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #666666 !important;
+    margin-bottom: 1rem !important;
+    padding: 0 1.5rem !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.blue {
+    background: #3b82f6 !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.green {
+    background: #10b981 !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.orange {
+    background: #f59e0b !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.purple {
+    background: #8b5cf6 !important;
+}
+
+.enhanced-elementary-sidebar .nav-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.enhanced-elementary-sidebar .nav-item {
+    margin: 0 !important;
+}
+
+.enhanced-elementary-sidebar .nav-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1.5rem !important;
+    color: #666666 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    border-radius: 0 25px 25px 0 !important;
+    margin-right: 1rem !important;
+}
+
+.enhanced-elementary-sidebar .nav-link:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #3b82f6 !important;
+    text-decoration: none !important;
+}
+
+.enhanced-elementary-sidebar .nav-link.active {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+.enhanced-elementary-sidebar .nav-link i {
+    width: 20px !important;
+    text-align: center !important;
+    font-size: 1rem !important;
+}
+
+.enhanced-elementary-sidebar .quick-actions-container {
+    padding: 0 1rem !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    margin-bottom: 0.75rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 1.2rem !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card.ebooks-card .quick-action-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card.ask-teacher-card .quick-action-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card.code-editor-card .quick-action-icon {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card.share-class-card .quick-action-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card.scratch-editor-card .quick-action-icon {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-content {
+    flex: 1 !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-content h4 {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.25rem 0 !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-content p {
+    font-size: 0.75rem !important;
+    color: #6b7280 !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-arrow {
+    color: #9ca3af !important;
+    font-size: 0.9rem !important;
+}
+
+/* Elementary Activities Page Styles */
+.elementary-activities-page .elementary-activities-content {
+    margin-left: 0 !important;
+    padding: 2rem !important;
+    min-height: 100vh !important;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%) !important;
+}
+
+.elementary-activities-page .activities-page-header {
+    text-align: center !important;
+    margin-bottom: 2rem !important;
+}
+
+.elementary-activities-page .activities-page-title {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    color: #2c3e50 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.elementary-activities-page .activities-page-title i {
+    color: #e74c3c !important;
+    margin-right: 0.5rem !important;
+}
+
+.elementary-activities-page .activities-page-subtitle {
+    font-size: 1.2rem !important;
+    color: #7f8c8d !important;
+    margin: 0 !important;
+}
+
+.elementary-activities-page .activities-stats-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1.5rem !important;
+    margin-bottom: 2rem !important;
+}
+
+.elementary-activities-page .activity-stat-card {
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid transparent !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+
+.elementary-activities-page .activity-stat-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+    border-color: #e74c3c !important;
+}
+
+.elementary-activities-page .activity-stat-card .stat-icon-container {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+}
+
+.elementary-activities-page .activity-stat-card .stat-icon-container .stat-icon {
+    color: white !important;
+    font-size: 1.5rem !important;
+}
+
+.elementary-activities-page .activity-stat-card .stat-content .stat-number {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #2c3e50 !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.elementary-activities-page .activity-stat-card .stat-content .stat-label {
+    font-size: 0.9rem !important;
+    color: #7f8c8d !important;
+    font-weight: 500 !important;
+}
+
+.elementary-activities-page .elementary-activities-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+    gap: 1.5rem !important;
+    margin-top: 2rem !important;
+}
+
+.elementary-activities-page .elementary-activity-card {
+    background: white !important;
+    border-radius: 20px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid transparent !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.elementary-activities-page .elementary-activity-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, #e74c3c, #f39c12) !important;
+}
+
+.elementary-activities-page .elementary-activity-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+    border-color: #e74c3c !important;
+}
+
+.elementary-activities-page .elementary-activity-card.completed::before {
+    background: linear-gradient(90deg, #2ecc71, #27ae60) !important;
+}
+
+.elementary-activities-page .elementary-activity-card.in-progress::before {
+    background: linear-gradient(90deg, #f39c12, #e67e22) !important;
+}
+
+.elementary-activities-page .elementary-activity-card.not-started::before {
+    background: linear-gradient(90deg, #95a5a6, #7f8c8d) !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    margin-bottom: 1rem !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-title {
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    line-height: 1.3 !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-course {
+    font-size: 0.9rem !important;
+    color: #7f8c8d !important;
+    margin: 0.5rem 0 0 0 !important;
+    font-style: italic !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-type-badge {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    color: white !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 12px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    margin-left: 1rem !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-status-indicator {
+    margin-left: 1rem !important;
+    font-size: 1.5rem !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-status-indicator.completed i {
+    color: #2ecc71 !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-status-indicator.in-progress i {
+    color: #f39c12 !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-header .activity-status-indicator.not-started i {
+    color: #95a5a6 !important;
+}
+
+.elementary-activities-page .elementary-activity-card .activity-content {
+    .activity-description {
+        color: #5a6c7d !important;
+        font-size: 0.95rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: 1.5rem !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    
+    .activity-progress-section {
+        margin-bottom: 1.5rem !important;
+        
+        .progress-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 0.5rem !important;
+            
+            .progress-label {
+                font-size: 0.9rem !important;
+                color: #5a6c7d !important;
+                font-weight: 500 !important;
+            }
+            
+            .progress-percentage {
+                font-size: 0.9rem !important;
+                color: #e74c3c !important;
+                font-weight: 600 !important;
+            }
+        }
+        
+        .progress-bar-container {
+            .progress-bar {
+                width: 100% !important;
+                height: 8px !important;
+                background: #ecf0f1 !important;
+                border-radius: 4px !important;
+                overflow: hidden !important;
+                
+                .progress-fill {
+                    height: 100% !important;
+                    background: linear-gradient(90deg, #e74c3c, #f39c12) !important;
+                    border-radius: 4px !important;
+                    transition: width 0.3s ease !important;
+                }
+            }
+        }
+    }
+    
+    .activity-info-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1rem !important;
+        margin-bottom: 1.5rem !important;
+        
+        .activity-info-item {
+            text-align: center !important;
+            padding: 0.75rem !important;
+            background: #f8f9fa !important;
+            border-radius: 12px !important;
+            
+            i {
+                color: #e74c3c !important;
+                font-size: 1.2rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .activity-info-value {
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+                color: #2c3e50 !important;
+                margin-bottom: 0.25rem !important;
+            }
+            
+            div:last-child {
+                font-size: 0.8rem !important;
+                color: #7f8c8d !important;
+            }
+        }
+    }
+    
+    .activity-action-button {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        padding: 0.75rem 1.5rem !important;
+        background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        color: white !important;
+        text-decoration: none !important;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        
+        i {
+            margin-right: 0.5rem !important;
+        }
+        
+        &:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3) !important;
+            color: white !important;
+            text-decoration: none !important;
+        }
+    }
+}
+
+.elementary-activities-page .no-activities-message {
+    text-align: center !important;
+    padding: 4rem 2rem !important;
+    background: white !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+.elementary-activities-page .no-activities-message .no-activities-icon {
+    font-size: 4rem !important;
+    color: #bdc3c7 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.elementary-activities-page .no-activities-message h3 {
+    color: #2c3e50 !important;
+    margin-bottom: 1rem !important;
+}
+
+.elementary-activities-page .no-activities-message p {
+    color: #7f8c8d !important;
+    margin-bottom: 2rem !important;
+}
+
+.elementary-activities-page .no-activities-message .btn {
+    padding: 0.75rem 2rem !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* Responsive design for elementary activities page */
+@media (max-width: 768px) {
+    .elementary-activities-page .elementary-activities-content {
+        margin-left: 0 !important;
+        padding: 1rem !important;
+    }
+    
+    .elementary-activities-page .elementary-activities-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .elementary-activities-page .elementary-activity-card {
+        padding: 1rem !important;
+    }
+    
+    .elementary-activities-page .elementary-activity-card .activity-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    
+    .elementary-activities-page .elementary-activity-card .activity-header .activity-status-indicator {
+        margin-left: 0 !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    .elementary-activities-page .elementary-activity-card .activity-content .activity-info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+    
+    .elementary-activities-page .activities-stats-container {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+/* Hide default navbar */
+{{#hide_default_navbar}}
+.navbar, .navbar-expand-lg, .navbar-nav {
+    display: none !important;
+}
+
+#page {
+    padding-top: 0 !important;
+}
+
+#page-wrapper {
+    margin-top: 0 !important;
+}
+{{/hide_default_navbar}}
+</style>
+
+{{#custom_elementary_activities}}
+
+<div class="elementary-activities-page">
+    <!-- Sidebar removed - using default Moodle sidebar -->
+    <div class="student-sidebar enhanced-elementary-sidebar" style="display: none;">
+        <nav class="sidebar-nav">
+            
+            <!-- DASHBOARD Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet blue"></span>
+                    DASHBOARD
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{dashboardurl}}}" class="nav-link">
+                            <i class="fa fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link">
+                            <i class="fa fa-book-open"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{lessonsurl}}}" class="nav-link">
+                            <i class="fa fa-play-circle"></i>
+                            <span>Lessons</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{activitiesurl}}}" class="nav-link active activities-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>Activities</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{achievementsurl}}}" class="nav-link">
+                            <i class="fa fa-trophy"></i>
+                            <span>Achievements</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{competenciesurl}}}" class="nav-link">
+                            <i class="fa fa-bullseye"></i>
+                            <span>Competencies</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{scheduleurl}}}" class="nav-link">
+                            <i class="fa fa-calendar"></i>
+                            <span>Schedule</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- TOOLS & RESOURCES Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet green"></span>
+                    TOOLS & RESOURCES
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{treeviewurl}}}" class="nav-link">
+                            <i class="fa fa-sitemap"></i>
+                            <span>Tree View</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- SETTINGS & PROFILE Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet orange"></span>
+                    SETTINGS & PROFILE
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{settingsurl}}}" class="nav-link">
+                            <i class="fa fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- QUICK ACTIONS Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet purple"></span>
+                    QUICK ACTIONS
+                </div>
+                <div class="quick-actions-container">
+                    <div class="quick-action-card ebooks-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-book"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>E-books</h4>
+                            <p>Access digital learning materials</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card ask-teacher-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-question-circle"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Ask Teacher</h4>
+                            <p>Get help from your instructor</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card code-editor-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-desktop"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Code Editor</h4>
+                            <p>Write and run JavaScript code</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card share-class-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-share-alt"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Share with Class</h4>
+                            <p>Collaborate with classmates</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card scratch-editor-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-play"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Scratch Editor</h4>
+                            <p>Create interactive projects</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Elementary Activities Content -->
+    <div class="elementary-activities-content">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="activities-page-header">
+                        <h2 class="activities-page-title">
+                            <i class="fa fa-chart-line"></i>
+                            My Learning Activities
+                        </h2>
+                        <p class="activities-page-subtitle">
+                            Complete exciting activities and track your progress!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activities Statistics -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="activities-stats-container">
+                        <div class="activity-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-tasks stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{total_activities_count}}</div>
+                                <div class="stat-label">Total Activities</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-clock-o stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="in-progress-activities-count">0</div>
+                                <div class="stat-label">In Progress</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-check-circle stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="completed-activities-count">0</div>
+                                <div class="stat-label">Completed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-stat-card">
+                            <div class="stat-icon-container">
+                                <i class="fa fa-circle-o stat-icon"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="not-started-activities-count">0</div>
+                                <div class="stat-label">Not Started</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activities Grid -->
+            {{#has_student_activities}}
+            <div class="row">
+                <div class="col-12">
+                    <div class="elementary-activities-grid">
+                        {{#student_activities}}
+                        <div class="elementary-activity-card enhanced" data-activity-id="{{id}}">
+                            <!-- Activity Header -->
+                            <div class="activity-header">
+                                <div>
+                                    <h3 class="activity-title">{{name}}</h3>
+                                    <p class="activity-course">{{coursename}}</p>
+                                </div>
+                                
+                                <div class="activity-type-badge">{{typename}}</div>
+                                
+                                <!-- Activity Status Indicator -->
+                                <div class="activity-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
+                                    <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-clock-o{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity Content -->
+                            <div class="activity-content">
+                                <!-- Activity Description -->
+                                <p class="activity-description">{{intro}}</p>
+                                
+                                <!-- Progress Section -->
+                                <div class="activity-progress-section">
+                                    <div class="progress-header">
+                                        <span class="progress-label">Your Progress</span>
+                                        <span class="progress-percentage">{{progress_percentage}}%</span>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Activity Information -->
+                                <div class="activity-info-grid">
+                                    <div class="activity-info-item">
+                                        <i class="fa {{icon}}"></i>
+                                        <div class="activity-info-value">{{typename}}</div>
+                                        <div>Activity Type</div>
+                                    </div>
+                                    <div class="activity-info-item">
+                                        <i class="fa fa-clock-o"></i>
+                                        <div class="activity-info-value">{{estimated_time}}</div>
+                                        <div>Estimated Time</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Activity Action Button -->
+                                <a href="{{activityurl}}" class="activity-action-button">
+                                    <i class="fa {{#completed}}fa-check{{/completed}}{{^completed}}fa-play{{/completed}}"></i>
+                                    {{#completed}}Review Activity{{/completed}}{{^completed}}Start Activity{{/completed}}
+                                </a>
+                            </div>
+                        </div>
+                        {{/student_activities}}
+                    </div>
+                </div>
+            </div>
+            {{/has_student_activities}}
+            
+            {{^has_student_activities}}
+            <!-- No Activities Message -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="no-activities-message">
+                        <div class="no-activities-icon">
+                            <i class="fa fa-tasks"></i>
+                        </div>
+                        <h3>No Activities Yet</h3>
+                        <p>You don't have any activities assigned yet. Check back later or contact your teacher!</p>
+                        <a href="{{{dashboardurl}}}" class="btn btn-primary">
+                            <i class="fa fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{/has_student_activities}}
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Add body class for content shifting
+    $('body').addClass('has-student-sidebar');
+    
+    // Count activities by status
+    let inProgressCount = 0;
+    let completedCount = 0;
+    let notStartedCount = 0;
+    
+    $('.elementary-activity-card').each(function() {
+        const card = $(this);
+        if (card.hasClass('completed')) {
+            completedCount++;
+        } else if (card.hasClass('in-progress')) {
+            inProgressCount++;
+        } else if (card.hasClass('not-started')) {
+            notStartedCount++;
+        }
+    });
+    
+    // Update statistics
+    $('#in-progress-activities-count').text(inProgressCount);
+    $('#completed-activities-count').text(completedCount);
+    $('#not-started-activities-count').text(notStartedCount);
+    
+    // Handle sidebar navigation clicks
+    $('.student-sidebar .nav-link').on('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active class from all links
+        $('.student-sidebar .nav-link').removeClass('active');
+        
+        // Add active class to clicked link
+        $(this).addClass('active');
+        
+        // Get the link text to determine action
+        var linkText = $(this).find('span').text().trim();
+        
+        // Get the current base URL
+        var baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        if (baseUrl.endsWith('/')) {
+            baseUrl = baseUrl.slice(0, -1);
+        }
+        
+        // Handle different navigation items
+        switch(linkText) {
+            case 'Dashboard':
+                window.location.href = baseUrl + '/my/';
+                break;
+            case 'My Courses':
+                window.location.href = baseUrl + '/theme/remui_kids/mycourses.php';
+                break;
+            case 'Lessons':
+                window.location.href = baseUrl + '/theme/remui_kids/elementary_lessons.php';
+                break;
+            case 'Activities':
+                // Already on activities page
+                break;
+            case 'Achievements':
+                window.location.href = baseUrl + '/badges/mybadges.php';
+                break;
+            case 'Competencies':
+                window.location.href = baseUrl + '/admin/tool/lp/index.php';
+                break;
+            case 'Schedule':
+                window.location.href = baseUrl + '/calendar/view.php';
+                break;
+            case 'Tree View':
+                window.location.href = baseUrl + '/course/view.php';
+                break;
+            case 'Settings':
+                window.location.href = baseUrl + '/user/preferences.php';
+                break;
+            default:
+                console.log('Navigation to:', linkText);
+        }
+    });
+    
+    // Handle Quick Action Cards
+    $('.quick-action-card').on('click', function(e) {
+        e.preventDefault();
+        
+        var cardType = $(this).attr('class').split(' ')[1]; // Get the card type class
+        
+        // Get the current base URL
+        var baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        if (baseUrl.endsWith('/')) {
+            baseUrl = baseUrl.slice(0, -1);
+        }
+        
+        // Handle different quick action cards
+        switch(cardType) {
+            case 'ebooks-card':
+                window.location.href = baseUrl + '/mod/book/index.php';
+                break;
+            case 'ask-teacher-card':
+                window.location.href = baseUrl + '/message/index.php';
+                break;
+            case 'code-editor-card':
+                window.open(baseUrl + '/mod/codeeditor/view.php', '_blank');
+                break;
+            case 'share-class-card':
+                window.location.href = baseUrl + '/mod/forum/index.php';
+                break;
+            case 'scratch-editor-card':
+                window.open(baseUrl + '/mod/scratch/view.php', '_blank');
+                break;
+            default:
+                console.log('Quick action clicked:', cardType);
+        }
+    });
+    
+    // Add hover effects to activity cards
+    $('.elementary-activity-card').hover(
+        function() {
+            $(this).css('transform', 'translateY(-5px)');
+            $(this).css('box-shadow', '0 10px 30px rgba(0, 0, 0, 0.15)');
+        },
+        function() {
+            $(this).css('transform', 'translateY(0)');
+            $(this).css('box-shadow', '0 5px 20px rgba(0, 0, 0, 0.1)');
+        }
+    );
+});
+</script>
+
+{{/custom_elementary_activities}}
+
+{{> theme_remui_kids/common_end}}

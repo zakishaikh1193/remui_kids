@@ -24,7 +24,7 @@ $PAGE->add_body_class('quizzes-page');
 
 // Start output
 echo $OUTPUT->header();
-
+echo '<div class="teacher-css-wrapper">';
 echo '<div class="teacher-dashboard-wrapper">';
 // Mobile toggle
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
@@ -85,12 +85,26 @@ echo '</div>';
 // Container
 echo '<div class="students-container">';
 
+// Filter and search controls
+echo '<div class="students-controls">';
+echo '<div class="search-box">';
+echo '<i class="fa fa-search search-icon"></i>';
+echo '<input type="text" id="questionSearch" class="search-input" placeholder="Search questions..." onkeyup="filterQuestions()">';
+echo '</div>';
+echo '<div class="filter-buttons">';
+echo '<button class="filter-btn active" onclick="filterByStatus(\'all\')">All Questions</button>';
+echo '<button class="filter-btn" onclick="filterByStatus(\'correct\')">Correct</button>';
+echo '<button class="filter-btn" onclick="filterByStatus(\'wrong\')">Incorrect</button>';
+echo '<button class="filter-btn" onclick="filterByStatus(\'partial\')">Partial</button>';
+echo '</div>';
+echo '</div>';
+
 // Use the question engine to load and render question summaries.
 $quba = question_engine::load_questions_usage_by_activity($attempt->uniqueid);
 $slots = $quba->get_slots();
 
 echo '<div class="students-table-wrapper">';
-echo '<table class="students-table">';
+echo '<table class="students-table" id="questionsTable">';
 echo '<thead><tr><th>#</th><th>Question</th><th>Submitted answer</th><th>Correct answer</th><th>Mark</th></tr></thead>'; 
 echo '<tbody>';
 
@@ -147,7 +161,7 @@ echo '</div>'; // students-container
 echo '</div>'; // students-page-wrapper
 echo '</div>'; // teacher-main-content
 echo '</div>'; // teacher-dashboard-wrapper
-
+echo '</div>'; // teacher-css-wrapper
 // Sidebar JS
 echo '<script>
 function toggleTeacherSidebar() {
@@ -169,6 +183,52 @@ window.addEventListener("resize", function() {
     sidebar.classList.remove("sidebar-open");
   }
 });
+
+// Question filtering and search functionality
+function filterQuestions() {
+  const searchTerm = document.getElementById("questionSearch").value.toLowerCase();
+  const table = document.getElementById("questionsTable");
+  const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+  
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const questionText = row.cells[1].textContent.toLowerCase();
+    const studentAnswer = row.cells[2].textContent.toLowerCase();
+    const correctAnswer = row.cells[3].textContent.toLowerCase();
+    
+    if (questionText.includes(searchTerm) || studentAnswer.includes(searchTerm) || correctAnswer.includes(searchTerm)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  }
+}
+
+function filterByStatus(status) {
+  // Update active button
+  const buttons = document.querySelectorAll(".filter-btn");
+  buttons.forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+  
+  const table = document.getElementById("questionsTable");
+  const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+  
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    
+    if (status === "all") {
+      row.style.display = "";
+    } else if (status === "correct" && row.classList.contains("answer-correct")) {
+      row.style.display = "";
+    } else if (status === "wrong" && row.classList.contains("answer-wrong")) {
+      row.style.display = "";
+    } else if (status === "partial" && row.classList.contains("answer-partial")) {
+      row.style.display = "";
+    } else if (status !== "all") {
+      row.style.display = "none";
+    }
+  }
+}
 </script>';
 
 echo $OUTPUT->footer();

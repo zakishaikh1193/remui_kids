@@ -7,6 +7,63 @@
 
 {{> theme_remui_kids/common_start}}
 
+<style>
+/* Force course categories height limit with scrollbar */
+.course-categories-section .categories-list {
+    max-height: 280px !important;
+    overflow-y: auto !important;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+    border: 1px solid #e0e0e0;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.course-categories-section .categories-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Force student enrollments height limit with scrollbar */
+.admin-student-enrollments-section .enrollments-list {
+    max-height: 240px !important;
+    overflow-y: auto !important;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.admin-student-enrollments-section .enrollments-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-student-enrollments-section .enrollments-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.admin-student-enrollments-section .enrollments-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.admin-student-enrollments-section .enrollments-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+
 {{#admin_dashboard}}
 <!-- Full Screen Admin Dashboard Wrapper -->
 <div class="admin-dashboard-wrapper">
@@ -156,7 +213,7 @@
             <h3 class="sidebar-category">SETTINGS</h3>
             <ul class="sidebar-menu">
                 <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
+                    <a href="{{config.wwwroot}}/theme/remui_kids/admin/user_profile_management.php" class="sidebar-link">
                         <i class="fa fa-cog sidebar-icon"></i>
                         <span class="sidebar-text">System Settings</span>
                     </a>
@@ -388,7 +445,14 @@
                         
                         <!-- Course Categories Section -->
                         <div class="course-categories-section">
-                            <h4 class="subsection-title">Course Categories</h4>
+                            <div class="subsection-header">
+                                <h4 class="subsection-title">Course Categories</h4>
+                                <a class="view-all-btn" href="{{config.wwwroot}}/theme/remui_kids/admin/manage_course_content.php">
+                                    <span class="btn-glow"></span>
+                                    <i class="fa fa-arrow-right"></i>
+                                    View All
+                                </a>
+                            </div>
                             <div class="categories-list">
                                 {{#admin_course_categories}}
                                 <div class="category-item">

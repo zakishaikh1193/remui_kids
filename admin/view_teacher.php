@@ -84,27 +84,162 @@ echo "<style>
     
     body {
         font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #E8DFFF 0%, #DCD0FF 100%);
         min-height: 100vh;
         padding: 20px;
+    }
+    
+    /* Sidebar Styles */
+    .admin-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        z-index: 1000;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+    
+    .admin-sidebar .sidebar-content {
+        padding: 6rem 0 2rem 0;
+    }
+    
+    .admin-sidebar .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .admin-sidebar .sidebar-category {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        margin-top: 0;
+    }
+    
+    .admin-sidebar .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-sidebar .sidebar-item {
+        margin-bottom: 0.25rem;
+    }
+    
+    .admin-sidebar .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .admin-sidebar .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border-left-color: #9D8DF1;
+    }
+    
+    .admin-sidebar .sidebar-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 1rem;
+        font-size: 1rem;
+        color: #6c757d;
+        text-align: center;
+    }
+    
+    .admin-sidebar .sidebar-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-link {
+        background-color: #E8DFFF;
+        color: #7C73E6;
+        border-left-color: #9D8DF1;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-icon {
+        color: #9D8DF1;
+    }
+    
+    /* Scrollbar styling */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Main content area with sidebar - FULL SCREEN */
+    .admin-main-content {
+        position: fixed;
+        top: 0;
+        left: 280px;
+        width: calc(100vw - 280px);
+        height: 100vh;
+        background-color: #ffffff;
+        overflow-y: auto;
+        z-index: 99;
+        will-change: transform;
+        backface-visibility: hidden;
+        padding-top: 80px;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .admin-sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+        
+        .admin-main-content {
+            position: relative;
+            left: 0;
+            width: 100vw;
+            height: auto;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
     }
     
     .view-container {
         max-width: 1200px;
         margin: 0 auto;
-        animation: slideInUp 0.8s ease-out;
     }
     
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
     
     .profile-header {
         background: rgba(255, 255, 255, 0.95);
@@ -117,7 +252,7 @@ echo "<style>
     }
     
     .header-background {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #C5B4E3 0%, #B8B5FF 100%);
         height: 200px;
         position: relative;
         overflow: hidden;
@@ -131,12 +266,6 @@ echo "<style>
         width: 200%;
         height: 200%;
         background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
     }
     
     .profile-content {
@@ -145,7 +274,7 @@ echo "<style>
     }
     
     .breadcrumb {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.3);
         padding: 15px 30px;
         border-radius: 12px;
         margin-bottom: 20px;
@@ -153,17 +282,19 @@ echo "<style>
     }
     
     .breadcrumb a {
-        color: rgba(255, 255, 255, 0.8);
+        color: #7C73E6;
         text-decoration: none;
         transition: color 0.3s ease;
+        font-weight: 500;
     }
     
     .breadcrumb a:hover {
-        color: white;
+        color: #9D8DF1;
     }
     
     .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.9);
+        color: #5B4E9E;
+        font-weight: 600;
     }
     
     .profile-info {
@@ -171,18 +302,6 @@ echo "<style>
         grid-template-columns: 200px 1fr;
         gap: 40px;
         align-items: start;
-        animation: fadeInUp 1s ease-out 0.3s both;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .profile-avatar {
@@ -194,7 +313,7 @@ echo "<style>
         width: 150px;
         height: 150px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #C5B4E3 0%, #B8B5FF 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -203,16 +322,9 @@ echo "<style>
         color: white;
         margin: 0 auto 20px;
         border: 5px solid white;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        animation: pulse 2s infinite;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         position: relative;
         overflow: hidden;
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
     }
     
     .avatar-container::before {
@@ -223,7 +335,6 @@ echo "<style>
         width: 200%;
         height: 200%;
         background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-        animation: rotate 15s linear infinite;
     }
     
     .status-badge {
@@ -234,18 +345,6 @@ echo "<style>
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        animation: slideInDown 0.8s ease-out 0.5s both;
-    }
-    
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .status-active {
@@ -259,18 +358,6 @@ echo "<style>
     }
     
     .profile-details {
-        animation: fadeInRight 1s ease-out 0.4s both;
-    }
-    
-    @keyframes fadeInRight {
-        from {
-            opacity: 0;
-            transform: translateX(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
     }
     
     .profile-name {
@@ -278,7 +365,7 @@ echo "<style>
         font-weight: 800;
         color: #2d3748;
         margin-bottom: 10px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #9D8DF1 0%, #7C73E6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -286,7 +373,7 @@ echo "<style>
     
     .profile-title {
         font-size: 1.2rem;
-        color: #4a5568;
+        color: #7C73E6;
         margin-bottom: 20px;
         font-weight: 500;
     }
@@ -305,7 +392,7 @@ echo "<style>
         padding: 15px;
         background: #f8fafc;
         border-radius: 12px;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #9D8DF1;
         transition: all 0.3s ease;
     }
     
@@ -318,7 +405,7 @@ echo "<style>
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #C5B4E3 0%, #B8B5FF 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -361,7 +448,6 @@ echo "<style>
         text-align: center;
         position: relative;
         overflow: hidden;
-        animation: slideInUp 0.8s ease-out;
     }
     
     .stat-card::before {
@@ -371,39 +457,32 @@ echo "<style>
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #C5B4E3 0%, #B8B5FF 100%);
     }
     
     .stat-icon {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #C5B4E3 0%, #B8B5FF 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-size: 1.5rem;
         margin: 0 auto 20px;
-        animation: bounce 2s infinite;
-    }
-    
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-        40% { transform: translateY(-10px); }
-        60% { transform: translateY(-5px); }
     }
     
     .stat-number {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #2d3748;
+        color: #7C73E6;
         margin-bottom: 10px;
     }
     
     .stat-label {
         font-size: 1rem;
-        color: #6b7280;
+        color: #9D8DF1;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -415,18 +494,12 @@ echo "<style>
         padding: 30px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(10px);
-        animation: fadeIn 1s ease-out 0.6s both;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
     }
     
     .section-title {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #2d3748;
+        color: #7C73E6;
         margin-bottom: 25px;
         display: flex;
         align-items: center;
@@ -443,22 +516,10 @@ echo "<style>
         gap: 15px;
         padding: 15px 0;
         border-bottom: 1px solid #e2e8f0;
-        animation: slideInLeft 0.6s ease-out;
     }
     
     .activity-item:last-child {
         border-bottom: none;
-    }
-    
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
     }
     
     .activity-icon {
@@ -493,7 +554,6 @@ echo "<style>
         gap: 15px;
         justify-content: center;
         margin-top: 30px;
-        animation: fadeInUp 1s ease-out 0.8s both;
     }
     
     .btn {
@@ -513,24 +573,24 @@ echo "<style>
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #9D8DF1 0%, #7C73E6 100%);
         color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(157, 141, 241, 0.3);
     }
     
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 8px 25px rgba(157, 141, 241, 0.4);
     }
     
     .btn-secondary {
-        background: #f7fafc;
-        color: #4a5568;
-        border: 2px solid #e2e8f0;
+        background: #ffffff;
+        color: #7C73E6;
+        border: 2px solid #DCD0FF;
     }
     
     .btn-secondary:hover {
-        background: #edf2f7;
+        background: #E8DFFF;
         transform: translateY(-2px);
     }
     
@@ -543,6 +603,17 @@ echo "<style>
     .btn-success:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
     }
     
     .floating-elements {
@@ -559,7 +630,6 @@ echo "<style>
         position: absolute;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
-        animation: float 6s ease-in-out infinite;
     }
     
     .floating-circle:nth-child(1) {
@@ -567,7 +637,6 @@ echo "<style>
         height: 100px;
         top: 10%;
         left: 10%;
-        animation-delay: 0s;
     }
     
     .floating-circle:nth-child(2) {
@@ -575,7 +644,6 @@ echo "<style>
         height: 80px;
         top: 60%;
         right: 10%;
-        animation-delay: 2s;
     }
     
     .floating-circle:nth-child(3) {
@@ -583,7 +651,6 @@ echo "<style>
         height: 60px;
         bottom: 20%;
         left: 20%;
-        animation-delay: 4s;
     }
     
     .floating-circle:nth-child(4) {
@@ -591,70 +658,6 @@ echo "<style>
         height: 120px;
         top: 30%;
         right: 30%;
-        animation-delay: 1s;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
-    }
-    @keyframes modalFadeIn {
-        0% { 
-            opacity: 0;
-            backdrop-filter: blur(0px);
-        }
-        100% { 
-            opacity: 1;
-            backdrop-filter: blur(10px);
-        }
-    }
-    @keyframes modalSlideIn {
-        0% {
-            opacity: 0;
-            transform: translateY(-100px) scale(0.8) rotateX(20deg);
-        }
-        50% {
-            opacity: 0.8;
-            transform: translateY(10px) scale(1.02) rotateX(-5deg);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0) scale(1) rotateX(0deg);
-        }
-    }
-    @keyframes shimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-    }
-    @keyframes bodySlideIn {
-        0% {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    @keyframes messageFadeIn {
-        0% {
-            opacity: 0;
-            transform: scale(0.8);
-        }
-        100% {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-    @keyframes footerSlideUp {
-        0% {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .confirmation-modal {
@@ -665,9 +668,8 @@ echo "<style>
         top: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+        background: linear-gradient(135deg, rgba(197, 180, 227, 0.85) 0%, rgba(184, 181, 255, 0.85) 100%);
         backdrop-filter: blur(10px);
-        animation: modalFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .modal-content {
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
@@ -681,7 +683,6 @@ echo "<style>
             0 30px 100px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        animation: modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         overflow: hidden;
         position: relative;
         transform-style: preserve-3d;
@@ -693,15 +694,13 @@ echo "<style>
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+        background: linear-gradient(90deg, #C5B4E3 0%, #B8B5FF 50%, #C5B4E3 100%);
         background-size: 200% 100%;
-        animation: shimmer 2s ease-in-out infinite;
     }
     .modal-body {
         padding: 40px 45px 35px;
         text-align: center;
         position: relative;
-        animation: bodySlideIn 0.8s ease-out 0.2s both;
     }
     .modal-message {
         font-size: 1.2rem;
@@ -710,21 +709,18 @@ echo "<style>
         line-height: 1.7;
         font-weight: 500;
         position: relative;
-        animation: messageFadeIn 1s ease-out 0.4s both;
     }
     .modal-message::before {
         content: '⚠️';
         display: block;
         font-size: 3rem;
         margin-bottom: 20px;
-        animation: bounce 2s infinite;
     }
     .modal-footer {
         padding: 0 45px 40px;
         display: flex;
         gap: 20px;
         justify-content: center;
-        animation: footerSlideUp 0.8s ease-out 0.6s both;
     }
     .modal-btn {
         padding: 16px 32px;
@@ -759,15 +755,15 @@ echo "<style>
         left: 100%;
     }
     .modal-btn-secondary {
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-        color: #4a5568;
-        border: 2px solid #e2e8f0;
+        background: linear-gradient(135deg, #ffffff 0%, #E8DFFF 100%);
+        color: #7C73E6;
+        border: 2px solid #DCD0FF;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     .modal-btn-secondary:hover {
-        background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, #E8DFFF 0%, #DCD0FF 100%);
         transform: translateY(-4px) scale(1.05);
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 12px 35px rgba(157, 141, 241, 0.2);
     }
     .modal-btn-danger {
         background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
@@ -826,15 +822,158 @@ echo "<div class='floating-circle'></div>";
 echo "<div class='floating-circle'></div>";
 echo "</div>";
 
+// Admin Sidebar Navigation
+echo "<div class='admin-sidebar'>";
+echo "<div class='sidebar-content'>";
+echo "<!-- DASHBOARD Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>DASHBOARD</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/my/' class='sidebar-link'>";
+echo "<i class='fa fa-th-large sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Admin Dashboard</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/admin/search.php' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Site Administration</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Community</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Enrollments</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- TEACHERS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>TEACHERS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item active'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/teachers_list.php' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Teachers</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-medal sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Master Trainers</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- COURSES & PROGRAMS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
+echo "<i class='fa fa-book sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Courses & Programs</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Certifications</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Assessments</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-school sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Schools</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- INSIGHTS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>INSIGHTS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/local/edwiserreports/index.php' class='sidebar-link'>";
+echo "<i class='fa fa-chart-bar sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Analytics</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-chart-line sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Predictive Models</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-file-alt sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Reports</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-map sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Competencies Map</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- SETTINGS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>SETTINGS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>System Settings</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/users_management_dashboard.php' class='sidebar-link'>";
+echo "<i class='fa fa-user-friends sidebar-icon'></i>";
+echo "<span class='sidebar-text'>User Management</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Cohort Navigation</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+echo "</div>";
+echo "</div>";
+
+// Main content area with sidebar
+echo "<div class='admin-main-content'>";
+
 echo "<div class='view-container'>";
 
 // Profile Header
 echo "<div class='profile-header'>";
 echo "<div class='header-background'>";
 echo "<div class='breadcrumb'>";
-echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
-echo "<a href='teachers_list.php'>Teachers</a> / ";
-echo "<span class='breadcrumb-item'>Teacher Profile</span>";
+
 echo "</div>";
 echo "</div>";
 
@@ -1057,7 +1196,36 @@ window.onclick = function(event) {
         closeConfirmationModal();
     }
 }
+
+// Sidebar toggle function
+function toggleSidebar() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    sidebar.classList.toggle('sidebar-open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.admin-sidebar');
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove('sidebar-open');
+        }
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
 </script>";
+
+// Close admin-main-content div
+echo "</div>";
 
 echo $OUTPUT->footer();
 ?>

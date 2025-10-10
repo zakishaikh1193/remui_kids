@@ -201,7 +201,7 @@
 
 .users-management-dashboard {
     padding: 20px;
-    max-width: 1400px;
+    max-width: 1800px;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -222,15 +222,16 @@
 
 /* Header Styles */
 .dashboard-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #f3e5f5;
     border-radius: 20px;
-    padding: 40px;
+    padding: 25px 40px;
     margin-bottom: 30px;
-    color: white;
+    color: #7b1fa2;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 20px 40px rgba(123, 31, 162, 0.2);
     animation: slideInDown 0.8s ease-out;
+    text-align: center;
 }
 
 @keyframes slideInDown {
@@ -252,7 +253,7 @@
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: float 6s ease-in-out infinite;
+   
 }
 
 @keyframes float {
@@ -265,32 +266,33 @@
 }
 
 .dashboard-title {
-    font-size: 3rem;
-    font-weight: 800;
-    margin: 0 0 15px 0;
-    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #7b1fa2;
     position: relative;
     z-index: 2;
-    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    animation: titleGlow 2s ease-in-out infinite alternate;
+    text-shadow: 0 2px 4px rgba(123, 31, 162, 0.2);
+    
 }
 
 @keyframes titleGlow {
     from {
-        text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        text-shadow: 0 2px 4px rgba(123, 31, 162, 0.2);
     }
     to {
-        text-shadow: 0 4px 20px rgba(255,255,255,0.3);
+        text-shadow: 0 4px 12px rgba(123, 31, 162, 0.4);
     }
 }
 
 .dashboard-subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin: 0;
-    opacity: 0.9;
+    opacity: 0.8;
     position: relative;
     z-index: 2;
-    font-weight: 300;
+    font-weight: 400;
+    color: #7b1fa2;
 }
 
 /* Navigation Tabs */
@@ -545,7 +547,7 @@
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
-    animation: slideInUp 0.8s ease-out 0.6s both;
+    
 }
 
 .quick-actions-section::before {
@@ -556,7 +558,7 @@
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
+    
 }
 
 @keyframes rotate {
