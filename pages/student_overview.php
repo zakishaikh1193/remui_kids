@@ -118,6 +118,61 @@ $PAGE->requires->js_init_code('
     link.rel = "stylesheet";
     link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css";
     document.head.appendChild(link);
+    
+    // Add CSS to handle broken images
+    var style = document.createElement("style");
+    style.textContent = `
+        img[src*="image.php"] {
+            display: none !important;
+        }
+        img[src*="1760078324"] {
+            display: none !important;
+        }
+        .broken-image {
+            display: none !important;
+        }
+        img[src*="theme/image.php"] {
+            display: none !important;
+        }
+        img[src*="remui_kids/core"] {
+            display: none !important;
+        }
+        img[alt="message"], img[alt="addcontact"] {
+            display: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Debug: Log any image loading errors
+    window.addEventListener("error", function(e) {
+        if (e.target.tagName === "IMG") {
+            console.log("Broken image detected:", e.target.src);
+            e.target.style.display = "none";
+        }
+    }, true);
+    
+    // Debug: Check for any hidden image elements
+    setTimeout(function() {
+        var images = document.querySelectorAll("img");
+        console.log("Total images found:", images.length);
+        for (var i = 0; i < images.length; i++) {
+            console.log("Image " + i + ":", images[i].src);
+            // Hide any broken images
+            if (images[i].src.includes("image.php") || images[i].src.includes("1760078324")) {
+                images[i].style.display = "none";
+            }
+        }
+    }, 1000);
+    
+    // Prevent any broken images from loading
+    document.addEventListener("DOMContentLoaded", function() {
+        var images = document.querySelectorAll("img");
+        for (var i = 0; i < images.length; i++) {
+            images[i].addEventListener("error", function() {
+                this.style.display = "none";
+            });
+        }
+    });
 ');
 
 // Add Teacher Sidebar CSS
@@ -257,6 +312,19 @@ $PAGE->requires->js_init_code('
 // Include Moodle header for navigation bar
 echo $OUTPUT->header();
 
+// Add CSS to remove the default main container
+echo '<style>
+/* Neutralize the default main container */
+#region-main,
+[role="main"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+</style>';
+
 // Teacher dashboard layout wrapper and sidebar
 echo '<div class="teacher-dashboard-wrapper">';
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
@@ -271,7 +339,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">DASHBOARD</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/my/" class="sidebar-link"><i class="fa fa-th-large sidebar-icon"></i><span class="sidebar-text">Teacher Dashboard</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/index.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/teacher_courses.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-graduation-cap sidebar-icon"></i><span class="sidebar-text">Gradebook</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
 echo '      </ul>';
@@ -290,7 +358,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">STUDENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item active"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php" class="sidebar-link"><i class="fa fa-users sidebar-icon"></i><span class="sidebar-text">All Students</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/enrol/users.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/enroll_students.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Reports</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
@@ -338,11 +406,11 @@ echo html_writer::end_div();
 
 // Profile section inside container
 echo html_writer::start_div('', ['style' => 'display: flex; align-items: center; gap: 20px; margin-bottom: 20px;']);
-echo html_writer::img($templatecontext['student']['avatar_url'], 'Profile', ['style' => 'width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e5e7eb;']);
+echo html_writer::img($templatecontext['student']['avatar_url'], 'Profile', ['style' => 'width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e5e7eb;', 'onerror' => 'this.style.display="none"']);
 echo html_writer::start_div('', ['style' => 'display: flex; flex-direction: column; gap: 8px;']);
 echo html_writer::tag('h1', fullname($student), ['style' => 'margin: 0; font-size: 24px; font-weight: 600; color: #1f2937;']);
 echo html_writer::start_div('', ['style' => 'display: flex; align-items: center; gap: 8px;']);
-echo html_writer::tag('span', 'Message', ['style' => 'color: #6b7280; font-size: 14px;']);
+echo html_writer::tag('span', '<i class="fas fa-envelope"></i> Message', ['style' => 'color: #6b7280; font-size: 14px;']);
 echo html_writer::end_div();
 echo html_writer::end_div();
 echo html_writer::end_div();
