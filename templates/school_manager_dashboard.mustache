@@ -1,0 +1,1118 @@
+{{!
+    School Manager Dashboard Template for remui_kids theme
+    
+    This template provides a school manager dashboard interface with sidebar navigation
+    matching the design from the provided image exactly.
+}}
+
+{{> theme_remui_kids/common_start}}
+
+<!-- School Manager Dashboard CSS -->
+<style>
+/* School Manager Dashboard Styles - Cache Buster: {{cache_buster}} */
+
+/* Scoped reset styles - only apply to school manager dashboard */
+.school-manager-dashboard-wrapper * {
+    box-sizing: border-box;
+}
+
+/* Main Dashboard Wrapper */
+.school-manager-dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    z-index: 1;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* School Manager Sidebar */
+.school-manager-sidebar {
+    width: 250px;
+    background: #f8f9fa;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    border-right: 1px solid #e0e0e0;
+}
+
+.school-manager-sidebar.sidebar-open {
+    transform: translateX(0);
+}
+
+/* Sidebar Content */
+.sidebar-content {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Green Header Section */
+.sidebar-header {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    padding: 25px 15px;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.header-icon {
+    width: 55px;
+    height: 55px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.header-icon i {
+    font-size: 22px;
+    color: #28a745;
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 12px;
+}
+
+.header-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Sidebar Navigation */
+.sidebar-navigation {
+    flex: 1;
+    padding: 18px 0;
+}
+
+/* Main Navigation Items */
+.sidebar-item {
+    margin: 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-item:last-child {
+    border-bottom: none;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.sidebar-link:hover {
+    background-color: #f8f9fa;
+    color: #28a745;
+    text-decoration: none;
+}
+
+.sidebar-item.active .sidebar-link {
+    background-color: transparent;
+    color: #2196f3;
+    border-bottom: 2px solid #2196f3;
+    border-right: none;
+}
+
+.sidebar-icon {
+    width: 20px;
+    margin-right: 12px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sidebar-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Sidebar Sections */
+.sidebar-section {
+    margin-top: 18px;
+    padding: 0 18px;
+}
+
+.sidebar-category {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    padding: 0 5px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu .sidebar-item {
+    border-bottom: none;
+    margin-bottom: 2px;
+}
+
+.sidebar-menu .sidebar-link {
+    padding: 12px 15px;
+    font-size: 13px;
+}
+
+/* Main Content Area */
+.school-manager-main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    width: 100%;
+}
+
+/* Welcome Banner - Soft Pastel Gradient */
+.welcome-banner {
+    background: linear-gradient(135deg, #f8bbd9, #b8e6b8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.banner-text {
+    flex: 1;
+}
+
+.banner-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
+
+.banner-subtitle {
+    font-size: 16px;
+    color: #6c757d;
+    margin: 0 0 5px 0;
+    opacity: 0.9;
+}
+
+.banner-date {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.refresh-stats-btn {
+    background: white;
+    color: #9c27b0;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.refresh-stats-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.refresh-stats-btn i {
+    font-size: 16px;
+}
+
+/* Statistics Cards Section - Matching Image Exactly */
+.stats-section {
+    margin-bottom: 25px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.stat-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #28a745;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.stat-status i {
+    font-size: 10px;
+}
+
+.stat-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.stat-icon.teachers {
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+}
+
+.stat-icon.enrolled {
+    background: linear-gradient(135deg, #e91e63, #c2185b);
+}
+
+.stat-icon.courses {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+}
+
+.stat-icon.enrollments {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+}
+
+.stat-arrow {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    color: #6c757d;
+    font-size: 16px;
+}
+
+/* Quick Actions Section - Matching Image Exactly */
+.quick-actions-section {
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.action-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 32px;
+}
+
+.action-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.action-description {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.action-btn {
+    background: #9c27b0;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(156, 39, 176, 0.3);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.action-btn:hover {
+    background: #7b1fa2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
+    text-decoration: none;
+    color: white;
+}
+
+/* Recent Activity Section */
+.recent-activity-section {
+    margin-bottom: 25px;
+}
+
+.activity-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-height: 180px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.activity-indicator {
+    width: 4px;
+    height: 40px;
+    background: #2196f3;
+    border-radius: 2px;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.activity-text {
+    flex: 1;
+}
+
+.activity-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.activity-time {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* Floating Action Buttons */
+.floating-action-buttons {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+}
+
+.fab-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.fab-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.fab-accessibility {
+    background: #333;
+}
+
+.fab-help {
+    background: #9c27b0;
+}
+
+/* Interactive Elements */
+.btn-clicked {
+    transform: scale(0.95) !important;
+}
+
+.stat-card-hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Notification Styles */
+.dashboard-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.dashboard-notification.success {
+    background: #4caf50;
+}
+
+.dashboard-notification.error {
+    background: #f44336;
+}
+
+.dashboard-notification.info {
+    background: #2196f3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar-toggle {
+        display: block;
+    }
+    
+    .school-manager-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .school-manager-main-content {
+        margin-left: 0;
+        left: 0;
+        width: 100%;
+    }
+    
+    .dashboard-container {
+        padding: 20px 15px;
+    }
+    
+    .banner-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .banner-title {
+        font-size: 24px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-banner {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-title {
+        font-size: 20px;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .action-card {
+        padding: 25px;
+    }
+    
+    .action-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+}
+</style>
+
+{{#school_manager_dashboard}}
+<!-- Full Screen School Manager Dashboard Wrapper -->
+<div class="school-manager-dashboard-wrapper">
+    <!-- Mobile Sidebar Toggle Button -->
+    <button class="sidebar-toggle" onclick="toggleSchoolManagerSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
+
+<!-- School Manager Sidebar Navigation -->
+<div class="school-manager-sidebar">
+    <div class="sidebar-content">
+        <!-- Green Header Section -->
+        <div class="sidebar-header">
+            <div class="header-icon">
+                <i class="fa fa-graduation-cap"></i>
+            </div>
+            <div class="header-title">School Dashboard</div>
+            <div class="header-subtitle">{{user.fullname}}</div>
+            <div class="header-badge">School Manager</div>
+        </div>
+
+        <!-- Main Navigation Links -->
+        <div class="sidebar-navigation">
+            <!-- School Admin Dashboard (Active) -->
+            <div class="sidebar-item active">
+                <a href="{{config.wwwroot}}/my/" class="sidebar-link">
+                    <i class="fa fa-globe sidebar-icon"></i>
+                    <span class="sidebar-text">School Dashboard</span>
+                </a>
+            </div>
+
+
+            <!-- Teacher Management -->
+            <div class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fa fa-chalkboard-teacher sidebar-icon"></i>
+                    <span class="sidebar-text">Teacher Management</span>
+                </a>
+            </div>
+
+            <!-- Student Management -->
+            <div class="sidebar-item">
+                <a href="#" class="sidebar-link">
+                    <i class="fa fa-user-graduate sidebar-icon"></i>
+                    <span class="sidebar-text">Student Management</span>
+                </a>
+            </div>
+
+            <!-- MANAGEMENT Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-category">MANAGEMENT</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-book sidebar-icon"></i>
+                            <span class="sidebar-text">Course Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-user-plus sidebar-icon"></i>
+                            <span class="sidebar-text">Enrollments</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-user-plus sidebar-icon"></i>
+                            <span class="sidebar-text">Add Users</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-upload sidebar-icon"></i>
+                            <span class="sidebar-text">Bulk Upload</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- REPORTS & ANALYTICS Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-category">REPORTS & ANALYTICS</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-chart-bar sidebar-icon"></i>
+                            <span class="sidebar-text">Analytics Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-file-alt sidebar-icon"></i>
+                            <span class="sidebar-text">User Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area with Sidebar -->
+<div class="school-manager-main-content">
+    <div class="dashboard-container">
+        
+        <!-- Welcome Banner - Matching Image Exactly -->
+        <div class="welcome-banner">
+            <div class="banner-content">
+                <div class="banner-text">
+                    <h1 class="banner-title">Welcome to School Dashboard</h1>
+                    <p class="banner-subtitle">School Manager Dashboard - {{user.fullname}}</p>
+                </div>
+                <div class="banner-date">
+                    Today: Thursday, October 9, 2025
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards Section - Matching Image Exactly -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                {{#school_manager_stats}}
+                <!-- Total Teachers Card -->
+                <div class="stat-card">
+                    <div class="stat-number">{{total_teachers}}</div>
+                    <div class="stat-label">TOTAL TEACHERS</div>
+                    <div class="stat-status">
+                        <i class="fa fa-arrow-up"></i>
+                        Active
+                    </div>
+                    <div class="stat-icon teachers">
+                        <i class="fa fa-chalkboard-teacher"></i>
+                    </div>
+                </div>
+
+                <!-- Enrolled Teachers Card -->
+                <div class="stat-card">
+                    <div class="stat-number">{{enrolled_teachers}}</div>
+                    <div class="stat-label">ENROLLED TEACHERS</div>
+                    <div class="stat-status">
+                        <i class="fa fa-arrow-up"></i>
+                        Active
+                    </div>
+                    <div class="stat-icon enrolled">
+                        <i class="fa fa-user-graduate"></i>
+                    </div>
+                </div>
+
+                <!-- Available Courses Card -->
+                <div class="stat-card">
+                    <div class="stat-number">{{available_courses}}</div>
+                    <div class="stat-label">AVAILABLE COURSES</div>
+                    <div class="stat-status">
+                        <i class="fa fa-arrow-up"></i>
+                        Active
+                    </div>
+                    <div class="stat-icon courses">
+                        <i class="fa fa-book"></i>
+                    </div>
+                </div>
+
+                <!-- Active Enrollments Card -->
+                <div class="stat-card">
+                    <div class="stat-number">{{active_enrollments}}</div>
+                    <div class="stat-label">ACTIVE ENROLLMENTS</div>
+                    <div class="stat-status">
+                        <i class="fa fa-arrow-up"></i>
+                        Current
+                    </div>
+                    <div class="stat-icon enrollments">
+                        <i class="fa fa-user-plus"></i>
+                    </div>
+                </div>
+                {{/school_manager_stats}}
+            </div>
+        </div>
+
+        <!-- Quick Actions Section - Matching Image Exactly -->
+        <div class="quick-actions-section">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="quick-actions-grid">
+                <!-- Add Teacher Card -->
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fa fa-user-plus"></i>
+                    </div>
+                    <h3 class="action-title">Add Teacher</h3>
+                    <p class="action-description">Add new teachers to your school</p>
+                    <a href="{{wwwroot}}/theme/remui_kids/school_manager/add_teacher.php" class="action-btn" target="_self">Add Teacher</a>
+                </div>
+
+                <!-- Enroll Teacher Card -->
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fa fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="action-title">Enroll Teacher</h3>
+                    <p class="action-description">Add teachers to your school</p>
+                    <button class="action-btn">Enroll Teacher</button>
+                </div>
+
+                <!-- View Courses Card -->
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fa fa-book"></i>
+                    </div>
+                    <h3 class="action-title">View Courses</h3>
+                    <p class="action-description">View and manage available courses</p>
+                    <button class="action-btn">View Courses</button>
+                </div>
+
+                <!-- View Reports Card -->
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fa fa-chart-bar"></i>
+                    </div>
+                    <h3 class="action-title">View Reports</h3>
+                    <p class="action-description">Access detailed analytics and reports</p>
+                    <button class="action-btn">View Reports</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="recent-activity-section">
+            <h2 class="section-title">Recent Activity</h2>
+            <div class="activity-content">
+                <div class="activity-item">
+                    <div class="activity-indicator"></div>
+                    <div class="activity-text">
+                        <div class="activity-title">New Teacher Added</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-indicator"></div>
+                    <div class="activity-text">
+                        <div class="activity-title">Course Enrollment Updated</div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="floating-action-buttons">
+    <button class="fab-button fab-help" title="Help">
+        <i class="fa fa-question"></i>
+    </button>
+    <button class="fab-button fab-accessibility" title="Accessibility">
+        <i class="fa fa-user"></i>
+    </button>
+</div>
+
+{{/school_manager_dashboard}}
+
+<!-- Regular Dashboard Content (fallback) -->
+<div class="dashboard-content">
+    <div id="region-main-box" class="d-print-block">
+        <section id="region-main" class="d-print-block" aria-label="{{#str}}content{{/str}}">
+            <div class="rui-course-content">
+                {{{ output.main_content }}}
+            </div>
+        </section>
+    </div>
+</div>
+
+{{> theme_remui/common_end}}
+
+{{#js}}
+// School Manager Dashboard JavaScript
+require(['jquery'], function($) {
+    $(document).ready(function() {
+        // Initialize dashboard components
+        initializeDashboard();
+    });
+    
+    function initializeDashboard() {
+        // Initialize sidebar functionality
+        initializeSidebar();
+        
+        // Initialize refresh stats button
+        initializeRefreshButton();
+        
+        // Initialize action buttons
+        initializeActionButtons();
+        
+        // Initialize stat cards
+        initializeStatCards();
+    }
+    
+    function initializeSidebar() {
+        // Handle sidebar toggle
+        $('.sidebar-toggle').on('click', function() {
+            $('.school-manager-sidebar').toggleClass('sidebar-open');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        $(document).on('click', function(event) {
+            if (window.innerWidth <= 768) {
+                if (!$(event.target).closest('.school-manager-sidebar').length && 
+                    !$(event.target).closest('.sidebar-toggle').length) {
+                    $('.school-manager-sidebar').removeClass('sidebar-open');
+                }
+            }
+        });
+        
+        // Handle window resize
+        $(window).on('resize', function() {
+            if (window.innerWidth > 768) {
+                $('.school-manager-sidebar').removeClass('sidebar-open');
+            }
+        });
+        
+        // Handle sidebar navigation clicks
+        $('.school-manager-sidebar .sidebar-link').on('click', function(e) {
+            var $link = $(this);
+            var href = $link.attr('href');
+            
+            // Remove active class from all sidebar items
+            $('.school-manager-sidebar .sidebar-item').removeClass('active');
+            
+            // Add active class to current item
+            $link.closest('.sidebar-item').addClass('active');
+            
+            // Handle placeholder links
+            if (href === '#' || !href) {
+                e.preventDefault();
+                console.log('Navigation to:', $link.find('.sidebar-text').text());
+            }
+        });
+    }
+    
+    function initializeRefreshButton() {
+        $('.refresh-stats-btn').on('click', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $icon = $btn.find('i');
+            
+            // Add loading animation
+            $icon.addClass('fa-spin');
+            $btn.prop('disabled', true);
+            
+            // Refresh the page to get updated stats
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+        });
+    }
+    
+    function initializeActionButtons() {
+        // Only handle button elements, not anchor elements
+        $('.action-btn:not(a)').on('click', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var action = $btn.text();
+            
+            // Add click animation
+            $btn.addClass('btn-clicked');
+            setTimeout(function() {
+                $btn.removeClass('btn-clicked');
+            }, 200);
+            
+            // Handle specific actions
+            switch(action) {
+                case 'Enroll Teacher':
+                    showNotification('Enroll Teacher functionality will be implemented', 'info');
+                    break;
+                case 'View Courses':
+                    showNotification('View Courses functionality will be implemented', 'info');
+                    break;
+                case 'View Reports':
+                    showNotification('View Reports functionality will be implemented', 'info');
+                    break;
+            }
+        });
+        
+        // Add click animation for anchor elements without preventing navigation
+        $('.action-btn').on('click', function(e) {
+            var $btn = $(this);
+            $btn.addClass('btn-clicked');
+            setTimeout(function() {
+                $btn.removeClass('btn-clicked');
+            }, 200);
+        });
+    }
+    
+    function initializeStatCards() {
+        // Add hover effects to stat cards
+        $('.stat-card').hover(
+            function() {
+                $(this).addClass('stat-card-hover');
+            },
+            function() {
+                $(this).removeClass('stat-card-hover');
+            }
+        );
+        
+        // Add click handlers for stat cards
+        $('.stat-card').on('click', function() {
+            var $card = $(this);
+            var label = $card.find('.stat-label').text();
+            
+            showNotification('Viewing details for: ' + label, 'info');
+        });
+    }
+    
+    function showNotification(message, type) {
+        // Create notification element
+        var $notification = $('<div class="dashboard-notification ' + type + '">' + message + '</div>');
+        
+        // Add styles
+        $notification.css({
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3',
+            color: 'white',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            zIndex: '9999',
+            fontSize: '14px',
+            fontWeight: '500',
+            transform: 'translateX(100%)',
+            transition: 'transform 0.3s ease'
+        });
+        
+        // Add to page
+        $('body').append($notification);
+        
+        // Animate in
+        setTimeout(function() {
+            $notification.css('transform', 'translateX(0)');
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(function() {
+            $notification.css('transform', 'translateX(100%)');
+            setTimeout(function() {
+                $notification.remove();
+            }, 300);
+        }, 3000);
+    }
+});
+{{/js}}
+
+</div> <!-- End school-manager-dashboard-wrapper -->

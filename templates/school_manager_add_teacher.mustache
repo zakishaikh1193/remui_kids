@@ -1,0 +1,898 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_remui_kids/school_manager_add_teacher
+
+    School Manager Add Teacher Form Template
+
+    Context variables required for this template:
+    * wwwroot - Moodle wwwroot URL
+    * sesskey - Session key
+    * user - Current user information
+    * success_message - Success message if any
+    * error_message - Error message if any
+    * form_data - Form data for repopulation
+
+    Example context (json):
+    {
+        "wwwroot": "http://localhost/moodle",
+        "sesskey": "abc123",
+        "user": {
+            "fullname": "John Doe",
+            "firstname": "John",
+            "lastname": "Doe"
+        },
+        "success_message": "Teacher added successfully",
+        "error_message": "",
+        "form_data": {
+            "firstname": "",
+            "lastname": "",
+            "email": "",
+            "username": "",
+            "phone": "",
+            "department": ""
+        }
+    }
+}}
+
+<style>
+/* Add Teacher Form Styles - Using School Dashboard Layout - Updated: 2025-01-10-v4 */
+
+/* Hide default Moodle page elements */
+body.path-theme-remui-kids-school-manager-add-teacher {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body.path-theme-remui-kids-school-manager-add-teacher #page,
+body.path-theme-remui-kids-school-manager-add-teacher #page-content,
+body.path-theme-remui-kids-school-manager-add-teacher .main-content,
+body.path-theme-remui-kids-school-manager-add-teacher .container-fluid,
+body.path-theme-remui-kids-school-manager-add-teacher .page,
+body.path-theme-remui-kids-school-manager-add-teacher .page-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    background: transparent !important;
+}
+
+/* Hide Moodle header and footer */
+body.path-theme-remui-kids-school-manager-add-teacher #page-header,
+body.path-theme-remui-kids-school-manager-add-teacher #page-footer,
+body.path-theme-remui-kids-school-manager-add-teacher .navbar,
+body.path-theme-remui-kids-school-manager-add-teacher .footer {
+    display: none !important;
+}
+
+/* Force sidebar visibility - Override any Moodle CSS */
+.school-manager-sidebar,
+.school-manager-sidebar *,
+.sidebar-content,
+.sidebar-header,
+.sidebar-navigation,
+.sidebar-item,
+.sidebar-link {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.sidebar-link {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Scoped reset styles - only apply to add teacher page */
+.add-teacher-dashboard-wrapper * {
+    box-sizing: border-box;
+}
+
+/* Main Dashboard Wrapper - Same as School Dashboard */
+.add-teacher-dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    z-index: 9999;
+    width: 100vw;
+}
+
+/* Sidebar */
+.school-manager-sidebar {
+    width: 250px !important;
+    background: #ffffff !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    border-right: 1px solid #e0e0e0 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.sidebar-content {
+    padding: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.sidebar-header {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white !important;
+    padding: 25px 15px !important;
+    text-align: center !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.header-icon {
+    width: 55px;
+    height: 55px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.header-icon i {
+    font-size: 22px;
+    color: white;
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.header-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.sidebar-navigation {
+    padding: 18px 0 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.sidebar-item {
+    margin-bottom: 5px;
+}
+
+.sidebar-item.active .sidebar-link {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-right: 3px solid #1976d2;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.sidebar-link:hover {
+    background: #e9ecef;
+    color: #2c3e50;
+}
+
+.sidebar-icon {
+    width: 20px;
+    margin-right: 12px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sidebar-text {
+    font-weight: 500;
+}
+
+.sidebar-section {
+    margin-top: 20px;
+    padding: 0 18px;
+}
+
+.sidebar-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    padding: 0 0 5px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Main Content - Same as School Dashboard */
+.add-teacher-main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Add Teacher Container - Same as School Dashboard */
+.add-teacher-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background: transparent;
+}
+
+/* Header - Direct on background */
+.header-section {
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    display: inline-block;
+}
+
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.back-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    float: right;
+    margin-top: -40px;
+}
+
+.back-btn:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+/* Error Message */
+.error-message {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+}
+
+.error-message h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.error-message ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.error-message li {
+    color: #dc3545;
+    font-size: 14px;
+}
+
+/* Form */
+.add-teacher-form {
+    background: transparent;
+    padding: 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group.two-columns {
+    grid-column: 1 / -1;
+}
+
+/* First row: Username, Password, First Name, Last Name */
+.form-group.row1-col1 {
+    grid-column: 1;
+}
+
+.form-group.row1-col2 {
+    grid-column: 2;
+}
+
+.form-group.row1-col3 {
+    grid-column: 3;
+}
+
+.form-group.row1-col4 {
+    grid-column: 4;
+}
+
+/* Second row: Email, Phone, City, Country */
+.form-group.row2-col1 {
+    grid-column: 1;
+}
+
+.form-group.row2-col2 {
+    grid-column: 2;
+}
+
+.form-group.row2-col3 {
+    grid-column: 3;
+}
+
+.form-group.row2-col4 {
+    grid-column: 4;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.required-indicator {
+    color: #dc3545;
+    margin-left: 3px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    background: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design - Same as School Dashboard */
+@media (max-width: 1200px) {
+    .school-manager-sidebar {
+        width: 200px;
+    }
+    
+    .add-teacher-main-content {
+        margin-left: 200px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .form-group.row1-col1,
+    .form-group.row1-col2,
+    .form-group.row2-col1,
+    .form-group.row2-col2 {
+        grid-column: 1;
+    }
+    
+    .form-group.row1-col3,
+    .form-group.row1-col4,
+    .form-group.row2-col3,
+    .form-group.row2-col4 {
+        grid-column: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .school-manager-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        position: fixed;
+        z-index: 1000;
+    }
+    
+    .add-teacher-main-content {
+        margin-left: 0;
+        margin-right: 0;
+        max-width: 100%;
+    }
+    
+    .add-teacher-container {
+        padding: 20px 15px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-group.full-width,
+    .form-group.two-columns,
+    .form-group.row1-col1,
+    .form-group.row1-col2,
+    .form-group.row1-col3,
+    .form-group.row1-col4,
+    .form-group.row2-col1,
+    .form-group.row2-col2,
+    .form-group.row2-col3,
+    .form-group.row2-col4 {
+        grid-column: 1;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .back-btn {
+        float: none;
+        margin-top: 10px;
+        display: block;
+    }
+}
+</style>
+
+<!-- Full Screen Add Teacher Dashboard Wrapper -->
+<div class="add-teacher-dashboard-wrapper">
+    <!-- Sidebar -->
+    <div class="school-manager-sidebar">
+        <div class="sidebar-content">
+            <!-- Green Header Section -->
+            <div class="sidebar-header">
+                <div class="header-icon">
+                    <i class="fa fa-graduation-cap"></i>
+                </div>
+                <div class="header-title">School Dashboard</div>
+                <div class="header-subtitle">{{user.fullname}}</div>
+                <div class="header-badge">School Manager</div>
+            </div>
+
+            <!-- Main Navigation Links -->
+            <div class="sidebar-navigation">
+                <!-- School Dashboard -->
+                <div class="sidebar-item">
+                    <a href="{{wwwroot}}/my/" class="sidebar-link">
+                        <i class="fa fa-globe sidebar-icon"></i>
+                        <span class="sidebar-text">School Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Teacher Management -->
+                <div class="sidebar-item active">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-chalkboard-teacher sidebar-icon"></i>
+                        <span class="sidebar-text">Teacher Management</span>
+                    </a>
+                </div>
+
+                <!-- Student Management -->
+                <div class="sidebar-item">
+                    <a href="#" class="sidebar-link">
+                        <i class="fa fa-user-graduate sidebar-icon"></i>
+                        <span class="sidebar-text">Student Management</span>
+                    </a>
+                </div>
+
+                <!-- MANAGEMENT Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">MANAGEMENT</div>
+                    
+                    <div class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-book sidebar-icon"></i>
+                            <span class="sidebar-text">Course Management</span>
+                        </a>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-users sidebar-icon"></i>
+                            <span class="sidebar-text">Enrollments</span>
+                        </a>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-user-plus sidebar-icon"></i>
+                            <span class="sidebar-text">Add Users</span>
+                        </a>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-upload sidebar-icon"></i>
+                            <span class="sidebar-text">Bulk Upload</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- REPORTS & ANALYTICS Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">REPORTS & ANALYTICS</div>
+                    
+                    <div class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-chart-bar sidebar-icon"></i>
+                            <span class="sidebar-text">Analytics Dashboard</span>
+                        </a>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-file-alt sidebar-icon"></i>
+                            <span class="sidebar-text">User Reports</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="add-teacher-main-content">
+        <div class="add-teacher-container">
+            <!-- Page Header - Direct on background -->
+            <div class="header-section">
+                <h1 class="page-title">Add New Teacher</h1>
+                <a href="{{wwwroot}}/my/" class="back-btn">
+                    <i class="fa fa-arrow-left"></i> Back
+                </a>
+                <div class="clearfix"></div>
+            </div>
+
+        <!-- Error Message -->
+        {{#error_message}}
+        <div class="error-message">
+            <h4>Please fix the following errors:</h4>
+            <ul>
+                <li>{{error_message}}</li>
+            </ul>
+        </div>
+        {{/error_message}}
+
+        <!-- Success Message -->
+        {{#success_message}}
+        <div class="alert alert-success">
+            <i class="fa fa-check-circle"></i> {{success_message}}
+        </div>
+        {{/success_message}}
+
+        <!-- Add Teacher Form -->
+        <form class="add-teacher-form" method="POST" action="">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+            <div class="form-grid">
+                <!-- First Row: Username, Password, First Name, Last Name -->
+                <!-- Username -->
+                <div class="form-group row1-col1">
+                    <label for="username">Username <span class="required-indicator">*</span></label>
+                    <input type="text" id="username" name="username" 
+                           value="{{form_data.username}}" required>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group row1-col2">
+                    <label for="password">Password <span class="required-indicator">*</span></label>
+                    <input type="password" id="password" name="password" 
+                           placeholder="Enter password" required>
+                </div>
+
+                <!-- First Name -->
+                <div class="form-group row1-col3">
+                    <label for="firstname">First Name <span class="required-indicator">*</span></label>
+                    <input type="text" id="firstname" name="firstname" 
+                           value="{{form_data.firstname}}" required>
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group row1-col4">
+                    <label for="lastname">Last Name <span class="required-indicator">*</span></label>
+                    <input type="text" id="lastname" name="lastname" 
+                           value="{{form_data.lastname}}" required>
+                </div>
+
+                <!-- Second Row: Email, Phone, City, Country -->
+                <!-- Email -->
+                <div class="form-group row2-col1">
+                    <label for="email">Email <span class="required-indicator">*</span></label>
+                    <input type="email" id="email" name="email" 
+                           value="{{form_data.email}}" required>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group row2-col2">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" 
+                           value="{{form_data.phone}}" placeholder="Enter phone">
+                </div>
+
+                <!-- City -->
+                <div class="form-group row2-col3">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" 
+                           value="{{form_data.city}}" placeholder="Enter city">
+                </div>
+
+                <!-- Country -->
+                <div class="form-group row2-col4">
+                    <label for="country">Country</label>
+                    <select id="country" name="country">
+                        <option value="">Select Country</option>
+                        <option value="SA" {{#form_data.country}}{{#selected_country_sa}}selected{{/selected_country_sa}}{{/form_data.country}}>Saudi Arabia</option>
+                        <option value="US" {{#form_data.country}}{{#selected_country_us}}selected{{/selected_country_us}}{{/form_data.country}}>United States</option>
+                        <option value="UK" {{#form_data.country}}{{#selected_country_uk}}selected{{/selected_country_uk}}{{/form_data.country}}>United Kingdom</option>
+                        <option value="CA" {{#form_data.country}}{{#selected_country_ca}}selected{{/selected_country_ca}}{{/form_data.country}}>Canada</option>
+                        <option value="AU" {{#form_data.country}}{{#selected_country_au}}selected{{/selected_country_au}}{{/form_data.country}}>Australia</option>
+                    </select>
+                </div>
+
+                <!-- Grade Level -->
+                <div class="form-group full-width">
+                    <label for="grade_level">Grade Level</label>
+                    <select id="grade_level" name="grade_level">
+                        <option value="">Select Grade</option>
+                        <option value="1" {{#form_data.grade_level}}{{#selected_grade_1}}selected{{/selected_grade_1}}{{/form_data.grade_level}}>Grade 1</option>
+                        <option value="2" {{#form_data.grade_level}}{{#selected_grade_2}}selected{{/selected_grade_2}}{{/form_data.grade_level}}>Grade 2</option>
+                        <option value="3" {{#form_data.grade_level}}{{#selected_grade_3}}selected{{/selected_grade_3}}{{/form_data.grade_level}}>Grade 3</option>
+                        <option value="4" {{#form_data.grade_level}}{{#selected_grade_4}}selected{{/selected_grade_4}}{{/form_data.grade_level}}>Grade 4</option>
+                        <option value="5" {{#form_data.grade_level}}{{#selected_grade_5}}selected{{/selected_grade_5}}{{/form_data.grade_level}}>Grade 5</option>
+                        <option value="6" {{#form_data.grade_level}}{{#selected_grade_6}}selected{{/selected_grade_6}}{{/form_data.grade_level}}>Grade 6</option>
+                        <option value="7" {{#form_data.grade_level}}{{#selected_grade_7}}selected{{/selected_grade_7}}{{/form_data.grade_level}}>Grade 7</option>
+                        <option value="8" {{#form_data.grade_level}}{{#selected_grade_8}}selected{{/selected_grade_8}}{{/form_data.grade_level}}>Grade 8</option>
+                        <option value="9" {{#form_data.grade_level}}{{#selected_grade_9}}selected{{/selected_grade_9}}{{/form_data.grade_level}}>Grade 9</option>
+                        <option value="10" {{#form_data.grade_level}}{{#selected_grade_10}}selected{{/selected_grade_10}}{{/form_data.grade_level}}>Grade 10</option>
+                        <option value="11" {{#form_data.grade_level}}{{#selected_grade_11}}selected{{/selected_grade_11}}{{/form_data.grade_level}}>Grade 11</option>
+                        <option value="12" {{#form_data.grade_level}}{{#selected_grade_12}}selected{{/selected_grade_12}}{{/form_data.grade_level}}>Grade 12</option>
+                    </select>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group full-width">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" placeholder="Additional notes about this teacher">{{form_data.notes}}</textarea>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-user-plus"></i> Add Teacher
+                </button>
+                <a href="{{wwwroot}}/my/" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+        </div>
+    </div>
+</div> <!-- End add-teacher-dashboard-wrapper -->
+
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.add-teacher-form');
+    const inputs = form.querySelectorAll('input[required]');
+    
+    // Add real-time validation
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('error')) {
+                validateField(this);
+            }
+        });
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields correctly.');
+        }
+    });
+    
+    function validateField(field) {
+        const value = field.value.trim();
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Remove existing error styling
+        field.classList.remove('error');
+        const existingError = field.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Required field validation
+        if (field.hasAttribute('required') && !value) {
+            isValid = false;
+            errorMessage = 'This field is required.';
+        }
+        
+        // Email validation
+        if (field.type === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                isValid = false;
+                errorMessage = 'Please enter a valid email address.';
+            }
+        }
+        
+        // Username validation
+        if (field.name === 'username' && value) {
+            const usernameRegex = /^[a-zA-Z0-9_]+$/;
+            if (!usernameRegex.test(value)) {
+                isValid = false;
+                errorMessage = 'Username can only contain letters, numbers, and underscores.';
+            }
+        }
+        
+        // Password validation
+        if (field.name === 'password' && value) {
+            if (value.length < 6) {
+                isValid = false;
+                errorMessage = 'Password must be at least 6 characters long.';
+            }
+        }
+        
+        // Show error if invalid
+        if (!isValid) {
+            field.classList.add('error');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'field-error';
+            errorDiv.style.color = '#dc3545';
+            errorDiv.style.fontSize = '12px';
+            errorDiv.style.marginTop = '5px';
+            errorDiv.textContent = errorMessage;
+            field.parentNode.appendChild(errorDiv);
+        }
+        
+        return isValid;
+    }
+});
+</script>
+
+<style>
+/* Additional error styling */
+.form-group input.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+</style>

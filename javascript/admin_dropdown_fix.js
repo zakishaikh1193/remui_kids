@@ -3,10 +3,10 @@
  * Fixes dropdown functionality issues in the admin dashboard
  */
 
-(function($) {
+define(['jquery'], function($) {
     'use strict';
 
-    var adminDropdownFix = {
+    return {
         init: function() {
             // Initialize dropdowns after DOM is ready
             $(document).ready(function() {
@@ -116,8 +116,4 @@
             });
         }
     };
-
-    // Call the init function to start the dropdown fix process
-    adminDropdownFix.init();
-
-})(jQuery);
+});

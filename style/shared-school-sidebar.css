@@ -1,0 +1,162 @@
+/* Shared School Manager Sidebar Styles */
+
+/* Force sidebar visibility - Override any Moodle CSS */
+.school-manager-sidebar,
+.school-manager-sidebar *,
+.sidebar-content,
+.sidebar-header,
+.sidebar-navigation,
+.sidebar-item,
+.sidebar-link {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.sidebar-link {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Sidebar */
+.school-manager-sidebar {
+    width: 250px !important;
+    background: #ffffff !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    border-right: 1px solid #e0e0e0 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.sidebar-content {
+    padding: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.sidebar-header {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white !important;
+    padding: 25px 15px !important;
+    text-align: center !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.header-icon {
+    width: 55px;
+    height: 55px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 22px;
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.header-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.sidebar-navigation {
+    padding: 18px 0 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.sidebar-item {
+    margin-bottom: 5px;
+}
+
+.sidebar-item.active .sidebar-link {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-right: 3px solid #1976d2;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0;
+}
+
+.sidebar-link:hover {
+    background: #f5f5f5;
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.sidebar-icon {
+    width: 20px;
+    margin-right: 12px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sidebar-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-section {
+    padding: 0 18px;
+    margin-top: 20px;
+}
+
+.sidebar-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding: 0 0 5px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .school-manager-sidebar {
+        width: 200px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .school-manager-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        position: fixed;
+        z-index: 1000;
+    }
+}

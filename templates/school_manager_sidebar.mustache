@@ -1,0 +1,97 @@
+{{!
+    School Manager Sidebar Template for remui_kids theme
+    
+    This template provides a reusable sidebar navigation for all school manager pages.
+}}
+
+<!-- School Manager Sidebar Navigation -->
+<div class="school-manager-sidebar">
+    <div class="sidebar-content">
+        <!-- Green Header Section -->
+        <div class="sidebar-header">
+            <div class="header-icon">
+                <i class="fa fa-graduation-cap"></i>
+            </div>
+            <div class="header-title">School Dashboard</div>
+            <div class="header-subtitle">Faisal Al-Faisaliah</div>
+            <div class="header-badge">School Manager</div>
+        </div>
+
+        <!-- Main Navigation Links -->
+        <div class="sidebar-navigation">
+            <!-- School Admin Dashboard -->
+            <div class="sidebar-item {{#dashboard_active}}active{{/dashboard_active}}">
+                <a href="{{config.wwwroot}}/my/" class="sidebar-link">
+                    <i class="fa fa-globe sidebar-icon"></i>
+                    <span class="sidebar-text">School Admin Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Teacher Management -->
+            <div class="sidebar-item {{#teacher_management_active}}active{{/teacher_management_active}}">
+                <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/teacher_management.php" class="sidebar-link">
+                    <i class="fa fa-user-tie sidebar-icon"></i>
+                    <span class="sidebar-text">Teacher Management</span>
+                </a>
+            </div>
+
+            <!-- Student Management -->
+            <div class="sidebar-item {{#student_management_active}}active{{/student_management_active}}">
+                <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/student_management.php" class="sidebar-link">
+                    <i class="fa fa-user-graduate sidebar-icon"></i>
+                    <span class="sidebar-text">Student Management</span>
+                </a>
+            </div>
+
+            <!-- MANAGEMENT Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-category">MANAGEMENT</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item {{#course_management_active}}active{{/course_management_active}}">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/course_management.php" class="sidebar-link">
+                            <i class="fa fa-book sidebar-icon"></i>
+                            <span class="sidebar-text">Course Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item {{#enrollments_active}}active{{/enrollments_active}}">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/enrollments.php" class="sidebar-link">
+                            <i class="fa fa-user-plus sidebar-icon"></i>
+                            <span class="sidebar-text">Enrollments</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item {{#add_users_active}}active{{/add_users_active}}">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/add_users.php" class="sidebar-link">
+                            <i class="fa fa-user-plus sidebar-icon"></i>
+                            <span class="sidebar-text">Add Users</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item {{#bulk_upload_active}}active{{/bulk_upload_active}}">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/bulk_upload.php" class="sidebar-link">
+                            <i class="fa fa-upload sidebar-icon"></i>
+                            <span class="sidebar-text">Bulk Upload</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- REPORTS & ANALYTICS Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-category">REPORTS & ANALYTICS</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item {{#analytics_dashboard_active}}active{{/analytics_dashboard_active}}">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/analytics_dashboard.php" class="sidebar-link">
+                            <i class="fa fa-chart-bar sidebar-icon"></i>
+                            <span class="sidebar-text">Analytics Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item {{#user_reports_active}}active{{/user_reports_active}}">
+                        <a href="{{config.wwwroot}}/theme/remui_kids/school_manager/user_reports.php" class="sidebar-link">
+                            <i class="fa fa-file-alt sidebar-icon"></i>
+                            <span class="sidebar-text">User Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
