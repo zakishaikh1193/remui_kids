@@ -625,6 +625,224 @@ function theme_remui_kids_get_elementary_dashboard_stats($userid) {
  * @param int $userid User ID
  * @return array Array containing assigned courses
  */
+/**
+ * Get course progress for a user
+ */
+function theme_remui_kids_get_course_progress($userid, $courseid) {
+    global $DB, $CFG;
+    
+    try {
+        // Include completion library
+        require_once($CFG->dirroot . '/lib/completionlib.php');
+        
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        $context = context_course::instance($courseid);
+        
+        // Get completion info
+        $completion = new completion_info($course);
+        
+        // Get all activities in the course
+        $activities = $DB->get_records_sql(
+            "SELECT cm.id, m.name as modname, cm.instance
+             FROM {course_modules} cm
+             JOIN {modules} m ON cm.module = m.id
+             WHERE cm.course = ? AND cm.visible = 1",
+            [$courseid]
+        );
+        
+        $total = count($activities);
+        $completed = 0;
+        
+        foreach ($activities as $activity) {
+            $cm = get_coursemodule_from_id($activity->modname, $activity->id);
+            
+            if ($completion->is_enabled($cm)) {
+                $completiondata = $completion->get_data($cm, false, $userid);
+                if ($completiondata->completionstate == COMPLETION_COMPLETE || 
+                    $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                    $completed++;
+                }
+            }
+        }
+        
+        $percentage = $total > 0 ? round(($completed / $total) * 100) : 0;
+        
+        return [
+            'total' => $total,
+            'completed' => $completed,
+            'percentage' => $percentage
+        ];
+        
+    } catch (Exception $e) {
+        // Fallback if completion tracking fails
+        return [
+            'total' => 0,
+            'completed' => 0,
+            'percentage' => 0
+        ];
+    }
+}
+
+/**
+ * Get lesson progress for a user
+ */
+function theme_remui_kids_get_lesson_progress($userid, $lessonid) {
+    global $DB, $CFG;
+    
+    try {
+        // Get lesson attempts
+        $attempts = $DB->get_records_sql(
+            "SELECT id, timeseen, grade, completed
+             FROM {lesson_attempts}
+             WHERE lessonid = ? AND userid = ?
+             ORDER BY timeseen DESC",
+            [$lessonid, $userid]
+        );
+        
+        $total_attempts = count($attempts);
+        $completed_attempts = 0;
+        $best_grade = 0;
+        $percentage = 0;
+        
+        if (!empty($attempts)) {
+            foreach ($attempts as $attempt) {
+                if ($attempt->completed) {
+                    $completed_attempts++;
+                }
+                if ($attempt->grade > $best_grade) {
+                    $best_grade = $attempt->grade;
+                }
+            }
+            
+            // Calculate percentage based on completion
+            $percentage = $completed_attempts > 0 ? 100 : 0;
+        }
+        
+        // Also check lesson completion status from course completion
+        require_once($CFG->dirroot . '/lib/completionlib.php');
+        $lesson_cm = $DB->get_record_sql(
+            "SELECT cm.id, cm.completion, cm.completionview
+             FROM {lesson} l
+             JOIN {course_modules} cm ON l.id = cm.instance
+             JOIN {modules} m ON cm.module = m.id AND m.name = 'lesson'
+             WHERE l.id = ?",
+            [$lessonid]
+        );
+        
+        if ($lesson_cm) {
+            $completion = new completion_info($DB->get_record('course', ['id' => $DB->get_field('lesson', 'course', ['id' => $lessonid])]));
+            $completiondata = $completion->get_completion($userid, $lesson_cm->id);
+            
+            if ($completiondata && $completiondata->completionstate == COMPLETION_COMPLETE) {
+                $percentage = 100;
+                $completed_attempts = 1;
+            }
+        }
+        
+        return [
+            'attempts' => $total_attempts,
+            'completed_attempts' => $completed_attempts,
+            'best_grade' => $best_grade,
+            'percentage' => $percentage
+        ];
+        
+    } catch (Exception $e) {
+        // Fallback if lesson tracking fails
+        return [
+            'attempts' => 0,
+            'completed_attempts' => 0,
+            'best_grade' => 0,
+            'percentage' => 0
+        ];
+    }
+}
+
+/**
+ * Get elementary lessons for a user
+ */
+function theme_remui_kids_get_elementary_lessons($userid) {
+    global $DB;
+    
+    try {
+        // Get user's enrolled courses
+        $courses = enrol_get_all_users_courses($userid, true);
+        $lessons = [];
+        
+        foreach ($courses as $course) {
+            // First check if there are any lessons in this course
+            $lessoncount = $DB->count_records('lesson', ['course' => $course->id]);
+            if ($lessoncount == 0) {
+                continue;
+            }
+            
+            $courselessons = $DB->get_records_sql(
+                "SELECT l.id, l.name, l.intro, l.timelimit, l.retake, l.attempts,
+                        cm.id as cmid, cm.completion, cm.completionview, cm.visible as cmvisible,
+                        c.id as courseid, c.fullname as coursename, c.shortname as courseshortname
+                 FROM {lesson} l
+                 JOIN {course_modules} cm ON l.id = cm.instance
+                 JOIN {modules} m ON cm.module = m.id AND m.name = 'lesson'
+                 JOIN {course} c ON l.course = c.id
+                 WHERE l.course = ? AND cm.visible = 1 AND cm.deletioninprogress = 0
+                 ORDER BY l.name",
+                [$course->id]
+            );
+            
+            foreach ($courselessons as $lesson) {
+                // Skip if no valid cmid
+                if (empty($lesson->cmid)) {
+                    error_log("Skipping lesson {$lesson->id} - no valid cmid");
+                    continue;
+                }
+                
+                try {
+                    // Get lesson progress
+                    $progress = theme_remui_kids_get_lesson_progress($userid, $lesson->id);
+                    
+                    // Create lesson URL with error handling
+                    $lessonurl = '';
+                    try {
+                        $lessonurl = (new moodle_url('/mod/lesson/view.php', ['id' => $lesson->cmid]))->out();
+                    } catch (Exception $e) {
+                        error_log("Error creating lesson URL for lesson {$lesson->id}, cmid {$lesson->cmid}: " . $e->getMessage());
+                        continue;
+                    }
+                    
+                    $lessons[] = [
+                        'id' => $lesson->id,
+                        'name' => $lesson->name,
+                        'intro' => $lesson->intro,
+                        'timelimit' => $lesson->timelimit,
+                        'retake' => $lesson->retake,
+                        'attempts' => $lesson->attempts,
+                        'courseid' => $lesson->courseid,
+                        'coursename' => $lesson->coursename,
+                        'courseshortname' => $lesson->courseshortname,
+                        'cmid' => $lesson->cmid,
+                        'progress_percentage' => $progress['percentage'],
+                        'completed_attempts' => $progress['attempts'],
+                        'best_grade' => $progress['best_grade'],
+                        'lessonurl' => $lessonurl,
+                        'completed' => $progress['percentage'] >= 100,
+                        'in_progress' => $progress['percentage'] > 0 && $progress['percentage'] < 100,
+                        'not_started' => $progress['percentage'] == 0,
+                        'estimated_time' => $lesson->timelimit > 0 ? gmdate("H:i", $lesson->timelimit) : 'No limit'
+                    ];
+                } catch (Exception $e) {
+                    error_log("Error processing lesson {$lesson->id}: " . $e->getMessage());
+                    continue;
+                }
+            }
+        }
+        
+        return $lessons;
+        
+    } catch (Exception $e) {
+        error_log("Error getting elementary lessons: " . $e->getMessage());
+        return [];
+    }
+}
+
 function theme_remui_kids_get_elementary_courses($userid) {
     global $DB;
     
@@ -6088,4 +6306,137 @@ function theme_remui_kids_get_assignment_analytics() {
         error_log("Error in theme_remui_kids_get_assignment_analytics: " . $e->getMessage());
         return [];
     }
+}
+
+/**
+ * Get activity progress for a user
+ * @param int $userid User ID
+ * @param int $cmid Course module ID
+ * @param string $modulename Module name
+ * @return array Progress information
+ */
+function theme_remui_kids_get_activity_progress($userid, $cmid, $modulename) {
+    global $CFG, $DB;
+    
+    require_once($CFG->dirroot . '/lib/completionlib.php');
+    
+    try {
+        // Get course module
+        $cm = $DB->get_record('course_modules', ['id' => $cmid], '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+        
+        // Initialize completion info
+        $completion = new completion_info($course);
+        
+        // Get completion data for this module
+        $completiondata = $completion->get_data($cm, false, $userid);
+        
+        $percentage = 0;
+        $completed = false;
+        $in_progress = false;
+        $not_started = true;
+        
+        if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+            $percentage = 100;
+            $completed = true;
+            $not_started = false;
+        } else {
+            // Check if there's any progress (e.g., attempts, views, etc.)
+            switch ($modulename) {
+                case 'quiz':
+                    $attempts = $DB->count_records('quiz_attempts', ['quiz' => $cm->instance, 'userid' => $userid]);
+                    if ($attempts > 0) {
+                        $percentage = min(50, $attempts * 10); // Rough progress based on attempts
+                        $in_progress = true;
+                        $not_started = false;
+                    }
+                    break;
+                case 'assign':
+                    $submissions = $DB->count_records('assign_submission', ['assignment' => $cm->instance, 'userid' => $userid]);
+                    if ($submissions > 0) {
+                        $percentage = min(80, $submissions * 40); // Rough progress based on submissions
+                        $in_progress = true;
+                        $not_started = false;
+                    }
+                    break;
+                case 'lesson':
+                    $attempts = $DB->count_records('lesson_attempts', ['lessonid' => $cm->instance, 'userid' => $userid]);
+                    if ($attempts > 0) {
+                        $percentage = min(60, $attempts * 20); // Rough progress based on attempts
+                        $in_progress = true;
+                        $not_started = false;
+                    }
+                    break;
+                default:
+                    // For other activities, check if viewed
+                    if ($completiondata->viewed) {
+                        $percentage = 25; // Minimal progress for viewing
+                        $in_progress = true;
+                        $not_started = false;
+                    }
+                    break;
+            }
+        }
+        
+        return [
+            'percentage' => $percentage,
+            'completed' => $completed,
+            'in_progress' => $in_progress,
+            'not_started' => $not_started
+        ];
+        
+    } catch (Exception $e) {
+        return [
+            'percentage' => 0,
+            'completed' => false,
+            'in_progress' => false,
+            'not_started' => true
+        ];
+    }
+}
+
+/**
+ * Get activity icon based on module type
+ * @param string $modulename Module name
+ * @return string FontAwesome icon class
+ */
+function theme_remui_kids_get_activity_icon($modulename) {
+    $icons = [
+        'quiz' => 'fa-question-circle',
+        'assign' => 'fa-file-text',
+        'lesson' => 'fa-book',
+        'forum' => 'fa-comments',
+        'choice' => 'fa-check-square-o',
+        'glossary' => 'fa-bookmark',
+        'wiki' => 'fa-edit',
+        'workshop' => 'fa-users',
+        'scorm' => 'fa-play-circle',
+        'hvp' => 'fa-cube',
+        'lti' => 'fa-external-link'
+    ];
+    
+    return isset($icons[$modulename]) ? $icons[$modulename] : 'fa-tasks';
+}
+
+/**
+ * Get estimated time for activity completion
+ * @param string $modulename Module name
+ * @return string Estimated time
+ */
+function theme_remui_kids_get_activity_estimated_time($modulename) {
+    $times = [
+        'quiz' => '10-15 min',
+        'assign' => '30-45 min',
+        'lesson' => '20-30 min',
+        'forum' => '5-10 min',
+        'choice' => '2-5 min',
+        'glossary' => '10-20 min',
+        'wiki' => '15-25 min',
+        'workshop' => '45-60 min',
+        'scorm' => '15-30 min',
+        'hvp' => '10-20 min',
+        'lti' => '10-30 min'
+    ];
+    
+    return isset($times[$modulename]) ? $times[$modulename] : '10-20 min';
 }
