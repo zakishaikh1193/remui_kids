@@ -25,6 +25,20 @@ $PAGE->add_body_class('quizzes-page');
 // Start output
 echo $OUTPUT->header();
 
+// Add CSS to remove the default main container
+echo '<style>
+/* Neutralize the default main container */
+#region-main,
+[role="main"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+</style>';
+
+echo '<div class="teacher-css-wrapper">';
 echo '<div class="teacher-dashboard-wrapper">';
 // Mobile toggle
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
@@ -47,7 +61,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">STUDENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php" class="sidebar-link"><i class="fa fa-users sidebar-icon"></i><span class="sidebar-text">All Students</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/enrol/users.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/enroll_students.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Reports</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
@@ -56,7 +70,15 @@ echo '      <h3 class="sidebar-category">ASSESSMENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
 echo '        <li class="sidebar-item active"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/quizzes.php" class="sidebar-link"><i class="fa fa-question-circle sidebar-icon"></i><span class="sidebar-text">Quizzes</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/competencies.php" class="sidebar-link"><i class="fa fa-sitemap sidebar-icon"></i><span class="sidebar-text">Competencies</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-star sidebar-icon"></i><span class="sidebar-text">Grading</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+// Questions section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">QUESTIONS</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/pages/questions_unified.php" class="sidebar-link"><i class="fa fa-question-circle sidebar-icon"></i><span class="sidebar-text">Questions Management</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
 echo '    <div class="sidebar-section">';
@@ -85,12 +107,26 @@ echo '</div>';
 // Container
 echo '<div class="students-container">';
 
+// Filter and search controls
+echo '<div class="students-controls">';
+echo '<div class="search-box">';
+echo '<i class="fa fa-search search-icon"></i>';
+echo '<input type="text" id="questionSearch" class="search-input" placeholder="Search questions..." onkeyup="filterQuestions()">';
+echo '</div>';
+echo '<div class="filter-buttons">';
+echo '<button class="filter-btn active" onclick="filterByStatus(\'all\')">All Questions</button>';
+echo '<button class="filter-btn" onclick="filterByStatus(\'correct\')">Correct</button>';
+echo '<button class="filter-btn" onclick="filterByStatus(\'wrong\')">Incorrect</button>';
+echo '<button class="filter-btn" onclick="filterByStatus(\'partial\')">Partial</button>';
+echo '</div>';
+echo '</div>';
+
 // Use the question engine to load and render question summaries.
 $quba = question_engine::load_questions_usage_by_activity($attempt->uniqueid);
 $slots = $quba->get_slots();
 
 echo '<div class="students-table-wrapper">';
-echo '<table class="students-table">';
+echo '<table class="students-table" id="questionsTable">';
 echo '<thead><tr><th>#</th><th>Question</th><th>Submitted answer</th><th>Correct answer</th><th>Mark</th></tr></thead>'; 
 echo '<tbody>';
 
@@ -147,7 +183,7 @@ echo '</div>'; // students-container
 echo '</div>'; // students-page-wrapper
 echo '</div>'; // teacher-main-content
 echo '</div>'; // teacher-dashboard-wrapper
-
+echo '</div>'; // teacher-css-wrapper
 // Sidebar JS
 echo '<script>
 function toggleTeacherSidebar() {
@@ -169,6 +205,52 @@ window.addEventListener("resize", function() {
     sidebar.classList.remove("sidebar-open");
   }
 });
+
+// Question filtering and search functionality
+function filterQuestions() {
+  const searchTerm = document.getElementById("questionSearch").value.toLowerCase();
+  const table = document.getElementById("questionsTable");
+  const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+  
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const questionText = row.cells[1].textContent.toLowerCase();
+    const studentAnswer = row.cells[2].textContent.toLowerCase();
+    const correctAnswer = row.cells[3].textContent.toLowerCase();
+    
+    if (questionText.includes(searchTerm) || studentAnswer.includes(searchTerm) || correctAnswer.includes(searchTerm)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  }
+}
+
+function filterByStatus(status) {
+  // Update active button
+  const buttons = document.querySelectorAll(".filter-btn");
+  buttons.forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+  
+  const table = document.getElementById("questionsTable");
+  const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+  
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    
+    if (status === "all") {
+      row.style.display = "";
+    } else if (status === "correct" && row.classList.contains("answer-correct")) {
+      row.style.display = "";
+    } else if (status === "wrong" && row.classList.contains("answer-wrong")) {
+      row.style.display = "";
+    } else if (status === "partial" && row.classList.contains("answer-partial")) {
+      row.style.display = "";
+    } else if (status !== "all") {
+      row.style.display = "none";
+    }
+  }
+}
 </script>';
 
 echo $OUTPUT->footer();

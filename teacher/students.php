@@ -54,7 +54,21 @@ $teachercourses = enrol_get_my_courses('id, fullname, shortname', 'visible DESC,
 // Start output.
 echo $OUTPUT->header();
 
+// Add CSS to remove the default main container
+echo '<style>
+/* Neutralize the default main container */
+#region-main,
+[role="main"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+</style>';
+
 // Teacher dashboard layout wrapper and sidebar (same as dashboard)
+echo '<div class="teacher-css-wrapper">';
 echo '<div class="teacher-dashboard-wrapper">';
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
 echo '    <i class="fa fa-bars"></i>';
@@ -68,7 +82,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">DASHBOARD</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/my/" class="sidebar-link"><i class="fa fa-th-large sidebar-icon"></i><span class="sidebar-text">Teacher Dashboard</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/index.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/teacher_courses.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-graduation-cap sidebar-icon"></i><span class="sidebar-text">Gradebook</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
 echo '      </ul>';
@@ -87,7 +101,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">STUDENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item active"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php" class="sidebar-link"><i class="fa fa-users sidebar-icon"></i><span class="sidebar-text">All Students</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/enrol/users.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/enroll_students.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Reports</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
@@ -97,7 +111,15 @@ echo '      <h3 class="sidebar-category">ASSESSMENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/quizzes.php" class="sidebar-link"><i class="fa fa-question-circle sidebar-icon"></i><span class="sidebar-text">Quizzes</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/competencies.php" class="sidebar-link"><i class="fa fa-sitemap sidebar-icon"></i><span class="sidebar-text">Competencies</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-star sidebar-icon"></i><span class="sidebar-text">Grading</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+// Questions section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">QUESTIONS</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/pages/questions_unified.php" class="sidebar-link"><i class="fa fa-question-circle sidebar-icon"></i><span class="sidebar-text">Questions Management</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
 // Reports section
@@ -162,8 +184,23 @@ if ($courseid) {
     $course = get_course($courseid);
     $context = context_course::instance($course->id);
     
-    // Get all enrolled users with student role.
-    $enrolledusers = get_enrolled_users($context, 'moodle/course:isincompletionreports');
+    // Get only students (exclude admin, manager, teacher roles)
+    $enrolledusers = $DB->get_records_sql(
+        "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.lastaccess
+         FROM {user} u
+         JOIN {user_enrolments} ue ON ue.userid = u.id
+         JOIN {enrol} e ON e.id = ue.enrolid
+         WHERE e.courseid = ?
+         AND u.deleted = 0
+         AND u.id NOT IN (
+             SELECT DISTINCT ra.userid 
+             FROM {role_assignments} ra 
+             JOIN {role} r ON ra.roleid = r.id 
+             WHERE r.shortname IN ('admin', 'manager', 'editingteacher', 'teacher')
+         )
+         ORDER BY u.lastname ASC, u.firstname ASC",
+        [$courseid]
+    );
     
     echo '<div class="students-container">';
     
@@ -274,7 +311,7 @@ echo '</div>'; // Close students-page-wrapper
 // Close main content and wrapper
 echo '</div>'; // End teacher-main-content
 echo '</div>'; // End teacher-dashboard-wrapper
-
+echo '</div>'; // End teacher-css-wrapper
 // Sidebar toggle script (reuse from dashboard template)
 echo '<script>
 function toggleTeacherSidebar() {
