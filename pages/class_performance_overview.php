@@ -223,6 +223,19 @@ try {
     exit;
 }
 
+// Add CSS to remove the default main container
+echo '<style>
+/* Neutralize the default main container */
+#region-main,
+[role="main"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+</style>';
+
 // Teacher dashboard layout wrapper and sidebar
 echo '<div class="teacher-dashboard-wrapper">';
 echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
@@ -237,7 +250,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">DASHBOARD</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/my/" class="sidebar-link"><i class="fa fa-th-large sidebar-icon"></i><span class="sidebar-text">Teacher Dashboard</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/index.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/teacher_courses.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-graduation-cap sidebar-icon"></i><span class="sidebar-text">Gradebook</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
 echo '      </ul>';
@@ -256,7 +269,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">STUDENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php" class="sidebar-link"><i class="fa fa-users sidebar-icon"></i><span class="sidebar-text">All Students</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/enrol/users.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/enroll_students.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Reports</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
@@ -799,7 +812,7 @@ echo 'function viewExamDetails() {';
 echo '    window.open("' . $CFG->wwwroot . '/theme/remui_kids/pages/exam_details.php?id=' . $courseid . '", "_blank");';
 echo '}';
 echo 'function addStudent() {';
-echo '    window.open("' . $CFG->wwwroot . '/enrol/users.php?id=' . $courseid . '", "_blank");';
+echo '    window.open("' . $CFG->wwwroot . '/theme/remui_kids/teacher/enroll_students.php", "_blank");';
 echo '}';
 echo 'function viewAllStudents() {';
 echo '    window.open("' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php?id=' . $courseid . '", "_blank");';

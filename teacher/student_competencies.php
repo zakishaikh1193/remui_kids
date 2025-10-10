@@ -53,6 +53,19 @@ $course = get_course($courseid);
 // Output start.
 echo $OUTPUT->header();
 
+// Add CSS to remove the default main container
+echo '<style>
+/* Neutralize the default main container */
+#region-main,
+[role="main"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+</style>';
+
 // Layout wrapper and sidebar (same as other teacher pages).
 echo '<div class="teacher-css-wrapper">';
 echo '<div class="teacher-dashboard-wrapper">';
@@ -77,7 +90,7 @@ echo '    <div class="sidebar-section">';
 echo '      <h3 class="sidebar-category">STUDENTS</h3>';
 echo '      <ul class="sidebar-menu">';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php" class="sidebar-link"><i class="fa fa-users sidebar-icon"></i><span class="sidebar-text">All Students</span></a></li>';
-echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/enrol/users.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/enroll_students.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
 echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Reports</span></a></li>';
 echo '      </ul>';
 echo '    </div>';
