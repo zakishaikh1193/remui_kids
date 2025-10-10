@@ -894,11 +894,45 @@ body {
     margin-right: auto;
 }
 
+.school-selection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
 .school-selection h3 {
     color: #374151;
-    margin-bottom: 12px;
+    margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
+}
+
+.iomad-dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.iomad-dashboard-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.iomad-dashboard-btn i {
+    font-size: 0.8rem;
 }
 
 .school-dropdown {
@@ -1310,6 +1344,17 @@ body {
     .course-panel {
         padding: 20px;
     }
+    
+    .school-selection-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .iomad-dashboard-btn {
+        align-self: stretch;
+        justify-content: center;
+    }
 }
 
 /* Custom Scrollbar */
@@ -1557,7 +1602,15 @@ body {
 
     <!-- School Selection -->
     <div class="school-selection">
-        <h3>Select School</h3>
+        <div class="school-selection-header">
+            <h3>Select School</h3>
+            <a href="<?php echo $CFG->wwwroot; ?>/blocks/iomad_company_admin/company_courses_form.php" 
+               class="iomad-dashboard-btn" 
+               title="Open IOMAD's official course assignment dashboard">
+                <i class="fa fa-external-link-alt"></i>
+                Manage Course Assigning through IOMAD Dashboard
+            </a>
+        </div>
         <div class="school-dropdown">
             <select class="school-select" id="schoolSelect">
                 <option value="">Choose a school...</option>
