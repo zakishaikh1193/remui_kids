@@ -28,8 +28,15 @@ global $CFG, $PAGE, $COURSE, $USER, $DB, $OUTPUT;
 
 require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
-// Check if this is a dashboard page and use our custom dashboard
-if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
+// Check if this is a dashboard page, mycourses page, or our custom pages
+$is_custom_mycourses = (strpos($PAGE->url->get_path(), '/theme/remui_kids/mycourses.php') !== false);
+$is_custom_lessons = (strpos($PAGE->url->get_path(), '/theme/remui_kids/lessons.php') !== false);
+$is_elementary_lessons = (strpos($PAGE->url->get_path(), '/theme/remui_kids/elementary_lessons.php') !== false);
+$is_elementary_activities = (strpos($PAGE->url->get_path(), '/theme/remui_kids/elementary_activities.php') !== false);
+
+if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') || 
+    ($PAGE->pagelayout == 'mycourses' && $PAGE->pagetype == 'my-index') ||
+    $is_custom_mycourses || $is_custom_lessons || $is_elementary_lessons || $is_elementary_activities) {
     // Check if user is admin first
     $isadmin = is_siteadmin($USER) || has_capability('moodle/site:config', context_system::instance(), $USER);
     
@@ -358,14 +365,25 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['gradesurl'] = (new moodle_url('/theme/remui_kids/highschool_grades.php'))->out();
         $templatecontext['calendarurl'] = (new moodle_url('/theme/remui_kids/highschool_calendar.php'))->out();
     } else {
-        $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
+        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/mycourses.php'))->out();
         $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
-        $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', array('id' => $USER->id)))->out();
+        $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', array('id' => $USER->id)))->out();                // Set lessons URL based on dashboard type
+        if ($dashboardtype === 'elementary') {
+            $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out();
+            $templatecontext['activitiesurl'] = (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out();
+        } else {
+            $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+            $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        }
         $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
         $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
-        $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     }
     
+    // Global Scratch Emulator URL for all dashboards
+    $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+    $templatecontext['treeviewurl'] = (new moodle_url('/theme/remui_kids/treeview.php'))->out();
+    $templatecontext['scheduleurl'] = (new moodle_url('/theme/remui_kids/schedule.php'))->out();
+    $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
     $templatecontext['codeeditorurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 1]))->out(); // Adjust ID as needed
     $templatecontext['scratchurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 2]))->out(); // Adjust ID as needed
@@ -520,6 +538,83 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
 
     // Must be called before rendering the template.
     require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
+    
+    // Check if this is the mycourses page and user is elementary student
+    if (($PAGE->pagelayout == 'mycourses' && $PAGE->pagetype == 'my-index' && $dashboardtype === 'elementary') ||
+        ($is_custom_mycourses && $dashboardtype === 'elementary')) {
+        // For mycourses page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for custom mycourses page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Check if this is the lessons page and user is elementary student
+    if ($is_custom_lessons && $dashboardtype === 'elementary') {
+        // For lessons page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for custom lessons page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Check if this is the elementary lessons page and user is elementary student
+    if ($is_elementary_lessons && $dashboardtype === 'elementary') {
+        // For elementary lessons page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for elementary lessons page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Check if this is the elementary activities page and user is elementary student
+    if ($is_elementary_activities && $dashboardtype === 'elementary') {
+        // For elementary activities page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for elementary activities page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
     
     // Render our student dashboard template (handles elementary, middle, and high school)
     echo $OUTPUT->render_from_template('theme_remui_kids/dashboard', $templatecontext);
