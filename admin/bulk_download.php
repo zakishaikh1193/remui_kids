@@ -398,7 +398,7 @@ echo "<div class='sidebar-section'>";
 echo "<h3 class='sidebar-category'>SETTINGS</h3>";
 echo "<ul class='sidebar-menu'>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-cog sidebar-icon'></i>";
 echo "<span class='sidebar-text'>System Settings</span>";
 echo "</a>";

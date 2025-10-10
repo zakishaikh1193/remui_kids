@@ -258,7 +258,7 @@ function theme_remui_kids_get_course_sections_data($course) {
  */
 function theme_remui_kids_get_section_image($sectionnum) {
     global $CFG;
-
+    
     // Default course section images - you can customize these
     $default_images = [
         1 => 'https://img.freepik.com/free-photo/copy-space-boy-with-books-showing-ok-sign_23-2148469950.jpg',

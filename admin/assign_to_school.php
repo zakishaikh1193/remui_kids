@@ -79,13 +79,13 @@ if (isset($_GET['action'])) {
                     
                     $category = $DB->get_record('course_categories', ['name' => $company->name]);
                     if ($category) {
-                        $courses = $DB->get_records_sql(
-                            "SELECT c.*, cc.name as category_name 
-                             FROM {course} c 
-                             LEFT JOIN {course_categories} cc ON c.category = cc.id
-                             WHERE c.visible = 1 
-                             AND c.id > 1 
-                             AND c.category = ?
+                $courses = $DB->get_records_sql(
+                    "SELECT c.*, cc.name as category_name 
+                     FROM {course} c 
+                     LEFT JOIN {course_categories} cc ON c.category = cc.id 
+                     WHERE c.visible = 1 
+                     AND c.id > 1 
+                     AND c.category = ?
                              ORDER BY c.fullname ASC",
                             [$category->id]
                         );
@@ -102,9 +102,9 @@ if (isset($_GET['action'])) {
                          WHERE c.visible = 1 
                          AND c.id > 1 
                          AND cc.companyid = ?
-                         ORDER BY c.fullname ASC",
-                        [$school_id]
-                    );
+                     ORDER BY c.fullname ASC",
+                    [$school_id]
+                );
                 }
                 echo json_encode(['status' => 'success', 'courses' => array_values($courses)]);
             } catch (Exception $e) {
@@ -130,19 +130,19 @@ if (isset($_GET['action'])) {
                     $category = $DB->get_record('course_categories', ['name' => $company->name]);
                     $exclude_category_id = $category ? $category->id : 0;
                     
-                    $courses = $DB->get_records_sql(
+                $courses = $DB->get_records_sql(
                         "SELECT c.*, 
                                 cc.name as category_name,
                                 cc.id as category_id,
                                 cc.parent as category_parent,
                                 parent_cc.name as parent_category_name
-                         FROM {course} c 
-                         LEFT JOIN {course_categories} cc ON c.category = cc.id
+                     FROM {course} c 
+                     LEFT JOIN {course_categories} cc ON c.category = cc.id 
                          LEFT JOIN {course_categories} parent_cc ON cc.parent = parent_cc.id
-                         WHERE c.visible = 1 
-                         AND c.id > 1 
+                     WHERE c.visible = 1 
+                     AND c.id > 1 
                          AND c.category > 1
-                         AND c.category != ?
+                     AND c.category != ?
                          ORDER BY parent_cc.name ASC, cc.name ASC, c.fullname ASC",
                         [$exclude_category_id]
                     );
@@ -161,11 +161,11 @@ if (isset($_GET['action'])) {
                          LEFT JOIN {company_course} comp_course ON c.id = comp_course.courseid AND comp_course.companyid = ?
                          WHERE c.visible = 1 
                          AND c.id > 1 
-                         AND c.category > 1
+                     AND c.category > 1
                          AND comp_course.courseid IS NULL
                          ORDER BY parent_cc.name ASC, cc.name ASC, c.fullname ASC",
-                        [$school_id]
-                    );
+                    [$school_id]
+                );
                 }
                 
                 // Organize courses by category hierarchy
@@ -321,16 +321,16 @@ if (isset($_GET['action'])) {
                         $course = $DB->get_record('course', ['id' => $course_id]);
                         if ($course && $course->category == $category->id) {
                             $course->category = 1; // Default category
-                            $course->timemodified = time();
-                            if ($DB->update_record('course', $course)) {
-                                echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
-                            } else {
-                                echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
-                            }
+                        $course->timemodified = time();
+                        if ($DB->update_record('course', $course)) {
+                            echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
                         } else {
-                            echo json_encode(['status' => 'error', 'message' => 'Course was not assigned to this company']);
+                            echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
                         }
                     } else {
+                            echo json_encode(['status' => 'error', 'message' => 'Course was not assigned to this company']);
+                    }
+                } else {
                         echo json_encode(['status' => 'error', 'message' => 'Company category not found']);
                     }
                     exit;
@@ -520,7 +520,7 @@ echo "<div class='sidebar-section'>";
 echo "<h3 class='sidebar-category'>SETTINGS</h3>";
 echo "<ul class='sidebar-menu'>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-cog sidebar-icon'></i>";
 echo "<span class='sidebar-text'>System Settings</span>";
 echo "</a>";
@@ -1977,3 +1977,4 @@ window.addEventListener('resize', function() {
 echo "</div>"; // End admin-main-content
 echo $OUTPUT->footer();
 ?>
+
