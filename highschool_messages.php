@@ -396,7 +396,8 @@ echo $OUTPUT->header();
             background: #f8fafc;
             min-height: 100vh;
             margin-left: 280px;
-            padding-left: 2rem;
+            padding: 0;
+            width: calc(100% - 280px);
         }
         
         .messages-main-content {
@@ -404,10 +405,10 @@ echo $OUTPUT->header();
             width: 100%;
         }
         
-        /* Remove all padding for full-width feel */
+        /* Container fluid padding */
         .container-fluid {
-            padding-left: 0;
-            padding-right: 0;
+            padding-left: 2rem;
+            padding-right: 2rem;
         }
         
         /* Remove all padding from main content */
@@ -454,7 +455,7 @@ echo $OUTPUT->header();
         
         body.has-student-sidebar .highschool-messages-page,
         body.has-enhanced-sidebar .highschool-messages-page {
-            margin-left: 280px;
+            margin-left: 20px;
         }
         
         body.has-student-sidebar #page-wrapper,
@@ -505,9 +506,9 @@ echo $OUTPUT->header();
             color: white;
             padding: 2rem 0;
             margin-bottom: 1.5rem;
-            margin-left: -2rem;
+            margin-left: 0;
             margin-right: 0;
-            width: calc(100% + 2rem);
+            width: 100%;
         }
         
         .messages-page-header .page-title {
@@ -790,12 +791,12 @@ echo $OUTPUT->header();
             
             .highschool-messages-page {
                 margin-left: 0 !important;
-                padding-left: 1rem !important;
+                padding: 0 !important;
             }
             
             .messages-page-header {
-                margin-left: -1rem !important;
-                width: calc(100% + 1rem) !important;
+                margin-left: 0 !important;
+                width: 100% !important;
             }
             
             body.has-student-sidebar #page,
@@ -809,12 +810,12 @@ echo $OUTPUT->header();
                 font-size: 1.8rem;
             }
             .messages-main-content {
-                padding: 0.5rem;
+                padding: 0;
             }
             
             .container-fluid {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
             }
         }
 </style>
@@ -974,29 +975,28 @@ echo $OUTPUT->header();
 </div>
 
 <div class="highschool-messages-page">
-    <div class="messages-main-content">
-        <!-- Page Header -->
-        <div class="messages-page-header">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="page-title">Messages</h1>
-                        <p>Real-time messages from Moodle API - <?php echo $template_data['total_messages']; ?> total messages • <?php echo $template_data['user_grade']; ?> Student</p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <button class="btn btn-outline-light me-2" onclick="refreshMessages()">
-                            <i class="fa fa-refresh me-2"></i>Refresh
-                        </button>
-                        <button class="btn btn-primary">
-                            <i class="fa fa-paper-plane me-2"></i>New Message
-                        </button>
-                    </div>
+    <!-- Page Header -->
+    <div class="messages-page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title">Messages</h1>
+                    <p>Real-time messages from Moodle API - <?php echo $template_data['total_messages']; ?> total messages • <?php echo $template_data['user_grade']; ?> Student</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-outline-light me-2" onclick="refreshMessages()">
+                        <i class="fa fa-refresh me-2"></i>Refresh
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fa fa-paper-plane me-2"></i>New Message
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Message Statistics -->
-        <div class="container-fluid">
+    <!-- Message Statistics -->
+    <div class="container-fluid">
             <div class="row g-2 mb-4">
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
@@ -1119,7 +1119,6 @@ echo $OUTPUT->header();
                 <?php endif; ?>
             </div>
         </div>
-    </div>
 </div>
 
 <script>

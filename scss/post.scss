@@ -7600,21 +7600,21 @@ body.has-enhanced-sidebar {
 }
 
 // Dark mode support for dropdowns
-@media (prefers-color-scheme: dark) {
-    .dropdown-menu {
-        background: #1f2937 !important;
-        border-color: #374151 !important;
+// @media (prefers-color-scheme: dark) {
+//     .dropdown-menu {
+//         background: #1f2937 !important;
+//         border-color: #374151 !important;
         
-        .dropdown-item {
-            color: #d1d5db !important;
+//         .dropdown-item {
+//             color: #d1d5db !important;
             
-            &:hover {
-                background: #374151 !important;
-                color: #f9fafb !important;
-            }
-        }
-    }
-}
+//             &:hover {
+//                 background: #374151 !important;
+//                 color: #f9fafb !important;
+//             }
+//         }
+//     }
+// }
 
 // Dropdown animations
 @keyframes dropdownSlideIn {

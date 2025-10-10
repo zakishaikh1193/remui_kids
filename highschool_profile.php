@@ -394,7 +394,7 @@ echo $OUTPUT->header();
         
         body.has-student-sidebar .highschool-profile-page,
         body.has-enhanced-sidebar .highschool-profile-page {
-            margin-left: 280px;
+            margin-left: 20px;
         }
         
         body.has-student-sidebar #page-wrapper,

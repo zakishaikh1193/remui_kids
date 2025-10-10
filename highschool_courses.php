@@ -776,8 +776,9 @@ echo $OUTPUT->header();
             position: relative;
             background: #f8fafc;
             min-height: 100vh;
-            margin-left: 280px;
-            padding-left: 2rem;
+            
+            padding: 0;
+            width: calc(100% - 280px);
         }
         
         .courses-main-content {
@@ -785,10 +786,10 @@ echo $OUTPUT->header();
             width: 100%;
         }
         
-        /* Remove all padding for full-width feel */
+        /* Container fluid padding */
         .container-fluid {
-            padding-left: 0;
-            padding-right: 0;
+            padding-left: 2rem;
+            padding-right: 2rem;
         }
         
         /* Remove course grid padding */
@@ -841,7 +842,7 @@ echo $OUTPUT->header();
         
         body.has-student-sidebar .highschool-courses-page,
         body.has-enhanced-sidebar .highschool-courses-page {
-            margin-left: 280px;
+            margin-left: 20px;
         }
         
         body.has-student-sidebar #page-wrapper,
@@ -891,9 +892,9 @@ echo $OUTPUT->header();
             color: white;
             padding: 2rem 0;
             margin-bottom: 1.5rem;
-            margin-left: -2rem;
+            margin-left: 0;
             margin-right: 0;
-            width: calc(100% + 2rem);
+            width: 100%;
         }
         .courses-page-header .page-title {
             font-size: 2.5rem;
@@ -1243,12 +1244,12 @@ echo $OUTPUT->header();
             
             .highschool-courses-page {
                 margin-left: 0 !important;
-                padding-left: 1rem !important;
+                padding: 0 !important;
             }
             
             .courses-page-header {
-                margin-left: -1rem !important;
-                width: calc(100% + 1rem) !important;
+                margin-left: 0 !important;
+                width: 100% !important;
             }
             
             body.has-student-sidebar #page,
@@ -1262,12 +1263,12 @@ echo $OUTPUT->header();
                 font-size: 1.8rem;
             }
             .courses-main-content {
-                padding: 0.5rem;
+                padding: 0;
             }
             
             .container-fluid {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
             }
         }
     </style>
@@ -1427,29 +1428,28 @@ echo $OUTPUT->header();
 </div>
 
 <div class="highschool-courses-page">
-    <div class="courses-main-content">
-        <!-- Page Header -->
-        <div class="courses-page-header">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="page-title">
-                            <i class="fa fa-graduation-cap me-3"></i>
-                            My Courses - <?php echo $template_data['user_grade']; ?>
-                        </h1>
-                        <p>Welcome back, <?php echo $template_data['user_name']; ?>! Continue your learning journey.</p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <a href="<?php echo $template_data['dashboard_url']; ?>" class="btn btn-outline-light">
-                            <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
-                        </a>
-                    </div>
+    <!-- Page Header -->
+    <div class="courses-page-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title">
+                        <i class="fa fa-graduation-cap me-3"></i>
+                        My Courses - <?php echo $template_data['user_grade']; ?>
+                    </h1>
+                    <p>Welcome back, <?php echo $template_data['user_name']; ?>! Continue your learning journey.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="<?php echo $template_data['dashboard_url']; ?>" class="btn btn-outline-light">
+                        <i class="fa fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Course Statistics -->
-        <div class="container-fluid">
+    <!-- Course Statistics -->
+    <div class="container-fluid">
             <div class="row g-2 mb-2">
                 <div class="col-lg-3 col-md-6">
                     <div class="stat-card">
@@ -1635,7 +1635,6 @@ echo $OUTPUT->header();
             </div>
             <?php endforeach; ?>
         </div>
-    </div>
 </div>
 
 <script>
