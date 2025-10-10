@@ -705,7 +705,7 @@ echo "</style>";
     echo "<h3 class='sidebar-category'>SETTINGS</h3>";
     echo "<ul class='sidebar-menu'>";
     echo "<li class='sidebar-item'>";
-    echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
+    echo "<a href='#' class='sidebar-link'>";
     echo "<i class='fa fa-cog sidebar-icon'></i>";
     echo "<span class='sidebar-text'>System Settings</span>";
     echo "</a>";
@@ -825,16 +825,15 @@ echo "</style>";
     echo "</div>";
     echo "</div>";
 
-    // Add all JavaScript in one block
-    echo <<<'JAVASCRIPT'
-<script>
+     // Add all JavaScript in one block
+    echo "<script>
 // Password strength checker
 document.getElementById('password').addEventListener('input', function() {
     const password = this.value;
     const strengthDiv = document.getElementById('password-strength');
     
     if (password.length === 0) {
-        strengthDiv.innerHTML = '<small style="color: #666;">Password requirements: at least 6 characters, 1 lowercase, 1 uppercase, 1 number, 1 special character</small>';
+        strengthDiv.innerHTML = '<small style=\"color: #666;\">Password requirements: at least 6 characters, 1 lowercase, 1 uppercase, 1 number, 1 special character</small>';
         return;
     }
     
@@ -917,8 +916,7 @@ window.addEventListener('resize', function() {
         sidebar.classList.remove('sidebar-open');
     }
 });
-</script>
-JAVASCRIPT;
+</script>";
 
     // Close admin-main-content div
     echo "</div>";

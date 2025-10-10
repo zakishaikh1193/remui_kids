@@ -65,6 +65,11 @@ if (isset($_GET['action'])) {
             
         case 'get_school_courses':
             $school_id = intval($_GET['school_id']);
+            
+            // DEBUG: Log GET school courses attempt
+            error_log("=== GET SCHOOL COURSES DEBUG START ===");
+            error_log("School ID: $school_id");
+            
             try {
                 // Get all course categories with full hierarchy
                 $all_categories = $DB->get_records_sql(
@@ -75,24 +80,57 @@ if (isset($_GET['action'])) {
                      ORDER BY path ASC",
                     []
                 );
+                error_log("DEBUG: Found " . count($all_categories) . " categories");
                 
-                // Get all courses that are assigned to this company/school
-                $courses = $DB->get_records_sql(
-                    "SELECT c.*, 
+                // Get all courses that are assigned to this company/school - EXACT IOMAD LOGIC
+                // Use the exact same logic as current_company_course_selector
+                
+                // Get the company's parent node (like IOMAD does)
+                require_once($CFG->dirroot . '/local/iomad/lib/company.php');
+                $parentlevel = company::get_company_parentnode($school_id);
+                error_log("DEBUG: Parent level - " . print_r($parentlevel, true));
+                
+                $departmentid = $parentlevel->id;
+                error_log("DEBUG: Department ID: $departmentid");
+                
+                // Build department list (like IOMAD does)
+                $departmentlist = array($departmentid => $departmentid) + company::get_department_parentnodes($departmentid);
+                error_log("DEBUG: Department list - " . print_r($departmentlist, true));
+                
+                $department_list = implode(',', array_keys($departmentlist));
+                error_log("DEBUG: Department list string: $department_list");
+                
+                // First, let's check what's in company_course table for this company
+                $all_company_courses = $DB->get_records('company_course', ['companyid' => $school_id]);
+                error_log("DEBUG: All company_course records for company $school_id: " . count($all_company_courses));
+                foreach ($all_company_courses as $cc) {
+                    $course = $DB->get_record('course', ['id' => $cc->courseid]);
+                    error_log("DEBUG: Company course - ID: {$cc->id}, Course: " . ($course ? $course->fullname : 'NOT FOUND') . ", Dept: {$cc->departmentid}");
+                }
+                
+                // Build the EXACT query that IOMAD uses for current courses
+                $sql = "SELECT DISTINCT c.*, 
                             cc.name as category_name,
                             cc.id as category_id,
                             cc.parent as category_parent,
                             cc.path as category_path,
                             cc.depth as category_depth
-                     FROM {course} c 
+                     FROM {course} c
+                     INNER JOIN {company_course} cc_table ON (c.id = cc_table.courseid AND cc_table.companyid = ?)
                      LEFT JOIN {course_categories} cc ON c.category = cc.id
-                     LEFT JOIN {company_course} comp_course ON c.id = comp_course.courseid AND comp_course.companyid = ?
                      WHERE c.visible = 1 
-                     AND c.id > 1 
-                     AND comp_course.courseid IS NOT NULL
-                     ORDER BY cc.path ASC, c.fullname ASC",
-                    [$school_id]
-                );
+                     AND c.id > 1
+                     AND cc_table.departmentid IN ($department_list)
+                     ORDER BY c.fullname ASC";
+                     
+                error_log("DEBUG: SQL Query: " . $sql);
+                error_log("DEBUG: SQL Parameters: [$school_id]");
+                
+                $courses = $DB->get_records_sql($sql, [$school_id]);
+                error_log("DEBUG: Found " . count($courses) . " assigned courses");
+                foreach ($courses as $course) {
+                    error_log("DEBUG: Assigned course - " . $course->fullname . " (ID: {$course->id}, Category: {$course->category_name})");
+                }
                 
                 // Build hierarchical structure
                 $hierarchy = [];
@@ -146,16 +184,25 @@ if (isset($_GET['action'])) {
                 
                 // Convert to flat array for frontend
                 $flat_hierarchy = flattenHierarchy($hierarchy);
+                error_log("DEBUG: Final flat hierarchy count: " . count($flat_hierarchy));
+                error_log("DEBUG: Final flat hierarchy - " . print_r($flat_hierarchy, true));
                 
                 echo json_encode(['status' => 'success', 'courses' => $flat_hierarchy]);
             } catch (Exception $e) {
                 error_log('Error in get_school_courses: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to load school courses: ' . $e->getMessage()]);
             }
+            
+            error_log("=== GET SCHOOL COURSES DEBUG END ===");
             exit;
             
         case 'get_potential_courses':
             $school_id = intval($_GET['school_id']);
+            
+            // DEBUG: Log GET potential courses attempt
+            error_log("=== GET POTENTIAL COURSES DEBUG START ===");
+            error_log("School ID: $school_id");
+            
             try {
                 // Get all course categories with full hierarchy
                 $all_categories = $DB->get_records_sql(
@@ -166,10 +213,10 @@ if (isset($_GET['action'])) {
                      ORDER BY path ASC",
                     []
                 );
+                error_log("DEBUG: Found " . count($all_categories) . " categories");
                 
-                // Get all courses that are NOT assigned to this company/school
-                $courses = $DB->get_records_sql(
-                    "SELECT c.*, 
+                // Get all courses that are NOT assigned to this company/school - SIMPLE AND RELIABLE
+                $sql = "SELECT c.*, 
                             cc.name as category_name,
                             cc.id as category_id,
                             cc.parent as category_parent,
@@ -182,9 +229,16 @@ if (isset($_GET['action'])) {
                      AND c.id > 1 
                      AND c.category > 1
                      AND comp_course.courseid IS NULL
-                     ORDER BY cc.path ASC, c.fullname ASC",
-                    [$school_id]
-                );
+                     ORDER BY cc.path ASC, c.fullname ASC";
+                     
+                error_log("DEBUG: Potential courses SQL: " . $sql);
+                error_log("DEBUG: Potential courses parameters: [$school_id]");
+                
+                $courses = $DB->get_records_sql($sql, [$school_id]);
+                error_log("DEBUG: Found " . count($courses) . " potential courses");
+                foreach ($courses as $course) {
+                    error_log("DEBUG: Potential course - " . $course->fullname . " (ID: {$course->id}, Category: {$course->category_name})");
+                }
                 
                 // Build hierarchical structure
                 $hierarchy = [];
@@ -238,198 +292,136 @@ if (isset($_GET['action'])) {
                 
                 // Convert to flat array for frontend
                 $flat_hierarchy = flattenHierarchy($hierarchy);
+                error_log("DEBUG: Final potential flat hierarchy count: " . count($flat_hierarchy));
                 
                 echo json_encode(['status' => 'success', 'courses' => $flat_hierarchy]);
             } catch (Exception $e) {
                 error_log('Error in get_potential_courses: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to load potential courses: ' . $e->getMessage()]);
             }
+            
+            error_log("=== GET POTENTIAL COURSES DEBUG END ===");
             exit;
             
         case 'assign_course':
             $school_id = intval($_POST['school_id']);
             $course_id = intval($_POST['course_id']);
             
+            // DEBUG: Log assignment attempt
+            error_log("=== ASSIGN COURSE DEBUG START ===");
+            error_log("School ID: $school_id");
+            error_log("Course ID: $course_id");
+            
             try {
-                // Check if company_course table exists
-                if (!$DB->get_manager()->table_exists('company_course')) {
-                    error_log('company_course table does not exist, falling back to course category assignment');
-                    
-                    // Fallback: Move course to the company's category (if company has a category)
-                    $company = $DB->get_record('company', ['id' => $school_id]);
-                    if (!$company) {
-                        echo json_encode(['status' => 'error', 'message' => 'Company not found']);
-                        exit;
-                    }
-                    
-                    // Check if company has a corresponding category
-                    $category = $DB->get_record('course_categories', ['name' => $company->name]);
-                    if (!$category) {
-                        // Create a category for this company
-                        $new_category = new stdClass();
-                        $new_category->name = $company->name;
-                        $new_category->description = 'Category for ' . $company->name;
-                        $new_category->parent = 0;
-                        $new_category->sortorder = 999;
-                        $new_category->visible = 1;
-                        $new_category->timecreated = time();
-                        $new_category->timemodified = time();
-                        
-                        $category_id = $DB->insert_record('course_categories', $new_category);
-                        if (!$category_id) {
-                            echo json_encode(['status' => 'error', 'message' => 'Failed to create category for company']);
-                            exit;
-                        }
-                    } else {
-                        $category_id = $category->id;
-                    }
-                    
-                    // Move course to company's category
+                // Verify course exists
                 $course = $DB->get_record('course', ['id' => $course_id]);
-                if ($course) {
-                        $course->category = $category_id;
-                    $course->timemodified = time();
-                    if ($DB->update_record('course', $course)) {
-                        echo json_encode(['status' => 'success', 'message' => 'Course assigned successfully']);
-                    } else {
-                        echo json_encode(['status' => 'error', 'message' => 'Failed to assign course']);
-                    }
-                } else {
+                if (!$course) {
+                    error_log("DEBUG: Course not found with ID: $course_id");
                     echo json_encode(['status' => 'error', 'message' => 'Course not found']);
-                    }
                     exit;
                 }
+                error_log("DEBUG: Course found - " . $course->fullname);
+                
+                // Verify company exists
+                $companyrecord = $DB->get_record('company', ['id' => $school_id]);
+                if (!$companyrecord) {
+                    error_log("DEBUG: Company not found with ID: $school_id");
+                    echo json_encode(['status' => 'error', 'message' => 'Company not found']);
+                    exit;
+                }
+                error_log("DEBUG: Company found - " . $companyrecord->name);
                 
                 // Check if course is already assigned to this company
                 $existing = $DB->get_record('company_course', ['companyid' => $school_id, 'courseid' => $course_id]);
                 if ($existing) {
-                    error_log('Course ' . $course_id . ' is already assigned to company ' . $school_id);
+                    error_log("DEBUG: Course already assigned - " . print_r($existing, true));
                     echo json_encode(['status' => 'error', 'message' => 'Course is already assigned to this school']);
                     exit;
                 }
                 
-                // Debug: Log the assignment attempt
-                error_log('Attempting to assign course ' . $course_id . ' to company ' . $school_id);
+                // USE IOMAD'S OFFICIAL METHOD - This is the key fix!
+                require_once($CFG->dirroot . '/local/iomad/lib/company.php');
+                $company = new company($school_id);
                 
-                // Assign course to company
-                $company_course = new stdClass();
-                $company_course->companyid = $school_id;
-                $company_course->courseid = $course_id;
-                $company_course->departmentid = 0; // Default department, can be updated later
+                // Get the parent level (top department) for the company
+                $parentlevel = company::get_company_parentnode($school_id);
+                $departmentid = $parentlevel->id;
+                error_log("DEBUG: Using department ID: $departmentid");
                 
-                // Debug: Log the data being inserted
-                error_log('Attempting to insert company_course record: ' . print_r($company_course, true));
+                // Use the official add_course method - this handles everything properly:
+                // - Inserts into company_course with correct department
+                // - Ensures iomad_courses record exists
+                // - Auto-enrolls managers/educators if configured
+                // - Purges the cache (THIS IS CRITICAL!)
+                $result = $company->add_course($course, $departmentid);
                 
-                $result = $DB->insert_record('company_course', $company_course);
                 if ($result) {
-                    error_log('Successfully inserted company_course record with ID: ' . $result);
-                    
-                    // Also create iomad_courses entry if it doesn't exist (required for IOMAD interface)
-                    if (!$DB->get_record('iomad_courses', array('courseid' => $course_id))) {
-                        $iomad_course = new stdClass();
-                        $iomad_course->courseid = $course_id;
-                        $iomad_course->licensed = 0;
-                        $iomad_course->shared = 0;
-                        $iomad_course->validlength = 0;
-                        $iomad_course->warnnotstarted = 0;
-                        $iomad_course->warnexpire = 0;
-                        $iomad_course->warncompletion = 0;
-                        $iomad_course->notifyperiod = 0;
-                        $iomad_course->hasgrade = 0;
-                        $iomad_course->autoenrol = 0;
-                        
-                        $iomad_result = $DB->insert_record('iomad_courses', $iomad_course);
-                        if ($iomad_result) {
-                            error_log('Successfully created iomad_courses record with ID: ' . $iomad_result);
-                        } else {
-                            error_log('Failed to create iomad_courses record');
-                        }
-                    } else {
-                        error_log('iomad_courses record already exists for course ' . $course_id);
-                    }
-                    
+                    error_log("DEBUG: Course assigned successfully using official IOMAD method");
                     echo json_encode(['status' => 'success', 'message' => 'Course assigned successfully']);
                 } else {
-                    error_log('Failed to insert company_course record');
-                    echo json_encode(['status' => 'error', 'message' => 'Failed to assign course - database insert failed']);
+                    throw new Exception('Failed to assign course using IOMAD method');
                 }
+                
             } catch (Exception $e) {
                 error_log('Error in assign_course: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to assign course: ' . $e->getMessage()]);
             }
+            
+            error_log("=== ASSIGN COURSE DEBUG END ===");
             exit;
             
         case 'unassign_course':
             $school_id = intval($_POST['school_id']);
             $course_id = intval($_POST['course_id']);
             
+            // DEBUG: Log unassignment attempt
+            error_log("=== UNASSIGN COURSE DEBUG START ===");
+            error_log("School ID: $school_id");
+            error_log("Course ID: $course_id");
+            
             try {
-                // Check if company_course table exists
-                if (!$DB->get_manager()->table_exists('company_course')) {
-                    error_log('company_course table does not exist, falling back to course category unassignment');
-                    
-                    // Fallback: Move course to default category
-                    $company = $DB->get_record('company', ['id' => $school_id]);
-                    if (!$company) {
-                        echo json_encode(['status' => 'error', 'message' => 'Company not found']);
-                        exit;
-                    }
-                    
-                    // Find the company's category
-                    $category = $DB->get_record('course_categories', ['name' => $company->name]);
-                    if ($category) {
-                        // Move course to default category (category 1)
-                        $course = $DB->get_record('course', ['id' => $course_id]);
-                        if ($course && $course->category == $category->id) {
-                            $course->category = 1; // Default category
-                        $course->timemodified = time();
-                        if ($DB->update_record('course', $course)) {
-                            echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
-                        } else {
-                            echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course']);
-                        }
-                    } else {
-                            echo json_encode(['status' => 'error', 'message' => 'Course was not assigned to this company']);
-                    }
-                } else {
-                        echo json_encode(['status' => 'error', 'message' => 'Company category not found']);
-                    }
+                // Verify course exists
+                $course = $DB->get_record('course', ['id' => $course_id]);
+                if (!$course) {
+                    error_log("DEBUG: Course not found with ID: $course_id");
+                    echo json_encode(['status' => 'error', 'message' => 'Course not found']);
                     exit;
                 }
+                error_log("DEBUG: Course found - " . $course->fullname);
                 
-                // Remove course from company
-                $deleted = $DB->delete_records('company_course', ['companyid' => $school_id, 'courseid' => $course_id]);
-                if ($deleted) {
-                    error_log('Successfully removed course ' . $course_id . ' from company ' . $school_id);
-                    
-                    // Check if this course is still assigned to other companies
-                    $other_assignments = $DB->get_records('company_course', ['courseid' => $course_id]);
-                    if (empty($other_assignments)) {
-                        // No other companies have this course, so we can remove it from iomad_courses
-                        // But only if it's not a shared course (shared = 0)
-                        $iomad_course = $DB->get_record('iomad_courses', ['courseid' => $course_id]);
-                        if ($iomad_course && $iomad_course->shared == 0) {
-                            $iomad_deleted = $DB->delete_records('iomad_courses', ['courseid' => $course_id]);
-                            if ($iomad_deleted) {
-                                error_log('Successfully removed course ' . $course_id . ' from iomad_courses table');
-                            } else {
-                                error_log('Failed to remove course ' . $course_id . ' from iomad_courses table');
-                            }
-                        } else {
-                            error_log('Course ' . $course_id . ' is shared or not in iomad_courses, keeping iomad_courses record');
-                        }
-                    } else {
-                        error_log('Course ' . $course_id . ' is still assigned to other companies, keeping iomad_courses record');
-                    }
-                    
+                // Check if course is actually assigned to this company
+                $existing = $DB->get_record('company_course', ['companyid' => $school_id, 'courseid' => $course_id]);
+                if (!$existing) {
+                    error_log("DEBUG: Course is not assigned to this company");
+                    echo json_encode(['status' => 'error', 'message' => 'Course is not assigned to this school']);
+                    exit;
+                }
+                error_log("DEBUG: Course is assigned, proceeding with removal");
+                
+                // USE IOMAD'S OFFICIAL METHOD - This is the key fix!
+                require_once($CFG->dirroot . '/local/iomad/lib/company.php');
+                
+                // Use the official remove_course method - this handles everything properly:
+                // - Removes from company_course
+                // - Handles shared courses correctly
+                // - Removes from licenses
+                // - Unenrolls users if needed
+                // - Purges the cache (THIS IS CRITICAL!)
+                $result = company::remove_course($course, $school_id, 0);
+                
+                if ($result) {
+                    error_log("DEBUG: Course unassigned successfully using official IOMAD method");
                     echo json_encode(['status' => 'success', 'message' => 'Course unassigned successfully']);
                 } else {
-                    echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course or course was not assigned']);
+                    throw new Exception('Failed to unassign course using IOMAD method');
                 }
+                
             } catch (Exception $e) {
                 error_log('Error in unassign_course: ' . $e->getMessage());
                 echo json_encode(['status' => 'error', 'message' => 'Failed to unassign course: ' . $e->getMessage()]);
             }
+            
+            error_log("=== UNASSIGN COURSE DEBUG END ===");
             exit;
     }
 }
@@ -1797,10 +1789,13 @@ function renderCategoryHierarchy(categories, type, level = 0) {
         
         const indent = level * 20;
         
+        // Create unique IDs for each panel to avoid conflicts
+        const uniqueCategoryId = `${type}_${category.id}`;
+        
         let html = `
             <div class="category-group" style="margin-left: ${indent}px;">
                 <div class="category-header ${level > 0 ? 'subcategory-header' : ''}">
-                    <div class="category-header-left" onclick="toggleCategory('${category.id}')">
+                    <div class="category-header-left" onclick="toggleCategory('${uniqueCategoryId}')">
                         <h4 class="category-title">
                             <i class="fa fa-folder${level > 0 ? '-open' : ''}"></i>
                             ${escapeHtml(category.name)}
@@ -1814,9 +1809,9 @@ function renderCategoryHierarchy(categories, type, level = 0) {
                         <i class="fa fa-check-double"></i>
                         Select All (${totalCourses})
                     </button>
-                    <i class="fa fa-chevron-down toggle-icon" id="toggle-${category.id}" onclick="toggleCategory('${category.id}')"></i>
+                    <i class="fa fa-chevron-down toggle-icon" id="toggle-${uniqueCategoryId}" onclick="toggleCategory('${uniqueCategoryId}')"></i>
                 </div>
-                <div class="category-content" id="category-${category.id}" style="display: none;">
+                <div class="category-content" id="category-${uniqueCategoryId}" style="display: none;">
         `;
         
         // Direct courses in this category
@@ -1917,7 +1912,8 @@ function updateCategorySelectAllButtons(type) {
     
     selectAllButtons.forEach(btn => {
         const categoryId = btn.dataset.categoryId;
-        const categoryContent = document.getElementById(`category-${categoryId}`);
+        const uniqueCategoryId = `${type}_${categoryId}`;
+        const categoryContent = document.getElementById(`category-${uniqueCategoryId}`);
         
         if (!categoryContent) return;
         
@@ -2073,12 +2069,15 @@ function updateCourseCount(elementId, count) {
 }
 
 function selectAllInCategory(categoryId, type) {
-    const categoryContent = document.getElementById(`category-${categoryId}`);
-    const selectAllBtn = document.querySelector(`button.category-select-all[data-category-id="${categoryId}"]`);
+    // Get the specific panel's container to avoid cross-panel interference
+    const panelContainer = type === 'school' ? 'schoolCourseList' : 'potentialCourseList';
+    const uniqueCategoryId = `${type}_${categoryId}`;
+    const categoryContent = document.getElementById(`category-${uniqueCategoryId}`);
+    const selectAllBtn = document.getElementById(`${panelContainer}`).querySelector(`button.category-select-all[data-category-id="${categoryId}"]`);
     
-    if (!categoryContent) return;
+    if (!categoryContent || !selectAllBtn) return;
     
-    // Get all course items in this category (including nested ones)
+    // Get all course items in this category (including nested ones) within the specific panel
     const courseItems = categoryContent.querySelectorAll('.course-item');
     const totalCount = courseItems.length;
     
@@ -2098,13 +2097,14 @@ function selectAllInCategory(categoryId, type) {
             }
         });
         
-        // Also update nested category select-all buttons
+        // Also update nested category select-all buttons within the same panel
         const nestedSelectAllBtns = categoryContent.querySelectorAll('.category-select-all');
         nestedSelectAllBtns.forEach(btn => {
             if (btn !== selectAllBtn) {
                 btn.classList.remove('selected');
                 const nestedCategoryId = btn.dataset.categoryId;
-                const nestedCategoryContent = document.getElementById(`category-${nestedCategoryId}`);
+                const uniqueNestedCategoryId = `${type}_${nestedCategoryId}`;
+                const nestedCategoryContent = document.getElementById(`category-${uniqueNestedCategoryId}`);
                 if (nestedCategoryContent) {
                     const nestedCount = nestedCategoryContent.querySelectorAll('.course-item').length;
                     btn.innerHTML = `<i class="fa fa-check-double"></i> Select All (${nestedCount})`;
@@ -2129,13 +2129,14 @@ function selectAllInCategory(categoryId, type) {
             }
         });
         
-        // Also update nested category select-all buttons
+        // Also update nested category select-all buttons within the same panel
         const nestedSelectAllBtns = categoryContent.querySelectorAll('.category-select-all');
         nestedSelectAllBtns.forEach(btn => {
             if (btn !== selectAllBtn) {
                 btn.classList.add('selected');
                 const nestedCategoryId = btn.dataset.categoryId;
-                const nestedCategoryContent = document.getElementById(`category-${nestedCategoryId}`);
+                const uniqueNestedCategoryId = `${type}_${nestedCategoryId}`;
+                const nestedCategoryContent = document.getElementById(`category-${uniqueNestedCategoryId}`);
                 if (nestedCategoryContent) {
                     const nestedCount = nestedCategoryContent.querySelectorAll('.course-item').length;
                     btn.innerHTML = `<i class="fa fa-times-circle"></i> Deselect All (${nestedCount})`;
