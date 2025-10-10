@@ -3,7 +3,16 @@
    ======================================== */
 .teacher-css-wrapper {
     margin-top: -150px !important;
- 
+    
+    /* Neutralize the default main container for all teacher pages */
+    #region-main,
+    [role="main"] {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 
     .students-page-wrapper {
     min-height: 100vh;
