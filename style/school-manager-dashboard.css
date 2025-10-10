@@ -18,8 +18,8 @@
     z-index: 1;
 }
 
-/* Sidebar Toggle Button */
-.sidebar-toggle {
+/* Sidebar Toggle Button - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .sidebar-toggle {
     display: none;
     position: fixed;
     top: 20px;
@@ -34,8 +34,8 @@
     font-size: 16px;
 }
 
-/* School Manager Sidebar */
-.school-manager-sidebar {
+/* School Manager Sidebar - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .school-manager-sidebar {
     width: 280px;
     background: white;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
@@ -49,20 +49,20 @@
     border-right: 1px solid #e0e0e0;
 }
 
-.school-manager-sidebar.sidebar-open {
+.school-manager-dashboard-wrapper .school-manager-sidebar.sidebar-open {
     transform: translateX(0);
 }
 
-/* Sidebar Content */
-.sidebar-content {
+/* Sidebar Content - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .sidebar-content {
     padding: 0;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-/* Green Header Section */
-.sidebar-header {
+/* Green Header Section - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .sidebar-header {
     background: linear-gradient(135deg, #28a745, #20c997);
     padding: 30px 20px;
     text-align: center;
@@ -70,7 +70,7 @@
     position: relative;
 }
 
-.header-icon {
+.school-manager-dashboard-wrapper .header-icon {
     width: 60px;
     height: 60px;
     background: white;
@@ -82,24 +82,24 @@
     border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
-.header-icon i {
+.school-manager-dashboard-wrapper .header-icon i {
     font-size: 24px;
     color: #28a745;
 }
 
-.header-title {
+.school-manager-dashboard-wrapper .header-title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
-.header-subtitle {
+.school-manager-dashboard-wrapper .header-subtitle {
     font-size: 14px;
     opacity: 0.9;
     margin-bottom: 15px;
 }
 
-.header-badge {
+.school-manager-dashboard-wrapper .header-badge {
     background: rgba(255, 255, 255, 0.2);
     padding: 8px 16px;
     border-radius: 20px;
@@ -109,23 +109,23 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Sidebar Navigation */
-.sidebar-navigation {
+/* Sidebar Navigation - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .sidebar-navigation {
     flex: 1;
     padding: 20px 0;
 }
 
-/* Main Navigation Items */
-.sidebar-item {
+/* Main Navigation Items - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .sidebar-item {
     margin: 0;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.sidebar-item:last-child {
+.school-manager-dashboard-wrapper .sidebar-item:last-child {
     border-bottom: none;
 }
 
-.sidebar-link {
+.school-manager-dashboard-wrapper .sidebar-link {
     display: flex;
     align-items: center;
     padding: 15px 20px;
@@ -135,37 +135,37 @@
     position: relative;
 }
 
-.sidebar-link:hover {
+.school-manager-dashboard-wrapper .sidebar-link:hover {
     background-color: #f8f9fa;
     color: #28a745;
     text-decoration: none;
 }
 
-.sidebar-item.active .sidebar-link {
+.school-manager-dashboard-wrapper .sidebar-item.active .sidebar-link {
     background-color: #e8f5e8;
     color: #28a745;
     border-right: 3px solid #28a745;
 }
 
-.sidebar-icon {
+.school-manager-dashboard-wrapper .sidebar-icon {
     width: 20px;
     margin-right: 12px;
     text-align: center;
     font-size: 16px;
 }
 
-.sidebar-text {
+.school-manager-dashboard-wrapper .sidebar-text {
     font-size: 14px;
     font-weight: 500;
 }
 
-/* Sidebar Sections */
-.sidebar-section {
+/* Sidebar Sections - Only apply to school manager dashboard wrapper */
+.school-manager-dashboard-wrapper .sidebar-section {
     margin-top: 20px;
     padding: 0 20px;
 }
 
-.sidebar-category {
+.school-manager-dashboard-wrapper .sidebar-category {
     font-size: 12px;
     font-weight: 600;
     color: #999;
@@ -175,18 +175,18 @@
     padding: 0 5px;
 }
 
-.sidebar-menu {
+.school-manager-dashboard-wrapper .sidebar-menu {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.sidebar-menu .sidebar-item {
+.school-manager-dashboard-wrapper .sidebar-menu .sidebar-item {
     border-bottom: none;
     margin-bottom: 2px;
 }
 
-.sidebar-menu .sidebar-link {
+.school-manager-dashboard-wrapper .sidebar-menu .sidebar-link {
     padding: 12px 15px;
     font-size: 13px;
 }
@@ -514,13 +514,13 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Responsive Design */
+/* Responsive Design - Only apply to school manager dashboard wrapper */
 @media (max-width: 768px) {
-    .sidebar-toggle {
+    .school-manager-dashboard-wrapper .sidebar-toggle {
         display: block;
     }
     
-    .school-manager-sidebar {
+    .school-manager-dashboard-wrapper .school-manager-sidebar {
         transform: translateX(-100%);
     }
     

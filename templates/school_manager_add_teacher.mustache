@@ -50,52 +50,7 @@
 }}
 
 <style>
-/* Add Teacher Form Styles - Using School Dashboard Layout - Updated: 2025-01-10-v4 */
-
-/* Hide default Moodle page elements */
-body.path-theme-remui-kids-school-manager-add-teacher {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-body.path-theme-remui-kids-school-manager-add-teacher #page,
-body.path-theme-remui-kids-school-manager-add-teacher #page-content,
-body.path-theme-remui-kids-school-manager-add-teacher .main-content,
-body.path-theme-remui-kids-school-manager-add-teacher .container-fluid,
-body.path-theme-remui-kids-school-manager-add-teacher .page,
-body.path-theme-remui-kids-school-manager-add-teacher .page-content {
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
-    width: 100% !important;
-    background: transparent !important;
-}
-
-/* Hide Moodle header and footer */
-body.path-theme-remui-kids-school-manager-add-teacher #page-header,
-body.path-theme-remui-kids-school-manager-add-teacher #page-footer,
-body.path-theme-remui-kids-school-manager-add-teacher .navbar,
-body.path-theme-remui-kids-school-manager-add-teacher .footer {
-    display: none !important;
-}
-
-/* Force sidebar visibility - Override any Moodle CSS */
-.school-manager-sidebar,
-.school-manager-sidebar *,
-.sidebar-content,
-.sidebar-header,
-.sidebar-navigation,
-.sidebar-item,
-.sidebar-link {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-.sidebar-link {
-    display: flex !important;
-    align-items: center !important;
-}
+/* Add Teacher Page Styles - Matching School Dashboard Layout - Updated: 2025-01-10-v4 */
 
 /* Scoped reset styles - only apply to add teacher page */
 .add-teacher-dashboard-wrapper * {
@@ -107,51 +62,63 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
     display: flex;
     min-height: 100vh;
     background-color: #f5f5f5;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
-    z-index: 9999;
-    width: 100vw;
+    z-index: 1;
 }
 
-/* Sidebar */
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* School Manager Sidebar */
 .school-manager-sidebar {
-    width: 250px !important;
-    background: #ffffff !important;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    height: 100vh !important;
-    overflow-y: auto !important;
-    z-index: 1000 !important;
-    border-right: 1px solid #e0e0e0 !important;
-    display: block !important;
-    visibility: visible !important;
+    width: 250px;
+    background: #f8f9fa;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    border-right: 1px solid #e0e0e0;
 }
 
+.school-manager-sidebar.sidebar-open {
+    transform: translateX(0);
+}
+
+/* Sidebar Content */
 .sidebar-content {
-    padding: 0 !important;
-    display: block !important;
-    visibility: visible !important;
-    width: 100% !important;
-    height: 100% !important;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar-header {
-    background: linear-gradient(135deg, #28a745, #20c997) !important;
-    color: white !important;
-    padding: 25px 15px !important;
-    text-align: center !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    display: block !important;
-    visibility: visible !important;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 25px 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-icon {
@@ -193,9 +160,7 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
 }
 
 .sidebar-navigation {
-    padding: 18px 0 !important;
-    display: block !important;
-    visibility: visible !important;
+    padding: 18px 0;
 }
 
 .sidebar-item {
@@ -263,7 +228,7 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
 
 /* Add Teacher Container - Same as School Dashboard */
 .add-teacher-container {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 30px 20px;
     background: transparent;
@@ -512,21 +477,18 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
 }
 
 @media (max-width: 768px) {
+    .sidebar-toggle {
+        display: block;
+    }
+    
     .school-manager-sidebar {
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        position: fixed;
-        z-index: 1000;
     }
     
     .add-teacher-main-content {
         margin-left: 0;
-        margin-right: 0;
-        max-width: 100%;
-    }
-    
-    .add-teacher-container {
-        padding: 20px 15px;
+        left: 0;
+        width: 100%;
     }
     
     .form-grid {
@@ -560,8 +522,13 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
 
 <!-- Full Screen Add Teacher Dashboard Wrapper -->
 <div class="add-teacher-dashboard-wrapper">
-    <!-- Sidebar -->
-    <div class="school-manager-sidebar">
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" onclick="toggleSchoolManagerSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
+
+<!-- School Manager Sidebar Navigation -->
+<div class="school-manager-sidebar">
         <div class="sidebar-content">
             <!-- Green Header Section -->
             <div class="sidebar-header">
@@ -657,7 +624,7 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
     <!-- Main Content -->
     <div class="add-teacher-main-content">
         <div class="add-teacher-container">
-            <!-- Page Header - Direct on background -->
+            <!-- Page Header -->
             <div class="header-section">
                 <h1 class="page-title">Add New Teacher</h1>
                 <a href="{{wwwroot}}/my/" class="back-btn">
@@ -794,8 +761,17 @@ body.path-theme-remui-kids-school-manager-add-teacher .footer {
 </div> <!-- End add-teacher-dashboard-wrapper -->
 
 <script>
+// Sidebar toggle functionality - Same as School Dashboard
+function toggleSchoolManagerSidebar() {
+    const sidebar = document.querySelector('.school-manager-sidebar');
+    sidebar.classList.toggle('sidebar-open');
+}
+
 // Form validation and enhancement
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize sidebar functionality
+    initializeSidebar();
+    
     const form = document.querySelector('.add-teacher-form');
     const inputs = form.querySelectorAll('input[required]');
     
@@ -887,6 +863,56 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
 });
+
+// Sidebar initialization - Same as School Dashboard
+function initializeSidebar() {
+    // Handle sidebar toggle
+    document.querySelectorAll('.sidebar-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            document.querySelector('.school-manager-sidebar').classList.toggle('sidebar-open');
+        });
+    });
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth <= 768) {
+            const sidebar = document.querySelector('.school-manager-sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                sidebar.classList.remove('sidebar-open');
+            }
+        }
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            document.querySelector('.school-manager-sidebar').classList.remove('sidebar-open');
+        }
+    });
+    
+    // Handle sidebar navigation clicks
+    document.querySelectorAll('.school-manager-sidebar .sidebar-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.school-manager-sidebar .sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to current item
+            this.closest('.sidebar-item').classList.add('active');
+            
+            // Handle placeholder links
+            if (href === '#' || !href) {
+                e.preventDefault();
+                console.log('Navigation to:', this.querySelector('.sidebar-text').textContent);
+            }
+        });
+    });
+}
 </script>
 
 <style>

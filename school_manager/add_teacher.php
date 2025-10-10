@@ -233,11 +233,10 @@ $templatecontext = array(
     ),
     'success_message' => $success_message,
     'error_message' => $error_message,
-    'form_data' => $form_data,
-    'teacher_management_active' => true
+    'form_data' => $form_data
 );
 
-// Output the page using standard Moodle structure with custom template
+// Output the page
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_add_teacher', $templatecontext);
 echo $OUTPUT->footer();
