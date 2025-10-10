@@ -1,8 +1,7 @@
 // Kids-friendly theme customizations
 // This file contains all the custom styles for the child theme
 // The parent theme styles are automatically inherited
-// Import enhanced course cards
-@import 'enhanced_course_cards';
+
 
 // ====================================
 // MOODLE MAIN CONTENT OVERRIDE
@@ -12999,8 +12998,7 @@ body:has(.admin-sidebar-wrapper) {
     }
 }
 
-@import 'teacher_dashboard.scss';
-@import 'students_page.scss';
+
 
 /* Elementary Lessons Page Styles */
 .elementary-lessons-page {
@@ -13299,3 +13297,7 @@ body:has(.admin-sidebar-wrapper) {
         }
     }
 }
+
+@import 'teacher_dashboard.scss';
+@import 'students_page.scss';
+@import 'enhanced_course_cards';
