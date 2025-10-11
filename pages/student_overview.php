@@ -323,10 +323,6 @@ echo '<div class="teacher-main-content">';
 // Full Screen Dashboard Layout with Integrated Profile
 echo html_writer::start_div('', ['style' => 'min-height: 100vh; background: #f8fafc; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 0; margin: 0; width: 100%; overflow-x: hidden;']);
 
-// Include Moodle header for navigation bar
-echo $OUTPUT->header();
-
-
 // Full Width Dashboard Content
 echo html_writer::start_div('', ['style' => 'max-width: 1400px; margin: 0 auto; padding: 24px;']);
 echo html_writer::start_div('', ['style' => 'display: grid; grid-template-columns: 2fr 1fr; gap: 32px;']);
