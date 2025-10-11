@@ -235,7 +235,7 @@ echo "<div class='sidebar-section'>";
 echo "<h3 class='sidebar-category'>SETTINGS</h3>";
 echo "<ul class='sidebar-menu'>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-cog sidebar-icon'></i>";
 echo "<span class='sidebar-text'>System Settings</span>";
 echo "</a>";
@@ -1081,7 +1081,7 @@ echo "<div class='admin-main-content'>";
         <h2 class="section-title">Course Management</h2>
         <div class="management-grid-container">
                 <div class="management-grid" id="managementGrid">
-                    <div class="management-card" onclick="window.location.href='course_categories.php'">
+                    <div class="management-card" onclick="window.location.href = WWWROOT + '/course/management.php';">
                         <div class="card-icon create-icon">
                             <i class="fa fa-plus"></i>
                         </div>
@@ -1270,12 +1270,15 @@ function selectCourseForContent(courseId) {
 }
 
 function viewAllCourses() {
-    // Redirect to course management page
-    window.location.href = WWWROOT + '/course/management.php';
+    // Redirect to view all courses page
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/view_all_courses.php';
 }
 
 
-
+function viewCourse(courseId) {
+    // Redirect to view all courses page
+    window.location.href = WWWROOT + '/course/view.php?id=' + courseId;
+}
 
 function showMessage(message, type) {
     const messageDiv = document.createElement('div');

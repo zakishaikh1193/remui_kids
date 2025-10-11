@@ -69,36 +69,170 @@ echo "<style>
     
     body {
         font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #E8DFFF 0%, #DCD0FF 100%);
         min-height: 100vh;
         padding: 20px;
     }
     
+    /* Sidebar Styles */
+    .admin-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        z-index: 1000;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+    
+    .admin-sidebar .sidebar-content {
+        padding: 6rem 0 2rem 0;
+    }
+    
+    .admin-sidebar .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .admin-sidebar .sidebar-category {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        padding: 0 2rem;
+        margin-top: 0;
+    }
+    
+    .admin-sidebar .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-sidebar .sidebar-item {
+        margin-bottom: 0.25rem;
+    }
+    
+    .admin-sidebar .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 2rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .admin-sidebar .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+        border-left-color: #9D8DF1;
+    }
+    
+    .admin-sidebar .sidebar-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 1rem;
+        font-size: 1rem;
+        color: #6c757d;
+        text-align: center;
+    }
+    
+    .admin-sidebar .sidebar-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-link {
+        background-color: #E8DFFF;
+        color: #7C73E6;
+        border-left-color: #9D8DF1;
+    }
+    
+    .admin-sidebar .sidebar-item.active .sidebar-icon {
+        color: #9D8DF1;
+    }
+    
+    /* Scrollbar styling */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Main content area with sidebar */
+    .admin-main-content {
+        position: fixed;
+        top: 0;
+        left: 280px;
+        width: calc(100vw - 280px);
+        height: 100vh;
+        background-color: #ffffff;
+        overflow-y: auto;
+        z-index: 99;
+        will-change: transform;
+        backface-visibility: hidden;
+        padding-top: 80px;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .admin-sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+        
+        .admin-main-content {
+            position: relative;
+            left: 0;
+            width: 100vw;
+            height: auto;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+    }
+    
     .edit-container {
-        max-width: 800px;
+        max-width: 1200px;
         margin: 0 auto;
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(10px);
         overflow: hidden;
-        animation: slideInUp 0.8s ease-out;
-    }
-    
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .edit-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #C5B4E3 0%, #B8B5FF 100%);
+        color: #5B4E9E;
         padding: 40px;
         text-align: center;
         position: relative;
@@ -113,12 +247,6 @@ echo "<style>
         width: 200%;
         height: 200%;
         background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
     }
     
     .edit-title {
@@ -127,18 +255,7 @@ echo "<style>
         margin-bottom: 10px;
         position: relative;
         z-index: 1;
-        animation: fadeInDown 1s ease-out 0.3s both;
-    }
-    
-    @keyframes fadeInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        color: #5B4E9E;
     }
     
     .edit-subtitle {
@@ -146,51 +263,28 @@ echo "<style>
         opacity: 0.9;
         position: relative;
         z-index: 1;
-        animation: fadeInUp 1s ease-out 0.5s both;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        color: #7C73E6;
     }
     
     .teacher-avatar {
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 2rem;
         font-weight: bold;
         margin: 20px auto;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        animation: pulse 2s infinite;
+        border: 3px solid rgba(255, 255, 255, 0.6);
         position: relative;
         z-index: 1;
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+        color: #7C73E6;
     }
     
     .edit-form {
         padding: 40px;
-        animation: fadeIn 1s ease-out 0.7s both;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
     }
     
     .form-row {
@@ -208,7 +302,7 @@ echo "<style>
     .form-label {
         display: block;
         font-weight: 600;
-        color: #2d3748;
+        color: #7C73E6;
         margin-bottom: 8px;
         font-size: 0.95rem;
         text-transform: uppercase;
@@ -218,7 +312,7 @@ echo "<style>
     .form-control {
         width: 100%;
         padding: 15px 20px;
-        border: 2px solid #e2e8f0;
+        border: 2px solid #DCD0FF;
         border-radius: 12px;
         font-size: 1rem;
         transition: all 0.3s ease;
@@ -227,14 +321,14 @@ echo "<style>
     
     .form-control:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #9D8DF1;
         background: white;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(157, 141, 241, 0.1);
         transform: translateY(-2px);
     }
     
     .form-control:hover {
-        border-color: #cbd5e0;
+        border-color: #C5B4E3;
         background: white;
     }
     
@@ -262,24 +356,24 @@ echo "<style>
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #9D8DF1 0%, #7C73E6 100%);
         color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(157, 141, 241, 0.3);
     }
     
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 8px 25px rgba(157, 141, 241, 0.4);
     }
     
     .btn-secondary {
-        background: #f7fafc;
-        color: #4a5568;
-        border: 2px solid #e2e8f0;
+        background: #ffffff;
+        color: #7C73E6;
+        border: 2px solid #DCD0FF;
     }
     
     .btn-secondary:hover {
-        background: #edf2f7;
+        background: #E8DFFF;
         transform: translateY(-2px);
     }
     
@@ -288,18 +382,6 @@ echo "<style>
         border-radius: 12px;
         margin-bottom: 30px;
         font-weight: 500;
-        animation: slideInDown 0.5s ease-out;
-    }
-    
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     
     .alert-success {
@@ -313,7 +395,7 @@ echo "<style>
     }
     
     .breadcrumb {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.3);
         padding: 15px 30px;
         border-radius: 12px;
         margin-bottom: 20px;
@@ -321,17 +403,19 @@ echo "<style>
     }
     
     .breadcrumb a {
-        color: rgba(255, 255, 255, 0.8);
+        color: #7C73E6;
         text-decoration: none;
         transition: color 0.3s ease;
+        font-weight: 500;
     }
     
     .breadcrumb a:hover {
-        color: white;
+        color: #9D8DF1;
     }
     
     .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.9);
+        color: #5B4E9E;
+        font-weight: 600;
     }
     
     .floating-elements {
@@ -348,7 +432,6 @@ echo "<style>
         position: absolute;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
-        animation: float 6s ease-in-out infinite;
     }
     
     .floating-circle:nth-child(1) {
@@ -356,7 +439,6 @@ echo "<style>
         height: 80px;
         top: 20%;
         left: 10%;
-        animation-delay: 0s;
     }
     
     .floating-circle:nth-child(2) {
@@ -364,7 +446,6 @@ echo "<style>
         height: 120px;
         top: 60%;
         right: 10%;
-        animation-delay: 2s;
     }
     
     .floating-circle:nth-child(3) {
@@ -372,12 +453,6 @@ echo "<style>
         height: 60px;
         bottom: 20%;
         left: 20%;
-        animation-delay: 4s;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
     }
     
     @media (max-width: 768px) {
@@ -409,12 +484,155 @@ echo "<div class='floating-circle'></div>";
 echo "<div class='floating-circle'></div>";
 echo "</div>";
 
+// Admin Sidebar Navigation
+echo "<div class='admin-sidebar'>";
+echo "<div class='sidebar-content'>";
+echo "<!-- DASHBOARD Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>DASHBOARD</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/my/' class='sidebar-link'>";
+echo "<i class='fa fa-th-large sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Admin Dashboard</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/admin/search.php' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Site Administration</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Community</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/enrollments.php' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Enrollments</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- TEACHERS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>TEACHERS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item active'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/teachers_list.php' class='sidebar-link'>";
+echo "<i class='fa fa-users sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Teachers</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-medal sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Master Trainers</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- COURSES & PROGRAMS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
+echo "<i class='fa fa-book sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Courses & Programs</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Certifications</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Assessments</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-school sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Schools</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- INSIGHTS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>INSIGHTS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/local/edwiserreports/index.php' class='sidebar-link'>";
+echo "<i class='fa fa-chart-bar sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Analytics</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-chart-line sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Predictive Models</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-file-alt sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Reports</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-map sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Competencies Map</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+
+echo "<!-- SETTINGS Section -->";
+echo "<div class='sidebar-section'>";
+echo "<h3 class='sidebar-category'>SETTINGS</h3>";
+echo "<ul class='sidebar-menu'>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
+echo "<i class='fa fa-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>System Settings</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/users_management_dashboard.php' class='sidebar-link'>";
+echo "<i class='fa fa-user-friends sidebar-icon'></i>";
+echo "<span class='sidebar-text'>User Management</span>";
+echo "</a>";
+echo "</li>";
+echo "<li class='sidebar-item'>";
+echo "<a href='#' class='sidebar-link'>";
+echo "<i class='fa fa-users-cog sidebar-icon'></i>";
+echo "<span class='sidebar-text'>Cohort Navigation</span>";
+echo "</a>";
+echo "</li>";
+echo "</ul>";
+echo "</div>";
+echo "</div>";
+echo "</div>";
+
+// Main content area with sidebar
+echo "<div class='admin-main-content'>";
+
 echo "<div class='edit-container'>";
 echo "<div class='edit-header'>";
 echo "<div class='breadcrumb'>";
-echo "<a href='{$CFG->wwwroot}/my/'>Dashboard</a> / ";
-echo "<a href='teachers_list.php'>Teachers</a> / ";
-echo "<span class='breadcrumb-item'>Edit Teacher</span>";
+
 echo "</div>";
 
 echo "<div class='teacher-avatar'>";
@@ -474,6 +692,38 @@ echo "</div>";
 
 echo "</form>";
 echo "</div>";
+echo "</div>";
+
+// Add JavaScript for sidebar toggle
+echo "<script>
+// Sidebar toggle function
+function toggleSidebar() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    sidebar.classList.toggle('sidebar-open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.admin-sidebar');
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    
+    if (window.innerWidth <= 768) {
+        if (!sidebar.contains(event.target) && toggleBtn && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove('sidebar-open');
+        }
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
+</script>";
+
+// Close admin-main-content div
 echo "</div>";
 
 echo $OUTPUT->footer();

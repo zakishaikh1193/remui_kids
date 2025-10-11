@@ -54,7 +54,7 @@ echo "<style>
     
     body {
         font-family: 'Inter', sans-serif;
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #fef7f7 0%, #f0f9ff 50%, #f0fdf4 100%);
         min-height: 100vh;
         overflow-x: hidden;
     }
@@ -217,19 +217,23 @@ echo "<style>
         justify-content: space-between;
         align-items: center;
         margin-bottom: 30px;
-        padding-bottom: 20px;
+        padding: 20px;
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
         border-bottom: 2px solid #e9ecef;
     }
     .teachers-title {
         font-size: 28px;
         font-weight: 600;
-        color: #2c3e50;
+        color: #166534;
         margin: 0;
     }
     .teachers-subtitle {
-        color: #6c757d;
+        color: #166534;
         margin: 5px 0 0 0;
         font-size: 16px;
+        opacity: 0.8;
     }
     .teachers-stats {
         display: flex;
@@ -239,14 +243,14 @@ echo "<style>
     .stat-item {
         text-align: center;
         padding: 10px 15px;
-        background: #f8f9fa;
+        background: #dcfce7;
         border-radius: 6px;
         min-width: 80px;
     }
     .stat-number {
         font-size: 24px;
         font-weight: bold;
-        color: #007bff;
+        color: #166534;
         margin: 0;
     }
     .stat-label {
@@ -265,8 +269,8 @@ echo "<style>
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .teachers-table th {
-        background: #007bff;
-        color: white;
+        background: #dcfce7;
+        color: #166534;
         padding: 15px 12px;
         text-align: left;
         font-weight: 600;
@@ -286,14 +290,12 @@ echo "<style>
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #007bff;
-        color: white;
+        background: #e0f2fe; /* light blue pastel */
+        color: #0369a1;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        font-size: 16px;
-        margin-right: 10px;
+        font-weight: 700;
     }
     .teacher-info {
         display: flex;
@@ -746,7 +748,7 @@ echo "<div class='sidebar-section'>";
 echo "<h3 class='sidebar-category'>SETTINGS</h3>";
 echo "<ul class='sidebar-menu'>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/user_profile_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-cog sidebar-icon'></i>";
 echo "<span class='sidebar-text'>System Settings</span>";
 echo "</a>";
@@ -823,13 +825,7 @@ try {
     $suspended_teachers = $total_teachers - $active_teachers;
     
     // Breadcrumb
-    echo "<nav aria-label='breadcrumb'>";
-    echo "<ol class='breadcrumb'>";
-    echo "<li class='breadcrumb-item'><a href='{$CFG->wwwroot}/my/'>Dashboard</a></li>";
-    echo "<li class='breadcrumb-item'><a href='{$CFG->wwwroot}/theme/remui_kids/admin/'>Administration</a></li>";
-    echo "<li class='breadcrumb-item active'>Teachers Management</li>";
-    echo "</ol>";
-    echo "</nav>";
+    
     
     // Main container
     echo "<div class='teachers-container'>";
@@ -996,7 +992,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = rows[i];
                 const name = row.cells[0].textContent.toLowerCase();
                 const email = row.cells[2].textContent.toLowerCase();
-                const status = row.cells[3].textContent.toLowerCase();
+                const status = row.cells[4].textContent.toLowerCase(); // Fixed: Status is in column 4, not 3
                 
                 const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
                 const matchesStatus = statusValue === 'all' || 

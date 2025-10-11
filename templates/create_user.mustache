@@ -1,3 +1,5 @@
+{{> theme_remui_kids/admin_shared_styles }}
+
 <div class="create-user-page">
     <!-- Header Section -->
     <div class="page-header">
@@ -332,12 +334,11 @@
 
 .create-user-page {
     padding: 20px;
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: white;
     min-height: 100vh;
-    animation: fadeIn 0.8s ease-out;
 }
 
 @keyframes fadeIn {
@@ -353,7 +354,7 @@
 
 /* Header Styles */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
@@ -363,19 +364,7 @@
     align-items: center;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-    animation: slideInDown 0.8s ease-out;
-}
-
-@keyframes slideInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    box-shadow: 0 10px 30px rgba(186, 104, 200, 0.3);
 }
 
 .page-header::before {

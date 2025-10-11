@@ -1,0 +1,949 @@
+{{!
+    Tree View Page Template - Dropdown Style
+    Hierarchical dropdown navigation for Courses → Lessons → Activities
+}}
+
+{{> theme_remui_kids/common_start}}
+
+<style>
+/* Enhanced Elementary Sidebar Styles */
+.enhanced-elementary-sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%) !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.enhanced-elementary-sidebar .sidebar-nav {
+    padding: 1.5rem 0 !important;
+}
+
+.enhanced-elementary-sidebar .nav-section {
+    margin-bottom: 2rem !important;
+}
+
+.enhanced-elementary-sidebar .section-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #666666 !important;
+    margin-bottom: 1rem !important;
+    padding: 0 1.5rem !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.blue {
+    background: #3b82f6 !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.green {
+    background: #10b981 !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.orange {
+    background: #f59e0b !important;
+}
+
+.enhanced-elementary-sidebar .section-bullet.purple {
+    background: #8b5cf6 !important;
+}
+
+.enhanced-elementary-sidebar .nav-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.enhanced-elementary-sidebar .nav-item {
+    margin-bottom: 0.5rem !important;
+}
+
+.enhanced-elementary-sidebar .nav-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    padding: 0.75rem 1.5rem !important;
+    color: #b0b3b8 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    border-radius: 0 25px 25px 0 !important;
+    margin-right: 1rem !important;
+}
+
+.enhanced-elementary-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    transform: translateX(5px) !important;
+}
+
+.enhanced-elementary-sidebar .nav-link.active {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+.enhanced-elementary-sidebar .nav-link i {
+    font-size: 1.1rem !important;
+    width: 20px !important;
+    text-align: center !important;
+}
+
+.enhanced-elementary-sidebar .nav-link span {
+    font-weight: 500 !important;
+}
+
+/* Quick Actions Container */
+.enhanced-elementary-sidebar .quick-actions-container {
+    padding: 0 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-card:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    color: white !important;
+    flex-shrink: 0 !important;
+}
+
+.enhanced-elementary-sidebar .ebooks-card .quick-action-icon {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.enhanced-elementary-sidebar .ask-teacher-card .quick-action-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.enhanced-elementary-sidebar .code-editor-card .quick-action-icon {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+}
+
+.enhanced-elementary-sidebar .share-class-card .quick-action-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.enhanced-elementary-sidebar .scratch-editor-card .quick-action-icon {
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-content {
+    flex: 1 !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-content h4 {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    margin: 0 0 0.25rem 0 !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-content p {
+    font-size: 0.75rem !important;
+    color: #b0b3b8 !important;
+    margin: 0 !important;
+}
+
+.enhanced-elementary-sidebar .quick-action-arrow {
+    color: #b0b3b8 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Tree View Page Styles - Dropdown Version */
+.treeview-page .treeview-content {
+    margin-left: 0 !important;
+    padding: 2rem !important;
+    min-height: 100vh !important;
+    background: #ffffff !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+/* Header Banner */
+.learning-path-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+    border-radius: 16px !important;
+    padding: 2rem !important;
+    margin-bottom: 2rem !important;
+    color: white !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+
+.header-icon {
+    width: 60px !important;
+    height: 60px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 2rem !important;
+    color: white !important;
+}
+
+.header-text h1 {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    color: white !important;
+}
+
+.header-text p {
+    font-size: 1.1rem !important;
+    margin: 0.5rem 0 0 0 !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.header-stats {
+    text-align: right !important;
+}
+
+.header-stats .stat-number {
+    font-size: 3rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    color: white !important;
+}
+
+.header-stats .stat-label {
+    font-size: 1rem !important;
+    margin: 0 !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dropdown Container */
+.dropdown-navigation {
+    max-width: 800px !important;
+    margin: 0 auto !important;
+}
+
+/* Course Dropdown */
+.course-dropdown {
+    margin-bottom: 1.5rem !important;
+}
+
+.course-dropdown-header {
+    background: #f8f9fa !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.5rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.course-dropdown-header:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.course-dropdown-header.active {
+    background: #e0f2fe !important;
+    border-color: #0ea5e9 !important;
+}
+
+.course-dropdown-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+
+.course-dropdown-icon {
+    width: 40px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 1.2rem !important;
+}
+
+.course-dropdown-info h3 {
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.25rem 0 !important;
+}
+
+.course-dropdown-meta {
+    font-size: 0.9rem !important;
+    color: #6b7280 !important;
+}
+
+.course-dropdown-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+
+.course-progress-text {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+}
+
+.course-dropdown-arrow {
+    font-size: 1.2rem !important;
+    color: #6b7280 !important;
+    transition: transform 0.3s ease !important;
+}
+
+.course-dropdown-arrow.rotated {
+    transform: rotate(180deg) !important;
+}
+
+/* Course Dropdown Content */
+.course-dropdown-content {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    border-radius: 0 0 12px 12px !important;
+    padding: 1rem !important;
+    display: none !important;
+}
+
+.course-dropdown-content.active {
+    display: block !important;
+}
+
+/* Lesson Dropdown */
+.lesson-dropdown {
+    margin-bottom: 1rem !important;
+}
+
+.lesson-dropdown-header {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-left: 1rem !important;
+}
+
+.lesson-dropdown-header:hover {
+    background: #f3f4f6 !important;
+}
+
+.lesson-dropdown-header.active {
+    background: #ecfdf5 !important;
+    border-color: #10b981 !important;
+}
+
+.lesson-dropdown-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+.lesson-dropdown-icon {
+    width: 32px !important;
+    height: 32px !important;
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 1rem !important;
+}
+
+.lesson-dropdown-info h4 {
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.125rem 0 !important;
+}
+
+.lesson-dropdown-meta {
+    font-size: 0.8rem !important;
+    color: #6b7280 !important;
+}
+
+.lesson-dropdown-arrow {
+    font-size: 1rem !important;
+    color: #6b7280 !important;
+    transition: transform 0.3s ease !important;
+}
+
+.lesson-dropdown-arrow.rotated {
+    transform: rotate(180deg) !important;
+}
+
+/* Lesson Dropdown Content */
+.lesson-dropdown-content {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 0.75rem !important;
+    display: none !important;
+    margin-left: 1rem !important;
+}
+
+.lesson-dropdown-content.active {
+    display: block !important;
+}
+
+/* Activities List */
+.activities-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+}
+
+.activity-item {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    transition: all 0.3s ease !important;
+    margin-left: 1rem !important;
+}
+
+.activity-item:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    transform: translateX(4px) !important;
+}
+
+.activity-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex: 1 !important;
+}
+
+.activity-number {
+    width: 28px !important;
+    height: 28px !important;
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    flex-shrink: 0 !important;
+}
+
+.activity-icon {
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.9rem !important;
+    color: #6b7280 !important;
+}
+
+.activity-info h5 {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.125rem 0 !important;
+}
+
+.activity-meta {
+    font-size: 0.75rem !important;
+    color: #6b7280 !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+}
+
+.activity-start-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.375rem 0.75rem !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.activity-start-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center !important;
+    padding: 4rem 2rem !important;
+    background: #f9fafb !important;
+    border-radius: 12px !important;
+    border: 2px dashed #d1d5db !important;
+}
+
+.empty-state i {
+    font-size: 3rem !important;
+    color: #9ca3af !important;
+    margin-bottom: 1rem !important;
+}
+
+.empty-state h3 {
+    color: #6b7280 !important;
+    margin: 1rem 0 0.5rem 0 !important;
+}
+
+.empty-state p {
+    color: #9ca3af !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .treeview-page .treeview-content {
+        padding: 1rem !important;
+    }
+    
+    .learning-path-header {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 1rem !important;
+    }
+    
+    .header-stats {
+        text-align: center !important;
+    }
+    
+    .course-dropdown-header,
+    .lesson-dropdown-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+    
+    .course-dropdown-right,
+    .lesson-dropdown-left {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+    
+    .activity-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+    
+    .activity-left {
+        width: 100% !important;
+    }
+    
+    .activity-start-btn {
+        align-self: flex-end !important;
+    }
+}
+
+/* Hide default navbar */
+{{#hide_default_navbar}}
+.navbar,
+.navbar-expand-lg,
+.navbar-nav {
+    display: none !important;
+}
+
+#page,
+#page-wrapper {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+{{/hide_default_navbar}}
+</style>
+
+<div class="treeview-page">
+    <!-- Sidebar removed - using default Moodle sidebar -->
+    <div class="student-sidebar enhanced-elementary-sidebar" style="display: none;">
+        <nav class="sidebar-nav">
+            
+            <!-- DASHBOARD Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet blue"></span>
+                    DASHBOARD
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{dashboardurl}}}" class="nav-link dashboard-link">
+                            <i class="fa fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{mycoursesurl}}}" class="nav-link mycourses-link">
+                            <i class="fa fa-book-open"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{lessonsurl}}}" class="nav-link">
+                            <i class="fa fa-play-circle"></i>
+                            <span>Lessons</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{activitiesurl}}}" class="nav-link">
+                            <i class="fa fa-chart-line"></i>
+                            <span>Activities</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{achievementsurl}}}" class="nav-link">
+                            <i class="fa fa-trophy"></i>
+                            <span>Achievements</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{competenciesurl}}}" class="nav-link">
+                            <i class="fa fa-bullseye"></i>
+                            <span>Competencies</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{{scheduleurl}}}" class="nav-link">
+                            <i class="fa fa-calendar"></i>
+                            <span>Schedule</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- TOOLS & RESOURCES Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet green"></span>
+                    TOOLS & RESOURCES
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{treeviewurl}}}" class="nav-link active">
+                            <i class="fa fa-sitemap"></i>
+                            <span>Tree View</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- SETTINGS & PROFILE Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet orange"></span>
+                    SETTINGS & PROFILE
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{{settingsurl}}}" class="nav-link settings-link">
+                            <i class="fa fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- QUICK ACTIONS Section -->
+            <div class="nav-section">
+                <div class="section-title">
+                    <span class="section-bullet purple"></span>
+                    QUICK ACTIONS
+                </div>
+                <div class="quick-actions-container">
+                    <div class="quick-action-card ebooks-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-book"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>E-books</h4>
+                            <p>Access digital learning materials</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card ask-teacher-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-question-circle"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Ask Teacher</h4>
+                            <p>Get help from your instructor</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card code-editor-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-desktop"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Code Editor</h4>
+                            <p>Write and run JavaScript code</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card share-class-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-share-alt"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Share with Class</h4>
+                            <p>Collaborate with classmates</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-action-card scratch-editor-card">
+                        <div class="quick-action-icon">
+                            <i class="fa fa-play"></i>
+                        </div>
+                        <div class="quick-action-content">
+                            <h4>Scratch Editor</h4>
+                            <p>Create interactive projects</p>
+                        </div>
+                        <div class="quick-action-arrow">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Tree View Content -->
+    <div class="treeview-content">
+        <!-- Header Banner -->
+        <div class="learning-path-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fa fa-book-open"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Learning Path Explorer</h1>
+                    <p>Discover and navigate through your learning journey</p>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-number">{{total_courses}}</div>
+                <div class="stat-label">Active Courses</div>
+            </div>
+        </div>
+
+        <!-- Dropdown Navigation -->
+        <div class="dropdown-navigation">
+            {{#has_courses}}
+                {{#courses}}
+                <div class="course-dropdown">
+                    <!-- Course Dropdown Header -->
+                    <div class="course-dropdown-header" data-course-id="{{id}}">
+                        <div class="course-dropdown-left">
+                            <div class="course-dropdown-icon">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="course-dropdown-info">
+                                <h3>{{fullname}}</h3>
+                                <div class="course-dropdown-meta">
+                                    • {{total_sections}} sections • {{progress_percentage}}% complete • {{shortname}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="course-dropdown-right">
+                            <span class="course-progress-text">{{progress_percentage}}%</span>
+                            <i class="fa fa-chevron-down course-dropdown-arrow"></i>
+                        </div>
+                    </div>
+
+                    <!-- Course Dropdown Content -->
+                    <div class="course-dropdown-content">
+                        {{#has_lessons}}
+                            {{#lessons}}
+                            <div class="lesson-dropdown">
+                                <!-- Lesson Dropdown Header -->
+                                <div class="lesson-dropdown-header" data-lesson-id="{{id}}">
+                                    <div class="lesson-dropdown-left">
+                                        <div class="lesson-dropdown-icon">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        <div class="lesson-dropdown-info">
+                                            <h4>{{name}}</h4>
+                                            <div class="lesson-dropdown-meta">
+                                                • {{activity_count}} activities • {{progress_percentage}}% complete
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <i class="fa fa-chevron-down lesson-dropdown-arrow"></i>
+                                </div>
+
+                                <!-- Lesson Dropdown Content -->
+                                <div class="lesson-dropdown-content">
+                                    {{#has_activities}}
+                                    <div class="activities-list">
+                                        {{#activities}}
+                                        <div class="activity-item" data-activity-url="{{url}}">
+                                            <div class="activity-left">
+                                                <div class="activity-number">{{activity_number}}</div>
+                                                <div class="activity-icon">
+                                                    <i class="fa {{icon}}"></i>
+                                                </div>
+                                                <div class="activity-info">
+                                                    <h5>{{name}}</h5>
+                                                    <div class="activity-meta">
+                                                        <span>• {{type}}</span>
+                                                        <span>• {{duration}} min</span>
+                                                        <span>• {{points}} pts</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button class="activity-start-btn">Start</button>
+                                        </div>
+                                        {{/activities}}
+                                    </div>
+                                    {{/has_activities}}
+                                </div>
+                            </div>
+                            {{/lessons}}
+                        {{/has_lessons}}
+                    </div>
+                </div>
+                {{/courses}}
+            {{/has_courses}}
+            
+            {{^has_courses}}
+            <div class="empty-state">
+                <i class="fa fa-tree"></i>
+                <h3>No Learning Path Available</h3>
+                <p>You don't have any enrolled courses yet. Contact your teacher to get started!</p>
+            </div>
+            {{/has_courses}}
+        </div>
+    </div>
+</div>
+
+{{> theme_remui/footer }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Course dropdown functionality
+    const courseHeaders = document.querySelectorAll('.course-dropdown-header');
+    courseHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            const arrow = this.querySelector('.course-dropdown-arrow');
+            
+            // Toggle active class
+            this.classList.toggle('active');
+            content.classList.toggle('active');
+            arrow.classList.toggle('rotated');
+            
+            // Close other course dropdowns
+            courseHeaders.forEach(otherHeader => {
+                if (otherHeader !== this) {
+                    otherHeader.classList.remove('active');
+                    otherHeader.nextElementSibling.classList.remove('active');
+                    otherHeader.querySelector('.course-dropdown-arrow').classList.remove('rotated');
+                }
+            });
+        });
+    });
+    
+    // Lesson dropdown functionality
+    const lessonHeaders = document.querySelectorAll('.lesson-dropdown-header');
+    lessonHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            const arrow = this.querySelector('.lesson-dropdown-arrow');
+            
+            // Toggle active class
+            this.classList.toggle('active');
+            content.classList.toggle('active');
+            arrow.classList.toggle('rotated');
+        });
+    });
+    
+    // Activity start button functionality
+    const startButtons = document.querySelectorAll('.activity-start-btn');
+    startButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const activityItem = this.closest('.activity-item');
+            const activityUrl = activityItem.dataset.activityUrl;
+            if (activityUrl) {
+                window.location.href = activityUrl;
+            }
+        });
+    });
+    
+    // Course header click to view course
+    courseHeaders.forEach(header => {
+        header.addEventListener('dblclick', function() {
+            const courseId = this.dataset.courseId;
+            if (courseId) {
+                window.location.href = '/course/view.php?id=' + courseId;
+            }
+        });
+    });
+});
+</script>

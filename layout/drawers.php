@@ -28,8 +28,15 @@ global $CFG, $PAGE, $COURSE, $USER, $DB, $OUTPUT;
 
 require_once($CFG->dirroot . '/theme/remui_kids/layout/common.php');
 
-// Check if this is a dashboard page and use our custom dashboard
-if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
+// Check if this is a dashboard page, mycourses page, or our custom pages
+$is_custom_mycourses = (strpos($PAGE->url->get_path(), '/theme/remui_kids/mycourses.php') !== false);
+$is_custom_lessons = (strpos($PAGE->url->get_path(), '/theme/remui_kids/lessons.php') !== false);
+$is_elementary_lessons = (strpos($PAGE->url->get_path(), '/theme/remui_kids/elementary_lessons.php') !== false);
+$is_elementary_activities = (strpos($PAGE->url->get_path(), '/theme/remui_kids/elementary_activities.php') !== false);
+
+if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') || 
+    ($PAGE->pagelayout == 'mycourses' && $PAGE->pagetype == 'my-index') ||
+    $is_custom_mycourses || $is_custom_lessons || $is_elementary_lessons || $is_elementary_activities) {
     // Check if user is admin first
     $isadmin = is_siteadmin($USER) || has_capability('moodle/site:config', context_system::instance(), $USER);
     
@@ -133,95 +140,27 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         // Top Courses (real data, with mock fallback for layout preview)
         $templatecontext['top_courses'] = theme_remui_kids_get_top_courses_by_enrollment(5);
         if (empty($templatecontext['top_courses'])) {
-            $templatecontext['top_courses'] = [
-                ['id' => 0, 'name' => 'Mathematics 101', 'enrollment_count' => 34, 'element_count' => 56, 'url' => '#'],
-                ['id' => 0, 'name' => 'Science Basics', 'enrollment_count' => 28, 'element_count' => 41, 'url' => '#'],
-                ['id' => 0, 'name' => 'English Grammar', 'enrollment_count' => 22, 'element_count' => 39, 'url' => '#'],
-                ['id' => 0, 'name' => 'Art & Design', 'enrollment_count' => 18, 'element_count' => 24, 'url' => '#'],
-                ['id' => 0, 'name' => 'History Overview', 'enrollment_count' => 15, 'element_count' => 31, 'url' => '#']
-            ];
+            error_log("No top courses found - user may not be a teacher in any courses");
+            // No mock data - template will show "No courses available" message
+        } else {
+            error_log("Loaded " . count($templatecontext['top_courses']) . " top courses with real data");
         }
         
         // Real data sections - Recent Student Activity and Course Overview
         $templatecontext['recent_student_activity'] = theme_remui_kids_get_recent_student_activity();
         if (empty($templatecontext['recent_student_activity'])) {
-            error_log("No recent student activity found - using mock data");
-            $templatecontext['recent_student_activity'] = [
-                [
-                    'student_name' => 'Sarah Johnson',
-                    'activity_name' => 'Mathematics Quiz - Chapter 5',
-                    'activity_type' => 'Quiz Attempt',
-                    'course_name' => 'Advanced Mathematics',
-                    'time' => '2 hours ago',
-                    'icon' => 'fa-star',
-                    'color' => '#FF9800'
-                ],
-                [
-                    'student_name' => 'Michael Chen',
-                    'activity_name' => 'Essay Assignment Submission',
-                    'activity_type' => 'Assignment Submitted',
-                    'course_name' => 'English Literature',
-                    'time' => '4 hours ago',
-                    'icon' => 'fa-file-text',
-                    'color' => '#4CAF50'
-                ],
-                [
-                    'student_name' => 'Emily Rodriguez',
-                    'activity_name' => 'Discussion: Climate Change',
-                    'activity_type' => 'Forum Post',
-                    'course_name' => 'Environmental Science',
-                    'time' => '6 hours ago',
-                    'icon' => 'fa-comments',
-                    'color' => '#2196F3'
-                ],
-                [
-                    'student_name' => 'David Kim',
-                    'activity_name' => 'Physics Lab Report',
-                    'activity_type' => 'Assignment Submitted',
-                    'course_name' => 'Physics 101',
-                    'time' => '8 hours ago',
-                    'icon' => 'fa-file-text',
-                    'color' => '#4CAF50'
-                ],
-                [
-                    'student_name' => 'Lisa Thompson',
-                    'activity_name' => 'History Quiz - World War II',
-                    'activity_type' => 'Quiz Attempt',
-                    'course_name' => 'World History',
-                    'time' => '1 day ago',
-                    'icon' => 'fa-star',
-                    'color' => '#FF9800'
-                ],
-                [
-                    'student_name' => 'James Wilson',
-                    'activity_name' => 'Programming Exercise 3',
-                    'activity_type' => 'Assignment Submitted',
-                    'course_name' => 'Computer Science',
-                    'time' => '1 day ago',
-                    'icon' => 'fa-file-text',
-                    'color' => '#4CAF50'
-                ],
-                [
-                    'student_name' => 'Maria Garcia',
-                    'activity_name' => 'Art Portfolio Review',
-                    'activity_type' => 'Assignment Submitted',
-                    'course_name' => 'Fine Arts',
-                    'time' => '2 days ago',
-                    'icon' => 'fa-file-text',
-                    'color' => '#4CAF50'
-                ],
-                [
-                    'student_name' => 'Alex Brown',
-                    'activity_name' => 'Chemistry Lab Safety Quiz',
-                    'activity_type' => 'Quiz Attempt',
-                    'course_name' => 'Chemistry',
-                    'time' => '2 days ago',
-                    'icon' => 'fa-star',
-                    'color' => '#FF9800'
-                ]
-            ];
+            error_log("No recent student activity found in the last 7 days");
+            // No mock data - template will show "No recent activity" message
         } else {
             error_log("Loaded " . count($templatecontext['recent_student_activity']) . " recent activities");
+        }
+
+        // Recent Users (Students) with activity data
+        $templatecontext['recent_users'] = theme_remui_kids_get_recent_users(10);
+        if (empty($templatecontext['recent_users'])) {
+            error_log("No recent users found in the last 7 days");
+        } else {
+            error_log("Loaded " . count($templatecontext['recent_users']) . " recent users");
         }
 
         // Student Questions System - Integrated with Moodle messaging and forums
@@ -451,11 +390,38 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $templatecontext['user_cohort_name'] = $usercohortname;
     $templatecontext['user_cohort_id'] = $usercohortid;
     $templatecontext['student_name'] = $USER->firstname;
-    $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
+
+    $templatecontext['hello_message'] = "Hello " . $USER->firstname . "!";
+    
+    // Set My Courses URL based on dashboard type
+    if ($dashboardtype === 'highschool') {
+        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/highschool_courses.php'))->out();
+        $templatecontext['assignmentsurl'] = (new moodle_url('/theme/remui_kids/highschool_assignments.php'))->out();
+        $templatecontext['profileurl'] = (new moodle_url('/theme/remui_kids/highschool_profile.php'))->out();
+        $templatecontext['messagesurl'] = (new moodle_url('/theme/remui_kids/highschool_messages.php'))->out();
+        $templatecontext['gradesurl'] = (new moodle_url('/theme/remui_kids/highschool_grades.php'))->out();
+        $templatecontext['calendarurl'] = (new moodle_url('/theme/remui_kids/highschool_calendar.php'))->out();
+    } else {
+        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/mycourses.php'))->out();
+        $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
+        $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', array('id' => $USER->id)))->out();                // Set lessons URL based on dashboard type
+        if ($dashboardtype === 'elementary') {
+            $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out();
+            $templatecontext['activitiesurl'] = (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out();
+        } else {
+            $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+            $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        }
+        $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
+        $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
+    }
+    
+    // Global Scratch Emulator URL for all dashboards
+    $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+    $templatecontext['treeviewurl'] = (new moodle_url('/theme/remui_kids/treeview.php'))->out();
+    $templatecontext['scheduleurl'] = (new moodle_url('/theme/remui_kids/schedule.php'))->out();
+    $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
-    $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
-    $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
-    $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
     $templatecontext['codeeditorurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 1]))->out(); // Adjust ID as needed
     $templatecontext['scratchurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 2]))->out(); // Adjust ID as needed
     $templatecontext['logouturl'] = (new moodle_url('/login/logout.php', ['sesskey' => sesskey()]))->out();
@@ -547,7 +513,6 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         $templatecontext['achievements'] = theme_remui_kids_get_achievements_data($USER->id);
         $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     }
-    
     // Add Grade 8-12 specific statistics and courses for high school students
     if ($dashboardtype === 'highschool') {
         $templatecontext['highschool_stats'] = theme_remui_kids_get_highschool_dashboard_stats($USER->id);
@@ -611,7 +576,84 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     // Must be called before rendering the template.
     require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
     
-    // Render our custom dashboard template
+    // Check if this is the mycourses page and user is elementary student
+    if (($PAGE->pagelayout == 'mycourses' && $PAGE->pagetype == 'my-index' && $dashboardtype === 'elementary') ||
+        ($is_custom_mycourses && $dashboardtype === 'elementary')) {
+        // For mycourses page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for custom mycourses page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Check if this is the lessons page and user is elementary student
+    if ($is_custom_lessons && $dashboardtype === 'elementary') {
+        // For lessons page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for custom lessons page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Check if this is the elementary lessons page and user is elementary student
+    if ($is_elementary_lessons && $dashboardtype === 'elementary') {
+        // For elementary lessons page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for elementary lessons page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Check if this is the elementary activities page and user is elementary student
+    if ($is_elementary_activities && $dashboardtype === 'elementary') {
+        // For elementary activities page with elementary students, add sidebar data to template context
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['show_elementary_sidebar'] = true;
+        $templatecontext['hide_default_navbar'] = true; // Hide navbar for elementary activities page
+        
+        // Use our custom drawers template with enhanced sidebar
+        echo $OUTPUT->render_from_template('theme_remui_kids/drawers', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
+    // Render our student dashboard template (handles elementary, middle, and high school)
     echo $OUTPUT->render_from_template('theme_remui_kids/dashboard', $templatecontext);
     return; // Exit early to prevent normal rendering
 }

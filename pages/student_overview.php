@@ -120,19 +120,211 @@ $PAGE->requires->js_init_code('
     document.head.appendChild(link);
 ');
 
+// Add Teacher Sidebar CSS
+$PAGE->requires->js_init_code('
+    var style = document.createElement("style");
+    style.textContent = `
+        .teacher-dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            z-index: 1001;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .teacher-sidebar {
+            width: 280px;
+            background: white;
+            color: #333;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-content {
+            padding: 20px 0;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+        
+        .sidebar-category {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin: 0 0 15px 0;
+            padding: 0 20px;
+            letter-spacing: 1px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-item {
+            margin: 0;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-link:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #10b981;
+        }
+        
+        .sidebar-item.active .sidebar-link {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #10b981;
+        }
+        
+        .sidebar-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .sidebar-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .teacher-main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .teacher-sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .teacher-sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .teacher-main-content {
+                margin-left: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add toggle function
+    window.toggleTeacherSidebar = function() {
+        const sidebar = document.querySelector(".teacher-sidebar");
+        sidebar.classList.toggle("open");
+    };
+');
+
 // Include Moodle header for navigation bar
 echo $OUTPUT->header();
 
-// Debug messages removed for clean UI
+// Teacher dashboard layout wrapper and sidebar
+echo '<div class="teacher-dashboard-wrapper">';
+echo '<button class="sidebar-toggle" onclick="toggleTeacherSidebar()">';
+echo '    <i class="fa fa-bars"></i>';
+echo '</button>';
+
+// Teacher Sidebar Navigation
+echo '<div class="teacher-sidebar">';
+echo '  <div class="sidebar-content">';
+// Dashboard section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">DASHBOARD</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/my/" class="sidebar-link"><i class="fa fa-th-large sidebar-icon"></i><span class="sidebar-text">Teacher Dashboard</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/index.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">My Courses</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-graduation-cap sidebar-icon"></i><span class="sidebar-text">Gradebook</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+// Courses section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">COURSES</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/index.php" class="sidebar-link"><i class="fa fa-book sidebar-icon"></i><span class="sidebar-text">All Courses</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/edit.php" class="sidebar-link"><i class="fa fa-plus sidebar-icon"></i><span class="sidebar-text">Create Course</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/course/index.php?categoryid=0" class="sidebar-link"><i class="fa fa-folder sidebar-icon"></i><span class="sidebar-text">Course Categories</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+// Students section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">STUDENTS</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item active"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/students.php" class="sidebar-link"><i class="fa fa-users sidebar-icon"></i><span class="sidebar-text">All Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/enrol/users.php" class="sidebar-link"><i class="fa fa-user-plus sidebar-icon"></i><span class="sidebar-text">Enroll Students</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Reports</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+// Assessments section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">ASSESSMENTS</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/mod/assign/index.php" class="sidebar-link"><i class="fa fa-tasks sidebar-icon"></i><span class="sidebar-text">Assignments</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/theme/remui_kids/teacher/quizzes.php" class="sidebar-link"><i class="fa fa-question-circle sidebar-icon"></i><span class="sidebar-text">Quizzes</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php" class="sidebar-link"><i class="fa fa-star sidebar-icon"></i><span class="sidebar-text">Grading</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+// Reports section
+echo '    <div class="sidebar-section">';
+echo '      <h3 class="sidebar-category">REPORTS</h3>';
+echo '      <ul class="sidebar-menu">';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/log/index.php" class="sidebar-link"><i class="fa fa-chart-bar sidebar-icon"></i><span class="sidebar-text">Activity Logs</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/outline/index.php" class="sidebar-link"><i class="fa fa-file-alt sidebar-icon"></i><span class="sidebar-text">Course Reports</span></a></li>';
+echo '        <li class="sidebar-item"><a href="' . $CFG->wwwroot . '/report/progress/index.php" class="sidebar-link"><i class="fa fa-chart-line sidebar-icon"></i><span class="sidebar-text">Progress Tracking</span></a></li>';
+echo '      </ul>';
+echo '    </div>';
+
+echo '  </div>';
+echo '</div>'; // end teacher-sidebar
+
+// Main content area next to sidebar
+echo '<div class="teacher-main-content">';
 
 // Full Screen Dashboard Layout with Integrated Profile
-echo html_writer::start_div('', ['style' => 'min-height: 100vh; background: #f8fafc; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 0; margin: 0; width: 100vw; overflow-x: hidden;']);
+echo html_writer::start_div('', ['style' => 'min-height: 100vh; background: #f8fafc; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 0; margin: 0; width: 100%; overflow-x: hidden;']);
 
-// Top Motivational Banner
-echo html_writer::start_div('', ['style' => 'background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 16px 24px; margin-bottom: 24px; border-radius: 12px; position: relative;']);
-echo html_writer::tag('p', 'Great effort so far ' . $student->firstname . '! Keep up the hard work, and with a bit more focus on your attendance, you\'re sure to reach your full potential!', ['style' => 'margin: 0; font-size: 16px; font-weight: 500; line-height: 1.5;']);
-echo html_writer::tag('button', '×', ['style' => 'position: absolute; top: 12px; right: 16px; background: none; border: none; color: white; font-size: 20px; font-weight: bold; cursor: pointer; padding: 4px 8px; border-radius: 4px; hover: background: rgba(255,255,255,0.1);']);
-echo html_writer::end_div();
+// Include Moodle header for navigation bar
+echo $OUTPUT->header();
+
 
 // Full Width Dashboard Content
 echo html_writer::start_div('', ['style' => 'max-width: 1400px; margin: 0 auto; padding: 24px;']);
