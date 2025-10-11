@@ -148,6 +148,9 @@ if (isset($_GET['action'])) {
                 exit;
             }
             
+            // Log the school_id for debugging
+            error_log("get_school_details called with school_id: " . $school_id);
+            
             try {
                 // Get school details from mdl_company table or course_categories
                 if ($DB->get_manager()->table_exists('company')) {
@@ -158,11 +161,18 @@ if (isset($_GET['action'])) {
                         $school->email = '';
                     }
                 } else {
-                    $school = $DB->get_record('course_categories', ['id' => $school_id], 'id, name, idnumber as code');
-                    if ($school) {
-                        $school->address = '';
-                        $school->phone = '';
-                        $school->email = '';
+                    // Check if the course category exists before trying to fetch it
+                    if ($DB->record_exists('course_categories', ['id' => $school_id])) {
+                        $school = $DB->get_record('course_categories', ['id' => $school_id], 'id, name, idnumber as code');
+                        if ($school) {
+                            $school->address = '';
+                            $school->phone = '';
+                            $school->email = '';
+                        }
+                    } else {
+                        // Return error if course category doesn't exist
+                        echo json_encode(['status' => 'error', 'message' => 'Course category with ID ' . $school_id . ' not found']);
+                        exit;
                     }
                 }
                 
