@@ -319,13 +319,6 @@ echo '</div>'; // end teacher-sidebar
 // Main content area next to sidebar
 echo '<div class="teacher-main-content">';
 
-// Full Screen Dashboard Layout with Integrated Profile
-echo html_writer::start_div('', ['style' => 'min-height: 100vh; background: #f8fafc; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 0; margin: 0; width: 100%; overflow-x: hidden;']);
-
-// Include Moodle header for navigation bar
-echo $OUTPUT->header();
-
-
 // Full Width Dashboard Content
 echo html_writer::start_div('', ['style' => 'max-width: 1400px; margin: 0 auto; padding: 24px;']);
 echo html_writer::start_div('', ['style' => 'display: grid; grid-template-columns: 2fr 1fr; gap: 32px;']);
@@ -382,6 +375,12 @@ echo html_writer::end_div();
 echo html_writer::end_div();
 echo html_writer::end_div();
 
+// Close left column
+echo html_writer::end_div(); // Close left column div (opened at line 327)
+
+// Close grid
+echo html_writer::end_div(); // Close grid div (opened at line 324)
+
 // Real upcoming classes data
 $upcoming_classes = [];
 
@@ -392,6 +391,12 @@ try {
     echo html_writer::div('Student Overview is temporarily unavailable.', 'alert alert-warning');
     echo html_writer::div(format_text($e->getMessage(), FORMAT_PLAIN), 'text-muted');
 }
+
+// Close all open divs
+echo html_writer::end_div(); // Close max-width container
+echo '</div>'; // Close teacher-main-content
+echo '</div>'; // Close teacher-dashboard-wrapper
+
 echo $OUTPUT->footer();
 
 ?>
