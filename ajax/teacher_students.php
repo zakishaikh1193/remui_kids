@@ -98,7 +98,7 @@ try {
         
         // Alternative approach using gravatar or default
         if (empty($avatar_url)) {
-            $avatar_url = (new moodle_url('/theme/image.php/remui_kids/core/164/f1'))->out();
+            $avatar_url = (new moodle_url('/user/pix.php/0/f1'))->out();
         }
         
         // Get course progress data for this student

@@ -1,0 +1,1565 @@
+{{!
+    School Manager Dashboard Template
+    This template overrides the default dashboard for school managers
+}}
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+{{#school_manager_dashboard}}
+
+<div class="school-manager-dashboard-override">
+
+    <!-- Main Dashboard Content with Sidebar -->
+    <div class="dashboard-main-wrapper">
+        <!-- School Manager Sidebar -->
+        <div class="school-manager-sidebar">
+            <div class="sidebar-header">
+                <div class="school-info">
+                    <h3 class="school-name">{{department_name}}</h3>
+                    <p class="manager-role">School Manager</p>
+                </div>
+            </div>
+            
+            <div class="sidebar-content">
+                <!-- DASHBOARD Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-category">DASHBOARD</h3>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item active">
+                            <a href="#" class="sidebar-link" onclick="showDashboardContent()">
+                                <i class="fa fa-th-large sidebar-icon"></i>
+                                <span class="sidebar-text">Overview</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('reports')">
+                                <i class="fa fa-chart-bar sidebar-icon"></i>
+                                <span class="sidebar-text">Reports</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('analytics')">
+                                <i class="fa fa-chart-line sidebar-icon"></i>
+                                <span class="sidebar-text">Analytics</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- STUDENTS Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-category">STUDENTS</h3>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('students')">
+                                <i class="fa fa-users sidebar-icon"></i>
+                                <span class="sidebar-text">All Students</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('student_enrollment')">
+                                <i class="fa fa-user-plus sidebar-icon"></i>
+                                <span class="sidebar-text">Enroll Students</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('student_progress')">
+                                <i class="fa fa-chart-pie sidebar-icon"></i>
+                                <span class="sidebar-text">Student Progress</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- TEACHERS Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-category">TEACHERS</h3>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('teachers')">
+                                <i class="fa fa-chalkboard-teacher sidebar-icon"></i>
+                                <span class="sidebar-text">All Teachers</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('assign_teachers')">
+                                <i class="fa fa-user-plus sidebar-icon"></i>
+                                <span class="sidebar-text">Assign Teachers</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('teacher_performance')">
+                                <i class="fa fa-award sidebar-icon"></i>
+                                <span class="sidebar-text">Performance</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- COURSES Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-category">COURSES</h3>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('courses')">
+                                <i class="fa fa-book sidebar-icon"></i>
+                                <span class="sidebar-text">All Courses</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('course_assignments')">
+                                <i class="fa fa-tasks sidebar-icon"></i>
+                                <span class="sidebar-text">Course Assignments</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('course_completion')">
+                                <i class="fa fa-graduation-cap sidebar-icon"></i>
+                                <span class="sidebar-text">Completion Rates</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- SETTINGS Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-category">SETTINGS</h3>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="loadPage('school_settings')">
+                                <i class="fa fa-cog sidebar-icon"></i>
+                                <span class="sidebar-text">School Settings</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{wwwroot}}/user/profile.php" class="sidebar-link">
+                                <i class="fa fa-user-circle sidebar-icon"></i>
+                                <span class="sidebar-text">My Profile</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="dashboard-main-content">
+            <!-- Include main content placeholder -->
+            {{{main_content}}}
+            
+            <div class="dashboard-content-container">
+                <div id="dashboard-content">
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-students">
+                        <div class="stat-icon">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{school_manager_stats.students_count}}</h3>
+                            <p class="stat-label">Total Students</p>
+                            <div class="stat-footer">
+                                <span class="stat-subtext">
+                                    <i class="fa fa-circle text-success"></i> {{school_manager_stats.active_students}} Active
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-teachers">
+                        <div class="stat-icon">
+                            <i class="fa fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{school_manager_stats.teachers_count}}</h3>
+                            <p class="stat-label">Total Teachers</p>
+                            <div class="stat-footer">
+                                <a href="#" class="stat-link" onclick="loadPage('teachers')">
+                                    View all <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-courses">
+                        <div class="stat-icon">
+                            <i class="fa fa-book"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{school_manager_stats.courses_count}}</h3>
+                            <p class="stat-label">Total Courses</p>
+                            <div class="stat-footer">
+                                <a href="#" class="stat-link" onclick="loadPage('courses')">
+                                    Manage courses <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-completion">
+                        <div class="stat-icon">
+                            <i class="fa fa-graduation-cap"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number">{{school_manager_stats.completion_rate}}%</h3>
+                            <p class="stat-label">Completion Rate</p>
+                            <div class="stat-footer">
+                                <span class="stat-subtext">
+                                    {{school_manager_stats.total_enrollments}} Total Enrollments
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions-section">
+                    <h2 class="section-title">Quick Actions</h2>
+                    <div class="quick-actions-grid">
+                        <a href="#" class="quick-action-card" onclick="loadPage('students')">
+                            <div class="action-icon">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <h3 class="action-title">Manage Students</h3>
+                            <p class="action-description">View and manage all students in your school</p>
+                        </a>
+
+                        <a href="#" class="quick-action-card" onclick="loadPage('teachers')">
+                            <div class="action-icon">
+                                <i class="fa fa-chalkboard-teacher"></i>
+                            </div>
+                            <h3 class="action-title">Manage Teachers</h3>
+                            <p class="action-description">View and manage teaching staff</p>
+                        </a>
+
+                        <a href="#" class="quick-action-card" onclick="loadPage('reports')">
+                            <div class="action-icon">
+                                <i class="fa fa-chart-bar"></i>
+                            </div>
+                            <h3 class="action-title">View Reports</h3>
+                            <p class="action-description">Access detailed performance reports</p>
+                        </a>
+
+                        <a href="#" class="quick-action-card" onclick="loadPage('courses')">
+                            <div class="action-icon">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <h3 class="action-title">Manage Courses</h3>
+                            <p class="action-description">View and manage school courses</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Competency Development & Teacher Engagement -->
+                <div class="analytics-section">
+                    <div class="analytics-grid">
+                        <!-- Competency Development Card -->
+                        <div class="analytics-card competency-card">
+                            <h3 class="analytics-title">Competency Development</h3>
+                            <div class="competency-list">
+                                <div class="competency-item">
+                                    <div class="competency-info">
+                                        <span class="competency-name">Pedagogical Skills</span>
+                                        <span class="competency-percentage">76%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill pedagogical" style="width: 76%"></div>
+                                    </div>
+                                </div>
+                                <div class="competency-item">
+                                    <div class="competency-info">
+                                        <span class="competency-name">Digital Literacy</span>
+                                        <span class="competency-percentage">68%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill digital" style="width: 68%"></div>
+                                    </div>
+                                </div>
+                                <div class="competency-item">
+                                    <div class="competency-info">
+                                        <span class="competency-name">Student Assessment</span>
+                                        <span class="competency-percentage">82%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill assessment" style="width: 82%"></div>
+                                    </div>
+                                </div>
+                                <div class="competency-item">
+                                    <div class="competency-info">
+                                        <span class="competency-name">Classroom Management</span>
+                                        <span class="competency-percentage">91%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill management" style="width: 91%"></div>
+                                    </div>
+                                </div>
+                                <div class="competency-item">
+                                    <div class="competency-info">
+                                        <span class="competency-name">Curriculum Design</span>
+                                        <span class="competency-percentage">64%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill curriculum" style="width: 64%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="analytics-footer">
+                                <a href="#" class="analytics-link">View detailed competency report →</a>
+                            </div>
+                        </div>
+
+                        <!-- Teacher Engagement Card -->
+                        <div class="analytics-card engagement-card">
+                            <h3 class="analytics-title">Teacher Engagement</h3>
+                            <div class="engagement-chart">
+                                <div class="chart-placeholder">
+                                    <i class="fa fa-clock chart-icon"></i>
+                                    <p class="chart-text">Engagement metrics by training format</p>
+                                </div>
+                            </div>
+                            <div class="engagement-metrics">
+                                <div class="metric-item ilt">
+                                    <span class="metric-value">84%</span>
+                                    <span class="metric-label">ILT</span>
+                                </div>
+                                <div class="metric-item vilt">
+                                    <span class="metric-value">76%</span>
+                                    <span class="metric-label">VILT</span>
+                                </div>
+                                <div class="metric-item self-paced">
+                                    <span class="metric-value">62%</span>
+                                    <span class="metric-label">Self-Paced</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar & Upcoming Sessions -->
+                <div class="schedule-section">
+                    <div class="schedule-grid">
+                        <!-- Calendar Card -->
+                        <div class="schedule-card calendar-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Calendar</h3>
+                                <div class="calendar-nav">
+                                    <button class="nav-btn"><i class="fa fa-chevron-left"></i></button>
+                                    <span class="current-week">May 5 - 11, 2025</span>
+                                    <button class="nav-btn"><i class="fa fa-chevron-right"></i></button>
+                                    <button class="today-btn">Today</button>
+                                </div>
+                                <div class="view-buttons">
+                                    <button class="view-btn active">Week</button>
+                                    <button class="view-btn">Month</button>
+                                    <button class="view-btn">List</button>
+                                </div>
+                            </div>
+                            <div class="calendar-week">
+                                <div class="week-header">
+                                    <div class="day-header">MON 5</div>
+                                    <div class="day-header">TUE 6</div>
+                                    <div class="day-header">WED 7</div>
+                                    <div class="day-header">THU 8</div>
+                                    <div class="day-header today">FRI 9</div>
+                                    <div class="day-header">SAT 10</div>
+                                    <div class="day-header">SUN 11</div>
+                                </div>
+                                <div class="week-events">
+                                    <div class="day-events">
+                                        <div class="event-item blue">Digital Learning Basics<br>9:00 - 11:00</div>
+                                    </div>
+                                    <div class="day-events">
+                                        <div class="event-item purple">Assessment Design<br>13:00 - 15:00</div>
+                                    </div>
+                                    <div class="day-events"></div>
+                                    <div class="day-events">
+                                        <div class="event-item green">Classroom Management<br>10:00 - 12:00</div>
+                                        <div class="event-item yellow">Mentoring Session<br>14:00 - 16:00</div>
+                                    </div>
+                                    <div class="day-events today">
+                                        <div class="event-item blue">Advanced Digital Assessment<br>9:00 - 12:00</div>
+                                        <div class="event-item red">Trainer Development<br>11:00 - 13:00</div>
+                                    </div>
+                                    <div class="day-events"></div>
+                                    <div class="day-events"></div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="#" class="footer-link">View full schedule →</a>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Sessions Card -->
+                        <div class="schedule-card sessions-card">
+                            <h3 class="card-title">Upcoming Sessions</h3>
+                            <div class="sessions-list">
+                                <div class="session-item">
+                                    <div class="session-indicator blue"></div>
+                                    <div class="session-content">
+                                        <h4 class="session-title">Advanced Digital Assessment</h4>
+                                        <div class="session-details">
+                                            <span class="session-date">May 9, 2025</span>
+                                            <span class="session-time">9:00 - 12:00</span>
+                                            <span class="session-location">Room 204</span>
+                                            <span class="session-enrollment">28 trainees enrolled</span>
+                                        </div>
+                                        <a href="#" class="session-link">View details</a>
+                                    </div>
+                                </div>
+                                <div class="session-item">
+                                    <div class="session-indicator red"></div>
+                                    <div class="session-content">
+                                        <h4 class="session-title">Trainer Development Workshop</h4>
+                                        <div class="session-details">
+                                            <span class="session-date">May 11, 2025</span>
+                                            <span class="session-time">11:00 - 13:00</span>
+                                            <span class="session-location">Virtual</span>
+                                            <span class="session-enrollment">12 trainees enrolled</span>
+                                        </div>
+                                        <a href="#" class="session-link">View details</a>
+                                    </div>
+                                </div>
+                                <div class="session-item">
+                                    <div class="session-indicator purple"></div>
+                                    <div class="session-content">
+                                        <h4 class="session-title">Curriculum Design Masterclass</h4>
+                                        <div class="session-details">
+                                            <span class="session-date">May 13, 2025</span>
+                                            <span class="session-time">10:00 - 14:00</span>
+                                            <span class="session-location">Room 102</span>
+                                            <span class="session-enrollment">18 trainees enrolled</span>
+                                        </div>
+                                        <a href="#" class="session-link">View details</a>
+                                    </div>
+                                </div>
+                                <div class="session-item">
+                                    <div class="session-indicator green"></div>
+                                    <div class="session-content">
+                                        <h4 class="session-title">Student Engagement Strategies</h4>
+                                        <div class="session-details">
+                                            <span class="session-date">May 15, 2025</span>
+                                            <span class="session-time">13:00 - 15:00</span>
+                                            <span class="session-location">Room 305</span>
+                                            <span class="session-enrollment">24 trainees enrolled</span>
+                                        </div>
+                                        <a href="#" class="session-link">View details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="#" class="footer-link">View full schedule →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity-section">
+                    <h2 class="section-title">Recent Activity</h2>
+                    <div class="activity-container" id="recent-activity">
+                        <div class="activity-loading">
+                            <i class="fa fa-spinner fa-spin"></i> Loading recent activity...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar Toggle Button for Mobile -->
+<button class="sidebar-toggle" onclick="toggleSchoolManagerSidebar()">
+    <i class="fa fa-bars"></i>
+</button>
+
+{{/school_manager_dashboard}}
+
+<!-- Dashboard Styles -->
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    .school-manager-dashboard-override {
+        font-family: 'Inter', sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+
+
+    /* Main Dashboard Wrapper */
+    .dashboard-main-wrapper {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+        max-width: none;
+        justify-content: center;
+    }
+
+    /* School Manager Sidebar */
+    .school-manager-sidebar {
+        width: 280px;
+        background: #ffffff;
+        border-right: 1px solid #e9ecef;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+    }
+    
+    .sidebar-header {
+        padding: 2rem 1.5rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .school-info .school-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: white;
+    }
+    
+    .school-info .manager-role {
+        font-size: 0.85rem;
+        margin: 0;
+        opacity: 0.9;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sidebar-content {
+        padding: 1.5rem 0;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .sidebar-category {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 0.75rem;
+        padding: 0 1.5rem;
+        margin-top: 0;
+    }
+    
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .sidebar-item {
+        margin-bottom: 0.25rem;
+    }
+    
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    
+    .sidebar-link:hover {
+        background-color: #f8f9fa;
+        color: #667eea;
+        text-decoration: none;
+        border-left-color: #667eea;
+    }
+    
+    .sidebar-icon {
+        width: 20px;
+        margin-right: 0.875rem;
+        font-size: 1rem;
+        color: #6c757d;
+        transition: color 0.2s ease;
+    }
+    
+    .sidebar-link:hover .sidebar-icon {
+        color: #667eea;
+    }
+    
+    .sidebar-item.active .sidebar-link {
+        background-color: #f0f4ff;
+        color: #667eea;
+        border-left-color: #667eea;
+        font-weight: 600;
+    }
+    
+    .sidebar-item.active .sidebar-icon {
+        color: #667eea;
+    }
+
+    /* Main Content Area */
+    .dashboard-main-content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+        max-width: none;
+        margin: 0;
+        width: 100%;
+        min-width: 1000px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .dashboard-content-container {
+        width: 100%;
+        max-width: 1400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Statistics Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+        width: 100%;
+        max-width: 1400px;
+        justify-content: center;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        transition: all 0.3s ease;
+        min-height: 180px;
+        width: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.25rem;
+        flex-shrink: 0;
+    }
+
+    .stat-students .stat-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stat-teachers .stat-icon {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .stat-courses .stat-icon {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .stat-completion .stat-icon {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 0 0 0.5rem 0;
+        font-weight: 500;
+    }
+
+    .stat-footer {
+        margin-top: 0.75rem;
+    }
+
+    .stat-link {
+        font-size: 0.875rem;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .stat-link:hover {
+        color: #5568d3;
+        text-decoration: none;
+    }
+
+    .stat-subtext {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .text-success {
+        color: #28a745;
+    }
+
+    /* Quick Actions Section */
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .quick-actions-section {
+        margin-bottom: 3rem;
+    }
+
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        width: 100%;
+        max-width: 1400px;
+        justify-content: center;
+    }
+
+    .quick-action-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2.5rem;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        cursor: pointer;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .quick-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
+        border-color: #667eea;
+        text-decoration: none;
+    }
+
+    .action-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .action-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 0.75rem 0;
+    }
+
+    .action-description {
+        font-size: 1rem;
+        color: #6c757d;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.5;
+    }
+
+    /* Analytics Section */
+    .analytics-section {
+        margin-bottom: 3rem;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 2rem;
+        width: 100%;
+        max-width: 1400px;
+        justify-content: center;
+    }
+
+    .analytics-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .analytics-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .analytics-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 1.5rem 0;
+    }
+
+    /* Competency Development Styles */
+    .competency-list {
+        margin-bottom: 1.5rem;
+    }
+
+    .competency-item {
+        margin-bottom: 1.25rem;
+    }
+
+    .competency-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .competency-name {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .competency-percentage {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .progress-fill.pedagogical { background-color: #28a745; }
+    .progress-fill.digital { background-color: #007bff; }
+    .progress-fill.assessment { background-color: #6f42c1; }
+    .progress-fill.management { background-color: #fd7e14; }
+    .progress-fill.curriculum { background-color: #dc3545; }
+
+    .analytics-footer {
+        text-align: right;
+    }
+
+    .analytics-link {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .analytics-link:hover {
+        color: #0056b3;
+        text-decoration: none;
+    }
+
+    /* Teacher Engagement Styles */
+    .engagement-chart {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-placeholder {
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .chart-icon {
+        font-size: 2rem;
+        color: #6f42c1;
+        margin-bottom: 0.5rem;
+    }
+
+    .chart-text {
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .engagement-metrics {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .metric-item {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .metric-item.ilt { background-color: #e3f2fd; color: #1976d2; }
+    .metric-item.vilt { background-color: #f3e5f5; color: #7b1fa2; }
+    .metric-item.self-paced { background-color: #fff3e0; color: #f57c00; }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .metric-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Schedule Section */
+    .schedule-section {
+        margin-bottom: 3rem;
+    }
+
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        width: 100%;
+        max-width: 1400px;
+        justify-content: center;
+    }
+
+    .schedule-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .schedule-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    /* Calendar Styles */
+    .calendar-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-btn {
+        background: none;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 0.5rem;
+        cursor: pointer;
+        color: #6c757d;
+        transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+    }
+
+    .current-week {
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0.5rem;
+    }
+
+    .today-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+    }
+
+    .today-btn:hover {
+        background: #0056b3;
+    }
+
+    .view-buttons {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .view-btn {
+        background: none;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .view-btn.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .view-btn:hover:not(.active) {
+        background-color: #f8f9fa;
+    }
+
+    /* Calendar Week View */
+    .calendar-week {
+        margin-bottom: 1rem;
+    }
+
+    .week-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .day-header {
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+        font-weight: 600;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .day-header.today {
+        background: #007bff;
+        color: white;
+    }
+
+    .week-events {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+        min-height: 200px;
+    }
+
+    .day-events {
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        padding: 0.5rem;
+        min-height: 120px;
+    }
+
+    .day-events.today {
+        background-color: #e3f2fd;
+        border: 2px solid #007bff;
+    }
+
+    .event-item {
+        background: white;
+        border-radius: 4px;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .event-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-item.blue { border-left: 4px solid #007bff; }
+    .event-item.purple { border-left: 4px solid #6f42c1; }
+    .event-item.green { border-left: 4px solid #28a745; }
+    .event-item.yellow { border-left: 4px solid #ffc107; }
+    .event-item.red { border-left: 4px solid #dc3545; }
+
+    /* Sessions List */
+    .sessions-list {
+        margin-bottom: 1.5rem;
+    }
+
+    .session-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .session-item:last-child {
+        border-bottom: none;
+    }
+
+    .session-indicator {
+        width: 4px;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    .session-indicator.blue { background-color: #007bff; }
+    .session-indicator.red { background-color: #dc3545; }
+    .session-indicator.purple { background-color: #6f42c1; }
+    .session-indicator.green { background-color: #28a745; }
+
+    .session-content {
+        flex: 1;
+    }
+
+    .session-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .session-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .session-details span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .session-link {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .session-link:hover {
+        color: #0056b3;
+        text-decoration: none;
+    }
+
+    .card-footer {
+        text-align: right;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .footer-link {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .footer-link:hover {
+        color: #0056b3;
+        text-decoration: none;
+    }
+
+    /* Recent Activity Section */
+    .recent-activity-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .activity-container {
+        margin-top: 1rem;
+    }
+
+    .activity-loading {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        background: #667eea;
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        font-size: 1.2rem;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .dashboard-main-wrapper {
+            flex-direction: column;
+        }
+
+        .school-manager-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .school-manager-sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+        
+        .dashboard-main-content {
+            margin-left: 0;
+        }
+        
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            min-width: 280px;
+        }
+
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            min-width: 280px;
+        }
+        
+        .dashboard-main-content {
+            padding: 1rem;
+            min-width: 320px;
+            align-items: stretch;
+        }
+
+        .dashboard-content-container {
+            max-width: none;
+            align-items: stretch;
+        }
+
+        .analytics-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: none;
+        }
+
+        .schedule-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: none;
+        }
+
+        .engagement-metrics {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .calendar-nav {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .view-buttons {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .week-header {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+        }
+
+        .week-events {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+        }
+
+        .session-details {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+<!-- Dashboard JavaScript -->
+<script>
+// Store the base URL for AJAX calls
+const BASE_URL = '{{wwwroot}}/theme/remui_kids/school_manager/';
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadRecentActivity();
+});
+
+function toggleSchoolManagerSidebar() {
+    const sidebar = document.querySelector('.school-manager-sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('sidebar-open');
+    }
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.school-manager-sidebar');
+    const toggleButton = document.querySelector('.sidebar-toggle');
+    
+    if (!sidebar || !toggleButton) return;
+    
+    if (window.innerWidth <= 768 && 
+        !sidebar.contains(event.target) && 
+        !toggleButton.contains(event.target)) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.school-manager-sidebar');
+    if (!sidebar) return;
+    
+    if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-open');
+    }
+});
+
+function loadPage(pageType) {
+    // Update active sidebar item
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    event.target.closest('.sidebar-item').classList.add('active');
+    
+    // Show loading state
+    const content = document.getElementById('dashboard-content');
+    content.innerHTML = '<div class="activity-loading"><i class="fa fa-spinner fa-spin"></i> Loading...</div>';
+    
+    // Load the appropriate page content
+    switch(pageType) {
+        case 'students':
+            loadStudentsPage();
+            break;
+        case 'teachers':
+            loadTeachersPage();
+            break;
+        case 'courses':
+            loadCoursesPage();
+            break;
+        case 'reports':
+            loadReportsPage();
+            break;
+        case 'analytics':
+            loadAnalyticsPage();
+            break;
+        case 'student_enrollment':
+            loadStudentEnrollmentPage();
+            break;
+        case 'student_progress':
+            loadStudentProgressPage();
+            break;
+        case 'assign_teachers':
+            loadAssignTeachersPage();
+            break;
+        case 'teacher_performance':
+            loadTeacherPerformancePage();
+            break;
+        case 'course_assignments':
+            loadCourseAssignmentsPage();
+            break;
+        case 'course_completion':
+            loadCourseCompletionPage();
+            break;
+        case 'school_settings':
+            loadSchoolSettingsPage();
+            break;
+        default:
+            showDashboardContent();
+    }
+}
+
+function showDashboardContent() {
+    // Reset to original dashboard content
+    location.reload();
+}
+
+function loadStudentsPage() {
+    fetch(BASE_URL + 'ajax/students_content.php')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('dashboard-content').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('dashboard-content').innerHTML = 
+                '<div class="activity-loading">Error loading students page</div>';
+        });
+}
+
+function loadTeachersPage() {
+    fetch(BASE_URL + 'ajax/teachers_content.php')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('dashboard-content').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('dashboard-content').innerHTML = 
+                '<div class="activity-loading">Error loading teachers page</div>';
+        });
+}
+
+function loadCoursesPage() {
+    fetch(BASE_URL + 'ajax/courses_content.php')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('dashboard-content').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('dashboard-content').innerHTML = 
+                '<div class="activity-loading">Error loading courses page</div>';
+        });
+}
+
+function loadReportsPage() {
+    fetch(BASE_URL + 'ajax/reports_content.php')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('dashboard-content').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('dashboard-content').innerHTML = 
+                '<div class="activity-loading">Error loading reports page</div>';
+        });
+}
+
+function loadAnalyticsPage() {
+    fetch(BASE_URL + 'analytics.php')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('dashboard-content').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('dashboard-content').innerHTML = 
+                '<div class="activity-loading">Error loading analytics page</div>';
+        });
+}
+
+// Placeholder functions for other pages
+function loadStudentEnrollmentPage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">Student Enrollment feature coming soon!</div>';
+}
+
+function loadStudentProgressPage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">Student Progress tracking coming soon!</div>';
+}
+
+function loadAssignTeachersPage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">Teacher Assignment feature coming soon!</div>';
+}
+
+function loadTeacherPerformancePage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">Teacher Performance metrics coming soon!</div>';
+}
+
+function loadCourseAssignmentsPage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">Course Assignment feature coming soon!</div>';
+}
+
+function loadCourseCompletionPage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">Course Completion tracking coming soon!</div>';
+}
+
+function loadSchoolSettingsPage() {
+    document.getElementById('dashboard-content').innerHTML = 
+        '<div class="activity-loading">School Settings coming soon!</div>';
+}
+
+function loadRecentActivity() {
+    // This would load recent activity data
+    // For now, just show a placeholder
+    setTimeout(() => {
+        const container = document.getElementById('recent-activity');
+        container.innerHTML = '<div class="activity-loading">No recent activity</div>';
+    }, 1000);
+}
+
+function refreshDashboardStats() {
+    location.reload();
+}
+</script>

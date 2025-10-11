@@ -17,31 +17,6 @@
 
 <div class="custom_dashboard">
 
-<!-- Custom Dashboard Header -->
-<div class="custom-dashboard-header">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="dashboard-greeting mb-2">
-                    {{hello_message}}
-                </h1>
-                <p class="dashboard-subtitle mb-0">
-                    {{#user_cohort_name}}
-                        Welcome to your {{user_cohort_name}} learning space!
-                    {{/user_cohort_name}}
-                    {{^user_cohort_name}}
-                        Welcome to your learning space!
-                    {{/user_cohort_name}}
-                </p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <div class="dashboard-badge">
-                    <i class="fa fa-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <!-- Cohort-specific content -->
@@ -2437,6 +2412,217 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
     
     {{#default}}
+        {{#school_manager_dashboard}}
+        <!-- School Manager Dashboard with Sidebar -->
+        <div class="school-manager-dashboard-wrapper">
+            <!-- School Manager Sidebar -->
+            <div class="school-manager-sidebar">
+                <div class="sidebar-header">
+                    <div class="school-info">
+                        <h3 class="school-name">{{department_name}}</h3>
+                        <p class="manager-role">School Manager</p>
+                    </div>
+                </div>
+                
+                <div class="sidebar-content">
+                    <!-- Main Navigation Items -->
+                    <div class="sidebar-section">
+                        <ul class="sidebar-menu">
+                            <li class="sidebar-item active">
+                                <a href="#" class="sidebar-link" onclick="showDashboardContent()">
+                                    <i class="fa fa-globe sidebar-icon"></i>
+                                    <span class="sidebar-text">School Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('teachers')">
+                                    <i class="fa fa-user-tie sidebar-icon"></i>
+                                    <span class="sidebar-text">Teacher Management</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('students')">
+                                    <i class="fa fa-graduation-cap sidebar-icon"></i>
+                                    <span class="sidebar-text">Student Management</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Management Section -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-category">MANAGEMENT</h3>
+                        <ul class="sidebar-menu">
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('courses')">
+                                    <i class="fa fa-book sidebar-icon"></i>
+                                    <span class="sidebar-text">Course Management</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('enrollments')">
+                                    <i class="fa fa-user-plus sidebar-icon"></i>
+                                    <span class="sidebar-text">Enrollments</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('add_users')">
+                                    <i class="fa fa-user-plus sidebar-icon"></i>
+                                    <span class="sidebar-text">Add Users</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('bulk_upload')">
+                                    <i class="fa fa-cloud-upload-alt sidebar-icon"></i>
+                                    <span class="sidebar-text">Bulk Upload</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Reports & Analytics Section -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-category">REPORTS & ANALYTICS</h3>
+                        <ul class="sidebar-menu">
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('analytics')">
+                                    <i class="fa fa-chart-bar sidebar-icon"></i>
+                                    <span class="sidebar-text">Analytics Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link" onclick="loadPage('reports')">
+                                    <i class="fa fa-file-alt sidebar-icon"></i>
+                                    <span class="sidebar-text">User Reports</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area with Sidebar -->
+            <div class="dashboard-main-content-with-sidebar">
+                <div id="dashboard-content">
+
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card stat-teachers">
+                            <div class="stat-icon">
+                                <i class="fa fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number">{{school_manager_stats.teachers_count}}</h3>
+                                <p class="stat-label">TOTAL TEACHERS</p>
+                                <div class="stat-footer">
+                                    <span class="stat-status">
+                                        <i class="fa fa-arrow-up text-success"></i> Active
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-enrolled-teachers">
+                            <div class="stat-icon">
+                                <i class="fa fa-graduation-cap"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number">{{school_manager_stats.teachers_count}}</h3>
+                                <p class="stat-label">ENROLLED TEACHERS</p>
+                                <div class="stat-footer">
+                                    <span class="stat-status">
+                                        <i class="fa fa-arrow-up text-success"></i> Active
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-courses">
+                            <div class="stat-icon">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number">{{school_manager_stats.courses_count}}</h3>
+                                <p class="stat-label">AVAILABLE COURSES</p>
+                                <div class="stat-footer">
+                                    <span class="stat-status">
+                                        <i class="fa fa-arrow-up text-success"></i> Active
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-enrollments">
+                            <div class="stat-icon">
+                                <i class="fa fa-user-plus"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number">{{school_manager_stats.total_enrollments}}</h3>
+                                <p class="stat-label">ACTIVE ENROLLMENTS</p>
+                                <div class="stat-footer">
+                                    <span class="stat-status">
+                                        <i class="fa fa-arrow-up text-success"></i> Current
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions-section">
+                        <h2 class="section-title">Quick Actions</h2>
+                        <div class="quick-actions-grid">
+                            <div class="quick-action-card">
+                                <div class="action-icon">
+                                    <i class="fa fa-user-plus"></i>
+                                </div>
+                                <h3 class="action-title">Add Teacher</h3>
+                                <p class="action-description">Add new teachers to your school</p>
+                                <button class="action-btn" onclick="loadPage('add_users')">Add Teacher</button>
+                            </div>
+
+                            <div class="quick-action-card">
+                                <div class="action-icon">
+                                    <i class="fa fa-chalkboard-teacher"></i>
+                                </div>
+                                <h3 class="action-title">Enroll Teacher</h3>
+                                <p class="action-description">Add teachers to your school</p>
+                                <button class="action-btn" onclick="loadPage('enrollments')">Enroll Teacher</button>
+                            </div>
+
+                            <div class="quick-action-card">
+                                <div class="action-icon">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <h3 class="action-title">View Courses</h3>
+                                <p class="action-description">View and manage available courses</p>
+                                <button class="action-btn" onclick="loadPage('courses')">View Courses</button>
+                            </div>
+
+                            <div class="quick-action-card">
+                                <div class="action-icon">
+                                    <i class="fa fa-chart-bar"></i>
+                                </div>
+                                <h3 class="action-title">View Reports</h3>
+                                <p class="action-description">Access detailed analytics and reports</p>
+                                <button class="action-btn" onclick="loadPage('reports')">View Reports</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Help Button -->
+                    <div class="help-button">
+                        <button class="help-btn" onclick="showHelp()">
+                            <i class="fa fa-question"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/school_manager_dashboard}}
+
+        {{^school_manager_dashboard}}
+        <!-- Regular Default Dashboard -->
         <div class="default-dashboard">
             <div class="row">
                 <div class="col-12">
@@ -2452,12 +2638,398 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         </div>
+        {{/school_manager_dashboard}}
     {{/default}}
 {{/dashboard_type}}
 
 </div>
 
 {{/custom_dashboard}}
+
+<!-- School Manager Dashboard Styles -->
+{{#school_manager_dashboard}}
+<style>
+.school-manager-dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.school-manager-sidebar {
+    width: 280px;
+    background: #ffffff;
+    color: #333333;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    border-right: 1px solid #e5e7eb;
+}
+
+.sidebar-header {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.school-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+}
+
+.manager-role {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.sidebar-content {
+    padding: 1rem 0;
+}
+
+.sidebar-section {
+    margin-bottom: 2rem;
+}
+
+.sidebar-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 1.5rem;
+    margin: 2rem 0 1rem 0;
+    color: #9ca3af;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-item {
+    margin: 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1.5rem;
+    color: #374151;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0.375rem;
+    margin: 0.25rem 1rem;
+}
+
+.sidebar-link:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    text-decoration: none;
+}
+
+.sidebar-item.active .sidebar-link {
+    background-color: #10b981;
+    color: white;
+}
+
+.sidebar-icon {
+    width: 20px;
+    margin-right: 1rem;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.sidebar-text {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.dashboard-main-content-with-sidebar {
+    margin-left: 280px;
+    flex: 1;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-teachers .stat-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.stat-enrolled-teachers .stat-icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.stat-courses .stat-icon { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stat-enrollments .stat-icon { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #374151;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-footer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.stat-status {
+    font-size: 0.75rem;
+    color: #059669;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.text-success {
+    color: #059669;
+}
+
+.quick-actions-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 1.5rem 0;
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.quick-action-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.action-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 0.5rem 0;
+}
+
+.action-description {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    margin: 0 0 1.5rem 0;
+}
+
+.action-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.action-btn:hover {
+    background: #5a67d8;
+}
+
+/* Help Button */
+.help-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+}
+
+.help-btn {
+    width: 50px;
+    height: 50px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.help-btn:hover {
+    background: #5a67d8;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .school-manager-sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+    }
+    
+    .dashboard-main-content-with-sidebar {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+function loadPage(page) {
+    const contentDiv = document.getElementById('dashboard-content');
+    contentDiv.innerHTML = '<div class="text-center p-4"><i class="fa fa-spinner fa-spin fa-2x"></i><p class="mt-2">Loading...</p></div>';
+    
+    // Remove active class from all sidebar items
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to clicked item
+    event.target.closest('.sidebar-item').classList.add('active');
+    
+    // Load content based on page
+    let url = '';
+    switch(page) {
+        case 'students':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/students_content.php';
+            break;
+        case 'teachers':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/teachers_content.php';
+            break;
+        case 'courses':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/courses_content.php';
+            break;
+        case 'reports':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/reports_content.php';
+            break;
+        case 'analytics':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/analytics.php';
+            break;
+        case 'enrollments':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/enrollments_content.php';
+            break;
+        case 'add_users':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/add_users_content.php';
+            break;
+        case 'bulk_upload':
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/bulk_upload_content.php';
+            break;
+        default:
+            url = '{{wwwroot}}/theme/remui_kids/school_manager/ajax/students_content.php';
+    }
+    
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            contentDiv.innerHTML = html;
+        })
+        .catch(error => {
+            contentDiv.innerHTML = '<div class="alert alert-danger">Error loading page content</div>';
+        });
+}
+
+function showDashboardContent() {
+    location.reload();
+}
+
+function showHelp() {
+    alert('Help documentation would open here. This would typically show a help modal or redirect to a help page.');
+}
+
+</script>
+{{/school_manager_dashboard}}
 
 <!-- Regular Dashboard Content -->
 <div class="dashboard-content">
@@ -2690,8 +3262,10 @@ function toggleActivities(activitiesId) {
     }
 }
 
-require(['jquery'], function($) {
-    $(document).ready(function() {
+// Check if RequireJS is available, otherwise use jQuery directly
+if (typeof require !== 'undefined') {
+    require(['jquery'], function($) {
+        $(document).ready(function() {
         // Store course sections data from PHP
         var coursesSectionsData = {};
         try {
@@ -2959,6 +3533,92 @@ require(['jquery'], function($) {
             $('.student-sidebar').toggleClass('show');
         });
     });
-});
+    });
+} else {
+    // Fallback for when RequireJS is not available
+    document.addEventListener('DOMContentLoaded', function() {
+        // Same functionality but without jQuery dependency
+        var coursesSectionsData = {};
+        try {
+            var rawData = '{{{middle_courses_sections}}}';
+            // Clean the JSON data by removing problematic characters
+            rawData = rawData.replace(/&amp;/g, '&');
+            rawData = rawData.replace(/&lt;/g, '<');
+            rawData = rawData.replace(/&gt;/g, '>');
+            rawData = rawData.replace(/&quot;/g, '"');
+            rawData = rawData.replace(/&#x27;/g, "'");
+            coursesSectionsData = JSON.parse(rawData);
+            console.log('Course sections data loaded:', coursesSectionsData);
+        } catch (e) {
+            console.error('Error parsing course sections data:', e);
+        }
+        
+        // Handle Preview button clicks for high school dashboard
+        var highschoolPreviewBtns = document.querySelectorAll('.highschool-dashboard .preview-btn');
+        highschoolPreviewBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('High school preview button clicked');
+                
+                var courseName = this.getAttribute('data-course');
+                var courseId = this.getAttribute('data-courseid');
+                
+                console.log('High school course name:', courseName, 'Course ID:', courseId);
+                
+                // Call the modal function
+                openPreviewModal(courseId, courseName);
+            });
+        });
+        
+        // Handle Preview button clicks for middle school dashboard
+        var middlePreviewBtns = document.querySelectorAll('.middle-dashboard .preview-btn');
+        middlePreviewBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Middle school preview button clicked');
+                
+                var courseName = this.getAttribute('data-course');
+                var courseId = this.getAttribute('data-courseid');
+                
+                console.log('Middle school course name:', courseName, 'Course ID:', courseId);
+                
+                // Update modal content
+                var courseNameDisplay = document.querySelector('.course-name-display');
+                if (courseNameDisplay) {
+                    courseNameDisplay.textContent = courseName;
+                }
+                
+                // Show loading state
+                var sectionsList = document.getElementById('sectionsList');
+                if (sectionsList) {
+                    sectionsList.innerHTML = '<div class="loading-sections"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+                }
+                
+                // Show the modal (using Bootstrap modal if available)
+                var modal = document.getElementById('middleCoursePreviewModal');
+                if (modal && typeof bootstrap !== 'undefined') {
+                    var bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+                } else if (modal) {
+                    modal.style.display = 'block';
+                }
+                
+                // Display course sections
+                displayCourseSections(courseId);
+            });
+        });
+        
+        // Mobile sidebar toggle (if needed)
+        var sidebarToggle = document.querySelector('.student-sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                var sidebar = document.querySelector('.student-sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('show');
+                }
+            });
+        }
+    });
+}
     </script>
 {{> theme_remui/common_end}}

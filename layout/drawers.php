@@ -54,6 +54,42 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
         return; // Exit early to prevent normal rendering
     }
     
+    // Check if user is a school manager (department manager)
+    $schoolmanager = false;
+    $company_user = $DB->get_record('company_users', ['userid' => $USER->id]);
+    
+    // Temporary override for testing - show school manager dashboard for user "faisal"
+    if ($USER->username == 'faisal') {
+        $schoolmanager = true;
+        $company_user = (object)[
+            'userid' => $USER->id,
+            'managertype' => 2,
+            'departmentid' => 1,
+            'companyid' => 1
+        ];
+    }
+    
+    // Debug: Check if company_user exists and what managertype it has
+    if ($company_user) {
+        // Check for department manager (managertype = 2) or company manager (managertype = 1)
+        if ($company_user->managertype == 2 || $company_user->managertype == 1) {
+            $schoolmanager = true;
+            $department = $DB->get_record('department', ['id' => $company_user->departmentid]);
+            $company = $DB->get_record('company', ['id' => $company_user->companyid]);
+        }
+    }
+    
+    if ($schoolmanager) {
+        // Add school manager data to template context
+        $templatecontext['school_manager_dashboard'] = true;
+        $templatecontext['school_manager_stats'] = theme_remui_kids_get_school_manager_stats($company_user->departmentid);
+        $templatecontext['department_name'] = $department->name ?? 'Al-Faisaliah Islamic School';
+        $templatecontext['company_name'] = $company->name ?? 'Al-Faisaliah Company';
+        $templatecontext['manager_name'] = fullname($USER);
+        $templatecontext['wwwroot'] = $CFG->wwwroot;
+    }
+    
+    
     // Check if user is a teacher (editingteacher, teacher, or has teacher capabilities)
     $isteacher = false;
     $context = context_system::instance();
@@ -415,7 +451,6 @@ if ($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') {
     $templatecontext['user_cohort_name'] = $usercohortname;
     $templatecontext['user_cohort_id'] = $usercohortid;
     $templatecontext['student_name'] = $USER->firstname;
-    $templatecontext['hello_message'] = "Hello " . $USER->firstname . "!";
     $templatecontext['mycoursesurl'] = (new moodle_url('/my/courses.php'))->out();
     $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
     $templatecontext['gradesurl'] = (new moodle_url('/grade/report/overview/index.php'))->out();
