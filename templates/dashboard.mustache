@@ -703,10 +703,6 @@
                                         {{/in_progress}}
                                         {{/completed}}
                                         
-                                        <!-- Course Details Button -->
-                                        <button class="course-info-btn">
-                                            <i class="fa fa-info"></i>
-                                        </button>
                                     </div>
                                     
                                     <!-- Course Details Panel (Hidden by default) -->
@@ -1022,26 +1018,39 @@
             </div>
             
             <!-- Course Preview Modal -->
-            <div id="coursePreviewModal" class="preview-modal">
-                <div class="modal-overlay" onclick="closePreviewModal()"></div>
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="modalCourseTitle">Course Preview</h3>
-                        <button class="modal-close" onclick="closePreviewModal()">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="course-sections-list" id="courseSectionsList">
-                            <!-- Sections will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
         {{/middle}}
     
-
     {{#middle}}
+        <!-- Include G4G7 Sidebar for Grade 4-7 Students -->
+        {{> theme_remui_kids/g4g7_sidebar}}
+        
+        <!-- Main content area with sidebar offset -->
+        <div class="g4g7-main-content" style="margin-left: 280px; padding: 20px; min-height: 100vh; background: #f8fafc; margin-top: 80px;">
+            <div class="g4g7-content-container" style="max-width: 1200px; margin: 0 auto;">          
+            <!-- Mobile responsive styles -->
+            <style>
+            @media (max-width: 768px) {
+                .g4g7-main-content {
+                    margin-left: 0 !important;
+                    margin-top: 80px !important;
+                    padding: 20px 15px !important;
+                }
+                
+                .middle-dashboard {
+                    padding: 0 !important;
+                }
+                
+                .g4g7-sidebar-toggle {
+                    display: block !important;
+                    top: 100px !important;
+                }
+                
+                .g4g7-sidebar {
+                    top: 80px !important;
+                    height: calc(100vh - 80px) !important;
+                }
+            }
+            </style>
     <style>
         /* Middle School Course Cards - Fixed Image Sizing */
         .middle-dashboard .enhanced-course-card {
@@ -1290,25 +1299,6 @@
             background: #007bff;
         }
         
-        .middle-dashboard .course-info-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: 12px;
-        }
-        
-        .middle-dashboard .course-info-btn:hover {
-            background: #495057;
-            transform: scale(1.05);
-        }
         
         /* My Courses Page Styles */
         .mycourses-page-content {
@@ -1636,31 +1626,6 @@
         }
     });
     
-    // Modal functionality
-    function openPreviewModal(courseId, courseName) {
-        const modal = document.getElementById('coursePreviewModal');
-        const modalTitle = document.getElementById('modalCourseTitle');
-        const sectionsList = document.getElementById('courseSectionsList');
-        
-        // Set modal title
-        modalTitle.textContent = courseName + ' - Course Sections';
-        
-        // Show loading state
-        sectionsList.innerHTML = '<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
-        
-        // Show modal
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
-        // Load course sections via AJAX
-        loadCourseSections(courseId, sectionsList);
-    }
-    
-    function closePreviewModal() {
-        const modal = document.getElementById('coursePreviewModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
     
     function loadCourseSections(courseId, container) {
         // Create a simple AJAX request to load sections
@@ -1691,20 +1656,6 @@
         });
     }
     
-    // Close modal when clicking outside
-    document.addEventListener('click', function(e) {
-        const modal = document.getElementById('coursePreviewModal');
-        if (e.target === modal) {
-            closePreviewModal();
-        }
-    });
-    
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closePreviewModal();
-        }
-    });
 
     // Real-time course count update functions
     function refreshCourseCount() {
@@ -1899,6 +1850,8 @@
     }
 
     </script>
+            </div> <!-- Close g4g7-content-container -->
+        </div> <!-- Close g4g7-main-content -->
     {{/middle}}
 
     
@@ -3024,23 +2977,6 @@
             });
         }
         
-        // Course preview buttons
-        const previewBtns = document.querySelectorAll('.preview-btn');
-        previewBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const courseName = this.dataset.course;
-                const courseId = this.dataset.courseid;
-                console.log('Preview course:', courseName, courseId);
-                
-                // Add visual feedback
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-                
-                showCoursePreview(courseId);
-            });
-        });
         
         // Deadline action buttons
         const deadlineActions = document.querySelectorAll('.deadline-action button');
@@ -3539,35 +3475,6 @@
         });
     }
     
-    function showCoursePreview(courseId) {
-        console.log('Opening course preview for ID:', courseId);
-        
-        // Create a simple modal
-        const modal = document.createElement('div');
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        `;
-        
-        modal.innerHTML = `
-            <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
-                <h3>Course Preview</h3>
-                <p>Course ID: ${courseId}</p>
-                <p>This would show a detailed course preview with syllabus, requirements, and more.</p>
-                <button onclick="this.closest('div').parentElement.remove()" style="background: #FF6B6B; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; margin-top: 1rem;">Close</button>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-    }
     
     function handleDeadlineAction(action, button) {
         const deadlineItem = button.closest('.deadline-item');
@@ -3726,55 +3633,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-<!-- Course Preview Modal -->
-<div id="middleCoursePreviewModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="middleCoursePreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="middleCoursePreviewModalLabel">
-                    <i class="fa fa-eye"></i> Course Preview
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="preview-content">
-                    <div class="preview-header text-center mb-4">
-                        <div class="preview-icon">
-                            <i class="fa fa-book fa-3x text-primary mb-2"></i>
-                        </div>
-                        <h3 class="preview-title">Course Preview</h3>
-                        <p class="course-name-display mb-3"></p>
-                    </div>
-                    
-                    <div class="sections-container">
-                        <h5 class="sections-title">
-                            <i class="fa fa-list"></i> Course Sections
-                        </h5>
-                        <div class="sections-list" id="sectionsList">
-                            <div class="loading-sections">
-                                <i class="fa fa-spinner fa-spin"></i> Loading sections...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fa fa-times"></i> Close
-                </button>
-                <button type="button" class="btn btn-primary start-course-btn">
-                    <i class="fa fa-play"></i> Start Course
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
-
-
 
 
 require(['jquery'], function($) {
@@ -3796,48 +3656,7 @@ require(['jquery'], function($) {
             console.log('Raw data:', '{{{middle_courses_sections}}}');
         }
         
-        
-        // Handle Preview button clicks for middle school dashboard
-        $('.middle-dashboard .preview-btn').on('click', function(e) {
-            e.preventDefault();
-            console.log('Middle school preview button clicked');
-            
-            // Get course data from attributes
-            var courseName = $(this).data('course');
-            var courseId = $(this).data('courseid');
-            
-            console.log('Middle school course name:', courseName, 'Course ID:', courseId);
-            
-            // Update modal content
-            $('.course-name-display').text(courseName);
-            
-            // Show loading state
-            $('#sectionsList').html('<div class="loading-sections"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>');
-            
-            // Show the modal
-            console.log('Attempting to show modal');
-            $('#middleCoursePreviewModal').modal('show');
-            
-            // Display course sections
-            displayCourseSections(courseId);
-        });
-        
-        // Test if modal exists
-        console.log('Modal element exists:', $('#middleCoursePreviewModal').length > 0);
-        console.log('Preview buttons found:', $('.preview-btn').length);
-        
-        // Test modal functionality
-        if ($('#middleCoursePreviewModal').length > 0) {
-            console.log('Modal HTML:', $('#middleCoursePreviewModal')[0].outerHTML.substring(0, 200) + '...');
-        }
-        
-        // Add a simple test to show modal
-        setTimeout(function() {
-            console.log('Testing modal show after 2 seconds...');
-            // Uncomment the line below to test modal functionality
-            // $('#middleCoursePreviewModal').modal('show');
-        }, 2000);
-        
+                
         // Function to display course sections with tree view
         function displayCourseSections(courseId) {
             console.log('Displaying sections for course ID:', courseId);
@@ -3951,23 +3770,6 @@ require(['jquery'], function($) {
             return icons[modname] || '<i class="fa fa-star"></i>';
         }
         
-        // Handle Start Course button in modal
-        $('.start-course-btn').on('click', function() {
-            // Close modal
-            $('#middleCoursePreviewModal').modal('hide');
-            
-            // Find the corresponding Continue Learning button and click it
-            var courseName = $('.course-name-display').text();
-            
-            // Find the course card with matching name and click its Continue Learning button
-            $('.middle-course-card').each(function() {
-                var cardCourseName = $(this).find('.course-title').text().trim();
-                if (cardCourseName === courseName) {
-                    $(this).find('.course-button.primary').click();
-                    return false; // Break the loop
-                }
-            });
-        });
     });
     
     // Student Sidebar Functionality
@@ -4068,10 +3870,10 @@ require(['jquery'], function($) {
                     window.location.href = baseUrl + '/mod/forum/index.php';
                     break;
                 case 'scratch-editor-card':
-                    window.location.href = baseUrl + '/theme/remui_kids/scratch_emulator.php';
+                    window.location.href = baseUrl + '/theme/remui_kids/scratch_simple.php';
                     break;
                 case 'code-editor-card':
-                    window.location.href = baseUrl + '/theme/remui_kids/code_editor.php';
+                    window.location.href = baseUrl + '/theme/remui_kids/code_editor_simple.php';
                     break;
                 default:
                     console.log('Quick action clicked:', cardType);

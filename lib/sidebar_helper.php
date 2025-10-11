@@ -20,7 +20,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return array Template context array for sidebar
  */
 function theme_remui_kids_get_elementary_sidebar_context($current_page = 'dashboard', $USER = null) {
-    global $CFG;
+    global $CFG, $DB;
     
     if ($USER === null) {
         global $USER;
@@ -41,18 +41,27 @@ function theme_remui_kids_get_elementary_sidebar_context($current_page = 'dashbo
         'is_code_editor_page' => ($current_page === 'code_editor'),
     ];
     
-    // Get user's cohort information
-    $usercohorts = $DB->get_records_sql(
-        "SELECT c.name, c.id 
-         FROM {cohort} c 
-         JOIN {cohort_members} cm ON c.id = cm.cohortid 
-         WHERE cm.userid = ?",
-        [$USER->id]
-    );
-
+    // Get user's cohort information with error handling
+    $usercohorts = [];
     $usercohortname = '';
     $usercohortid = 0;
     $dashboardtype = 'default';
+    
+    try {
+        if ($DB && isset($USER->id)) {
+            $usercohorts = $DB->get_records_sql(
+                "SELECT c.name, c.id 
+                 FROM {cohort} c 
+                 JOIN {cohort_members} cm ON c.id = cm.cohortid 
+                 WHERE cm.userid = ?",
+                [$USER->id]
+            );
+        }
+    } catch (Exception $e) {
+        // If database query fails, use default values
+        error_log("Sidebar helper database error: " . $e->getMessage());
+        $usercohorts = [];
+    }
 
     if (!empty($usercohorts)) {
         $cohort = reset($usercohorts);
@@ -92,10 +101,15 @@ function theme_remui_kids_get_elementary_sidebar_context($current_page = 'dashbo
         
         // Quick action URLs
         'ebooksurl' => (new moodle_url('/mod/book/index.php'))->out(),
+        'messagesurl' => (new moodle_url('/message/index.php'))->out(),
         'askteacherurl' => (new moodle_url('/message/index.php'))->out(),
         'shareclassurl' => (new moodle_url('/mod/forum/index.php'))->out(),
-        'scratcheditorurl' => (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out(),
-        'codeeditorurl' => (new moodle_url('/theme/remui_kids/code_editor.php'))->out(),
+        'scratcheditorurl' => (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out(),
+        'codeeditorurl' => (new moodle_url('/theme/remui_kids/code_editor_simple.php'))->out(),
+        
+        // Additional URLs for G4G7 sidebar
+        'gradesurl' => (new moodle_url('/grade/report/user/index.php'))->out(),
+        'badgesurl' => (new moodle_url('/badges/mybadges.php'))->out(),
     ]);
 }
 

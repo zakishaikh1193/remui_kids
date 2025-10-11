@@ -266,3 +266,170 @@
     });
 {{/js}}
 {{/show_admin_sidebar}}
+
+{{#js}}
+// Fix for drawer close button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for the drawer to be fully rendered
+    setTimeout(function() {
+        // Target the specific block drawer close button
+        const blockDrawer = document.getElementById('theme_remui-drawers-blocks');
+        if (blockDrawer) {
+            console.log('Block drawer found:', blockDrawer);
+            
+            // Find close button within the drawer
+            const closeButton = blockDrawer.querySelector('button[data-action="closedrawer"], .drawer-close, [aria-label*="Close block drawer"]');
+            if (closeButton) {
+                console.log('Close button found:', closeButton);
+                
+                // Remove any existing event listeners by cloning the button
+                const newCloseButton = closeButton.cloneNode(true);
+                closeButton.parentNode.replaceChild(newCloseButton, closeButton);
+                
+                // Add our custom event listener
+                newCloseButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    
+                    console.log('Close button clicked - closing drawer');
+                    
+                    // Close the drawer
+                    blockDrawer.classList.remove('show');
+                    document.body.classList.remove('show-drawer-right');
+                    
+                    // Update user preference
+                    if (typeof M !== 'undefined' && M.util) {
+                        M.util.set_user_preference('drawer-open-block', 'false');
+                    }
+                    
+                    // Also try the standard Moodle way
+                    if (typeof M !== 'undefined' && M.util && M.util.set_user_preference) {
+                        M.util.set_user_preference('drawer-open-block', 'false');
+                    }
+                    
+                    console.log('Drawer closed successfully');
+                });
+            } else {
+                console.warn('Close button not found in block drawer');
+            }
+            
+            // Also handle the drawer toggle button
+            const toggleButton = document.querySelector('[data-target="theme_remui-drawers-blocks"]');
+            if (toggleButton) {
+                console.log('Toggle button found:', toggleButton);
+                
+                // Remove existing listeners by cloning
+                const newToggleButton = toggleButton.cloneNode(true);
+                toggleButton.parentNode.replaceChild(newToggleButton, toggleButton);
+                
+                newToggleButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    
+                    const isOpen = blockDrawer.classList.contains('show');
+                    console.log('Toggle button clicked - drawer is:', isOpen ? 'open' : 'closed');
+                    
+                    if (isOpen) {
+                        // Close the drawer
+                        blockDrawer.classList.remove('show');
+                        document.body.classList.remove('show-drawer-right');
+                        
+                        if (typeof M !== 'undefined' && M.util) {
+                            M.util.set_user_preference('drawer-open-block', 'false');
+                        }
+                        
+                        console.log('Drawer closed via toggle');
+                    } else {
+                        // Open the drawer
+                        blockDrawer.classList.add('show');
+                        document.body.classList.add('show-drawer-right');
+                        
+                        if (typeof M !== 'undefined' && M.util) {
+                            M.util.set_user_preference('drawer-open-block', 'true');
+                        }
+                        
+                        console.log('Drawer opened via toggle');
+                    }
+                });
+            }
+        } else {
+            console.warn('Block drawer not found');
+        }
+    }, 1000); // Wait 1 second for everything to load
+    
+    // Additional fallback: Force close drawer with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const blockDrawer = document.getElementById('theme_remui-drawers-blocks');
+            if (blockDrawer && blockDrawer.classList.contains('show')) {
+                blockDrawer.classList.remove('show');
+                document.body.classList.remove('show-drawer-right');
+                
+                if (typeof M !== 'undefined' && M.util) {
+                    M.util.set_user_preference('drawer-open-block', 'false');
+                }
+                
+                console.log('Drawer closed via Escape key');
+            }
+        }
+    });
+    
+    // Also try to close drawer when clicking outside
+    document.addEventListener('click', function(e) {
+        const blockDrawer = document.getElementById('theme_remui-drawers-blocks');
+        if (blockDrawer && blockDrawer.classList.contains('show')) {
+            // Check if click is outside the drawer
+            if (!blockDrawer.contains(e.target) && !e.target.closest('[data-target="theme_remui-drawers-blocks"]')) {
+                blockDrawer.classList.remove('show');
+                document.body.classList.remove('show-drawer-right');
+                
+                if (typeof M !== 'undefined' && M.util) {
+                    M.util.set_user_preference('drawer-open-block', 'false');
+                }
+                
+                console.log('Drawer closed via outside click');
+            }
+        }
+    });
+});
+{{/js}}
+
+<style>
+/* Force drawer close button to work */
+#theme_remui-drawers-blocks button[data-action="closedrawer"],
+#theme_remui-drawers-blocks .drawer-close,
+#theme_remui-drawers-blocks [aria-label*="Close block drawer"] {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+}
+
+/* Ensure drawer can be hidden */
+#theme_remui-drawers-blocks.hide,
+#theme_remui-drawers-blocks:not(.show) {
+    transform: translateX(100%) !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Make sure show class works */
+#theme_remui-drawers-blocks.show {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Force close button styling */
+#theme_remui-drawers-blocks button[data-action="closedrawer"] {
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 12px !important;
+    border-radius: 4px !important;
+    font-weight: bold !important;
+}
+
+#theme_remui-drawers-blocks button[data-action="closedrawer"]:hover {
+    background: #c82333 !important;
+}
+</style>

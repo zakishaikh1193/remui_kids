@@ -162,7 +162,7 @@ $templatecontext = [
     'ebooksurl' => (new moodle_url('/mod/book/index.php'))->out(),
     'askteacherurl' => (new moodle_url('/message/index.php'))->out(),
     'shareclassurl' => (new moodle_url('/mod/forum/index.php'))->out(),
-    'scratcheditorurl' => (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out(),
+    'scratcheditorurl' => (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out(),
 ];
 
 // Add body class for styling

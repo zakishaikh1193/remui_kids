@@ -5,6 +5,9 @@
 
 {{> theme_remui_kids/common_start}}
 
+<!-- Ensure favicon is preserved -->
+<link rel="icon" type="image/x-icon" href="{{config.wwwroot}}/theme/remui_kids/pix/favicon.ico">
+
 <style>
 /* Enhanced Elementary Sidebar Styles */
 .enhanced-elementary-sidebar {
@@ -178,9 +181,18 @@
 .scratch-emulator-page .scratch-emulator-content {
     margin-left: 0 !important;
     padding: 0 !important;
-    min-height: 100vh !important;
+    min-height: calc(100vh - 80px) !important;
     background: #ffffff !important;
+    margin-top: 80px !important;
 }
+
+/* Ensure proper spacing with sidebar */
+{{#show_middle_sidebar}}
+.scratch-emulator-page .scratch-emulator-content {
+    margin-left: 280px !important;
+    margin-top: 80px !important;
+}
+{{/show_middle_sidebar}}
 
 .scratch-emulator-header {
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
@@ -444,6 +456,11 @@
 </style>
 
 <div class="scratch-emulator-page">
+    {{#show_middle_sidebar}}
+    <!-- Include G4G7 Sidebar for Grade 4-7 Students -->
+    {{> theme_remui_kids/g4g7_sidebar}}
+    {{/show_middle_sidebar}}
+    
     {{#show_elementary_sidebar}}
     <!-- Sidebar removed - using default Moodle sidebar -->
     <div class="student-sidebar enhanced-elementary-sidebar" style="display: none;">
@@ -611,7 +628,7 @@
     {{/show_elementary_sidebar}}
 
     <!-- Scratch Emulator Content -->
-    <div class="scratch-emulator-content">
+    <div class="scratch-emulator-content" {{#show_middle_sidebar}}style="margin-left: 280px;"{{/show_middle_sidebar}}>
         <!-- Header -->
         <div class="scratch-emulator-header">
             <div class="scratch-header-content">
@@ -668,7 +685,7 @@
                 <iframe 
                     id="scratch-iframe"
                     class="scratch-iframe" 
-                    src="{{config.wwwroot}}/theme/remui_kids/scratch-gui-develop/scratch-gui-develop/build/index.html"
+                    src="{{config.wwwroot}}/kodeit/iomad/theme/remui_kids/scratch-gui-develop/scratch-gui-develop/build/index.html"
                     allowtransparency="true"
                     allow="camera; microphone; fullscreen"
                     allowfullscreen
@@ -742,7 +759,12 @@
     }
     
     // Get base URL for local Scratch GUI
-    const baseUrl = window.location.origin + '/theme/remui_kids/scratch-gui-develop/scratch-gui-develop/build/';
+    const baseUrl = window.location.origin + '/kodeit/iomad/theme/remui_kids/scratch-gui-develop/scratch-gui-develop/build/';
+    
+    // Update iframe src to use local Scratch GUI
+    if (scratchIframe) {
+        scratchIframe.src = baseUrl + 'index.html';
+    }
     
     // Project selector functionality - Note: For local Scratch GUI, project loading works differently
     const projectSelect = document.getElementById('project-select');
@@ -801,5 +823,5 @@
 })();
 </script>
 
-{{> theme_remui/footer }}
+{{> theme_remui_kids/common_end}}
 

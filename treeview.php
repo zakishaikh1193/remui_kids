@@ -175,7 +175,7 @@ $templatecontext = [
     'settingsurl' => (new moodle_url('/user/preferences.php'))->out(),
     'profileurl' => (new moodle_url('/user/profile.php', ['id' => $USER->id]))->out(),
     'logouturl' => (new moodle_url('/login/logout.php', ['sesskey' => sesskey()]))->out(),
-    'scratchemulatorurl' => (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out(),
+    'scratchemulatorurl' => (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out(),
     'calendarurl' => (new moodle_url('/calendar/view.php'))->out(),
     
     // Sidebar flags

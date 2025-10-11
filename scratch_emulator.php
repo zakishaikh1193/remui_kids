@@ -20,7 +20,7 @@ require_login();
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/theme/remui_kids/scratch_emulator.php'));
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('sitename') . ' - Scratch Emulator');
 $PAGE->set_heading('Scratch Emulator');
 
@@ -87,6 +87,11 @@ $templatecontext = [
     // Body attributes for styling
     'bodyattributes' => $OUTPUT->body_attributes(['class' => 'scratch-emulator-page ' . $dashboardtype . '-dashboard']),
 ];
+
+// Include the G4G7 Sidebar Component for Grade 4-7 students
+if ($dashboardtype === 'middle') {
+    include_once('components/g4g7_sidebar.php');
+}
 
 // Render the template
 echo $OUTPUT->render_from_template('theme_remui_kids/scratch_emulator_page', $templatecontext);

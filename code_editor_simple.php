@@ -1,6 +1,6 @@
 <?php
 /**
- * Code Editor page for remui_kids theme
+ * Simple Code Editor page for remui_kids theme
  * This page embeds the Judge0 IDE from the local ide-master directory
  *
  * @package    theme_remui_kids
@@ -15,9 +15,9 @@ global $USER, $CFG, $PAGE, $OUTPUT;
 
 // Set up the page
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/theme/remui_kids/code_editor.php'));
+$PAGE->set_url(new moodle_url('/theme/remui_kids/code_editor_simple.php'));
 $PAGE->set_pagelayout('base');
-$PAGE->set_title('Code Editor');
+$PAGE->set_title('Code Editor - Simple Version');
 $PAGE->set_heading('Code Editor');
 
 // Get user info
@@ -30,7 +30,7 @@ $dashboardurl = new moodle_url('/my/');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Editor</title>
+    <title>Code Editor - Simple Version</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="<?php echo $CFG->wwwroot; ?>/theme/remui_kids/pix/favicon.ico">

@@ -1,13 +1,14 @@
 <?php
 /**
- * Code Editor page for remui_kids theme
- * This page embeds the Judge0 IDE from the local ide-master directory
+ * Simple Scratch Editor Page
+ * A minimal Scratch editor without complex Moodle integration
  *
  * @package    theme_remui_kids
- * @copyright  2024 KodeIt
+ * @copyright  2024 WisdmLabs
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Moodle configuration
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
@@ -15,10 +16,10 @@ global $USER, $CFG, $PAGE, $OUTPUT;
 
 // Set up the page
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/theme/remui_kids/code_editor.php'));
+$PAGE->set_url(new moodle_url('/theme/remui_kids/scratch_simple.php'));
 $PAGE->set_pagelayout('base');
-$PAGE->set_title('Code Editor');
-$PAGE->set_heading('Code Editor');
+$PAGE->set_title('Scratch Editor');
+$PAGE->set_heading('Scratch Editor');
 
 // Get user info
 $username = fullname($USER);
@@ -30,7 +31,7 @@ $dashboardurl = new moodle_url('/my/');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Editor</title>
+    <title>Scratch Editor - Simple Version</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="<?php echo $CFG->wwwroot; ?>/theme/remui_kids/pix/favicon.ico">
@@ -52,11 +53,11 @@ $dashboardurl = new moodle_url('/my/');
         }
         
         /* Header */
-        .code-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .scratch-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -140,7 +141,7 @@ $dashboardurl = new moodle_url('/my/');
         }
         
         /* Main Content */
-        .code-container {
+        .scratch-container {
             margin-top: 80px;
             height: calc(100vh - 80px);
             width: 100%;
@@ -148,13 +149,13 @@ $dashboardurl = new moodle_url('/my/');
             background: #ffffff;
         }
         
-        .code-iframe-wrapper {
+        .scratch-iframe-wrapper {
             width: 100%;
             height: 100%;
             position: relative;
         }
         
-        .code-iframe {
+        .scratch-iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -173,7 +174,7 @@ $dashboardurl = new moodle_url('/my/');
             width: 60px;
             height: 60px;
             border: 5px solid #f3f3f3;
-            border-top: 5px solid #667eea;
+            border-top: 5px solid #8b5cf6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
@@ -206,7 +207,7 @@ $dashboardurl = new moodle_url('/my/');
         
         .error-icon {
             font-size: 3rem;
-            color: #667eea;
+            color: #f59e0b;
             margin-bottom: 1rem;
         }
         
@@ -223,31 +224,11 @@ $dashboardurl = new moodle_url('/my/');
             margin: 1rem 0;
         }
         
-        .feature-list {
-            background: #f3f4f6;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-            text-align: left;
-        }
-        
-        .feature-list h4 {
-            margin: 0 0 1rem 0;
-            color: #1f2937;
-        }
-        
-        .feature-list ul {
-            margin: 0;
-            padding-left: 1.5rem;
-            color: #6b7280;
-            line-height: 1.8;
-        }
-        
         .external-link-btn {
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             color: white;
             border: none;
             padding: 1rem 2rem;
@@ -262,14 +243,14 @@ $dashboardurl = new moodle_url('/my/');
         
         .external-link-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
             color: white;
             text-decoration: none;
         }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .code-header {
+            .scratch-header {
                 padding: 1rem;
                 flex-direction: column;
                 gap: 1rem;
@@ -280,7 +261,7 @@ $dashboardurl = new moodle_url('/my/');
                 justify-content: center;
             }
             
-            .code-container {
+            .scratch-container {
                 margin-top: 120px;
                 height: calc(100vh - 120px);
             }
@@ -289,14 +270,14 @@ $dashboardurl = new moodle_url('/my/');
 </head>
 <body>
     <!-- Header -->
-    <div class="code-header">
+    <div class="scratch-header">
         <div class="header-left">
             <div class="header-icon">
-                <i class="fa fa-code"></i>
+                <i class="fa fa-play"></i>
             </div>
             <div>
-                <h1 class="header-title">Code Editor</h1>
-                <p class="header-subtitle">Welcome, <?php echo htmlspecialchars($username); ?>! Write, compile, and run code in 60+ programming languages!</p>
+                <h1 class="header-title">Scratch Editor</h1>
+                <p class="header-subtitle">Welcome, <?php echo htmlspecialchars($username); ?>! Create amazing interactive stories, games, and animations!</p>
             </div>
         </div>
         <div class="header-actions">
@@ -304,31 +285,31 @@ $dashboardurl = new moodle_url('/my/');
                 <i class="fa fa-arrow-left"></i>
                 Back to Dashboard
             </a>
-            <button class="action-btn" id="save-code-btn">
+            <button class="action-btn" id="save-project-btn">
                 <i class="fa fa-save"></i>
-                Save Code
+                Save Project
             </button>
-            <button class="action-btn" id="run-code-btn">
-                <i class="fa fa-play"></i>
-                Run Code
+            <button class="action-btn" id="share-project-btn">
+                <i class="fa fa-share-alt"></i>
+                Share
             </button>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="code-container">
-        <div class="code-iframe-wrapper">
+    <div class="scratch-container">
+        <div class="scratch-iframe-wrapper">
             <!-- Loading State -->
             <div class="loading-container" id="loading-container">
                 <div class="loading-spinner"></div>
-                <div class="loading-text">Loading Code Editor...</div>
+                <div class="loading-text">Loading Scratch Editor...</div>
             </div>
             
-            <!-- Code Editor Iframe -->
+            <!-- Scratch Iframe -->
             <iframe 
-                id="code-iframe"
-                class="code-iframe" 
-                src="/kodeit/iomad/theme/remui_kids/ide-master/index.html"
+                id="scratch-iframe"
+                class="scratch-iframe" 
+                src="/kodeit/iomad/theme/remui_kids/scratch-gui-develop/scratch-gui-develop/build/index.html"
                 allowtransparency="true"
                 allow="camera; microphone; fullscreen"
                 allowfullscreen
@@ -338,28 +319,27 @@ $dashboardurl = new moodle_url('/my/');
             <!-- Error State -->
             <div class="error-container" id="error-container" style="display: none;">
                 <div class="error-icon">
-                    <i class="fa fa-code"></i>
+                    <i class="fa fa-exclamation-circle"></i>
                 </div>
-                <h3 class="error-title">Code Editor Ready!</h3>
-                <p class="error-text">The Judge0 IDE is properly configured and ready to use.</p>
-                <div class="feature-list">
-                    <h4>Features Available:</h4>
-                    <ul>
-                        <li>60+ Programming Languages (Python, JavaScript, Java, C++, etc.)</li>
-                        <li>Monaco Editor with syntax highlighting</li>
-                        <li>Real-time code execution and output</li>
-                        <li>Multiple themes (Light, Dark, Monokai)</li>
-                        <li>Code saving and file management</li>
-                        <li>Compiler options and command line arguments</li>
+                <h3 class="error-title">Scratch Editor Ready!</h3>
+                <p class="error-text">The local Scratch editor is properly configured and ready to use.</p>
+                <div style="background: #f3f4f6; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; text-align: left;">
+                    <h4 style="margin: 0 0 1rem 0; color: #1f2937;">Features Available:</h4>
+                    <ul style="margin: 0; padding-left: 1.5rem; color: #6b7280; line-height: 1.8;">
+                        <li>Complete Scratch 3.0 programming environment</li>
+                        <li>Drag-and-drop coding blocks</li>
+                        <li>Sprite and backdrop creation</li>
+                        <li>Sound and music integration</li>
+                        <li>Project saving and sharing</li>
                     </ul>
                 </div>
                 <div style="margin-top: 2rem;">
                     <p style="font-size: 0.9rem; color: #666;">
-                        <strong>Getting Started:</strong> Select a language, write your code, and click "Run Code" to execute it.
+                        <strong>Alternative:</strong> Use the official Scratch editor
                     </p>
-                    <a href="https://ide.judge0.com/" target="_blank" class="external-link-btn">
+                    <a href="https://scratch.mit.edu/projects/editor/" target="_blank" class="external-link-btn">
                         <i class="fa fa-external-link-alt"></i>
-                        Visit Official Judge0 IDE
+                        Open Scratch.mit.edu
                     </a>
                 </div>
             </div>
@@ -367,27 +347,27 @@ $dashboardurl = new moodle_url('/my/');
     </div>
 
     <script>
-        // Code Editor JavaScript
+        // Scratch Editor JavaScript
         (function() {
             'use strict';
             
-            const codeIframe = document.getElementById('code-iframe');
+            const scratchIframe = document.getElementById('scratch-iframe');
             const loadingContainer = document.getElementById('loading-container');
             const errorContainer = document.getElementById('error-container');
             let iframeLoaded = false;
             
             // Wait for iframe to load
-            if (codeIframe) {
-                codeIframe.addEventListener('load', function() {
+            if (scratchIframe) {
+                scratchIframe.addEventListener('load', function() {
                     // Hide loading, show iframe
                     if (loadingContainer) {
                         loadingContainer.style.display = 'none';
                     }
-                    codeIframe.style.display = 'block';
+                    scratchIframe.style.display = 'block';
                     iframeLoaded = true;
                 });
                 
-                // If iframe fails to load after 10 seconds, show error
+                // If iframe fails to load after 8 seconds, show error
                 setTimeout(function() {
                     if (!iframeLoaded) {
                         if (loadingContainer) {
@@ -397,70 +377,24 @@ $dashboardurl = new moodle_url('/my/');
                             errorContainer.style.display = 'block';
                         }
                     }
-                }, 10000);
+                }, 8000);
             }
             
-            // Save code functionality
-            const saveCodeBtn = document.getElementById('save-code-btn');
-            if (saveCodeBtn) {
-                saveCodeBtn.addEventListener('click', function() {
-                    if (codeIframe.contentWindow) {
-                        codeIframe.contentWindow.postMessage({action: 'save'}, '*');
-                    }
-                    
-                    // Show success feedback
-                    const originalText = saveCodeBtn.innerHTML;
-                    saveCodeBtn.innerHTML = '<i class="fa fa-check"></i> Saved!';
-                    setTimeout(() => {
-                        saveCodeBtn.innerHTML = originalText;
-                    }, 2000);
+            // Save project functionality
+            const saveProjectBtn = document.getElementById('save-project-btn');
+            if (saveProjectBtn) {
+                saveProjectBtn.addEventListener('click', function() {
+                    alert('Your project is automatically saved in your browser. To save permanently, click "File" > "Save to computer" in the editor.');
                 });
             }
             
-            // Run code functionality
-            const runCodeBtn = document.getElementById('run-code-btn');
-            if (runCodeBtn) {
-                runCodeBtn.addEventListener('click', function() {
-                    if (codeIframe.contentWindow) {
-                        codeIframe.contentWindow.postMessage({action: 'run'}, '*');
-                    }
-                    
-                    // Show running feedback
-                    const originalText = runCodeBtn.innerHTML;
-                    runCodeBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Running...';
-                    setTimeout(() => {
-                        runCodeBtn.innerHTML = originalText;
-                    }, 3000);
+            // Share project functionality
+            const shareProjectBtn = document.getElementById('share-project-btn');
+            if (shareProjectBtn) {
+                shareProjectBtn.addEventListener('click', function() {
+                    alert('To share your project:\n1. Click "File" > "Save to computer" to download\n2. Upload to scratch.mit.edu to share with others');
                 });
             }
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    if (saveCodeBtn) saveCodeBtn.click();
-                } else if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    if (runCodeBtn) runCodeBtn.click();
-                }
-            });
-            
-            // Listen for messages from iframe
-            window.addEventListener('message', function(event) {
-                if (event.data && typeof event.data === 'object') {
-                    if (event.data.event === 'initialised') {
-                        console.log('Judge0 IDE initialized');
-                    } else if (event.data.event === 'running') {
-                        if (runCodeBtn) {
-                            runCodeBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Running...';
-                        }
-                    } else if (event.data.event === 'finished') {
-                        if (runCodeBtn) {
-                            runCodeBtn.innerHTML = '<i class="fa fa-play"></i> Run Code';
-                        }
-                    }
-                }
-            });
             
         })();
     </script>

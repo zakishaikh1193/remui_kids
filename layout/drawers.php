@@ -380,7 +380,7 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
     }
     
     // Global Scratch Emulator URL for all dashboards
-    $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+    $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out();
     $templatecontext['treeviewurl'] = (new moodle_url('/theme/remui_kids/treeview.php'))->out();
     $templatecontext['scheduleurl'] = (new moodle_url('/theme/remui_kids/schedule.php'))->out();
     $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
@@ -445,6 +445,21 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $templatecontext['has_middle_courses'] = !empty($courses);
         $templatecontext['total_courses_count'] = count($courses);
         $templatecontext['show_view_all_button'] = count($courses) > 3;
+        
+        // Add G4G7 sidebar URLs for middle school students
+        $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
+        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/moodle_mycourses.php'))->out();
+        $templatecontext['lessonsurl'] = (new moodle_url('/theme/remui_kids/lessons.php'))->out();
+        $templatecontext['activitiesurl'] = (new moodle_url('/mod/quiz/index.php'))->out();
+        $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
+        $templatecontext['gradesurl'] = (new moodle_url('/grade/report/user/index.php'))->out();
+        $templatecontext['badgesurl'] = (new moodle_url('/badges/mybadges.php'))->out();
+        $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
+        $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
+        $templatecontext['treeviewurl'] = (new moodle_url('/theme/remui_kids/treeview.php'))->out();
+        $templatecontext['ebooksurl'] = (new moodle_url('/mod/book/index.php'))->out();
+        $templatecontext['messagesurl'] = (new moodle_url('/message/index.php'))->out();
         
         // Add course sections data for modal preview
         $coursesectionsdata = [];
@@ -547,7 +562,7 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
         $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
         $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
-        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out();
         $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
         $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
         $templatecontext['show_elementary_sidebar'] = true;
@@ -566,7 +581,7 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
         $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
         $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
-        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out();
         $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
         $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
         $templatecontext['show_elementary_sidebar'] = true;
@@ -585,7 +600,7 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
         $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
         $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
-        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out();
         $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
         $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
         $templatecontext['show_elementary_sidebar'] = true;
@@ -604,7 +619,7 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $templatecontext['achievementsurl'] = (new moodle_url('/badges/mybadges.php'))->out();
         $templatecontext['competenciesurl'] = (new moodle_url('/admin/tool/lp/index.php'))->out();
         $templatecontext['scheduleurl'] = (new moodle_url('/calendar/view.php'))->out();
-        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out();
+        $templatecontext['scratchemulatorurl'] = (new moodle_url('/theme/remui_kids/scratch_simple.php'))->out();
         $templatecontext['treeviewurl'] = (new moodle_url('/course/view.php'))->out();
         $templatecontext['settingsurl'] = (new moodle_url('/user/preferences.php'))->out();
         $templatecontext['show_elementary_sidebar'] = true;
