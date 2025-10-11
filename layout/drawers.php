@@ -87,6 +87,165 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $isteacher = true;
     }
     
+    // Check if user is a school manager - Enhanced detection
+    $isschoolmanager = false;
+    
+    // Method 1: Check for specific school manager roles (system level)
+    $schoolmanagerroles = $DB->get_records_sql(
+        "SELECT DISTINCT r.shortname 
+         FROM {role} r 
+         JOIN {role_assignments} ra ON r.id = ra.roleid 
+         JOIN {context} ctx ON ra.contextid = ctx.id 
+         WHERE ra.userid = ? 
+         AND ctx.contextlevel = ? 
+         AND r.shortname IN ('school_manager', 'manager', 'schooladmin', 'school_admin')",
+        [$USER->id, CONTEXT_SYSTEM]
+    );
+    
+    if (!empty($schoolmanagerroles)) {
+        $isschoolmanager = true;
+    }
+    
+    // Method 2: Check for school manager roles at any context level
+    if (!$isschoolmanager) {
+        $anycontextroles = $DB->get_records_sql(
+            "SELECT DISTINCT r.shortname 
+             FROM {role} r 
+             JOIN {role_assignments} ra ON r.id = ra.roleid 
+             WHERE ra.userid = ? 
+             AND r.shortname IN ('school_manager', 'manager', 'schooladmin', 'school_admin')",
+            [$USER->id]
+        );
+        
+        if (!empty($anycontextroles)) {
+            $isschoolmanager = true;
+        }
+    }
+    
+    // Method 3: Check for school manager capabilities (more restrictive)
+    if (!$isschoolmanager && has_capability('moodle/site:config', $context, $USER) && 
+                             has_capability('moodle/user:create', $context, $USER)) {
+        $isschoolmanager = true;
+    }
+    
+    // Method 4: Check if user is a company admin in IOMAD
+    if (!$isschoolmanager && class_exists('company')) {
+        try {
+            $company = company::by_userid($USER->id);
+            if ($company) {
+                // Check if user is a company admin/manager
+                $companyuser = $DB->get_record('company_users', ['userid' => $USER->id]);
+                if ($companyuser && $companyuser->managertype > 0) {
+                    $isschoolmanager = true;
+                }
+            }
+        } catch (Exception $e) {
+            // Ignore errors and continue
+        }
+    }
+    
+    // Method 5: Check for users with school-related profile fields
+    if (!$isschoolmanager) {
+        $profilefields = $DB->get_records_sql(
+            "SELECT f.shortname, d.data 
+             FROM {user_info_field} f 
+             JOIN {user_info_data} d ON f.id = d.fieldid 
+             WHERE d.userid = ? AND f.shortname IN ('school', 'company', 'organization', 'school_manager')",
+            [$USER->id]
+        );
+        
+        if (!empty($profilefields)) {
+            foreach ($profilefields as $field) {
+                if (!empty($field->data) && 
+                    (stripos($field->data, 'manager') !== false || 
+                     stripos($field->data, 'admin') !== false ||
+                     stripos($field->data, 'school') !== false)) {
+                    $isschoolmanager = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Method 6: Check for users in school-related groups
+    if (!$isschoolmanager) {
+        $schoolgroups = $DB->get_records_sql(
+            "SELECT g.id, g.name 
+             FROM {groups} g 
+             JOIN {groups_members} gm ON g.id = gm.groupid 
+             WHERE gm.userid = ? AND (
+                 g.name LIKE '%school%' OR 
+                 g.name LIKE '%manager%' OR 
+                 g.name LIKE '%admin%' OR
+                 g.name LIKE '%company%'
+             )",
+            [$USER->id]
+        );
+        
+        if (!empty($schoolgroups)) {
+            $isschoolmanager = true;
+        }
+    }
+    
+    // Method 7: Check for users with department containing school/manager keywords
+    if (!$isschoolmanager && !empty($USER->department)) {
+        $department = strtolower($USER->department);
+        if (strpos($department, 'school') !== false || 
+            strpos($department, 'manager') !== false ||
+            strpos($department, 'admin') !== false) {
+            $isschoolmanager = true;
+        }
+    }
+    
+    // Ensure user is NOT a teacher to prevent conflicts
+    if ($isschoolmanager && $isteacher) {
+        // If user is both teacher and has school manager roles, prioritize teacher role
+        // unless they have specific school manager system-level roles
+        $systemlevelroles = $DB->get_records_sql(
+            "SELECT DISTINCT r.shortname 
+             FROM {role} r 
+             JOIN {role_assignments} ra ON r.id = ra.roleid 
+             JOIN {context} ctx ON ra.contextid = ctx.id 
+             WHERE ra.userid = ? 
+             AND ctx.contextlevel = ? 
+             AND r.shortname IN ('school_manager', 'manager', 'schooladmin', 'school_admin')",
+            [$USER->id, CONTEXT_SYSTEM]
+        );
+        
+        if (empty($systemlevelroles)) {
+            $isschoolmanager = false; // Treat as teacher only
+        }
+    }
+    
+    // Log the detection result for debugging (can be removed in production)
+    // error_log("School Manager Detection - User: {$USER->id}, Username: {$USER->username}, Is School Manager: " . ($isschoolmanager ? 'YES' : 'NO') . ", Is Teacher: " . ($isteacher ? 'YES' : 'NO'));
+    
+    if ($isschoolmanager) {
+        // Show school manager dashboard
+        $templatecontext['custom_dashboard'] = true;
+        $templatecontext['dashboard_type'] = 'school_manager';
+        $templatecontext['school_manager_dashboard'] = true;
+        $templatecontext['school_manager_stats'] = theme_remui_kids_get_school_manager_dashboard_stats();
+        
+        // Add user information for personalization
+        $templatecontext['user'] = [
+            'fullname' => fullname($USER),
+            'firstname' => $USER->firstname,
+            'lastname' => $USER->lastname,
+            'email' => $USER->email
+        ];
+        
+        // Set active state for sidebar
+        $templatecontext['dashboard_active'] = true;
+        
+        // Must be called before rendering the template.
+        require_once($CFG->dirroot . '/theme/remui/layout/common_end.php');
+        
+        // Render our custom school manager dashboard template
+        echo $OUTPUT->render_from_template('theme_remui_kids/school_manager_dashboard', $templatecontext);
+        return; // Exit early to prevent normal rendering
+    }
+    
     if ($isteacher) {
         // Show teacher dashboard
         $templatecontext['custom_dashboard'] = true;

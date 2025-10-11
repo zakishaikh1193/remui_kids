@@ -1,0 +1,185 @@
+{{!
+    School Manager Teacher Management Template for remui_kids theme
+    
+    This template provides a teacher management interface with shared sidebar navigation.
+}}
+
+{{> theme_remui_kids/common_start}}
+
+<!-- Include shared sidebar styles -->
+<style>
+@import url('school-manager-sidebar.css');
+
+/* Teacher Management Specific Styles */
+.teacher-management-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    z-index: 1;
+}
+
+.teacher-management-wrapper * {
+    box-sizing: border-box;
+}
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.page-header {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+}
+
+.page-subtitle {
+    font-size: 16px;
+    color: #6c757d;
+    margin: 0;
+}
+
+.content-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 20px 15px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+}
+</style>
+
+<!-- Teacher Management Wrapper -->
+<div class="teacher-management-wrapper">
+    <!-- Mobile Sidebar Toggle Button -->
+    <button class="sidebar-toggle" onclick="toggleSchoolManagerSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    {{> theme_remui_kids/school_manager_sidebar}}
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="school-manager-main-content">
+        <div class="page-container">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Teacher Management</h1>
+                <p class="page-subtitle">Manage teachers, their courses, and assignments</p>
+            </div>
+
+            <!-- Teacher List Section -->
+            <div class="content-section">
+                <h2 class="section-title">Teacher List</h2>
+                <p>This section will contain the list of teachers with their details, courses, and management options.</p>
+                <p>Features to be implemented:</p>
+                <ul>
+                    <li>View all teachers</li>
+                    <li>Add new teachers</li>
+                    <li>Edit teacher information</li>
+                    <li>Assign courses to teachers</li>
+                    <li>View teacher performance</li>
+                </ul>
+            </div>
+
+            <!-- Course Assignment Section -->
+            <div class="content-section">
+                <h2 class="section-title">Course Assignment</h2>
+                <p>This section will allow you to assign courses to teachers and manage their teaching loads.</p>
+            </div>
+
+            <!-- Performance Analytics Section -->
+            <div class="content-section">
+                <h2 class="section-title">Performance Analytics</h2>
+                <p>This section will show analytics and reports related to teacher performance and course completion rates.</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{{> theme_remui/common_end}}
+
+{{#js}}
+// Teacher Management JavaScript
+require(['jquery'], function($) {
+    $(document).ready(function() {
+        // Initialize sidebar functionality
+        initializeSidebar();
+    });
+    
+    function initializeSidebar() {
+        // Handle sidebar toggle
+        $('.sidebar-toggle').on('click', function() {
+            $('.school-manager-sidebar').toggleClass('sidebar-open');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        $(document).on('click', function(event) {
+            if (window.innerWidth <= 768) {
+                if (!$(event.target).closest('.school-manager-sidebar').length && 
+                    !$(event.target).closest('.sidebar-toggle').length) {
+                    $('.school-manager-sidebar').removeClass('sidebar-open');
+                }
+            }
+        });
+        
+        // Handle window resize
+        $(window).on('resize', function() {
+            if (window.innerWidth > 768) {
+                $('.school-manager-sidebar').removeClass('sidebar-open');
+            }
+        });
+        
+        // Handle sidebar navigation clicks
+        $('.school-manager-sidebar .sidebar-link').on('click', function(e) {
+            var $link = $(this);
+            var href = $link.attr('href');
+            
+            // Remove active class from all sidebar items
+            $('.school-manager-sidebar .sidebar-item').removeClass('active');
+            
+            // Add active class to current item
+            $link.closest('.sidebar-item').addClass('active');
+            
+            // Handle placeholder links
+            if (href === '#' || !href) {
+                e.preventDefault();
+                console.log('Navigation to:', $link.find('.sidebar-text').text());
+            }
+        });
+    }
+});
+{{/js}}
