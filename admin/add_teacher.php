@@ -195,10 +195,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher'])) {
                 $transaction->allow_commit();
                 
                 // Redirect back with success message
-                redirect(new moodle_url('/theme/remui_kids/school_manager_dashboard.php'), 
-                    'Teacher "' . $created_user->firstname . ' ' . $created_user->lastname . '" has been successfully added!', 
                 redirect(new moodle_url('/theme/remui_kids/admin/teachers_list.php'), 
-                    'Teacher "' . $user_data->firstname . ' ' . $user_data->lastname . '" has been successfully added!', 
+                    'Teacher "' . $created_user->firstname . ' ' . $created_user->lastname . '" has been successfully added!', 
                     null, \core\output\notification::NOTIFY_SUCCESS);
     } else {
                 $errors[] = 'Failed to create user account.';
@@ -930,11 +928,7 @@ window.addEventListener('resize', function() {
 });
 </script>";
 
-<?php
-echo $OUTPUT->footer();
-?>
-    // Close admin-main-content div
-    echo "</div>";
+// Close admin-main-content div
+echo "</div>";
 
-    echo $OUTPUT->footer();
-    ?>
+echo $OUTPUT->footer();
