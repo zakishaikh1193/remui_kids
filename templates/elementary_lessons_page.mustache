@@ -266,7 +266,7 @@
 
 .elementary-lessons-page .elementary-lessons-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)) !important;
     gap: 1.5rem !important;
     margin-top: 2rem !important;
 }
@@ -274,12 +274,88 @@
 .elementary-lessons-page .elementary-lesson-card {
     background: white !important;
     border-radius: 20px !important;
-    padding: 1.5rem !important;
+    padding: 0 !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
     border: 2px solid transparent !important;
     transition: all 0.3s ease !important;
     position: relative !important;
     overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.elementary-lessons-page .section-card {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    min-height: 200px !important;
+}
+
+.elementary-lessons-page .section-image-container {
+    position: relative !important;
+    width: 200px !important;
+    height: 200px !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+}
+
+.elementary-lessons-page .section-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px 0 0 20px !important;
+}
+
+.elementary-lessons-page .section-badge {
+    position: absolute !important;
+    top: 15px !important;
+    left: 15px !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: white !important;
+    padding: 5px 12px !important;
+    border-radius: 15px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.elementary-lessons-page .section-stats {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
+    padding: 0 1.5rem !important;
+    padding-top: 1rem !important;
+}
+
+.elementary-lessons-page .section-stats .stat-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    color: #8b5cf6 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+.elementary-lessons-page .section-stats .stat-item i {
+    font-size: 1rem !important;
+}
+
+.elementary-lessons-page .section-card .lesson-content {
+    padding: 0 1.5rem 1.5rem 1.5rem !important;
+    justify-content: space-between !important;
+}
+
+.elementary-lessons-page .section-card .lesson-header {
+    margin-bottom: 0.5rem !important;
+}
+
+.elementary-lessons-page .section-card .lesson-description {
+    margin-bottom: 1rem !important;
+}
+
+.elementary-lessons-page .section-card .lesson-progress-section {
+    margin-bottom: 1rem !important;
 }
 
 .elementary-lessons-page .elementary-lesson-card::before {
@@ -499,6 +575,20 @@
         gap: 1rem !important;
     }
     
+    .elementary-lessons-page .section-card {
+        flex-direction: column !important;
+        min-height: auto !important;
+    }
+    
+    .elementary-lessons-page .section-image-container {
+        width: 100% !important;
+        height: 150px !important;
+    }
+    
+    .elementary-lessons-page .section-image {
+        border-radius: 20px 20px 0 0 !important;
+    }
+    
     .elementary-lessons-page .elementary-lesson-card {
         padding: 1rem !important;
     }
@@ -716,26 +806,26 @@
                     <div class="lessons-page-header">
                         <h2 class="lessons-page-title">
                             <i class="fa fa-play-circle"></i>
-                            My Learning Adventures
+                            My Course Sections
                         </h2>
                         <p class="lessons-page-subtitle">
-                            Discover exciting lessons and track your learning progress!
+                            Explore your course sections and track your learning progress!
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Lessons Statistics -->
+            <!-- Course Sections Statistics -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="lessons-stats-container">
                         <div class="lesson-stat-card">
                             <div class="stat-icon-container">
-                                <i class="fa fa-play-circle stat-icon"></i>
+                                <i class="fa fa-folder-open stat-icon"></i>
                             </div>
                             <div class="stat-content">
-                                <div class="stat-number">{{total_lessons_count}}</div>
-                                <div class="stat-label">Total Lessons</div>
+                                <div class="stat-number">{{total_sections_count}}</div>
+                                <div class="stat-label">Total Sections</div>
                             </div>
                         </div>
                         
@@ -744,7 +834,7 @@
                                 <i class="fa fa-clock-o stat-icon"></i>
                             </div>
                             <div class="stat-content">
-                                <div class="stat-number" id="in-progress-lessons-count">0</div>
+                                <div class="stat-number" id="in-progress-sections-count">0</div>
                                 <div class="stat-label">In Progress</div>
                             </div>
                         </div>
@@ -754,18 +844,18 @@
                                 <i class="fa fa-check-circle stat-icon"></i>
                             </div>
                             <div class="stat-content">
-                                <div class="stat-number" id="completed-lessons-count">0</div>
+                                <div class="stat-number" id="completed-sections-count">0</div>
                                 <div class="stat-label">Completed</div>
                             </div>
                         </div>
                         
                         <div class="lesson-stat-card">
                             <div class="stat-icon-container">
-                                <i class="fa fa-circle-o stat-icon"></i>
+                                <i class="fa fa-tasks stat-icon"></i>
                             </div>
                             <div class="stat-content">
-                                <div class="stat-number" id="not-started-lessons-count">0</div>
-                                <div class="stat-label">Not Started</div>
+                                <div class="stat-number" id="total-activities-count">0</div>
+                                <div class="stat-label">Total Activities</div>
                             </div>
                         </div>
                     </div>
@@ -773,32 +863,50 @@
             </div>
 
             <!-- Lessons Grid -->
-            {{#has_student_lessons}}
+            {{#has_course_sections}}
             <div class="row">
                 <div class="col-12">
                     <div class="elementary-lessons-grid">
-                        {{#student_lessons}}
-                        <div class="elementary-lesson-card enhanced" data-lesson-id="{{id}}">
-                            <!-- Lesson Header -->
-                            <div class="lesson-header">
-                                <h3 class="lesson-title">{{name}}</h3>
-                                <p class="lesson-course">{{coursename}}</p>
-                                
-                                <!-- Lesson Status Indicator -->
-                                <div class="lesson-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
-                                    <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-play-circle{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
-                                </div>
+                        {{#course_sections}}
+                        <div class="elementary-lesson-card enhanced section-card" data-section-id="{{id}}">
+                            <!-- Section Image -->
+                            <div class="section-image-container">
+                                <img src="{{section_image}}" alt="{{name}}" class="section-image">
+                                <div class="section-badge">Section {{section_number}}</div>
                             </div>
                             
-                            <!-- Lesson Content -->
+                            <!-- Section Content -->
                             <div class="lesson-content">
-                                <!-- Lesson Description -->
-                                <p class="lesson-description">{{intro}}</p>
+                                <!-- Section Stats -->
+                                <div class="section-stats">
+                                    <div class="stat-item">
+                                        <i class="fa fa-file-text-o"></i>
+                                        <span>{{activities_count}} Activities</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fa fa-user"></i>
+                                        <span>{{completed_activities}} Completed</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section Header -->
+                                <div class="lesson-header">
+                                    <h3 class="lesson-title">{{name}}</h3>
+                                    <p class="lesson-course">{{coursename}}</p>
+                                    
+                                    <!-- Section Status Indicator -->
+                                    <div class="lesson-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
+                                        <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-play-circle{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section Description -->
+                                <p class="lesson-description">{{summary}}</p>
                                 
                                 <!-- Progress Section -->
                                 <div class="lesson-progress-section">
                                     <div class="progress-header">
-                                        <span class="progress-label">Your Progress</span>
+                                        <span class="progress-label">Progress</span>
                                         <span class="progress-percentage">{{progress_percentage}}%</span>
                                     </div>
                                     <div class="progress-bar-container">
@@ -808,43 +916,29 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Lesson Statistics -->
-                                <div class="lesson-stats-grid">
-                                    <div class="lesson-stat-item">
-                                        <i class="fa fa-clock-o"></i>
-                                        <div class="lesson-stat-value">{{estimated_time}}</div>
-                                        <div>Time Limit</div>
-                                    </div>
-                                    <div class="lesson-stat-item">
-                                        <i class="fa fa-repeat"></i>
-                                        <div class="lesson-stat-value">{{completed_attempts}}/{{attempts}}</div>
-                                        <div>Attempts</div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Lesson Action Button -->
-                                <a href="{{lessonurl}}" class="lesson-action-button">
+                                <!-- Section Action Button -->
+                                <a href="{{sectionurl}}" class="lesson-action-button">
                                     <i class="fa {{#completed}}fa-check{{/completed}}{{^completed}}fa-play{{/completed}}"></i>
-                                    {{#completed}}Review Lesson{{/completed}}{{^completed}}Start Learning{{/completed}}
+                                    {{#completed}}Review Section{{/completed}}{{^completed}}Start Learning{{/completed}}
                                 </a>
                             </div>
                         </div>
-                        {{/student_lessons}}
+                        {{/course_sections}}
                     </div>
                 </div>
             </div>
-            {{/has_student_lessons}}
+            {{/has_course_sections}}
             
-            {{^has_student_lessons}}
-            <!-- No Lessons Message -->
+            {{^has_course_sections}}
+            <!-- No Sections Message -->
             <div class="row">
                 <div class="col-12">
                     <div class="no-lessons-message">
                         <div class="no-lessons-icon">
                             <i class="fa fa-play-circle"></i>
                         </div>
-                        <h3>No Lessons Yet</h3>
-                        <p>You don't have any lessons assigned yet. Check back later or contact your teacher!</p>
+                        <h3>No Course Sections Yet</h3>
+                        <p>You don't have any course sections assigned yet. Check back later or contact your teacher!</p>
                         <a href="{{{dashboardurl}}}" class="btn btn-primary">
                             <i class="fa fa-arrow-left"></i>
                             Back to Dashboard
@@ -852,7 +946,7 @@
                     </div>
                 </div>
             </div>
-            {{/has_student_lessons}}
+            {{/has_course_sections}}
         </div>
     </div>
 </div>
@@ -862,26 +956,31 @@ $(document).ready(function() {
     // Add body class for content shifting
     $('body').addClass('has-student-sidebar');
     
-    // Count lessons by status
+    // Count sections by status
     let inProgressCount = 0;
     let completedCount = 0;
-    let notStartedCount = 0;
+    let totalActivitiesCount = 0;
     
-    $('.elementary-lesson-card').each(function() {
+    $('.section-card').each(function() {
         const card = $(this);
         if (card.hasClass('completed')) {
             completedCount++;
         } else if (card.hasClass('in-progress')) {
             inProgressCount++;
-        } else if (card.hasClass('not-started')) {
-            notStartedCount++;
+        }
+        
+        // Count activities from section stats
+        const activitiesText = card.find('.section-stats .stat-item:first span').text();
+        const activitiesMatch = activitiesText.match(/(\d+)\s+Activities/);
+        if (activitiesMatch) {
+            totalActivitiesCount += parseInt(activitiesMatch[1]);
         }
     });
     
     // Update statistics
-    $('#in-progress-lessons-count').text(inProgressCount);
-    $('#completed-lessons-count').text(completedCount);
-    $('#not-started-lessons-count').text(notStartedCount);
+    $('#in-progress-sections-count').text(inProgressCount);
+    $('#completed-sections-count').text(completedCount);
+    $('#total-activities-count').text(totalActivitiesCount);
     
     // Handle sidebar navigation clicks
     $('.student-sidebar .nav-link').on('click', function(e) {

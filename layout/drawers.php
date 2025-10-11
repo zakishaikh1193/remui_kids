@@ -365,7 +365,7 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
         $templatecontext['gradesurl'] = (new moodle_url('/theme/remui_kids/highschool_grades.php'))->out();
         $templatecontext['calendarurl'] = (new moodle_url('/theme/remui_kids/highschool_calendar.php'))->out();
     } else {
-        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/mycourses.php'))->out();
+        $templatecontext['mycoursesurl'] = (new moodle_url('/theme/remui_kids/moodle_mycourses.php'))->out();
         $templatecontext['assignmentsurl'] = (new moodle_url('/mod/assign/index.php'))->out();
         $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', array('id' => $USER->id)))->out();                // Set lessons URL based on dashboard type
         if ($dashboardtype === 'elementary') {
@@ -385,7 +385,6 @@ if (($PAGE->pagelayout == 'mydashboard' && $PAGE->pagetype == 'my-index') ||
     $templatecontext['scheduleurl'] = (new moodle_url('/theme/remui_kids/schedule.php'))->out();
     $templatecontext['calendarurl'] = (new moodle_url('/calendar/view.php'))->out();
     $templatecontext['dashboardurl'] = (new moodle_url('/my/'))->out();
-    $templatecontext['codeeditorurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 1]))->out(); // Adjust ID as needed
     $templatecontext['scratchurl'] = (new moodle_url('/mod/lti/view.php', ['id' => 2]))->out(); // Adjust ID as needed
     $templatecontext['logouturl'] = (new moodle_url('/login/logout.php', ['sesskey' => sesskey()]))->out();
     $templatecontext['profileurl'] = (new moodle_url('/user/profile.php', ['id' => $USER->id]))->out();
