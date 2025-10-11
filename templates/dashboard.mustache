@@ -3266,21 +3266,36 @@ function toggleActivities(activitiesId) {
 if (typeof require !== 'undefined') {
     require(['jquery'], function($) {
         $(document).ready(function() {
-        // Store course sections data from PHP
-        var coursesSectionsData = {};
+        // Store course sections data from PHP (global variable)
+        window.coursesSectionsData = {};
         try {
             var rawData = '{{{middle_courses_sections}}}';
-            // Clean the JSON data by removing problematic characters
-            rawData = rawData.replace(/&amp;/g, '&');
-            rawData = rawData.replace(/&lt;/g, '<');
-            rawData = rawData.replace(/&gt;/g, '>');
-            rawData = rawData.replace(/&quot;/g, '"');
-            rawData = rawData.replace(/&#x27;/g, "'");
-            coursesSectionsData = JSON.parse(rawData);
-            console.log('Course sections data loaded:', coursesSectionsData);
+            
+            // Check if rawData is empty or undefined
+            if (!rawData || rawData.trim() === '' || rawData === 'undefined' || rawData === 'null') {
+                console.log('No course sections data provided, using empty object');
+                window.coursesSectionsData = {};
+            } else {
+                // Clean the JSON data by removing problematic characters
+                rawData = rawData.replace(/&amp;/g, '&');
+                rawData = rawData.replace(/&lt;/g, '<');
+                rawData = rawData.replace(/&gt;/g, '>');
+                rawData = rawData.replace(/&quot;/g, '"');
+                rawData = rawData.replace(/&#x27;/g, "'");
+                
+                // Validate JSON before parsing
+                if (rawData.trim().startsWith('{') || rawData.trim().startsWith('[')) {
+                    window.coursesSectionsData = JSON.parse(rawData);
+                    console.log('Course sections data loaded:', window.coursesSectionsData);
+                } else {
+                    console.log('Invalid JSON format, using empty object');
+                    window.coursesSectionsData = {};
+                }
+            }
         } catch (e) {
             console.error('Error parsing course sections data:', e);
-            console.log('Raw data:', '{{{middle_courses_sections}}}');
+            console.log('Raw data received:', '{{{middle_courses_sections}}}');
+            window.coursesSectionsData = {};
         }
         
         // Handle Preview button clicks for high school dashboard
@@ -3310,10 +3325,16 @@ if (typeof require !== 'undefined') {
             console.log('Middle school course name:', courseName, 'Course ID:', courseId);
             
             // Update modal content
-            $('.course-name-display').text(courseName);
+            var courseNameDisplay = document.querySelector('.course-name-display');
+            if (courseNameDisplay) {
+                courseNameDisplay.textContent = courseName;
+            }
             
             // Show loading state
-            $('#sectionsList').html('<div class="loading-sections"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>');
+            var sectionsList = document.getElementById('sectionsList');
+            if (sectionsList) {
+                sectionsList.innerHTML = '<div class="loading-sections"><i class="fa fa-spinner fa-spin"></i> Loading sections...</div>';
+            }
             
             // Show the modal
             console.log('Attempting to show modal');
@@ -3339,17 +3360,22 @@ if (typeof require !== 'undefined') {
             // $('#middleCoursePreviewModal').modal('show');
         }, 2000);
         
-        // Function to display course sections with tree view
-        function displayCourseSections(courseId) {
+        // Function to display course sections with tree view (global function)
+        window.displayCourseSections = function(courseId) {
             console.log('Displaying sections for course ID:', courseId);
-            console.log('Available course data:', coursesSectionsData);
+            console.log('Available course data:', window.coursesSectionsData);
             
-            var sectionsData = coursesSectionsData[courseId];
+            var sectionsData = window.coursesSectionsData[courseId];
             console.log('Sections data for course:', sectionsData);
             
             if (!sectionsData || !sectionsData.sections || sectionsData.sections.length === 0) {
-                console.log('No sections data available');
-                $('#sectionsList').html('<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>');
+                console.log('No sections data available for course:', courseId);
+                var sectionsList = document.getElementById('sectionsList');
+                if (sectionsList) {
+                    sectionsList.innerHTML = '<div class="no-sections"><i class="fa fa-info-circle"></i> No sections available for this course. The course may not have any activities yet.</div>';
+                } else {
+                    console.error('sectionsList element not found');
+                }
                 return;
             }
             
@@ -3416,7 +3442,12 @@ if (typeof require !== 'undefined') {
                 '</div>';
             });
             
-            $('#sectionsList').html(sectionsHtml);
+            var sectionsListElement = document.getElementById('sectionsList');
+            if (sectionsListElement) {
+                sectionsListElement.innerHTML = sectionsHtml;
+            } else {
+                console.error('sectionsList element not found');
+            }
         }
         
         // Function to toggle section expansion
@@ -3538,19 +3569,35 @@ if (typeof require !== 'undefined') {
     // Fallback for when RequireJS is not available
     document.addEventListener('DOMContentLoaded', function() {
         // Same functionality but without jQuery dependency
-        var coursesSectionsData = {};
+        window.coursesSectionsData = {};
         try {
             var rawData = '{{{middle_courses_sections}}}';
-            // Clean the JSON data by removing problematic characters
-            rawData = rawData.replace(/&amp;/g, '&');
-            rawData = rawData.replace(/&lt;/g, '<');
-            rawData = rawData.replace(/&gt;/g, '>');
-            rawData = rawData.replace(/&quot;/g, '"');
-            rawData = rawData.replace(/&#x27;/g, "'");
-            coursesSectionsData = JSON.parse(rawData);
-            console.log('Course sections data loaded:', coursesSectionsData);
+            
+            // Check if rawData is empty or undefined
+            if (!rawData || rawData.trim() === '' || rawData === 'undefined' || rawData === 'null') {
+                console.log('No course sections data provided, using empty object');
+                window.coursesSectionsData = {};
+            } else {
+                // Clean the JSON data by removing problematic characters
+                rawData = rawData.replace(/&amp;/g, '&');
+                rawData = rawData.replace(/&lt;/g, '<');
+                rawData = rawData.replace(/&gt;/g, '>');
+                rawData = rawData.replace(/&quot;/g, '"');
+                rawData = rawData.replace(/&#x27;/g, "'");
+                
+                // Validate JSON before parsing
+                if (rawData.trim().startsWith('{') || rawData.trim().startsWith('[')) {
+                    window.coursesSectionsData = JSON.parse(rawData);
+                    console.log('Course sections data loaded:', window.coursesSectionsData);
+                } else {
+                    console.log('Invalid JSON format, using empty object');
+                    window.coursesSectionsData = {};
+                }
+            }
         } catch (e) {
             console.error('Error parsing course sections data:', e);
+            console.log('Raw data received:', '{{{middle_courses_sections}}}');
+            window.coursesSectionsData = {};
         }
         
         // Handle Preview button clicks for high school dashboard
