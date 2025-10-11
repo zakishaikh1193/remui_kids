@@ -32,6 +32,24 @@ require_login();
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
+// Get the user ID to view (default to current user if admin)
+$userid = optional_param('id', $USER->id, PARAM_INT);
+
+// Get user record
+$viewuser = $DB->get_record('user', ['id' => $userid, 'deleted' => 0]);
+if (!$viewuser) {
+    throw new moodle_exception('invaliduser', 'error');
+}
+
+// Check if current user can view this profile
+$usercontext = context_user::instance($userid);
+if (!user_can_view_profile($viewuser)) {
+    throw new moodle_exception('usernotavailable', 'error');
+}
+
+// Get user's enrolled courses
+$enrolled_courses = enrol_get_users_courses($userid, true, 'id, fullname, shortname, summary, visible');
+
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
@@ -42,26 +60,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $user = $DB->get_record('user', ['id' => $user_id, 'deleted' => 0]);
             
             if ($user) {
-                // Get user's enrolled courses
-                $courses = $DB->get_records_sql(
-                    "SELECT c.id, c.fullname, c.shortname, c.summary, 
-                            cc.name as category_name,
-                            ue.timecreated as enrolled_date,
-                            ue.status as enrollment_status
-                     FROM {course} c
-                     LEFT JOIN {course_categories} cc ON c.category = cc.id
-                     LEFT JOIN {user_enrolments} ue ON c.id = ue.userid
-                     LEFT JOIN {enrol} e ON ue.enrolid = e.id
-                     WHERE e.courseid = c.id AND ue.userid = ?
-                     AND c.visible = 1 AND c.id > 1
-                     ORDER BY c.fullname ASC",
-                    [$user_id]
-                );
+                // Get user's enrolled courses using Moodle's function
+                $courses = enrol_get_users_courses($user_id, true, 'id, fullname, shortname, summary, visible');
+                
+                // Format courses for JSON
+                $courses_array = [];
+                foreach ($courses as $course) {
+                    $courses_array[] = [
+                        'id' => $course->id,
+                        'fullname' => $course->fullname,
+                        'shortname' => $course->shortname,
+                        'summary' => $course->summary,
+                        'url' => (new moodle_url('/course/view.php', ['id' => $course->id]))->out()
+                    ];
+                }
                 
                 echo json_encode([
                     'status' => 'success',
                     'user' => $user,
-                    'courses' => array_values($courses)
+                    'courses' => $courses_array
                 ]);
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'User not found']);
@@ -278,7 +295,7 @@ echo "<span class='sidebar-text'>Site Administration</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/user/index.php' class='sidebar-link'>";
 echo "<i class='fa fa-users sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Community</span>";
 echo "</a>";
@@ -303,7 +320,7 @@ echo "<span class='sidebar-text'>Teachers</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/admin/roles/assign.php?contextid=1' class='sidebar-link'>";
 echo "<i class='fa fa-medal sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Master Trainers</span>";
 echo "</a>";
@@ -322,19 +339,19 @@ echo "<span class='sidebar-text'>Courses & Programs</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/badges/index.php' class='sidebar-link'>";
 echo "<i class='fa fa-graduation-cap sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Certifications</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/question/bank/managecategories/category.php' class='sidebar-link'>";
 echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Assessments</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/schools_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-school sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Schools</span>";
 echo "</a>";
@@ -353,19 +370,19 @@ echo "<span class='sidebar-text'>Analytics</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/report/insights/insights.php' class='sidebar-link'>";
 echo "<i class='fa fa-chart-line sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Predictive Models</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/report/courseoverview/index.php' class='sidebar-link'>";
 echo "<i class='fa fa-file-alt sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Reports</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/admin/tool/lp/competencies.php' class='sidebar-link'>";
 echo "<i class='fa fa-map sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Competencies Map</span>";
 echo "</a>";
@@ -390,7 +407,7 @@ echo "<span class='sidebar-text'>User Management</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/cohort/index.php' class='sidebar-link'>";
 echo "<i class='fa fa-users-cog sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Cohort Navigation</span>";
 echo "</a>";
@@ -405,8 +422,9 @@ echo "<div class='admin-main-content'>";
 echo "<div class='profile-container'>";
 
 // Header Section
+$user_fullname = fullname($viewuser);
 echo "<div class='page-header'>";
-echo "<h1 class='page-title'>Profile Setting</h1>";
+echo "<h1 class='page-title'>" . s($user_fullname) . "'s Profile</h1>";
 echo "<p class='page-subtitle'>Manage and view detailed user profiles, course enrollments, and activity reports</p>";
 echo "</div>";
 
@@ -436,40 +454,47 @@ echo "<div class='profile-layout'>";
 echo "<div class='profile-left-column'>";
 
 // User Details Card
+$edit_profile_url = new moodle_url('/user/edit.php', ['id' => $userid]);
+$user_timezone = $viewuser->timezone == 99 ? get_string('serverlocaltime') : core_date::get_user_timezone($viewuser);
+$user_status = $viewuser->suspended ? 'Suspended' : 'Active';
+$last_access = $viewuser->lastaccess ? userdate($viewuser->lastaccess) : get_string('never');
+
 echo "<div class='profile-card user-details-card'>";
 echo "<div class='card-header'>";
 echo "<h3>User details</h3>";
-echo "<a href='#' class='edit-link'>Edit profile</a>";
+echo "<a href='{$edit_profile_url}' class='edit-link'>Edit profile</a>";
 echo "</div>";
 echo "<div class='card-content'>";
 echo "<div class='detail-item'>";
 echo "<label>Email address:</label>";
-echo "<span id='user-email' class='detail-value'>zaki.byline@gmail.com</span>";
+echo "<span id='user-email' class='detail-value'>" . s($viewuser->email) . "</span>";
 echo "<small class='visibility-note'>(Visible to everyone)</small>";
 echo "</div>";
 echo "<div class='detail-item'>";
 echo "<label>Timezone:</label>";
-echo "<span id='user-timezone' class='detail-value'>Europe/London</span>";
+echo "<span id='user-timezone' class='detail-value'>" . s($user_timezone) . "</span>";
 echo "</div>";
 echo "<div class='detail-item'>";
 echo "<label>Account Status:</label>";
-echo "<span id='user-status' class='detail-value'>Active</span>";
+echo "<span id='user-status' class='detail-value'>{$user_status}</span>";
 echo "</div>";
 echo "<div class='detail-item'>";
 echo "<label>Last Access:</label>";
-echo "<span id='user-lastaccess' class='detail-value'>Today</span>";
+echo "<span id='user-lastaccess' class='detail-value'>{$last_access}</span>";
 echo "</div>";
 echo "</div>";
 echo "</div>";
 
 // Privacy and Policies Card
+$data_retention_url = new moodle_url('/admin/tool/dataprivacy/summary.php', ['userid' => $userid]);
+
 echo "<div class='profile-card privacy-card'>";
 echo "<div class='card-header'>";
 echo "<h3>Privacy and policies</h3>";
 echo "</div>";
 echo "<div class='card-content'>";
 echo "<div class='policy-links'>";
-echo "<a href='#' class='policy-link'>Data retention summary</a>";
+echo "<a href='{$data_retention_url}' class='policy-link'>Data retention summary</a>";
 echo "</div>";
 echo "</div>";
 echo "</div>";
@@ -483,13 +508,17 @@ echo "<div class='card-content'>";
 echo "<div class='course-profiles'>";
 echo "<h4>Course profiles</h4>";
 echo "<div id='enrolled-courses' class='course-list'>";
-echo "<a href='#' class='course-link'>tetsts</a>";
-echo "<a href='#' class='course-link'>testenroll</a>";
-echo "<a href='#' class='course-link'>Digital Foundations</a>";
-echo "<a href='#' class='course-link'>Communication and Safety</a>";
-echo "<a href='#' class='course-link'>Hardware, Networking and Internet</a>";
-echo "<a href='#' class='course-link'>Coding Foundations</a>";
-echo "<a href='#' class='course-link'>Multimedia, Cybersecurity and Ethics</a>";
+
+// Display real enrolled courses
+if (!empty($enrolled_courses)) {
+    foreach ($enrolled_courses as $course) {
+        $course_url = new moodle_url('/course/view.php', ['id' => $course->id]);
+        echo "<a href='{$course_url}' class='course-link'>" . format_string($course->fullname) . "</a>";
+    }
+} else {
+    echo "<p class='no-courses'>No enrolled courses</p>";
+}
+
 echo "</div>";
 echo "</div>";
 echo "</div>";
@@ -501,40 +530,61 @@ echo "</div>"; // End Left Column
 echo "<div class='profile-right-column'>";
 
 // Miscellaneous Card
+$blog_url = new moodle_url('/blog/index.php', ['userid' => $userid]);
+$notes_url = new moodle_url('/notes/index.php', ['user' => $userid]);
+$forum_posts_url = new moodle_url('/mod/forum/user.php', ['id' => $userid]);
+$forum_discussions_url = new moodle_url('/mod/forum/user.php', ['id' => $userid, 'mode' => 'discussions']);
+$learning_plans_url = new moodle_url('/admin/tool/lp/plans.php', ['userid' => $userid]);
+
 echo "<div class='profile-card miscellaneous-card'>";
 echo "<div class='card-header'>";
 echo "<h3>Miscellaneous</h3>";
 echo "</div>";
 echo "<div class='card-content'>";
 echo "<div class='misc-links'>";
-echo "<a href='#' class='misc-link'>Blog entries</a>";
-echo "<a href='#' class='misc-link'>Notes</a>";
-echo "<a href='#' class='misc-link'>Forum posts</a>";
-echo "<a href='#' class='misc-link'>Forum discussions</a>";
-echo "<a href='#' class='misc-link'>Learning plans</a>";
+echo "<a href='{$blog_url}' class='misc-link'><i class='fa fa-blog'></i> Blog entries</a>";
+echo "<a href='{$notes_url}' class='misc-link'><i class='fa fa-sticky-note'></i> Notes</a>";
+echo "<a href='{$forum_posts_url}' class='misc-link'><i class='fa fa-comments'></i> Forum posts</a>";
+echo "<a href='{$forum_discussions_url}' class='misc-link'><i class='fa fa-comment-dots'></i> Forum discussions</a>";
+echo "<a href='{$learning_plans_url}' class='misc-link'><i class='fa fa-clipboard-list'></i> Learning plans</a>";
 echo "</div>";
 echo "</div>";
 echo "</div>";
 
 // Reports Card
+// Use SITEID (course=1) for site-wide user reports, matching Moodle's standard profile.php behavior
+$report_course = SITEID; // Always use site context for user profile reports
+
+// Build report URLs using correct Moodle paths with course=1 (site-wide reports)
+$today_logs_url = new moodle_url('/report/log/user.php', ['id' => $userid, 'course' => $report_course, 'mode' => 'today']);
+$all_logs_url = new moodle_url('/report/log/user.php', ['id' => $userid, 'course' => $report_course, 'mode' => 'all']);
+$outline_report_url = new moodle_url('/report/outline/user.php', ['id' => $userid, 'course' => $report_course]);
+$complete_report_url = new moodle_url('/report/participation/user.php', ['id' => $userid, 'course' => $report_course]);
+$stats_report_url = new moodle_url('/report/stats/user.php', ['id' => $userid, 'course' => $report_course]);
+$grades_url = new moodle_url('/grade/report/user/index.php', ['id' => $report_course, 'userid' => $userid]);
+
 echo "<div class='profile-card reports-card'>";
 echo "<div class='card-header'>";
 echo "<h3>Reports</h3>";
 echo "</div>";
 echo "<div class='card-content'>";
 echo "<div class='report-links'>";
-echo "<a href='#' class='report-link'>Today's logs</a>";
-echo "<a href='#' class='report-link'>All logs</a>";
-echo "<a href='#' class='report-link'>Outline report</a>";
-echo "<a href='#' class='report-link'>Complete report</a>";
-echo "<a href='#' class='report-link'>Browser sessions</a>";
-echo "<a href='#' class='report-link'>Grades overview</a>";
-echo "<a href='#' class='report-link'>Grades</a>";
+echo "<a href='{$today_logs_url}' class='report-link'><i class='fa fa-calendar-day'></i> Today's logs</a>";
+echo "<a href='{$all_logs_url}' class='report-link'><i class='fa fa-list'></i> All logs</a>";
+echo "<a href='{$outline_report_url}' class='report-link'><i class='fa fa-stream'></i> Activity outline</a>";
+echo "<a href='{$complete_report_url}' class='report-link'><i class='fa fa-check-circle'></i> Activity completion</a>";
+echo "<a href='{$stats_report_url}' class='report-link'><i class='fa fa-chart-line'></i> Statistics</a>";
+echo "<a href='{$grades_url}' class='report-link'><i class='fa fa-graduation-cap'></i> Grades report</a>";
 echo "</div>";
 echo "</div>";
 echo "</div>";
 
 // Login Activity Card
+$last_login = $viewuser->lastlogin ? userdate($viewuser->lastlogin) : get_string('never');
+$account_created = userdate($viewuser->timecreated);
+$last_ip = $viewuser->lastip ? $viewuser->lastip : get_string('unknown', 'admin');
+$first_access = $viewuser->firstaccess ? userdate($viewuser->firstaccess) : get_string('never');
+
 echo "<div class='profile-card login-activity-card'>";
 echo "<div class='card-header'>";
 echo "<h3>Login activity</h3>";
@@ -543,15 +593,19 @@ echo "<div class='card-content'>";
 echo "<div id='login-activity' class='activity-content'>";
 echo "<div class='activity-item'>";
 echo "<label>Last Login:</label>";
-echo "<span id='last-login' class='activity-value'>Today at 2:30 PM</span>";
+echo "<span id='last-login' class='activity-value'>{$last_login}</span>";
+echo "</div>";
+echo "<div class='activity-item'>";
+echo "<label>First Access:</label>";
+echo "<span id='first-access' class='activity-value'>{$first_access}</span>";
 echo "</div>";
 echo "<div class='activity-item'>";
 echo "<label>Account Created:</label>";
-echo "<span id='account-created' class='activity-value'>January 15, 2024</span>";
+echo "<span id='account-created' class='activity-value'>{$account_created}</span>";
 echo "</div>";
 echo "<div class='activity-item'>";
 echo "<label>Last IP:</label>";
-echo "<span id='last-ip' class='activity-value'>192.168.1.100</span>";
+echo "<span id='last-ip' class='activity-value'>{$last_ip}</span>";
 echo "</div>";
 echo "</div>";
 echo "</div>";
@@ -926,21 +980,39 @@ echo "<style>
 .policy-link, .misc-link, .report-link {
     color: #4fc3f7;
     text-decoration: none;
-    padding: 0.5rem 0;
+    padding: 0.75rem 1rem;
     border-bottom: 1px solid #e1f5fe;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     font-weight: 500;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.report-link i,
+.misc-link i,
+.policy-link i {
+    width: 20px;
+    text-align: center;
+    color: #4fc3f7;
+    transition: all 0.3s ease;
 }
 
 .policy-link:hover, .misc-link:hover, .report-link:hover {
     color: #29b6f6;
-    padding-left: 0.5rem;
     background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%);
-    border-radius: 8px;
-    padding: 0.5rem;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(129, 212, 250, 0.2);
+    text-decoration: none;
+}
+
+.policy-link:hover i, 
+.misc-link:hover i, 
+.report-link:hover i {
+    color: #29b6f6;
+    transform: scale(1.1);
 }
 
 /* Course List */
@@ -1001,6 +1073,15 @@ echo "<style>
 .activity-value {
     color: #37474f;
     font-weight: 500;
+}
+
+.no-courses {
+    color: #78909c;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
 /* Floating Search Button */
@@ -1213,10 +1294,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const coursesList = document.getElementById('enrolled-courses');
         if (courses.length > 0) {
             coursesList.innerHTML = courses.map(course => 
-                '<a href=\"#\" class=\"course-link\">' + course.fullname + '</a>'
+                '<a href=\"' + course.url + '\" class=\"course-link\">' + course.fullname + '</a>'
             ).join('');
         } else {
-            coursesList.innerHTML = '<div class=\"loading\">No enrolled courses</div>';
+            coursesList.innerHTML = '<p class=\"no-courses\">No enrolled courses</p>';
         }
     }
 });

@@ -820,7 +820,7 @@ echo "<div id='session-status' style='position: fixed; top: 10px; right: 10px; b
 </a>
 </li>
 <li class='sidebar-item'>
-<a href='#' class='sidebar-link'>
+<a href='<?php echo $CFG->wwwroot; ?>/theme/remui_kids/admin/schools_management.php' class='sidebar-link'>
 <i class='fa fa-school sidebar-icon'></i>
 <span class='sidebar-text'>Schools</span>
 </a>

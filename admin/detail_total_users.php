@@ -172,7 +172,7 @@ echo "<span class='sidebar-text'>Assessments</span>";
 echo "</a>";
 echo "</li>";
 echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/schools_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-school sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Schools</span>";
 echo "</a>";

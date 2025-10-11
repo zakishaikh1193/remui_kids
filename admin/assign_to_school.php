@@ -30,10 +30,6 @@ if (isset($_GET['action'])) {
                      FROM {course_categories} 
                      WHERE visible = 1 
                      AND id > 1 
-                     AND (name NOT LIKE '%Miscellaneous%' 
-                          AND name NOT LIKE '%Default%' 
-                          AND name NOT LIKE '%System%'
-                          AND name NOT LIKE '%General%')
                      AND parent = 0
                      ORDER BY name ASC",
                     []
@@ -500,10 +496,6 @@ try {
          FROM {course_categories} 
          WHERE visible = 1 
          AND id > 1 
-         AND (name NOT LIKE '%Miscellaneous%' 
-              AND name NOT LIKE '%Default%' 
-              AND name NOT LIKE '%System%'
-              AND name NOT LIKE '%General%')
          AND parent = 0
          ORDER BY name ASC",
         []
@@ -595,7 +587,7 @@ echo "<!-- COURSES & PROGRAMS Section -->";
 echo "<div class='sidebar-section'>";
 echo "<h3 class='sidebar-category'>COURSES & PROGRAMS</h3>";
 echo "<ul class='sidebar-menu'>";
-echo "<li class='sidebar-item active'>";
+echo "<li class='sidebar-item'>";
 echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/courses.php' class='sidebar-link'>";
 echo "<i class='fa fa-book sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Courses & Programs</span>";
@@ -613,8 +605,8 @@ echo "<i class='fa fa-clipboard-list sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Assessments</span>";
 echo "</a>";
 echo "</li>";
-echo "<li class='sidebar-item'>";
-echo "<a href='#' class='sidebar-link'>";
+echo "<li class='sidebar-item active'>";
+echo "<a href='{$CFG->wwwroot}/theme/remui_kids/admin/schools_management.php' class='sidebar-link'>";
 echo "<i class='fa fa-school sidebar-icon'></i>";
 echo "<span class='sidebar-text'>Schools</span>";
 echo "</a>";
