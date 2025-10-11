@@ -45,7 +45,7 @@ $PAGE->set_heading('');
 // Add breadcrumb.
 $PAGE->navbar->add('Enroll Students');
 
-// Handle enrollment/unenrollment actions
+// Handle enrollment/unenrollment actions - Simple Direct Approach
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     require_sesskey(); // Security check
     
@@ -53,72 +53,119 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $user_id = required_param('user_id', PARAM_INT);
     $action = required_param('action', PARAM_ALPHA);
     
+    // Debug: Log the attempt
+    error_log("=== ENROLLMENT ATTEMPT ===");
+    error_log("Course ID: $course_id");
+    error_log("User ID: $user_id");
+    error_log("Action: $action");
+    error_log("POST Data: " . print_r($_POST, true));
+    
     try {
         if ($action === 'enroll') {
-            // Get manual enrolment instance
-            $manual_instance = $DB->get_record('enrol', [
-                'courseid' => $course_id,
-                'enrol' => 'manual',
-                'status' => 0 // Active
-            ], '*', IGNORE_MULTIPLE);
-            
-            if (!$manual_instance) {
-                // Create manual enrolment instance if it doesn't exist
-                $manual_plugin = enrol_get_plugin('manual');
-                if ($manual_plugin) {
-                    $manual_instance_id = $manual_plugin->add_instance($DB->get_record('course', ['id' => $course_id]));
-                    $manual_instance = $DB->get_record('enrol', ['id' => $manual_instance_id]);
-                }
+            // Simple direct enrollment approach
+            $course = $DB->get_record('course', ['id' => $course_id]);
+            if (!$course) {
+                throw new Exception("Course not found");
             }
             
-            if ($manual_instance) {
-                // Get student role
+            // Get or create manual enrollment instance
+            $enrol_instance = $DB->get_record('enrol', [
+                'courseid' => $course_id,
+                'enrol' => 'manual',
+                'status' => 0
+            ]);
+            
+            if (!$enrol_instance) {
+                // Create manual enrollment instance
+                $enrol_instance = new stdClass();
+                $enrol_instance->courseid = $course_id;
+                $enrol_instance->enrol = 'manual';
+                $enrol_instance->status = 0;
+                $enrol_instance->timecreated = time();
+                $enrol_instance->timemodified = time();
+                $enrol_instance->id = $DB->insert_record('enrol', $enrol_instance);
+                error_log("Created enrollment instance: " . $enrol_instance->id);
+            }
+            
+            // Check if already enrolled
+            $existing = $DB->get_record('user_enrolments', [
+                'enrolid' => $enrol_instance->id,
+                'userid' => $user_id
+            ]);
+            
+            if (!$existing) {
+                // Enroll user directly
+                $enrollment = new stdClass();
+                $enrollment->enrolid = $enrol_instance->id;
+                $enrollment->userid = $user_id;
+                $enrollment->timestart = time();
+                $enrollment->timeend = 0;
+                $enrollment->modifierid = $USER->id;
+                $enrollment->timecreated = time();
+                $enrollment->timemodified = time();
+                $enrollment->status = 0; // Active
+                
+                $enrollment_id = $DB->insert_record('user_enrolments', $enrollment);
+                error_log("Created enrollment record: " . $enrollment_id);
+                
+                // Assign student role
+                $context = context_course::instance($course_id);
                 $student_role = $DB->get_record('role', ['shortname' => 'student']);
-                
-                // Check if already enrolled
-                $existing = $DB->get_record('user_enrolments', [
-                    'enrolid' => $manual_instance->id,
-                    'userid' => $user_id
-                ]);
-                
-                if (!$existing) {
-                    // Enroll student
-                    $manual_plugin = enrol_get_plugin('manual');
-                    $manual_plugin->enrol_user($manual_instance, $user_id, $student_role->id);
-                    $success_message = "Student enrolled successfully!";
-                } else {
-                    $error_message = "Student is already enrolled in this course.";
+                if ($student_role) {
+                    role_assign($student_role->id, $user_id, $context->id, 'enrol_manual', $enrol_instance->id);
+                    error_log("Assigned student role");
                 }
+                
+                $success_message = "Student enrolled successfully!";
             } else {
-                $error_message = "Could not find or create manual enrollment instance.";
+                $error_message = "Student is already enrolled in this course.";
             }
             
         } elseif ($action === 'unenroll') {
-            // Get manual enrolment instance
-            $manual_instance = $DB->get_record('enrol', [
+            // Simple direct unenrollment approach
+            $enrol_instance = $DB->get_record('enrol', [
                 'courseid' => $course_id,
                 'enrol' => 'manual'
-            ], '*', IGNORE_MULTIPLE);
+            ]);
             
-            if ($manual_instance) {
-                // Unenroll student
-                $manual_plugin = enrol_get_plugin('manual');
-                $manual_plugin->unenrol_user($manual_instance, $user_id);
-                $success_message = "Student unenrolled successfully!";
+            if ($enrol_instance) {
+                // Remove enrollment
+                $deleted = $DB->delete_records('user_enrolments', [
+                    'enrolid' => $enrol_instance->id,
+                    'userid' => $user_id
+                ]);
+                
+                if ($deleted) {
+                    // Remove role assignments
+                    $context = context_course::instance($course_id);
+                    $student_role = $DB->get_record('role', ['shortname' => 'student']);
+                    if ($student_role) {
+                        role_unassign($student_role->id, $user_id, $context->id, 'enrol_manual', $enrol_instance->id);
+                    }
+                    error_log("Removed enrollment and role assignment");
+                    $success_message = "Student unenrolled successfully!";
+                } else {
+                    $error_message = "Student was not enrolled in this course.";
+                }
             } else {
-                $error_message = "Could not find manual enrollment instance.";
+                $error_message = "Could not find enrollment instance.";
             }
         }
     } catch (Exception $e) {
         $error_message = "Error: " . $e->getMessage();
+        error_log('Enrollment error: ' . $e->getMessage());
     }
     
-    // Redirect to prevent form resubmission
-    redirect(new moodle_url('/theme/remui_kids/teacher/enroll_students.php'), 
-             isset($success_message) ? $success_message : (isset($error_message) ? $error_message : ''),
-             null,
-             isset($success_message) ? \core\output\notification::NOTIFY_SUCCESS : \core\output\notification::NOTIFY_ERROR
-    );
+    // Store message in session
+    if (isset($success_message)) {
+        $_SESSION['enrollment_success'] = $success_message;
+    }
+    if (isset($error_message)) {
+        $_SESSION['enrollment_error'] = $error_message;
+    }
+    
+    // Simple redirect
+    redirect(new moodle_url('/theme/remui_kids/teacher/enroll_students.php'));
 }
 
 // Get teacher's courses
@@ -134,11 +181,12 @@ $teacher_courses = $DB->get_records_sql(
     [$USER->id]
 );
 
-// Get all students
+// Get all students (excluding guest and admin users)
 $all_students = $DB->get_records_sql(
     "SELECT DISTINCT u.*
      FROM {user} u
-     WHERE u.deleted = 0 AND u.suspended = 0 AND u.id > 1
+     WHERE u.deleted = 0 AND u.suspended = 0 AND u.id > 2
+     AND u.firstname != '' AND u.lastname != ''
      ORDER BY u.firstname, u.lastname ASC"
 );
 
@@ -303,19 +351,88 @@ echo '<style>
         max-width: 1600px;
         margin: 0 auto;
         padding: 32px;
-        background: #f8f9fa;
+        background: transparent;
         min-height: 100vh;
+        position: relative;
     }
     
-    .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Horizontal Statistics Container */
+    .horizontal-stats-container {
+        background: linear-gradient(135deg, #d1fae5 0%, #fed7aa 100%);
         border-radius: 20px;
         padding: 32px;
-        margin-bottom: 32px;
-        color: white;
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        margin-bottom: 0;
+        box-shadow: 0 8px 32px rgba(209, 250, 229, 0.3);
         position: relative;
         overflow: hidden;
+    }
+    
+    .horizontal-stats-container::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    
+    .stats-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .stat-item {
+        flex: 1;
+        text-align: center;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        padding: 24px 16px;
+        border: 1px solid rgba(255,255,255,0.6);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-item:hover {
+        transform: translateY(-2px);
+        background: rgba(255,255,255,0.9);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    
+    .stat-item .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 8px;
+        color: #000000;
+        text-shadow: none;
+    }
+    
+    .stat-item .stat-label {
+        font-size: 0.9rem;
+        color: #000000;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-shadow: none;
+    }
+    
+    
+    .dashboard-header {
+        background: linear-gradient(135deg,rgb(149, 216, 177) 0%,rgb(245, 217, 169) 100%);
+        border-radius: 24px;
+        padding: 48px 40px;
+        margin-bottom: 40px;
+        color: white;
+        box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
     }
     
     .dashboard-header::before {
@@ -340,16 +457,25 @@ echo '<style>
     }
     
     .dashboard-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0 0 8px 0;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-size: 2.8rem;
+        font-weight: 900;
+        margin: 0 0 16px 0;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
     .dashboard-subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin: 0 0 24px 0;
+        font-size: 1.2rem;
+        opacity: 0.95;
+        margin: 0 0 40px 0;
+        font-weight: 500;
+        line-height: 1.6;
+        color: #e2e8f0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
     .stats-grid {
@@ -360,37 +486,56 @@ echo '<style>
     }
     
     .stat-card {
-        background: rgba(255,255,255,0.2);
-        backdrop-filter: blur(15px);
-        border-radius: 20px;
-        padding: 24px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 28px 24px;
         text-align: center;
-        border: 1px solid rgba(255,255,255,0.3);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg,rgb(149, 231, 170),rgb(248, 215, 157),rgb(194, 191, 184));
+        border-radius: 24px 24px 0 0;
     }
     
     .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-        background: rgba(255,255,255,0.25);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.4);
     }
     
     .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 8px;
-        color: white;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 12px;
+        color: #ffffff;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
     .stat-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        color: white;
-        font-weight: 600;
+        font-size: 0.95rem;
+        opacity: 0.95;
+        color: #e2e8f0;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     
     .courses-grid {
@@ -402,26 +547,44 @@ echo '<style>
     
     .course-card {
         background: white;
-        border-radius: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,0,0,0.05);
         position: relative;
+        backdrop-filter: blur(10px);
+    }
+    
+    .course-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #d1fae5, #fed7aa, #fef3c7);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     
     .course-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.08);
-        border-color: #667eea;
+        transform: translateY(-6px) scale(1.01);
+        box-shadow: 0 16px 40px rgba(209, 250, 229, 0.15);
+        border-color: rgba(209, 250, 229, 0.5);
+    }
+    
+    .course-card:hover::before {
+        opacity: 1;
     }
     
     .course-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg,rgb(166, 245, 196) 0%,rgb(243, 220, 181) 100%);
         color: white;
-        padding: 36px 32px;
+        padding: 24px 20px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
     }
     
     .course-header::before {
@@ -447,21 +610,31 @@ echo '<style>
     }
     
     .course-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
-        margin: 0 0 8px 0;
+        margin: 0 0 6px 0;
         position: relative;
         z-index: 2;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     
     .course-code {
-        font-size: 1rem;
-        opacity: 0.85;
-        margin: 0 0 20px 0;
+        font-size: 0.85rem;
+        opacity: 0.95;
+        margin: 0 0 16px 0;
         position: relative;
         z-index: 2;
-        font-weight: 500;
+        font-weight: 600;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        background: rgba(255,255,255,0.2);
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
     }
     
     .course-stats {
@@ -476,21 +649,77 @@ echo '<style>
     .course-stat {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.9rem;
-        background: rgba(255,255,255,0.3);
-        padding: 10px 18px;
-        border-radius: 14px;
+        gap: 6px;
+        font-size: 0.8rem;
+        background: rgba(255,255,255,0.25);
+        padding: 8px 12px;
+        border-radius: 8px;
         backdrop-filter: blur(15px);
-        font-weight: 700;
-        color: white;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        border: 1px solid rgba(255,255,255,0.2);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-weight: 600;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.4);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .course-stat:hover {
+        background: rgba(255,255,255,0.35);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .course-stat i {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .course-icon-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+    
+    .course-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .course-icon i {
+        font-size: 2.5rem;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .course-category-tag {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: rgba(255,255,255,0.9);
+        color: #667eea;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.5);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 3;
     }
     
     .course-content {
-        padding: 32px;
+        padding: 20px;
+        background: #ffffff;
     }
     
     .section-header {
@@ -503,13 +732,13 @@ echo '<style>
     }
     
     .section-title {
-        font-size: 1.35rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: #0f172a;
         display: flex;
         align-items: center;
-        gap: 12px;
-        letter-spacing: -0.02em;
+        gap: 8px;
+        letter-spacing: -0.01em;
     }
     
     .section-icon {
@@ -545,15 +774,16 @@ echo '<style>
     .student-card {
         background: white;
         border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 20px;
+        border-radius: 12px;
+        padding: 18px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: visible;
-        min-height: 80px;
+        min-height: 70px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     
     .student-card::before {
@@ -571,8 +801,8 @@ echo '<style>
     
     .student-card:hover {
         border-color: #667eea;
-        transform: translateX(4px);
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.12);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
     }
     
     .student-card:hover::before {
@@ -657,22 +887,23 @@ echo '<style>
     }
     
     .btn {
-        padding: 10px 18px;
+        padding: 8px 16px;
         border: none;
-        border-radius: 10px;
-        font-size: 0.875rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         text-decoration: none;
         position: relative;
         overflow: hidden;
         white-space: nowrap;
-        min-width: 80px;
+        min-width: 70px;
         justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .btn::before {
@@ -688,6 +919,11 @@ echo '<style>
     
     .btn:hover::before {
         left: 100%;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     
     .btn-enroll {
@@ -909,6 +1145,41 @@ echo '<style>
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     
+    /* Custom Scrollbar for Students Grid */
+    .students-grid {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    
+    .students-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .students-grid::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .students-grid::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #d1fae5 0%, #fed7aa 100%);
+        border-radius: 10px;
+        border: 1px solid #a7f3d0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .students-grid::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #a7f3d0 0%, #fdba74 100%);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Firefox Scrollbar */
+    .students-grid {
+        scrollbar-width: thin;
+        scrollbar-color: #d1fae5 #f1f5f9;
+    }
+    
     .more-students-content {
         display: flex;
         align-items: center;
@@ -926,6 +1197,30 @@ echo '<style>
         color: #475569;
         font-weight: 500;
         font-size: 0.95rem;
+    }
+    
+    .btn-show-more {
+        background: linear-gradient(135deg, #d1fae5 0%, #fed7aa 100%);
+        color: #000000;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .btn-show-more:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #a7f3d0 0%, #fdba74 100%);
+    }
+    
+    .btn-show-more:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     @media (max-width: 768px) {
@@ -1070,6 +1365,21 @@ echo '<div class="teacher-main-content">';
 echo '<div class="enrollment-dashboard">';
 
 // Success/Error Messages
+if (isset($_SESSION['enrollment_success'])) {
+    echo '<div class="success-message">';
+    echo '<i class="fas fa-check-circle"></i> ' . $_SESSION['enrollment_success'];
+    echo '</div>';
+    unset($_SESSION['enrollment_success']);
+}
+
+if (isset($_SESSION['enrollment_error'])) {
+    echo '<div class="error-message">';
+    echo '<i class="fas fa-exclamation-triangle"></i> ' . $_SESSION['enrollment_error'];
+    echo '</div>';
+    unset($_SESSION['enrollment_error']);
+}
+
+// Also check for direct messages (for debugging)
 if (isset($success_message)) {
     echo '<div class="success-message">';
     echo '<i class="fas fa-check-circle"></i> ' . $success_message;
@@ -1082,6 +1392,32 @@ if (isset($error_message)) {
     echo '</div>';
 }
 
+// Debug information (remove in production)
+if (debugging()) {
+    echo '<div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px;">';
+    echo '<strong>Debug Info:</strong><br>';
+    echo 'Total Courses: ' . count($teacher_courses) . '<br>';
+    echo 'Total Students: ' . count($all_students) . '<br>';
+    echo 'Current User ID: ' . $USER->id . '<br>';
+    echo 'Is Teacher: ' . ($isteacher ? 'Yes' : 'No') . '<br>';
+    echo 'Request Method: ' . $_SERVER['REQUEST_METHOD'] . '<br>';
+    echo 'POST Data: ' . print_r($_POST, true) . '<br>';
+    echo '</div>';
+    
+    // Test form
+    echo '<div style="background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ffeaa7;">';
+    echo '<strong>Test Enrollment Form:</strong><br>';
+    echo '<form method="post" style="margin: 10px 0;" onsubmit="console.log(\'Test form submitted\')">';
+    echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
+    echo '<input type="hidden" name="action" value="enroll">';
+    echo '<input type="hidden" name="course_id" value="1">';
+    echo '<input type="hidden" name="user_id" value="2">';
+    echo '<button type="submit" style="background: #28a745; color: white; padding: 5px 10px; border: none; border-radius: 3px;">Test Enroll User 2 in Course 1</button>';
+    echo '</form>';
+    echo '<p style="font-size: 12px; color: #666;">Check browser console and server logs for debugging info.</p>';
+    echo '</div>';
+}
+
 // Calculate overall statistics with error handling
 $total_courses = count($teacher_courses);
 $total_students = count($all_students);
@@ -1091,14 +1427,9 @@ $active_courses = 0;
 try {
     foreach ($teacher_courses as $course) {
         try {
-            $enrolled_count = $DB->count_records_sql(
-                "SELECT COUNT(DISTINCT u.id)
-                 FROM {user} u
-                 JOIN {user_enrolments} ue ON u.id = ue.userid
-                 JOIN {enrol} e ON ue.enrolid = e.id
-                 WHERE e.courseid = ? AND u.deleted = 0 AND u.suspended = 0",
-                [$course->id]
-            );
+            // Use Moodle's standard function to count enrolled users
+            $context = context_course::instance($course->id);
+            $enrolled_count = count_enrolled_users($context);
             $total_enrollments += $enrolled_count;
             if ($enrolled_count > 0) {
                 $active_courses++;
@@ -1113,33 +1444,27 @@ try {
     error_log('Error calculating statistics: ' . $e->getMessage());
 }
 
-// Advanced Dashboard Header
-echo '<div class="dashboard-header">';
-echo '<div class="header-content">';
-echo '<h1 class="dashboard-title">Student Enrollment Dashboard</h1>';
-echo '<p class="dashboard-subtitle">Manage student enrollments across all your courses with advanced tools and insights</p>';
-
-// Statistics Grid
-echo '<div class="stats-grid">';
-echo '<div class="stat-card">';
+// Horizontal Statistics Container
+echo '<div class="horizontal-stats-container">';
+echo '<div class="stats-row">';
+echo '<div class="stat-item">';
 echo '<div class="stat-number">' . $total_courses . '</div>';
 echo '<div class="stat-label">Total Courses</div>';
 echo '</div>';
-echo '<div class="stat-card">';
+echo '<div class="stat-item">';
 echo '<div class="stat-number">' . $total_students . '</div>';
 echo '<div class="stat-label">Available Students</div>';
 echo '</div>';
-echo '<div class="stat-card">';
+echo '<div class="stat-item">';
 echo '<div class="stat-number">' . $total_enrollments . '</div>';
 echo '<div class="stat-label">Total Enrollments</div>';
 echo '</div>';
-echo '<div class="stat-card">';
+echo '<div class="stat-item">';
 echo '<div class="stat-number">' . $active_courses . '</div>';
 echo '<div class="stat-label">Active Courses</div>';
 echo '</div>';
-echo '</div>'; // stats-grid
-echo '</div>'; // header-content
-echo '</div>'; // dashboard-header
+echo '</div>'; // stats-row
+echo '</div>'; // horizontal-stats-container
 
 // Search and Filter Section
 echo '<div class="search-section">';
@@ -1159,16 +1484,16 @@ if (!empty($teacher_courses)) {
     echo '<div class="courses-grid">';
     
     foreach ($teacher_courses as $course) {
-        // Get enrolled students for this course
-        $enrolled_students = $DB->get_records_sql(
-            "SELECT DISTINCT u.*
-             FROM {user} u
-             JOIN {user_enrolments} ue ON u.id = ue.userid
-             JOIN {enrol} e ON ue.enrolid = e.id
-             WHERE e.courseid = ? AND u.deleted = 0 AND u.suspended = 0
-             ORDER BY u.firstname, u.lastname ASC",
-            [$course->id]
-        );
+        // Get enrolled students using Moodle's participant system
+        $context = context_course::instance($course->id);
+        $enrolled_users = get_enrolled_users($context, '', 0, 'u.*', 'u.firstname, u.lastname');
+        $enrolled_students = [];
+        
+        foreach ($enrolled_users as $user) {
+            if ($user->deleted == 0 && $user->suspended == 0) {
+                $enrolled_students[$user->id] = $user;
+            }
+        }
         
         // Get course completion stats with error handling
         try {
@@ -1204,6 +1529,12 @@ if (!empty($teacher_courses)) {
         
         echo '<div class="course-card" data-course-id="' . $course->id . '">';
         echo '<div class="course-header">';
+        echo '<div class="course-category-tag">Grade 1</div>';
+        echo '<div class="course-icon-container">';
+        echo '<div class="course-icon">';
+        echo '<i class="fas fa-graduation-cap"></i>';
+        echo '</div>';
+        echo '</div>';
         echo '<h2 class="course-title">' . htmlspecialchars($course->fullname) . '</h2>';
         echo '<p class="course-code">' . htmlspecialchars($course->shortname) . '</p>';
         echo '<div class="course-stats">';
@@ -1221,6 +1552,11 @@ if (!empty($teacher_courses)) {
         echo '<div class="section-icon"><i class="fas fa-users"></i></div>';
         echo 'Enrolled Students (' . count($enrolled_students) . ')';
         echo '</div>';
+        echo '<div class="section-actions">';
+        echo '<a href="' . $CFG->wwwroot . '/user/index.php?id=' . $course->id . '" class="btn btn-sm" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem;">';
+        echo '<i class="fas fa-cog"></i> Manage Participants';
+        echo '</a>';
+        echo '</div>';
         echo '</div>';
         
         if (!empty($enrolled_students)) {
@@ -1235,12 +1571,12 @@ if (!empty($teacher_courses)) {
                 echo '</div>';
                 echo '</div>';
                 echo '<div class="action-buttons">';
-                echo '<form method="post" style="display: inline;">';
+                echo '<form method="post" style="display: inline;" onsubmit="return confirmEnrollment(this)">';
                 echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
                 echo '<input type="hidden" name="action" value="unenroll">';
                 echo '<input type="hidden" name="course_id" value="' . $course->id . '">';
                 echo '<input type="hidden" name="user_id" value="' . $student->id . '">';
-                echo '<button type="submit" class="btn btn-unenroll" onclick="return confirm(\'Are you sure you want to unenroll this student?\')">';
+                echo '<button type="submit" class="btn btn-unenroll" data-student-name="' . htmlspecialchars(fullname($student)) . '" data-course-name="' . htmlspecialchars($course->fullname) . '" onclick="console.log(\'Unenroll button clicked for user: ' . $student->id . ', course: ' . $course->id . '\')">';
                 echo '<i class="fas fa-user-minus"></i> Unenroll';
                 echo '</button>';
                 echo '</form>';
@@ -1263,6 +1599,11 @@ if (!empty($teacher_courses)) {
         echo '<div class="section-icon"><i class="fas fa-user-plus"></i></div>';
         echo 'Available Students';
         echo '</div>';
+        echo '<div class="section-actions">';
+        echo '<a href="' . $CFG->wwwroot . '/enrol/users.php?id=' . $course->id . '" class="btn btn-sm" style="background: #10b981; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem;">';
+        echo '<i class="fas fa-user-plus"></i> Enroll Users';
+        echo '</a>';
+        echo '</div>';
         echo '</div>';
         
         // Get students not enrolled in this course
@@ -1272,8 +1613,14 @@ if (!empty($teacher_courses)) {
         });
         
         if (!empty($available_students)) {
-            echo '<div class="students-grid">';
-            foreach (array_slice($available_students, 0, 12) as $student) { // Show first 12 available students
+            $students_to_show = 8; // Show fewer initially for better layout
+            $total_available = count($available_students);
+            $showing_count = min($students_to_show, $total_available);
+            $show_all = isset($_GET['show_all_' . $course->id]) && $_GET['show_all_' . $course->id] == '1';
+            
+            echo '<div class="students-grid" id="available-students-' . $course->id . '">';
+            $students_to_display = $show_all ? $available_students : array_slice($available_students, 0, $students_to_show);
+            foreach ($students_to_display as $student) {
                 echo '<div class="student-card available-student" data-student-id="' . $student->id . '">';
                 echo '<div class="student-info">';
                 echo '<div class="student-avatar">' . strtoupper(substr($student->firstname, 0, 1)) . '</div>';
@@ -1283,12 +1630,12 @@ if (!empty($teacher_courses)) {
                 echo '</div>';
                 echo '</div>';
                 echo '<div class="action-buttons">';
-                echo '<form method="post" style="display: inline;">';
+                echo '<form method="post" style="display: inline;" onsubmit="return confirmEnrollment(this)">';
                 echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
                 echo '<input type="hidden" name="action" value="enroll">';
                 echo '<input type="hidden" name="course_id" value="' . $course->id . '">';
                 echo '<input type="hidden" name="user_id" value="' . $student->id . '">';
-                echo '<button type="submit" class="btn btn-enroll">';
+                echo '<button type="submit" class="btn btn-enroll" data-student-name="' . htmlspecialchars(fullname($student)) . '" data-course-name="' . htmlspecialchars($course->fullname) . '" onclick="console.log(\'Enroll button clicked for user: ' . $student->id . ', course: ' . $course->id . '\')">';
                 echo '<i class="fas fa-user-plus"></i> Enroll';
                 echo '</button>';
                 echo '</form>';
@@ -1297,11 +1644,29 @@ if (!empty($teacher_courses)) {
             }
             echo '</div>';
             
-            if (count($available_students) > 12) {
+            // Show banner with dynamic count and proper state
+            if ($show_all) {
+                echo '<div class="more-students-banner">';
+                echo '<div class="more-students-content">';
+                echo '<i class="fas fa-check-circle more-students-icon" style="color: #10b981;"></i>';
+                echo '<span class="more-students-text">Showing all ' . $total_available . ' available students for this course.</span>';
+                echo '<a href="' . $PAGE->url . '" class="btn-show-more" style="margin-left: 12px; padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 8px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-block;">Show Less</a>';
+                echo '</div>';
+                echo '</div>';
+            } else if ($total_available > $students_to_show) {
+                $remaining_count = $total_available - $students_to_show;
                 echo '<div class="more-students-banner">';
                 echo '<div class="more-students-content">';
                 echo '<i class="fas fa-info-circle more-students-icon"></i>';
-                echo '<span class="more-students-text">... and ' . (count($available_students) - 12) . ' more students available for enrollment.</span>';
+                echo '<span class="more-students-text">Showing ' . $showing_count . ' of ' . $total_available . ' available students. ' . $remaining_count . ' more students available for enrollment.</span>';
+                echo '<a href="' . $PAGE->url . '?show_all_' . $course->id . '=1" class="btn-show-more" style="margin-left: 12px; padding: 6px 12px; background: linear-gradient(135deg, #d1fae5 0%, #fed7aa 100%); color: #000000; border: none; border-radius: 8px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-block;">Show All</a>';
+                echo '</div>';
+                echo '</div>';
+            } else {
+                echo '<div class="more-students-banner">';
+                echo '<div class="more-students-content">';
+                echo '<i class="fas fa-check-circle more-students-icon" style="color: #10b981;"></i>';
+                echo '<span class="more-students-text">Showing all ' . $total_available . ' available students for this course.</span>';
                 echo '</div>';
                 echo '</div>';
             }
@@ -1332,6 +1697,30 @@ echo '</div>'; // teacher-dashboard-wrapper
 
 // Advanced JavaScript for Enrollment Dashboard
 echo '<script>
+// Global confirmation function
+function confirmEnrollment(form) {
+    console.log("confirmEnrollment called");
+    const button = form.querySelector("button[type=submit]");
+    const studentName = button.getAttribute("data-student-name");
+    const courseName = button.getAttribute("data-course-name");
+    const action = form.querySelector("input[name=action]").value;
+    
+    console.log("Action:", action, "Student:", studentName, "Course:", courseName);
+    
+    // For now, just return true to allow submission
+    return true;
+    
+    // Uncomment below for confirmation dialog
+    /*
+    if (action === "enroll") {
+        return confirm(`Are you sure you want to enroll ${studentName} in ${courseName}?`);
+    } else if (action === "unenroll") {
+        return confirm(`Are you sure you want to unenroll ${studentName} from ${courseName}?`);
+    }
+    return true;
+    */
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     console.log("Enrollment Dashboard initialized");
     
@@ -1595,6 +1984,17 @@ window.enrollmentDashboard = {
         location.reload();
     }
 };
+
+// Enhanced scrollbar functionality
+document.addEventListener("DOMContentLoaded", function() {
+    // Add smooth scrolling to all scrollable areas
+    const scrollableElements = document.querySelectorAll(".students-grid, .questions-list");
+    scrollableElements.forEach(element => {
+        element.style.scrollBehavior = "smooth";
+    });
+    
+    console.log("Enhanced scrollbar functionality initialized");
+});
 </script>';
 
 echo $OUTPUT->footer();

@@ -2011,20 +2011,24 @@
     padding: 0.5rem;
     
     &::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
     }
     
     &::-webkit-scrollbar-track {
-        background: #f8fafc;
+        background: #f1f5f9;
         border-radius: 10px;
+        border: 1px solid #e2e8f0;
     }
     
     &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: linear-gradient(135deg, #d1fae5 0%, #fed7aa 100%);
         border-radius: 10px;
+        border: 1px solid #a7f3d0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         
         &:hover {
-            background: #94a3b8;
+            background: linear-gradient(135deg, #a7f3d0 0%, #fdba74 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
     }
 }
