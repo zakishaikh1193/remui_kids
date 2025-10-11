@@ -90,8 +90,16 @@ function theme_remui_kids_get_pre_scss($theme) {
  */
 function theme_remui_kids_get_extra_scss($theme) {
     $content = '';
+    
+    // Add elementary dashboard styles (Grades 1-3)
+    $elementaryscss = $theme->dir . '/scss/elementary_dashboard.scss';
+    if (file_exists($elementaryscss)) {
+        $content .= file_get_contents($elementaryscss);
+    }
+    
     // Add our custom kids-friendly styles
     $content .= file_get_contents($theme->dir . '/scss/post.scss');
+    
     return $content;
 }
 
