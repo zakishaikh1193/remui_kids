@@ -1,0 +1,182 @@
+{{!
+    Elementary Sidebar Template for remui_kids theme
+    
+    This template provides the sidebar navigation for Grade 1-3 (Elementary) dashboard.
+    It can be reused across all elementary pages for consistent navigation.
+}}
+
+<!-- Enhanced Student Sidebar -->
+<div class="student-sidebar enhanced-elementary-sidebar">
+    <nav class="sidebar-nav">
+        
+        <!-- DASHBOARD Section -->
+        <div class="nav-section">
+            <div class="section-title">
+                <span class="section-bullet blue"></span>
+                DASHBOARD
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{{{dashboardurl}}}" class="nav-link {{^is_mycourses_page}}{{^is_lessons_page}}{{^is_activities_page}}active{{/is_activities_page}}{{/is_lessons_page}}{{/is_mycourses_page}} dashboard-link">
+                        <i class="fa fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{mycoursesurl}}}" class="nav-link {{#is_mycourses_page}}active{{/is_mycourses_page}}">
+                        <i class="fa fa-book-open"></i>
+                        <span>My Courses</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{lessonsurl}}}" class="nav-link {{#is_lessons_page}}active{{/is_lessons_page}}">
+                        <i class="fa fa-play-circle"></i>
+                        <span>Lessons</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{activitiesurl}}}" class="nav-link {{#is_activities_page}}active{{/is_activities_page}}">
+                        <i class="fa fa-chart-line"></i>
+                        <span>Activities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{achievementsurl}}}" class="nav-link">
+                        <i class="fa fa-trophy"></i>
+                        <span>Achievements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{competenciesurl}}}" class="nav-link">
+                        <i class="fa fa-bullseye"></i>
+                        <span>Competencies</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{scheduleurl}}}" class="nav-link">
+                        <i class="fa fa-calendar"></i>
+                        <span>Schedule</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- TOOLS & RESOURCES Section -->
+        <div class="nav-section">
+            <div class="section-title">
+                <span class="section-bullet green"></span>
+                TOOLS & RESOURCES
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{{{treeviewurl}}}" class="nav-link">
+                        <i class="fa fa-sitemap"></i>
+                        <span>Tree View</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- SETTINGS & PROFILE Section -->
+        <div class="nav-section">
+            <div class="section-title">
+                <span class="section-bullet orange"></span>
+                SETTINGS & PROFILE
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{{{settingsurl}}}" class="nav-link">
+                        <i class="fa fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{profileurl}}}" class="nav-link">
+                        <i class="fa fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{{logouturl}}}" class="nav-link">
+                        <i class="fa fa-sign-out"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- QUICK ACTIONS Section -->
+        <div class="nav-section">
+            <div class="section-title">
+                <span class="section-bullet purple"></span>
+                QUICK ACTIONS
+            </div>
+            <div class="quick-actions-container">
+                <div class="quick-action-card ebooks-card">
+                    <div class="quick-action-icon">
+                        <i class="fa fa-book"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>E-books</h4>
+                        <p>Access digital learning materials</p>
+                    </div>
+                    <div class="quick-action-arrow">
+                        <i class="fa fa-arrow-right"></i>
+                    </div>
+                </div>
+                
+                <div class="quick-action-card ask-teacher-card">
+                    <div class="quick-action-icon">
+                        <i class="fa fa-question-circle"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Ask Teacher</h4>
+                        <p>Get help from your instructor</p>
+                    </div>
+                    <div class="quick-action-arrow">
+                        <i class="fa fa-arrow-right"></i>
+                    </div>
+                </div>
+                
+                <div class="quick-action-card share-class-card">
+                    <div class="quick-action-icon">
+                        <i class="fa fa-share-alt"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Share with Class</h4>
+                        <p>Collaborate with classmates</p>
+                    </div>
+                    <div class="quick-action-arrow">
+                        <i class="fa fa-arrow-right"></i>
+                    </div>
+                </div>
+                
+                <a href="{{{scratcheditorurl}}}" class="quick-action-card scratch-editor-card {{#is_scratch_emulator_page}}active{{/is_scratch_emulator_page}}" style="text-decoration: none; color: inherit;">
+                    <div class="quick-action-icon">
+                        <i class="fa fa-puzzle-piece"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Scratch Editor</h4>
+                        <p>Create interactive projects</p>
+                    </div>
+                    <div class="quick-action-arrow">
+                        <i class="fa fa-arrow-right"></i>
+                    </div>
+                </a>
+                
+                <a href="{{{codeeditorurl}}}" class="quick-action-card code-editor-card {{#is_code_editor_page}}active{{/is_code_editor_page}}" style="text-decoration: none; color: inherit;">
+                    <div class="quick-action-icon">
+                        <i class="fa fa-code"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <h4>Code Editor</h4>
+                        <p>Write and test your code</p>
+                    </div>
+                    <div class="quick-action-arrow">
+                        <i class="fa fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+</div>

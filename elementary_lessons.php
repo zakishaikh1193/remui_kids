@@ -47,8 +47,8 @@ if (!empty($usercohorts)) {
     }
 }
 
-// Get elementary student's lessons
-$studentlessons = [];
+// Get elementary student's course sections
+$coursesections = [];
 try {
     // Get user's enrolled courses
     $courses = enrol_get_all_users_courses($USER->id, true);
@@ -60,156 +60,215 @@ try {
         // Debug: Log course info
         error_log("Elementary Lessons: Processing course: {$course->fullname} (ID: {$course->id})");
         
-        // Get lessons with proper validation - improved query
-        $lessons = $DB->get_records_sql(
-            "SELECT l.id, l.name, l.intro, l.timelimit, l.retake, l.attempts, l.course,
-                    cm.id as cmid, cm.completion, cm.completionview, cm.visible as cmvisible,
+        // Get course sections with activities
+        $sections = $DB->get_records_sql(
+            "SELECT cs.id, cs.section, cs.name, cs.summary, cs.sequence,
                     c.id as courseid, c.fullname as coursename, c.shortname as courseshortname
-             FROM {lesson} l
-             JOIN {course_modules} cm ON l.id = cm.instance
-             JOIN {modules} m ON cm.module = m.id AND m.name = 'lesson'
-             JOIN {course} c ON l.course = c.id
-             WHERE l.course = ? AND cm.visible = 1 AND cm.deletioninprogress = 0
-             ORDER BY l.name",
+             FROM {course_sections} cs
+             JOIN {course} c ON cs.course = c.id
+             WHERE cs.course = ? AND cs.section > 0 AND cs.visible = 1
+             ORDER BY cs.section",
             [$course->id]
         );
         
-        // Debug: Log the number of lessons found
-        error_log("Elementary Lessons: Found " . count($lessons) . " lessons in course {$course->fullname}");
+        // Debug: Log the number of sections found
+        error_log("Elementary Lessons: Found " . count($sections) . " sections in course {$course->fullname}");
         
-        foreach ($lessons as $lesson) {
-            // Skip if no valid cmid
-            if (empty($lesson->cmid)) {
-                error_log("Elementary Lessons: Skipping lesson '{$lesson->name}' - no valid cmid");
-                continue;
-            }
-            
+        foreach ($sections as $section) {
             try {
-                // Get lesson progress
-                $progress = theme_remui_kids_get_lesson_progress($USER->id, $lesson->id);
+                // Get section activities count
+                $activities_count = 0;
+                $completed_activities = 0;
                 
-                // Create lesson URL safely
-                $lessonurl = '';
+                if (!empty($section->sequence)) {
+                    $cmids = explode(',', $section->sequence);
+                    $activities_count = count($cmids);
+                    
+                    // Count completed activities
+                    foreach ($cmids as $cmid) {
+                        if (empty($cmid)) continue;
+                        
+                        $completion = $DB->get_record('course_modules_completion', [
+                            'coursemoduleid' => $cmid,
+                            'userid' => $USER->id,
+                            'completionstate' => 1
+                        ]);
+                        
+                        if ($completion) {
+                            $completed_activities++;
+                        }
+                    }
+                }
+                
+                // Calculate progress percentage
+                $progress_percentage = $activities_count > 0 ? round(($completed_activities / $activities_count) * 100) : 0;
+                
+                // Create section URL
+                $sectionurl = '';
                 try {
-                    $lessonurl = (new moodle_url('/mod/lesson/view.php', ['id' => $lesson->cmid]))->out();
+                    $sectionurl = (new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]))->out();
                 } catch (Exception $e) {
-                    error_log("Elementary Lessons: Failed to create URL for lesson '{$lesson->name}': " . $e->getMessage());
-                    continue; // Skip this lesson if URL creation fails
+                    error_log("Elementary Lessons: Failed to create URL for section '{$section->name}': " . $e->getMessage());
+                    continue;
                 }
                 
-                // Clean lesson intro text
-                $intro = $lesson->intro ? strip_tags($lesson->intro) : 'Complete this lesson to continue your learning journey!';
-                if (strlen($intro) > 150) {
-                    $intro = substr($intro, 0, 150) . '...';
+                // Clean section summary text
+                $summary = $section->summary ? strip_tags($section->summary) : 'Explore this section to learn new concepts and complete activities.';
+                if (strlen($summary) > 150) {
+                    $summary = substr($summary, 0, 150) . '...';
                 }
                 
-                $studentlessons[] = [
-                    'id' => $lesson->id,
-                    'name' => $lesson->name,
-                    'intro' => $intro,
-                    'timelimit' => $lesson->timelimit,
-                    'retake' => $lesson->retake,
-                    'attempts' => $lesson->attempts,
-                    'courseid' => $lesson->courseid,
-                    'coursename' => $lesson->coursename,
-                    'courseshortname' => $lesson->courseshortname,
-                    'cmid' => $lesson->cmid,
-                    'progress_percentage' => $progress['percentage'],
-                    'completed_attempts' => $progress['attempts'],
-                    'best_grade' => $progress['best_grade'],
-                    'lessonurl' => $lessonurl,
-                    'completed' => $progress['percentage'] >= 100,
-                    'in_progress' => $progress['percentage'] > 0 && $progress['percentage'] < 100,
-                    'not_started' => $progress['percentage'] == 0,
-                    'estimated_time' => $lesson->timelimit > 0 ? gmdate("H:i", $lesson->timelimit) : 'No limit'
+                // Fetch section image from course files
+                $section_image = '';
+                try {
+                    // Get course context for file access
+                    $coursecontext = context_course::instance($course->id);
+                    $fs = get_file_storage();
+                    
+                    // Priority 1: Look for section-specific images
+                    $section_image_files = $fs->get_area_files(
+                        $coursecontext->id,
+                        'course',
+                        'section',
+                        $section->id,
+                        'filename',
+                        false
+                    );
+                    
+                    // Priority 2: Look for course overview images
+                    if (empty($section_image_files)) {
+                        $section_image_files = $fs->get_area_files(
+                            $coursecontext->id,
+                            'course',
+                            'overviewfiles',
+                            0,
+                            'filename',
+                            false
+                        );
+                    }
+                    
+                    // Priority 3: Look for course summary images
+                    if (empty($section_image_files)) {
+                        $section_image_files = $fs->get_area_files(
+                            $coursecontext->id,
+                            'course',
+                            'summary',
+                            0,
+                            'filename',
+                            false
+                        );
+                    }
+                    
+                    // Priority 4: Look for any course files that might be images
+                    if (empty($section_image_files)) {
+                        $all_course_files = $fs->get_area_files(
+                            $coursecontext->id,
+                            'course',
+                            'legacy',
+                            0,
+                            'filename',
+                            false
+                        );
+                        
+                        // Filter for image files only
+                        foreach ($all_course_files as $file) {
+                            if ($file->is_valid_image()) {
+                                $section_image_files[] = $file;
+                            }
+                        }
+                    }
+                    
+                    // Get the first valid image file
+                    if (!empty($section_image_files)) {
+                        foreach ($section_image_files as $image_file) {
+                            if ($image_file && $image_file->is_valid_image()) {
+                                $section_image = moodle_url::make_pluginfile_url(
+                                    $image_file->get_contextid(),
+                                    $image_file->get_component(),
+                                    $image_file->get_filearea(),
+                                    $image_file->get_itemid(),
+                                    $image_file->get_filepath(),
+                                    $image_file->get_filename()
+                                )->out();
+                                break; // Use the first valid image found
+                            }
+                        }
+                    }
+                    
+                    // Debug: Log image fetching results
+                    if (!empty($section_image)) {
+                        error_log("Elementary Lessons: Found section image for '{$section->name}': {$section_image}");
+                    } else {
+                        error_log("Elementary Lessons: No section image found for '{$section->name}', will use default");
+                    }
+                    
+                } catch (Exception $e) {
+                    error_log("Elementary Lessons: Error fetching section image for section '{$section->name}': " . $e->getMessage());
+                }
+                
+                // Fallback to default section images if no image found
+                if (empty($section_image)) {
+                    $default_section_images = [
+                        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1523240798034-6c5c0b0b0b0b?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&auto=format',
+                        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop&auto=format'
+                    ];
+                    $section_image = $default_section_images[($section->section - 1) % count($default_section_images)];
+                }
+                
+                $coursesections[] = [
+                    'id' => $section->id,
+                    'section_number' => $section->section,
+                    'name' => $section->name ?: "Section {$section->section}",
+                    'summary' => $summary,
+                    'courseid' => $section->courseid,
+                    'coursename' => $section->coursename,
+                    'courseshortname' => $section->courseshortname,
+                    'sectionurl' => $sectionurl,
+                    'activities_count' => $activities_count,
+                    'completed_activities' => $completed_activities,
+                    'progress_percentage' => $progress_percentage,
+                    'completed' => $progress_percentage >= 100,
+                    'in_progress' => $progress_percentage > 0 && $progress_percentage < 100,
+                    'not_started' => $progress_percentage == 0,
+                    'section_image' => $section_image
                 ];
                 
-                // Debug: Log successful lesson processing
-                error_log("Elementary Lessons: Successfully processed lesson '{$lesson->name}' from course '{$lesson->coursename}'");
+                // Debug: Log successful section processing
+                error_log("Elementary Lessons: Successfully processed section '{$section->name}' from course '{$section->coursename}'");
                 
             } catch (Exception $e) {
-                error_log("Elementary Lessons: Error processing lesson '{$lesson->name}': " . $e->getMessage());
-                continue; // Skip problematic lessons
+                error_log("Elementary Lessons: Error processing section '{$section->name}': " . $e->getMessage());
+                continue; // Skip problematic sections
             }
         }
     }
     
-    // Debug: Log total lessons found
-    error_log("Elementary Lessons: Total lessons found for user {$USER->id}: " . count($studentlessons));
-    
-    // If no lessons found, try a broader search to see if there are any lessons in enrolled courses
-    if (empty($studentlessons)) {
-        error_log("Elementary Lessons: No lessons found, trying broader search...");
-        
-        $courseids = array_keys($courses);
-        if (!empty($courseids)) {
-            $courseids_sql = implode(',', $courseids);
-            $all_lessons = $DB->get_records_sql(
-                "SELECT l.id, l.name, l.intro, l.timelimit, l.retake, l.attempts, l.course,
-                        cm.id as cmid, cm.completion, cm.completionview, cm.visible as cmvisible,
-                        c.id as courseid, c.fullname as coursename, c.shortname as courseshortname
-                 FROM {lesson} l
-                 JOIN {course_modules} cm ON l.id = cm.instance
-                 JOIN {modules} m ON cm.module = m.id AND m.name = 'lesson'
-                 JOIN {course} c ON l.course = c.id
-                 WHERE l.course IN ($courseids_sql) AND cm.visible = 1 AND cm.deletioninprogress = 0
-                 ORDER BY c.fullname, l.name",
-                []
-            );
-            
-            error_log("Elementary Lessons: Found " . count($all_lessons) . " total lessons in all enrolled courses");
-            
-            // Process these lessons as well
-            foreach ($all_lessons as $lesson) {
-                if (empty($lesson->cmid)) {
-                    continue;
-                }
-                
-                try {
-                    $progress = theme_remui_kids_get_lesson_progress($USER->id, $lesson->id);
-                    
-                    $lessonurl = '';
-                    try {
-                        $lessonurl = (new moodle_url('/mod/lesson/view.php', ['id' => $lesson->cmid]))->out();
-                    } catch (Exception $e) {
-                        continue;
-                    }
-                    
-                    $intro = $lesson->intro ? strip_tags($lesson->intro) : 'Complete this lesson to continue your learning journey!';
-                    if (strlen($intro) > 150) {
-                        $intro = substr($intro, 0, 150) . '...';
-                    }
-                    
-                    $studentlessons[] = [
-                        'id' => $lesson->id,
-                        'name' => $lesson->name,
-                        'intro' => $intro,
-                        'timelimit' => $lesson->timelimit,
-                        'retake' => $lesson->retake,
-                        'attempts' => $lesson->attempts,
-                        'courseid' => $lesson->courseid,
-                        'coursename' => $lesson->coursename,
-                        'courseshortname' => $lesson->courseshortname,
-                        'cmid' => $lesson->cmid,
-                        'progress_percentage' => $progress['percentage'],
-                        'completed_attempts' => $progress['attempts'],
-                        'best_grade' => $progress['best_grade'],
-                        'lessonurl' => $lessonurl,
-                        'completed' => $progress['percentage'] >= 100,
-                        'in_progress' => $progress['percentage'] > 0 && $progress['percentage'] < 100,
-                        'not_started' => $progress['percentage'] == 0,
-                        'estimated_time' => $lesson->timelimit > 0 ? gmdate("H:i", $lesson->timelimit) : 'No limit'
-                    ];
-                } catch (Exception $e) {
-                    continue;
-                }
-            }
-        }
-    }
+    // Debug: Log total sections found
+    error_log("Elementary Lessons: Total sections found for user {$USER->id}: " . count($coursesections));
     
 } catch (Exception $e) {
-    error_log("Elementary Lessons: Error fetching lessons for user {$USER->id}: " . $e->getMessage());
-    $studentlessons = []; // Fallback to empty array
+    error_log("Elementary Lessons: Error fetching sections for user {$USER->id}: " . $e->getMessage());
+    $coursesections = []; // Fallback to empty array
+}
+
+// Calculate section statistics
+$completed_sections_count = 0;
+$in_progress_sections_count = 0;
+$total_activities_count = 0;
+
+foreach ($coursesections as $section) {
+    if ($section['completed']) {
+        $completed_sections_count++;
+    } elseif ($section['in_progress']) {
+        $in_progress_sections_count++;
+    }
+    $total_activities_count += $section['activities_count'];
 }
 
 // Prepare template context for elementary dashboard integration
@@ -219,13 +278,16 @@ $templatecontext = [
     'user_cohort_name' => $usercohortname,
     'user_cohort_id' => $usercohortid,
     'student_name' => $USER->firstname,
-    'student_lessons' => $studentlessons,
-    'has_student_lessons' => !empty($studentlessons),
-    'total_lessons_count' => count($studentlessons),
+    'course_sections' => $coursesections,
+    'has_course_sections' => !empty($coursesections),
+    'total_sections_count' => count($coursesections),
+    'completed_sections_count' => $completed_sections_count,
+    'in_progress_sections_count' => $in_progress_sections_count,
+    'total_activities_count' => $total_activities_count,
     
     // URLs for sidebar navigation - pointing to elementary pages
     'dashboardurl' => (new moodle_url('/my/'))->out(),
-    'mycoursesurl' => (new moodle_url('/theme/remui_kids/mycourses.php'))->out(),
+    'mycoursesurl' => (new moodle_url('/theme/remui_kids/moodle_mycourses.php'))->out(),
     'lessonsurl' => (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out(),
     'activitiesurl' => (new moodle_url('/mod/quiz/index.php'))->out(),
     'achievementsurl' => (new moodle_url('/badges/mybadges.php'))->out(),

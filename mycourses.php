@@ -33,8 +33,8 @@ global $USER, $DB, $PAGE, $OUTPUT, $CFG;
 // Set up the page
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/theme/remui_kids/mycourses.php');
-$PAGE->set_pagelayout('mycourses');
-$PAGE->set_title('My Courses');
+$PAGE->set_pagelayout('base'); // Use base layout like dashboard
+$PAGE->set_title('My Courses', false); // Remove site name from title
 $PAGE->set_heading('My Courses');
 
 // Get user's cohort information
@@ -122,22 +122,34 @@ if ($dashboardtype === 'elementary') {
     }
 }
 
-// Prepare template context
+// Prepare template context for dashboard template
 $templatecontext = [
-    'custom_mycourses' => true,
-    'dashboard_type' => $dashboardtype,
+    // Dashboard type flags
+    'elementary' => ($dashboardtype === 'elementary'),
+    'middle' => ($dashboardtype === 'middle'),
+    'highschool' => ($dashboardtype === 'highschool'),
+    'default' => ($dashboardtype === 'default'),
+    
+    // User information
     'user_cohort_name' => $usercohortname,
     'user_cohort_id' => $usercohortid,
     'student_name' => $USER->firstname,
+    'dashboard_type' => $dashboardtype,
+    
+    // Course data
     'student_courses' => $studentcourses,
     'has_student_courses' => !empty($studentcourses),
     'total_courses_count' => count($studentcourses),
     
+    // Page type flags
+    'is_mycourses_page' => true,
+    'is_dashboard_page' => false,
+    
     // URLs for sidebar navigation
     'dashboardurl' => (new moodle_url('/my/'))->out(),
     'mycoursesurl' => (new moodle_url('/theme/remui_kids/mycourses.php'))->out(),
-    'lessonsurl' => (new moodle_url('/mod/lesson/index.php'))->out(),
-    'activitiesurl' => (new moodle_url('/mod/quiz/index.php'))->out(),
+    'lessonsurl' => (new moodle_url('/theme/remui_kids/elementary_lessons.php'))->out(),
+    'activitiesurl' => (new moodle_url('/theme/remui_kids/elementary_activities.php'))->out(),
     'achievementsurl' => (new moodle_url('/badges/mybadges.php'))->out(),
     'competenciesurl' => (new moodle_url('/admin/tool/lp/index.php'))->out(),
     'scheduleurl' => (new moodle_url('/calendar/view.php'))->out(),
@@ -145,18 +157,17 @@ $templatecontext = [
     'settingsurl' => (new moodle_url('/user/preferences.php'))->out(),
     'profileurl' => (new moodle_url('/user/profile.php', ['id' => $USER->id]))->out(),
     'logouturl' => (new moodle_url('/login/logout.php', ['sesskey' => sesskey()]))->out(),
+    
+    // Quick action URLs
+    'ebooksurl' => (new moodle_url('/mod/book/index.php'))->out(),
+    'askteacherurl' => (new moodle_url('/message/index.php'))->out(),
+    'shareclassurl' => (new moodle_url('/mod/forum/index.php'))->out(),
+    'scratcheditorurl' => (new moodle_url('/theme/remui_kids/scratch_emulator.php'))->out(),
 ];
 
-// Set individual dashboard type flags
-$templatecontext['elementary'] = ($dashboardtype === 'elementary');
-$templatecontext['middle'] = ($dashboardtype === 'middle');
-$templatecontext['highschool'] = ($dashboardtype === 'highschool');
-$templatecontext['default'] = ($dashboardtype === 'default');
-
 // Add body class for styling
-$templatecontext['bodyattributes'] = 'class="custom-mycourses-page has-student-sidebar"';
+$templatecontext['bodyattributes'] = 'class="has-student-sidebar elementary-dashboard mycourses-page"';
 
-// Flag to hide the default navbar
-$templatecontext['hide_default_navbar'] = true;
-
-echo $OUTPUT->render_from_template('theme_remui_kids/mycourses_page', $templatecontext);
+echo $OUTPUT->header();
+echo $OUTPUT->render_from_template('theme_remui_kids/dashboard', $templatecontext);
+echo $OUTPUT->footer();

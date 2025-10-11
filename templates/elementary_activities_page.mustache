@@ -310,6 +310,87 @@
     background: linear-gradient(90deg, #95a5a6, #7f8c8d) !important;
 }
 
+.elementary-activities-page .elementary-activity-card.overdue::before {
+    background: linear-gradient(90deg, #e74c3c, #c0392b) !important;
+}
+
+        .elementary-activities-page .activity-info-value.overdue {
+            color: #e74c3c !important;
+            font-weight: 600 !important;
+        }
+
+        /* Active Activities Section Styling (matching the image) */
+        .elementary-activities-page .active-activities-section {
+            margin-bottom: 30px;
+        }
+
+        .elementary-activities-page .section-header {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .elementary-activities-page .section-icon {
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+
+        .elementary-activities-page .section-title {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        /* Enhanced Activity Cards */
+        .elementary-activities-page .elementary-activity-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .elementary-activities-page .elementary-activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .elementary-activities-page .elementary-activity-card:active {
+            transform: translateY(-2px);
+        }
+
+        /* Activity Action Button Enhancement */
+        .elementary-activities-page .activity-action-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .elementary-activities-page .activity-action-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .elementary-activities-page .activity-action-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .elementary-activities-page .activity-action-button:hover:before {
+            left: 100%;
+        }
+
 .elementary-activities-page .elementary-activity-card .activity-header {
     display: flex !important;
     justify-content: space-between !important;
@@ -790,65 +871,94 @@
             {{#has_student_activities}}
             <div class="row">
                 <div class="col-12">
-                    <div class="elementary-activities-grid">
-                        {{#student_activities}}
-                        <div class="elementary-activity-card enhanced" data-activity-id="{{id}}">
-                            <!-- Activity Header -->
-                            <div class="activity-header">
-                                <div>
-                                    <h3 class="activity-title">{{name}}</h3>
-                                    <p class="activity-course">{{coursename}}</p>
-                                </div>
-                                
-                                <div class="activity-type-badge">{{typename}}</div>
-                                
-                                <!-- Activity Status Indicator -->
-                                <div class="activity-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
-                                    <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-clock-o{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
-                                </div>
+        <!-- Active Activities Section (matching the image) -->
+        <div class="active-activities-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fa fa-gamepad"></i>
+                </div>
+                <h2 class="section-title">Active Activities</h2>
+            </div>
+            
+            <div class="activities-debug-info" style="background: #f8f9fa; padding: 10px; margin-bottom: 20px; border-radius: 5px; font-size: 0.9rem; color: #6c757d;">
+                <strong>Debug Info:</strong> Found {{total_activities_count}} activities 
+                ({{completed_activities_count}} completed, {{in_progress_activities_count}} in progress, {{overdue_activities_count}} overdue)
+            </div>
+            
+            <div class="elementary-activities-grid">
+                {{#student_activities}}
+                <div class="elementary-activity-card enhanced {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}{{#is_overdue}} overdue{{/is_overdue}}" data-activity-id="{{id}}">
+                    <!-- Activity Header -->
+                    <div class="activity-header">
+                        <div>
+                            <h3 class="activity-title">{{name}}</h3>
+                            <p class="activity-course">{{coursename}}</p>
+                        </div>
+                        
+                        <div class="activity-type-badge">{{typename}}</div>
+                        
+                        <!-- Activity Status Indicator -->
+                        <div class="activity-status-indicator {{#completed}}completed{{/completed}}{{^completed}}{{#in_progress}}in-progress{{/in_progress}}{{^in_progress}}not-started{{/in_progress}}{{/completed}}">
+                            <i class="fa {{#completed}}fa-check-circle{{/completed}}{{^completed}}{{#in_progress}}fa-clock-o{{/in_progress}}{{^in_progress}}fa-circle-o{{/in_progress}}{{/completed}}"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Content -->
+                    <div class="activity-content">
+                        <!-- Activity Description -->
+                        <p class="activity-description">{{intro}}</p>
+                        
+                        <!-- Progress Section -->
+                        <div class="activity-progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">Your Progress</span>
+                                <span class="progress-percentage">{{progress_percentage}}%</span>
                             </div>
-                            
-                            <!-- Activity Content -->
-                            <div class="activity-content">
-                                <!-- Activity Description -->
-                                <p class="activity-description">{{intro}}</p>
-                                
-                                <!-- Progress Section -->
-                                <div class="activity-progress-section">
-                                    <div class="progress-header">
-                                        <span class="progress-label">Your Progress</span>
-                                        <span class="progress-percentage">{{progress_percentage}}%</span>
-                                    </div>
-                                    <div class="progress-bar-container">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
-                                        </div>
-                                    </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{progress_percentage}}%"></div>
                                 </div>
-                                
-                                <!-- Activity Information -->
-                                <div class="activity-info-grid">
-                                    <div class="activity-info-item">
-                                        <i class="fa {{icon}}"></i>
-                                        <div class="activity-info-value">{{typename}}</div>
-                                        <div>Activity Type</div>
-                                    </div>
-                                    <div class="activity-info-item">
-                                        <i class="fa fa-clock-o"></i>
-                                        <div class="activity-info-value">{{estimated_time}}</div>
-                                        <div>Estimated Time</div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Activity Action Button -->
-                                <a href="{{activityurl}}" class="activity-action-button">
-                                    <i class="fa {{#completed}}fa-check{{/completed}}{{^completed}}fa-play{{/completed}}"></i>
-                                    {{#completed}}Review Activity{{/completed}}{{^completed}}Start Activity{{/completed}}
-                                </a>
                             </div>
                         </div>
-                        {{/student_activities}}
+                        
+                        <!-- Activity Information -->
+                        <div class="activity-info-grid">
+                            <div class="activity-info-item">
+                                <i class="fa {{icon}}"></i>
+                                <div class="activity-info-value">{{typename}}</div>
+                                <div>Activity Type</div>
+                            </div>
+                            <div class="activity-info-item">
+                                <i class="fa fa-clock-o"></i>
+                                <div class="activity-info-value">{{estimated_time}}</div>
+                                <div>Estimated Time</div>
+                            </div>
+                            {{#sectionname}}
+                            <div class="activity-info-item">
+                                <i class="fa fa-folder"></i>
+                                <div class="activity-info-value">{{sectionname}}</div>
+                                <div>Section</div>
+                            </div>
+                            {{/sectionname}}
+                            {{#due_date_formatted}}
+                            <div class="activity-info-item">
+                                <i class="fa fa-calendar"></i>
+                                <div class="activity-info-value {{#is_overdue}}overdue{{/is_overdue}}">{{due_date_formatted}}</div>
+                                <div>{{#is_overdue}}Overdue{{/is_overdue}}{{^is_overdue}}Due Date{{/is_overdue}}</div>
+                            </div>
+                            {{/due_date_formatted}}
+                        </div>
+                        
+                        <!-- Activity Action Button -->
+                        <a href="{{activityurl}}" class="activity-action-button" onclick="return performActivity('{{activityurl}}', '{{name}}')">
+                            <i class="fa {{#completed}}fa-check{{/completed}}{{^completed}}fa-play{{/completed}}"></i>
+                            {{#completed}}Review Activity{{/completed}}{{^completed}}Start Activity{{/completed}}
+                        </a>
                     </div>
+                </div>
+                {{/student_activities}}
+            </div>
+        </div>
                 </div>
             </div>
             {{/has_student_activities}}
@@ -999,6 +1109,43 @@ $(document).ready(function() {
             $(this).css('box-shadow', '0 5px 20px rgba(0, 0, 0, 0.1)');
         }
     );
+
+    // Activity Performance Function
+    window.performActivity = function(activityUrl, activityName) {
+        console.log('Performing activity:', activityName, 'URL:', activityUrl);
+        
+        // Show loading toast
+        showToast('Opening ' + activityName + '...', 'info');
+        
+        // Track activity click for analytics (optional)
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'activity_click', {
+                'activity_name': activityName,
+                'activity_url': activityUrl
+            });
+        }
+        
+        // Open activity in new tab for better user experience
+        window.open(activityUrl, '_blank');
+        
+        // Return false to prevent default link behavior
+        return false;
+    };
+
+    // Enhanced activity card click handling
+    $('.elementary-activity-card').on('click', function(e) {
+        // Don't trigger if clicking on the action button
+        if ($(e.target).closest('.activity-action-button').length > 0) {
+            return;
+        }
+        
+        const activityUrl = $(this).find('.activity-action-button').attr('href');
+        const activityName = $(this).find('.activity-title').text();
+        
+        if (activityUrl && activityName) {
+            performActivity(activityUrl, activityName);
+        }
+    });
 });
 </script>
 
